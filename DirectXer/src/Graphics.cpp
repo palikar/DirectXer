@@ -128,7 +128,7 @@ void Graphics::setRasterizationState()
 	ID3D11RasterizerState* rastState;
 	D3D11_RASTERIZER_DESC rastDesc{0};
 	rastDesc.CullMode = D3D11_CULL_NONE;
-	rastDesc.FillMode = D3D11_FILL_SOLID;
+	rastDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;
 

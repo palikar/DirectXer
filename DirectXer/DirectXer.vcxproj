@@ -168,6 +168,7 @@
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\BaseException.h" />
     <ClInclude Include="src\DxgiInfoManager.h" />
+    <ClInclude Include="src\Geometry.hpp" />
     <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\IncludeWin.h" />
     <ClInclude Include="src\Keyboard.h" />

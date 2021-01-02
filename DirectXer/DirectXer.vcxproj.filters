@@ -74,6 +74,9 @@
     <ClInclude Include="src\DxgiInfoManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Geometry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\VertexShader.hlsl" />
