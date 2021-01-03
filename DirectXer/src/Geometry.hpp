@@ -4,6 +4,8 @@
 #include <vector>
 #include <cmath>
 
+inline constexpr float PI = 3.14159265358979323846;
+
 struct CubeGeometry
 {
 	float width{1.0};
@@ -21,6 +23,17 @@ struct PlaneGeometry
 	size_t height{1};
 	float width_segments{1.0};
 	float height_segments{1.0};
+};
+
+struct SphereGeometry
+{
+	float radius{1.0};
+	float width_segments{8.0};
+	float height_segments{8.0};
+	float phi_start{0.0};
+	float phi_length{2.0f*PI};
+	float theta_start{0.0};
+	float theta_length{1.0f*PI};
 };
 
 struct GeometryInfo
@@ -129,7 +142,6 @@ int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices,
 	return 0;
 }
 
-
 GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 {
 	size_t vertices = (size_t)((std::floor(t_PlaneInfo.width_segments) + 1) * (std::floor(t_PlaneInfo.height_segments) + 1));
@@ -177,6 +189,115 @@ int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertic
             uint32_t d = static_cast<size_t>((ix + 1) + grid_x1 * iy);
 
             t_Indices.insert(t_Indices.end(), { a, b, d, b, c, d });
+        }
+    }
+
+	return 0;
+}
+
+GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
+{
+
+	const float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
+    const float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
+	const float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
+	
+	size_t vertices = (size_t)((width_segments + 1) * (height_segments + 1));
+	vertices *= 3;
+
+	
+	size_t indices = 0;
+	int ix, iy;
+    for (iy = 0; iy < height_segments; ++iy)
+    {
+
+        for (ix = 0; ix < width_segments; ++ix)
+        {
+
+			if (iy != 0 || t_SphereInfo.theta_start > 0)
+            {
+                indices+=3;
+            }
+
+            if (iy != height_segments - 1 || theta_end < PI)
+            {
+                indices+=3;
+            }
+        }
+    }
+
+	return {vertices, indices};
+}
+
+int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+{
+
+	float radius = std::max(t_SphereInfo.radius, 1.0f);
+
+    float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
+    float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
+
+    float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
+    int ix, iy;
+    size_t index = 0;
+    std::vector<std::vector<size_t>> grid;
+
+    for (iy = 0; iy <= height_segments; ++iy)
+    {
+        std::vector<size_t> verticesRow;
+        float v = iy / height_segments;
+		
+        float uOffset = 0;
+        if (iy == 0 && t_SphereInfo.theta_start == 0)
+        {
+            uOffset = 0.5f / width_segments;
+        }
+        else if (iy == height_segments && theta_end == PI)
+        {
+            uOffset = -0.5f / width_segments;
+        }
+
+        for (ix = 0; ix <= width_segments; ix++)
+        {
+            float u       = ix / width_segments;
+            const float x = -radius * std::cos(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
+                            * std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
+            const float y = radius * std::cos(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
+            const float z = radius * std::sin(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
+                            * std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
+
+            t_Vertices.insert(t_Vertices.end(), { x, y, z });
+
+            // auto norm = glm::normalize(glm::vec3(x, y, z));
+            // normals.insert(normals.end(), { norm.x, norm.y, norm.z });
+            // uv.insert(uv.end(), { u + uOffset, 1 - v });
+
+            verticesRow.push_back(index++);
+        }
+
+        grid.push_back(verticesRow);
+    }
+
+    for (iy = 0; iy < height_segments; ++iy)
+    {
+
+        for (ix = 0; ix < width_segments; ++ix)
+        {
+
+            uint32_t a = grid[iy][ix + 1];
+            uint32_t b = grid[iy][ix];
+            uint32_t c = grid[iy + 1][ix];
+            uint32_t d = grid[iy + 1][ix + 1];
+
+            if (iy != 0 || t_SphereInfo.theta_start > 0)
+            {
+                t_Indices.insert(t_Indices.end(), { d, b, a });
+            }
+
+            if (iy != height_segments - 1 || theta_end < PI)
+            {
+                t_Indices.insert(t_Indices.end(), { d, c, b });
+            }
         }
     }
 
