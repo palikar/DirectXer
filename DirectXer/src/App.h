@@ -3,6 +3,8 @@
 
 #include "IncludeWin.h"
 #include "Window.h"
+#include "Mouse.h"
+#include "Keyboard.h"
 
 class App
 {
@@ -17,4 +19,5 @@ public:
     Graphics m_Graphics;
 	int m_ReturnValue{0};
 	boolean m_Running{true};
+	
 };

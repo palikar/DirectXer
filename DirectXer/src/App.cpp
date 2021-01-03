@@ -11,8 +11,7 @@ struct Camera
 
 	Camera()
 	{
-		auto rot = dx::XMQuaternionRotationAxis(dx::XMVectorSet(0.0, 1.0, 0.0, 0.0), 0.0f);
-		
+		const auto rot = dx::XMQuaternionRotationAxis(dx::XMVectorSet(0.0, 1.0, 0.0, 0.0), 0.0f);
 		dx::XMStoreFloat4(&m_Rot, rot);
 	}
 
@@ -29,32 +28,33 @@ struct Camera
 	
 	void rotate(float t_Amount, dx::XMFLOAT3 t_Axis)
 	{
-		auto rot = dx::XMQuaternionRotationAxis(dx::XMLoadFloat3(&t_Axis), t_Amount);
+		const auto rot = dx::XMQuaternionRotationAxis(dx::XMLoadFloat3(&t_Axis), t_Amount);
 		dx::XMStoreFloat4(&m_Rot, dx::XMQuaternionMultiply(rot, dx::XMLoadFloat4(&m_Rot)));
 	} 
 
 	void lookAt(dx::XMFLOAT3 t_Point)
 	{
-		auto rot = dx::XMMatrixLookAtRH(dx::XMLoadFloat3(&m_Pos), dx::XMLoadFloat3(&t_Point), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
+		const auto rot = dx::XMMatrixLookAtLH(dx::XMLoadFloat3(&m_Pos), dx::XMLoadFloat3(&t_Point), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
 		dx::XMStoreFloat4(&m_Rot, dx::XMQuaternionRotationMatrix(rot));
-	}
-
-	dx::XMMATRIX lookAt_(dx::XMFLOAT3 t_Point)
-	{
-		return dx::XMMatrixLookAtRH(dx::XMLoadFloat3(&t_Point), dx::XMLoadFloat3(&m_Pos), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
 	}
 
 	dx::XMMATRIX view()
 	{
 		dx::XMVECTOR pos = dx::XMLoadFloat3(&m_Pos);
-		dx::XMVECTOR rot = dx::XMLoadFloat4(&m_Rot);
-		
+		dx::XMVECTOR rot = dx::XMLoadFloat4(&m_Rot);		
+		return (dx::XMMatrixTranslationFromVector(dx::XMVectorMultiply(pos, dx::XMVectorSet(-1.0, -1.0, -1.0, -1.0))) * dx::XMMatrixRotationQuaternion(rot));
+	}
+
+	dx::XMVECTOR at()
+	{
 		// dx::XMVECTOR axis;
 		// float angle;
-		// dx::XMQuaternionToAxisAngle(&axis, &angle, rot);
-		// return dx::XMMatrixLookAtRH(dx::XMVectorAdd(pos, dx::XMVectorScale(dx::XMVector3Normalize(rot), 0.1f)), pos, dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
-		
-		return (dx::XMMatrixTranslationFromVector(dx::XMVectorMultiply(pos, dx::XMVectorSet(-1.0, -1.0, -1.0, 1.0))) * dx::XMMatrixRotationQuaternion(rot));
+		// dx::XMQuaternionToAxisAngle(&axis, &angle, dx::XMLoadFloat4(&m_Rot));
+		return dx::XMVectorSet(
+			2*(m_Rot.x*m_Rot.z + m_Rot.w * m_Rot.y),
+			2*(m_Rot.y*m_Rot.z - m_Rot.w * m_Rot.x),
+			1 - 2*(m_Rot.x*m_Rot.x + m_Rot.y * m_Rot.y),
+		0.0);
 	}
 
 	
@@ -123,21 +123,37 @@ int App::Go()
 
 	Camera camera;
 
+	camera.m_Pos = {0.0f, 0.0f, -0.5f};
+
 	float t = 0.0;
 	while (m_Running)
 	{
 		processMessages();
 
+		if (m_Window.m_Keyboard.KeyIsPressed(0x57))
+		{
+			OutputDebugString("pressed!\n");
+			//auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&camera.m_Pos), dx::XMVectorSet(0.0, 0.0, 0.01f, 0.0));
+			auto at = camera.at();
+			auto x = dx::XMVectorGetX(at);
+			auto y = dx::XMVectorGetY(at);
+			auto z = dx::XMVectorGetZ(at);
+
+			auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&camera.m_Pos), dx::XMVectorScale(camera.at(), 0.01f));
+			dx::XMStoreFloat3(&camera.m_Pos, newPos);
+		}
+
+
 		m_Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 		m_Graphics.ClearZBuffer();
 
-		auto x = 5.5f * std::sinf(t);
-		auto y = 5.5f * std::cosf(t);
+		//auto x = 5.5f * std::sinf(t);
+		//auto y = 5.5f * std::cosf(t);
 
-		camera.m_Pos = {x, 5.5f, y};
-		camera.lookAt({0.0, 0.0, 0.0});
+		//camera.m_Pos = {x, 5.5f, y};
+		//camera.lookAt({0.0, 0.0, 0.0});
 
-		m_Graphics.m_VertexShaderCB.projection = dx::XMMatrixTranspose(dx::XMMatrixPerspectiveFovRH(65.0f, 3.0f/4.0f, 0.0001, 1000.0));
+		m_Graphics.m_VertexShaderCB.projection = dx::XMMatrixTranspose(dx::XMMatrixPerspectiveFovLH(65.0f, 3.0f/4.0f, 0.0001, 1000.0));
 		m_Graphics.m_VertexShaderCB.view = dx::XMMatrixTranspose(camera.view());			
 
 
