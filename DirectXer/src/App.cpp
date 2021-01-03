@@ -3,6 +3,64 @@
 #include "Geometry.hpp"
 #include <iostream>
 
+
+struct Camera
+{
+	dx::XMFLOAT3 m_Pos{0.0, 0.0, 0.0};
+	dx::XMFLOAT4 m_Rot{0.0, 0.0, 0.0, 1.0};
+
+	Camera()
+	{
+		auto rot = dx::XMQuaternionRotationAxis(dx::XMVectorSet(0.0, 1.0, 0.0, 0.0), 0.0f);
+		
+		dx::XMStoreFloat4(&m_Rot, rot);
+	}
+
+	void move(float t_Amount, dx::XMFLOAT3 t_Dir)
+	{
+		dx::XMStoreFloat3(&m_Pos, dx::XMVectorScale(dx::XMLoadFloat3(&t_Dir),t_Amount));
+	}
+
+	void rotate(dx::XMFLOAT3 t_Rot)
+	{
+		const auto newRot = dx::XMQuaternionRotationRollPitchYawFromVector(dx::XMLoadFloat3(&t_Rot));
+		dx::XMStoreFloat4(&m_Rot, newRot);
+	}
+	
+	void rotate(float t_Amount, dx::XMFLOAT3 t_Axis)
+	{
+		auto rot = dx::XMQuaternionRotationAxis(dx::XMLoadFloat3(&t_Axis), t_Amount);
+		dx::XMStoreFloat4(&m_Rot, dx::XMQuaternionMultiply(rot, dx::XMLoadFloat4(&m_Rot)));
+	} 
+
+	void lookAt(dx::XMFLOAT3 t_Point)
+	{
+		auto rot = dx::XMMatrixLookAtRH(dx::XMLoadFloat3(&t_Point), dx::XMLoadFloat3(&m_Pos), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
+		dx::XMStoreFloat4(&m_Rot, dx::XMQuaternionRotationMatrix(rot));
+	}
+
+	dx::XMMATRIX lookAt_(dx::XMFLOAT3 t_Point)
+	{
+		return dx::XMMatrixLookAtRH(dx::XMLoadFloat3(&t_Point), dx::XMLoadFloat3(&m_Pos), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
+	}
+
+	dx::XMMATRIX view()
+	{
+		dx::XMVECTOR pos = dx::XMLoadFloat3(&m_Pos);
+		dx::XMVECTOR rot = dx::XMLoadFloat4(&m_Rot);
+		
+		// dx::XMVECTOR axis;
+		// float angle;
+		// dx::XMQuaternionToAxisAngle(&axis, &angle, rot);
+		// return dx::XMMatrixLookAtRH(dx::XMVectorAdd(pos, dx::XMVectorScale(dx::XMVector3Normalize(rot), 0.1f)), pos, dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
+		
+		return dx::XMMatrixInverse(nullptr, dx::XMMatrixTranslationFromVector(dx::XMVectorMultiply(pos, dx::XMVectorSet(-1.0, -1.0, -1.0, 1.0))) * dx::XMMatrixRotationQuaternion(rot));
+	}
+
+	
+
+};
+
 App::App() :
 	m_Window(800, 600, "DirectXer")
 {
@@ -63,6 +121,8 @@ int App::Go()
 	m_Graphics.setViewport(0, 0, 800, 600);
 	m_Graphics.setRasterizationState();
 
+	Camera camera;
+
 	float t = 0.0;
 	while (m_Running)
 	{
@@ -71,19 +131,14 @@ int App::Go()
 		m_Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 		m_Graphics.ClearZBuffer();
 
-		auto x = 7.5f * std::sinf(t);
-		auto y = 7.5f * std::cosf(t);
+		auto x = 10.5f * std::sinf(t);
+		auto y = 10.5f * std::cosf(t);
 
-		m_Graphics.m_VertexShaderCB.projection = dx::XMMatrixTranspose(
-			dx::XMMatrixPerspectiveFovRH(65.0f, 3.0f/4.0f, 0.0001, 1000.0)
-		);
+		camera.m_Pos = {x, 10.0f, y};
+		camera.lookAt({0.0, 0.0, 0.0});
 
-		m_Graphics.m_VertexShaderCB.view = dx::XMMatrixTranspose(
-			dx::XMMatrixLookAtRH(
-				dx::XMVECTOR{x, 7.5f, y},
-				dx::XMVECTOR{0.0, 0.0, 0.0},
-				dx::XMVECTOR{0.0, 1.0, 0.0}
-		));
+		m_Graphics.m_VertexShaderCB.projection = dx::XMMatrixTranspose(dx::XMMatrixPerspectiveFovRH(65.0f, 3.0f/4.0f, 0.0001, 1000.0));
+		m_Graphics.m_VertexShaderCB.view = dx::XMMatrixTranspose(camera.view());			
 
 
 		m_Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };

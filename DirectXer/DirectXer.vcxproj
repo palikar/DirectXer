@@ -170,6 +170,7 @@
     <ClInclude Include="src\DxgiInfoManager.h" />
     <ClInclude Include="src\Geometry.hpp" />
     <ClInclude Include="src\Graphics.h" />
+    <ClInclude Include="src\GraphicsCommon.h" />
     <ClInclude Include="src\IncludeWin.h" />
     <ClInclude Include="src\Keyboard.h" />
     <ClInclude Include="src\Mouse.h" />
