@@ -35,7 +35,7 @@ struct Camera
 
 	void lookAt(dx::XMFLOAT3 t_Point)
 	{
-		auto rot = dx::XMMatrixLookAtRH(dx::XMLoadFloat3(&t_Point), dx::XMLoadFloat3(&m_Pos), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
+		auto rot = dx::XMMatrixLookAtRH(dx::XMLoadFloat3(&m_Pos), dx::XMLoadFloat3(&t_Point), dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
 		dx::XMStoreFloat4(&m_Rot, dx::XMQuaternionRotationMatrix(rot));
 	}
 
@@ -54,7 +54,7 @@ struct Camera
 		// dx::XMQuaternionToAxisAngle(&axis, &angle, rot);
 		// return dx::XMMatrixLookAtRH(dx::XMVectorAdd(pos, dx::XMVectorScale(dx::XMVector3Normalize(rot), 0.1f)), pos, dx::XMVectorSet(0.0, 1.0, 0.0, 0.0));
 		
-		return dx::XMMatrixInverse(nullptr, dx::XMMatrixTranslationFromVector(dx::XMVectorMultiply(pos, dx::XMVectorSet(-1.0, -1.0, -1.0, 1.0))) * dx::XMMatrixRotationQuaternion(rot));
+		return (dx::XMMatrixTranslationFromVector(dx::XMVectorMultiply(pos, dx::XMVectorSet(-1.0, -1.0, -1.0, 1.0))) * dx::XMMatrixRotationQuaternion(rot));
 	}
 
 	
@@ -131,10 +131,10 @@ int App::Go()
 		m_Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 		m_Graphics.ClearZBuffer();
 
-		auto x = 10.5f * std::sinf(t);
-		auto y = 10.5f * std::cosf(t);
+		auto x = 5.5f * std::sinf(t);
+		auto y = 5.5f * std::cosf(t);
 
-		camera.m_Pos = {x, 10.0f, y};
+		camera.m_Pos = {x, 5.5f, y};
 		camera.lookAt({0.0, 0.0, 0.0});
 
 		m_Graphics.m_VertexShaderCB.projection = dx::XMMatrixTranspose(dx::XMMatrixPerspectiveFovRH(65.0f, 3.0f/4.0f, 0.0001, 1000.0));
