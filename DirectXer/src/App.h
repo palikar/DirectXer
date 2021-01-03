@@ -13,9 +13,7 @@ public:
 	int Go();
 	void processMessages();
 
-	void DrawFrame();
-
-    Window m_Window;
+	Window m_Window;
     Graphics m_Graphics;
 	int m_ReturnValue{0};
 	boolean m_Running{true};

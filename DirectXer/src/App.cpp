@@ -27,16 +27,32 @@ void App::processMessages()
 
 }
 
+template<typename VertexType>
+VBObject vertexBufferFactory(Graphics& graphics, std::vector<float> t_VertexList)
+{
+	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), sizeof(VertexType)*t_VertexList.size());
+}
+
+template<typename IndexType = size_t>
+IBObject indexBufferFactory(Graphics& graphics, std::vector<IndexType> t_IndexList)
+{
+	return graphics.createIndexBuffer(t_IndexList.data(), sizeof(IndexType)*t_IndexList.size());
+}
+
+
 int App::Go()
 {
 
 
-	std::vector<float> cubeVert;
-	std::vector<size_t> cubeInd;
-	CubeGeometry({}, cubeVert, cubeInd);
+	std::vector<float> plainGeometrVert;
+	std::vector<size_t> plainGeometryInd;
+	auto cube = CubeGeometryInfo({});
+	auto plane = PlaneGeometryInfo({1, 1, 5.0, 5.0});
+	CubeGeometry({}, plainGeometrVert, plainGeometryInd);
+	PlaneGeometry({1, 1, 5.0, 5.0}, plainGeometrVert, plainGeometryInd);
 
-	auto vb = m_Graphics.createVertexBuffer(sizeof(SimpleVertex), cubeVert.data(), cubeVert.size() * sizeof(SimpleVertex));
-	auto ib = m_Graphics.createIndexBuffer(cubeInd.data(), sizeof(size_t)*cubeInd.size());
+	auto vb = vertexBufferFactory<SimpleVertex>(m_Graphics, plainGeometrVert);
+	auto ib = indexBufferFactory(m_Graphics, plainGeometryInd);
 
 	m_Graphics.setVertexBuffer(vb);
 	m_Graphics.setIndexBuffer(ib);
@@ -62,14 +78,19 @@ int App::Go()
 				dx::XMVECTOR{0.0, 0.0, 0.0},
 				dx::XMVECTOR{0.0, 1.0, 0.0}
 			);
-
 		auto modelMatrix = dx::XMMatrixScaling(1.0, 1.0, 1.0)*dx::XMMatrixTranslation(0.0, std::sinf(t), 0.0);
+
 
 		m_Graphics.updateCB(PSConstantBuffer{ 0.0, 0.0, 1.0, 1.0 });
 		m_Graphics.updateCB(VSConstantBuffer{dx::XMMatrixTranspose(modelMatrix*viewMatrix*projMatrix)});
 
-		m_Graphics.drawIndex(Graphics::TT_TRIANGLES, cubeInd.size());
+		m_Graphics.drawIndex(Graphics::TT_TRIANGLES, cube.indexCount);
 
+		modelMatrix = dx::XMMatrixScaling(1.0, 1.0, 1.0)*dx::XMMatrixTranslation(0.0, 0.0, 0.0);
+		m_Graphics.updateCB(PSConstantBuffer{ 1.0, 0.0, 0.0, 1.0 });
+		m_Graphics.updateCB(VSConstantBuffer{dx::XMMatrixTranspose(modelMatrix*viewMatrix*projMatrix)});
+
+		m_Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
 
 		m_Graphics.EndFrame();
 
@@ -79,10 +100,4 @@ int App::Go()
 	}
 
 	return m_ReturnValue;
-}
-
-void App::DrawFrame()
-{
-
-
 }

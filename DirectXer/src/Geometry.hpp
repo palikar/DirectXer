@@ -2,8 +2,9 @@
 
 
 #include <vector>
+#include <cmath>
 
-struct CubeGeometryInfo
+struct CubeGeometry
 {
 	float width{1.0};
 	float height{1.0};
@@ -14,11 +15,43 @@ struct CubeGeometryInfo
 
 };
 
-int CubeGeometry(const CubeGeometryInfo& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+struct PlaneGeometry
+{
+	size_t width{1};
+	size_t height{1};
+	float width_segments{1.0};
+	float height_segments{1.0};
+};
+
+struct GeometryInfo
+{
+	size_t vertexCount{0};
+	size_t indexCount{0};
+};
+
+GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
+{
+
+	size_t vertices = (size_t)((t_CubeInfo.depthSegments + 1) * (t_CubeInfo.heightSegments + 1));
+	vertices += (size_t)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.depthSegments  + 1));
+	vertices += (size_t)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.heightSegments + 1));
+	vertices *= 2;
+	vertices *= 3;
+
+	size_t indices = (size_t)(t_CubeInfo.depthSegments * t_CubeInfo.heightSegments);
+	indices += (size_t)(t_CubeInfo.widthSegments * t_CubeInfo.depthSegments);
+	indices += (size_t)(t_CubeInfo.widthSegments * t_CubeInfo.heightSegments);
+	indices *= 2;
+	indices *= 6;
+
+	return {vertices, indices};
+}
+
+int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
 {
 	int numberOfVertices = 0;
 	
-	auto buildPlane = [&](char u,
+	const auto buildPlane = [&](char u,
 	char v,
 	char w,
 	float udir,
@@ -74,33 +107,78 @@ int CubeGeometry(const CubeGeometryInfo& t_CubeInfo, std::vector<float>& t_Verti
         {
             for (ix = 0; ix < gridX; ix++)
             {
-                uint32_t a = numberOfVertices + ix + gridX1 * iy;
-                uint32_t b = numberOfVertices + ix + gridX1 * (iy + 1);
-                uint32_t c = numberOfVertices + (ix + 1) + gridX1 * (iy + 1);
-                uint32_t d = numberOfVertices + (ix + 1) + gridX1 * iy;
+                uint32_t a = (uint32_t)(numberOfVertices + ix + gridX1 * iy);
+                uint32_t b = (uint32_t)(numberOfVertices + ix + gridX1 * (iy + 1));
+                uint32_t c = (uint32_t)(numberOfVertices + (ix + 1) + gridX1 * (iy + 1));
+                uint32_t d = (uint32_t)(numberOfVertices + (ix + 1) + gridX1 * iy);
 
-				
-                // t_Indices.insert(t_Indices.end(), { a, b, d, d, c, b });
-                t_Indices.insert(t_Indices.end(), { d, b, a, d, c, b });
+				t_Indices.insert(t_Indices.end(), { d, b, a, d, c, b });
             }
         }
 
         numberOfVertices += vertexCounter;
     };
 
-	// buildPlane(2, 1, 0, -1, -1, depth, height, width, depthSegments, heightSegments);
-    // buildPlane(2, 1, 0, 1, -1, depth, height, -width, depthSegments, heightSegments);
-    // buildPlane(0, 2, 1, 1, 1, width, depth, height, widthSegments, depthSegments);
-    // buildPlane(0, 2, 1, 1, -1, width, depth, -height, widthSegments, depthSegments);
-    // buildPlane(0, 1, 2, 1, -1, width, height, depth, widthSegments, heightSegments);
-    // buildPlane(0, 1, 2, -1, -1, width, height, -depth, widthSegments, heightSegments);
-
-    buildPlane(2, 1, 0, -1, -1, t_CubeInfo.depth, t_CubeInfo.height, t_CubeInfo.width, t_CubeInfo.depthSegments, t_CubeInfo.heightSegments);
+	buildPlane(2, 1, 0, -1, -1, t_CubeInfo.depth, t_CubeInfo.height, t_CubeInfo.width, t_CubeInfo.depthSegments, t_CubeInfo.heightSegments);
     buildPlane(2, 1, 0, 1, -1, t_CubeInfo.depth, t_CubeInfo.height, -t_CubeInfo.width, t_CubeInfo.depthSegments, t_CubeInfo.heightSegments);
     buildPlane(0, 2, 1, 1, 1, t_CubeInfo.width, t_CubeInfo.depth, t_CubeInfo.height, t_CubeInfo.widthSegments, t_CubeInfo.depthSegments);
-    buildPlane(0, 2, 1, 1, -1, t_CubeInfo.width, t_CubeInfo.depth, -t_CubeInfo.height, t_CubeInfo.widthSegments, t_CubeInfo.depthSegments);
+	buildPlane(0, 2, 1, 1, -1, t_CubeInfo.width, t_CubeInfo.depth, -t_CubeInfo.height, t_CubeInfo.widthSegments, t_CubeInfo.depthSegments);
     buildPlane(0, 1, 2, 1, -1, t_CubeInfo.width, t_CubeInfo.height, t_CubeInfo.depth, t_CubeInfo.widthSegments, t_CubeInfo.heightSegments);
     buildPlane(0, 1, 2, -1, -1, t_CubeInfo.width, t_CubeInfo.height, -t_CubeInfo.depth, t_CubeInfo.widthSegments, t_CubeInfo.heightSegments);
 	
+	return 0;
+}
+
+
+GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
+{
+	size_t vertices = (size_t)((std::floor(t_PlaneInfo.width_segments) + 1) * (std::floor(t_PlaneInfo.height_segments) + 1));
+	vertices *= 3;
+
+	size_t indices = (size_t)((std::floor(t_PlaneInfo.width_segments)) * (std::floor(t_PlaneInfo.height_segments)));
+	indices *= 6;
+
+	return {vertices, indices};
+}
+
+int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+{
+	const auto half_width  = t_PlaneInfo.width / 2.0f;
+    const auto half_height = t_PlaneInfo.height / 2.0f;
+
+    const auto grid_x          = (std::floor(t_PlaneInfo.width_segments));
+    const auto grid_y          = (std::floor(t_PlaneInfo.height_segments));
+    const auto grid_x1         = grid_x + 1;
+    const auto grid_y1         = grid_y + 1;
+    const float segment_width  = t_PlaneInfo.width / grid_x;
+    const float segment_height = t_PlaneInfo.height / grid_y;
+
+    for (size_t iy = 0; iy < grid_y1; iy++)
+    {
+        auto y = iy * segment_height - half_height;
+        for (size_t ix = 0; ix < grid_x1; ix++)
+        {
+            auto x = ix * segment_width - half_width;
+
+            t_Vertices.insert(t_Vertices.end(), { x, -y, 0 });
+            // normals.insert(normals.end(), { 0, 0, -1 });
+            // uv.insert(uv.end(), { ix / grid_x, 1 - (iy / grid_y) });
+        }
+    }
+
+
+    for (size_t iy = 0; iy < grid_y; iy++)
+    {
+        for (size_t ix = 0; ix < grid_x; ix++)
+        {
+            uint32_t a = static_cast<size_t>(ix + grid_x1 * iy);
+            uint32_t b = static_cast<size_t>(ix + grid_x1 * (iy + 1));
+            uint32_t c = static_cast<size_t>((ix + 1) + grid_x1 * (iy + 1));
+            uint32_t d = static_cast<size_t>((ix + 1) + grid_x1 * iy);
+
+            t_Indices.insert(t_Indices.end(), { a, b, d, b, c, d });
+        }
+    }
+
 	return 0;
 }

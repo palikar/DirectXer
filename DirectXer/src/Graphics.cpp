@@ -322,14 +322,15 @@ void Graphics::setVertexBuffer(VBObject t_buffer, size_t offset)
 	m_Context->IASetVertexBuffers(0, 1, &t_buffer.id, &t_buffer.structSize, &offset);
 }
 
-void Graphics::drawIndex(TopolgyType topology, size_t count, size_t offset)
+void Graphics::drawIndex(TopolgyType topology, size_t count, size_t offset, size_t base)
 {
 	switch (topology) {
 	  case TT_TRIANGLES: 
 		  m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		  break;
 	}
-	m_Context->DrawIndexed(count, offset, 0);
+	
+	m_Context->DrawIndexed(count, offset, base);
 }
 
 

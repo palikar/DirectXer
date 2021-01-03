@@ -122,7 +122,7 @@ class Graphics
 	template<typename Type, bool isPSBuffer>
 	void createConstantBuffer(Type& buffer);
 
-	void drawIndex(TopolgyType topology, size_t count, size_t offset = 0);
+	void drawIndex(TopolgyType topology, size_t count, size_t offset = 0,  size_t base = 0);
 
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue);
