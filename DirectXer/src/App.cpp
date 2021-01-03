@@ -43,7 +43,6 @@ IBObject indexBufferFactory(Graphics& graphics, std::vector<IndexType> t_IndexLi
 int App::Go()
 {
 
-
 	std::vector<float> plainGeometrVert;
 	std::vector<size_t> plainGeometryInd;
 	auto cube = CubeGeometryInfo({});
@@ -75,32 +74,44 @@ int App::Go()
 		auto x = 7.5f * std::sinf(t);
 		auto y = 7.5f * std::cosf(t);
 
-		auto projMatrix = dx::XMMatrixPerspectiveFovRH(65.0f, 3.0f/4.0f, 0.0001, 1000.0);
-		auto viewMatrix = dx::XMMatrixLookAtRH(
-			dx::XMVECTOR{x, 7.5f, y},
+		m_Graphics.m_VertexShaderCB.projection = dx::XMMatrixTranspose(
+			dx::XMMatrixPerspectiveFovRH(65.0f, 3.0f/4.0f, 0.0001, 1000.0)
+		);
+
+		m_Graphics.m_VertexShaderCB.view = dx::XMMatrixTranspose(
+			dx::XMMatrixLookAtRH(
+				dx::XMVECTOR{x, 7.5f, y},
 				dx::XMVECTOR{0.0, 0.0, 0.0},
 				dx::XMVECTOR{0.0, 1.0, 0.0}
-			);
-		auto modelMatrix = dx::XMMatrixScaling(1.0, 1.0, 1.0)*dx::XMMatrixTranslation(0.0, std::sinf(t), 0.0);
+		));
 
 
-		m_Graphics.updateCB(PSConstantBuffer{ 0.0, 0.0, 1.0, 1.0 });
-		m_Graphics.updateCB(VSConstantBuffer{dx::XMMatrixTranspose(modelMatrix*viewMatrix*projMatrix)});
+		m_Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
+		m_Graphics.m_VertexShaderCB.model = dx::XMMatrixTranspose(
+			dx::XMMatrixScaling(1.0, 1.0, 1.0)*dx::XMMatrixTranslation(0.0, 0.0, 0.0)
+		);
 
+		m_Graphics.updateCBs();
 		m_Graphics.drawIndex(Graphics::TT_TRIANGLES, cube.indexCount);
 
-		modelMatrix = dx::XMMatrixScaling(1.0, 1.0, 1.0)*dx::XMMatrixTranslation(0.0, 0.0, 0.0);
 
-		m_Graphics.updateCB(PSConstantBuffer{ 1.0, 0.0, 0.0, 1.0 });
-		m_Graphics.updateCB(VSConstantBuffer{dx::XMMatrixTranspose(modelMatrix*viewMatrix*projMatrix)});
+		m_Graphics.m_PixelShaderCB.color = { 1.0, 0.0, 0.0, 1.0};
+		m_Graphics.m_VertexShaderCB.model = dx::XMMatrixTranspose(
+			dx::XMMatrixScaling(1.0, 1.0, 1.0)*dx::XMMatrixTranslation(0.0, 0.0, 0.0)
+		);
+		
 
+		m_Graphics.updateCBs();
 		m_Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
 
-		modelMatrix = dx::XMMatrixScaling(0.3, 0.3, 0.3)*dx::XMMatrixTranslation(2.0, 0.0, 0.0);
 
-		m_Graphics.updateCB(PSConstantBuffer{ 0.0, 1.0, 0.0, 1.0 });
-		m_Graphics.updateCB(VSConstantBuffer{dx::XMMatrixTranspose(modelMatrix*viewMatrix*projMatrix)});
+		m_Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 0.0, 1.0 };
+		m_Graphics.m_VertexShaderCB.model = dx::XMMatrixTranspose(
+			dx::XMMatrixScaling(0.3, 0.3, 0.3)*dx::XMMatrixTranslation(2.0, 0.0, 0.0)
+		);
+		
 
+		m_Graphics.updateCBs();
 		m_Graphics.drawIndex(Graphics::TT_TRIANGLES, sphere.indexCount, cube.indexCount + plane.indexCount, cube.vertexCount/3 + plane.vertexCount/3);
 
 		m_Graphics.EndFrame();

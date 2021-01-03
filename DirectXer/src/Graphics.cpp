@@ -231,25 +231,18 @@ void Graphics::initResources()
 	
 }
 
-void Graphics::updateCB(PSConstantBuffer buffer)
+
+void Graphics::updateCBs()
 {
-	m_PixelShaderCB = std::move(buffer);
-
 	D3D11_MAPPED_SUBRESOURCE msr;
-	m_Context->Map(PSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-	memcpy(msr.pData, &m_PixelShaderCB, sizeof(m_PixelShaderCB));
-	m_Context->Unmap(PSConstantBuffer::id, 0);
-	
-}
 
-void Graphics::updateCB(VSConstantBuffer buffer)
-{
-	m_VertexShaderCB = std::move(buffer);
-
-	D3D11_MAPPED_SUBRESOURCE msr;
 	m_Context->Map(VSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
 	memcpy(msr.pData, &m_VertexShaderCB, sizeof(m_VertexShaderCB));
 	m_Context->Unmap(VSConstantBuffer::id, 0);
+
+	m_Context->Map(PSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	memcpy(msr.pData, &m_PixelShaderCB, sizeof(m_PixelShaderCB));
+	m_Context->Unmap(PSConstantBuffer::id, 0);	
 	
 }
 

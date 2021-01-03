@@ -114,8 +114,7 @@ class Graphics
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
 
-	void updateCB(VSConstantBuffer buffer);
-	void updateCB(PSConstantBuffer buffer);
+	void updateCBs();
 
 	VBObject createVertexBuffer(size_t structSize, void* data, size_t dataSize);
 	IBObject createIndexBuffer(void* data, size_t dataSize);

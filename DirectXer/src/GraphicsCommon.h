@@ -8,14 +8,16 @@ struct PSConstantBuffer
 {
     inline static ID3D11Buffer* id{nullptr};
     
-    float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    dx::XMVECTOR color = {1.0f, 1.0f, 1.0f, 1.0f};
 };
 
 struct VSConstantBuffer
 {
 	inline static ID3D11Buffer* id{nullptr};
     
-	dx::XMMATRIX transform{dx::XMMatrixIdentity()};
+	dx::XMMATRIX model{dx::XMMatrixIdentity()};
+	dx::XMMATRIX view{dx::XMMatrixIdentity()};
+	dx::XMMATRIX projection{dx::XMMatrixIdentity()};
 };
 
 struct SimpleVertex
