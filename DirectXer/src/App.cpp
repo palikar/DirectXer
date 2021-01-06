@@ -1,3 +1,4 @@
+
 #include "App.h"
 
 #include "Geometry.hpp"
@@ -47,9 +48,6 @@ struct Camera
 
 	dx::XMVECTOR at()
 	{
-		// dx::XMVECTOR axis;
-		// float angle;
-		// dx::XMQuaternionToAxisAngle(&axis, &angle, dx::XMLoadFloat4(&m_Rot));
 		return dx::XMVectorSet(
 			2*(m_Rot.x*m_Rot.z + m_Rot.w * m_Rot.y),
 			2*(m_Rot.y*m_Rot.z - m_Rot.w * m_Rot.x),
@@ -57,9 +55,113 @@ struct Camera
 		0.0);
 	}
 
+	dx::XMVECTOR left()
+	{
+		return dx::XMVectorSet(
+			1 - 2*(m_Rot.x * m_Rot.x + m_Rot.z * m_Rot.z),
+			2*(m_Rot.x * m_Rot.y + m_Rot.w * m_Rot.z),
+			2*(m_Rot.x * m_Rot.z - m_Rot.w * m_Rot.y),
+		0.0);
+	}
+
 	
 
 };
+
+static void cameraController(Window& t_Win, Camera& t_Camera)
+{
+	
+	if (t_Win.m_Keyboard.KeyIsPressed(0x57))
+	{
+		auto at = t_Camera.at();
+		auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&t_Camera.m_Pos), dx::XMVectorScale(t_Camera.at(), 0.01f));
+		dx::XMStoreFloat3(&t_Camera.m_Pos, newPos);
+	}
+
+	if (t_Win.m_Keyboard.KeyIsPressed(0x53))
+	{
+		auto at = t_Camera.at();
+		auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&t_Camera.m_Pos), dx::XMVectorScale(t_Camera.at(), -0.01f));
+		dx::XMStoreFloat3(&t_Camera.m_Pos, newPos);
+	}
+
+	if (t_Win.m_Keyboard.KeyIsPressed(0x41))
+	{
+		auto at = t_Camera.at();
+		auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&t_Camera.m_Pos), dx::XMVectorScale(t_Camera.left(), -0.01f));
+		dx::XMStoreFloat3(&t_Camera.m_Pos, newPos);
+	}
+
+		
+	if (t_Win.m_Keyboard.KeyIsPressed(0x44))
+	{
+		auto at = t_Camera.at();
+		auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&t_Camera.m_Pos), dx::XMVectorScale(t_Camera.left(), 0.01f));
+		dx::XMStoreFloat3(&t_Camera.m_Pos, newPos);
+	}
+
+	static bool initialClick = false;
+	static std::pair<int,int> lastPos = {};
+	static dx::XMVECTOR look{0,0};
+		
+	if (t_Win.m_Mouse.LeftIsPressed())
+	{
+		if (!initialClick)
+		{
+			initialClick = true;
+			lastPos = t_Win.m_Mouse.GetPos();
+
+			return;
+		}
+		else
+		{
+			auto [xPos, yPos] = t_Win.m_Mouse.GetPos();
+		
+			auto diff_x = (lastPos.first - xPos)*0.01f;
+			auto diff_y = (lastPos.second - yPos)*0.01f;
+			look = dx::XMVectorAdd(look, dx::XMVECTOR{ (float)diff_x, (float)diff_y });
+
+			float x = dx::XMVectorGetX(look);
+			float y = dx::XMVectorGetY(look);
+
+			if (y < -1.57)
+			{
+				y = -1.57;
+			}
+
+			if (y > 1.57)
+			{
+				y = 1.57;
+			}
+			
+			if (x > 2 * 3.14)
+			{
+				x -= 2 * 3.14f;
+			}
+
+			if (x < -2 * 3.14)
+			{
+				x += 2 * 3.14f;
+			}
+
+			const float camX = 2.0f * sin(x);
+			const float camY = 1;
+			const float camZ = 2.0f * cos(x);
+
+			dx::XMFLOAT3 point;
+			dx::XMStoreFloat3(&point, dx::XMVectorAdd(dx::XMVectorSet(camX, camY, camZ, 0), dx::XMLoadFloat3(&t_Camera.m_Pos)));
+			t_Camera.lookAt(point);
+		}
+	}
+	else
+	{
+		initialClick = false;
+	}
+	lastPos = t_Win.m_Mouse.GetPos();
+
+
+
+}
 
 App::App() :
 	m_Window(800, 600, "DirectXer")
@@ -130,19 +232,7 @@ int App::Go()
 	{
 		processMessages();
 
-		if (m_Window.m_Keyboard.KeyIsPressed(0x57))
-		{
-			OutputDebugString("pressed!\n");
-			//auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&camera.m_Pos), dx::XMVectorSet(0.0, 0.0, 0.01f, 0.0));
-			auto at = camera.at();
-			auto x = dx::XMVectorGetX(at);
-			auto y = dx::XMVectorGetY(at);
-			auto z = dx::XMVectorGetZ(at);
-
-			auto newPos = dx::XMVectorAdd(dx::XMLoadFloat3(&camera.m_Pos), dx::XMVectorScale(camera.at(), 0.01f));
-			dx::XMStoreFloat3(&camera.m_Pos, newPos);
-		}
-
+		cameraController(m_Window, camera);
 
 		m_Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 		m_Graphics.ClearZBuffer();
