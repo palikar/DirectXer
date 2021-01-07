@@ -42,7 +42,7 @@ struct GeometryInfo
 	size_t indexCount{0};
 };
 
-GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
+inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 {
 
 	size_t vertices = (size_t)((t_CubeInfo.depthSegments + 1) * (t_CubeInfo.heightSegments + 1));
@@ -60,7 +60,7 @@ GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	return {vertices, indices};
 }
 
-int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+inline int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
 {
 	int numberOfVertices = 0;
 	
@@ -142,7 +142,7 @@ int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices,
 	return 0;
 }
 
-GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
+inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 {
 	size_t vertices = (size_t)((std::floor(t_PlaneInfo.width_segments) + 1) * (std::floor(t_PlaneInfo.height_segments) + 1));
 	vertices *= 3;
@@ -153,7 +153,7 @@ GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 	return {vertices, indices};
 }
 
-int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+inline int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
 {
 	const auto half_width  = t_PlaneInfo.width / 2.0f;
     const auto half_height = t_PlaneInfo.height / 2.0f;
@@ -195,7 +195,7 @@ int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertic
 	return 0;
 }
 
-GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
+inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 {
 
 	const float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
@@ -229,7 +229,7 @@ GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	return {vertices, indices};
 }
 
-int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+inline int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
 {
 
 	float radius = std::max(t_SphereInfo.radius, 1.0f);

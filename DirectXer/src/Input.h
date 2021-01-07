@@ -166,8 +166,8 @@ struct Input
 
 
 	// @Imporve use lots of 8 bit things and then bitshift
-	bool KeyboardPressedKeys[MAX_KEYS];
-	bool KeyboardReleasedKeys[MAX_KEYS];
+	bool KeyboardPressedKeys[MAX_KEYS]{0};
+	bool KeyboardReleasedKeys[MAX_KEYS]{0};
  
 	// @Imporve put in a sinlge 8 bit thing
 	bool KeyboardCtrl{ false };
@@ -178,8 +178,8 @@ struct Input
 	glm::vec2 LastMousePosition{0.0};
 
 	// @Imporve use lots of 8 bit things and then bitshift
-	bool MousePressedKeys[10];
-	bool MouseReleasedKeys[10];
+	bool MousePressedKeys[10]{0};
+	bool MouseReleasedKeys[10]{0};
 
 	glm::vec2 MouseScollOffset{0.0};
 	glm::vec2 MouseLastScollOffset{0.0};
@@ -253,6 +253,8 @@ struct Input
 
 	void UpdateMouseScroll(float m_Delta)
 	{
+		MouseScollOffset = {m_Delta, 0};
+		MouseLastScollOffset = MouseScollOffset;
 	}
 
 	bool IsKeyPressed(KeyCode t_Key)

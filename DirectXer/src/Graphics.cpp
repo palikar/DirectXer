@@ -26,7 +26,7 @@ void Graphics::initSwapChain(HWND hWnd)
 
 
 	HRESULT hr;
-    GFX_THROW_INFO(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
+    GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
 	D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &sd, &m_Swap, &m_Device, nullptr, &m_Context));
 	
 }
@@ -37,8 +37,8 @@ void Graphics::initBackBuffer()
 	ID3D11Resource* pBackBuffer{ nullptr };
 
 	HRESULT hr;
-    GFX_THROW_INFO(m_Swap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)(&pBackBuffer)));
-	GFX_THROW_INFO(m_Device->CreateRenderTargetView(pBackBuffer, nullptr, &m_Target));
+    GFX_CALL(m_Swap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)(&pBackBuffer)));
+	GFX_CALL(m_Device->CreateRenderTargetView(pBackBuffer, nullptr, &m_Target));
 	pBackBuffer->Release();
 }
 
@@ -52,7 +52,7 @@ void Graphics::initZBuffer()
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
     
     ID3D11DepthStencilState *pDSState;
-	GFX_THROW_INFO(m_Device->CreateDepthStencilState(&dsDesc, &pDSState));
+	GFX_CALL(m_Device->CreateDepthStencilState(&dsDesc, &pDSState));
 	m_Context->OMSetDepthStencilState(pDSState, 1);
 	
 
@@ -67,13 +67,13 @@ void Graphics::initZBuffer()
 	descDepth.SampleDesc.Quality = 0u;
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	GFX_THROW_INFO( m_Device->CreateTexture2D( &descDepth,nullptr,&pDepthStencil ) );
+	GFX_CALL( m_Device->CreateTexture2D( &descDepth,nullptr,&pDepthStencil ) );
 
     D3D11_DEPTH_STENCIL_VIEW_DESC descDSV{0};
 	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0u;
-	GFX_THROW_INFO(m_Device->CreateDepthStencilView(pDepthStencil, &descDSV, &m_DepthStencilView));
+	GFX_CALL(m_Device->CreateDepthStencilView(pDepthStencil, &descDSV, &m_DepthStencilView));
  
     m_Context->OMSetRenderTargets(1, &m_Target, m_DepthStencilView);
 	assert(m_DepthStencilView);
@@ -94,18 +94,15 @@ Graphics::~Graphics()
 void Graphics::EndFrame()
 {
     HRESULT hr;
-#ifndef NDEBUG
-	infoManager.Set();
-#endif
 	if( FAILED( hr = m_Swap->Present( 1u,0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
-			throw GFX_DEVICE_REMOVED_EXCEPT( m_Device->GetDeviceRemovedReason() );
+			assert(false);
 		}
 		else
 		{
-			throw GFX_EXCEPT( hr );
+			assert(false);
 		}
 	}
 }
@@ -133,7 +130,7 @@ void Graphics::setRasterizationState()
 	rastDesc.ScissorEnable  = false;
 
 	HRESULT hr;
-	GFX_THROW_INFO(m_Device->CreateRasterizerState(&rastDesc, &rastState));
+	GFX_CALL(m_Device->CreateRasterizerState(&rastDesc, &rastState));
 	m_Context->RSSetState(rastState);
 
 }
@@ -153,7 +150,7 @@ VBObject Graphics::createVertexBuffer(size_t structSize, void* data, size_t data
 	bufferData.pSysMem = data;
 
 	HRESULT hr;
-	GFX_THROW_INFO(m_Device->CreateBuffer(&vertexBufferDesc, &bufferData, &pVertexBuffer));
+	GFX_CALL(m_Device->CreateBuffer(&vertexBufferDesc, &bufferData, &pVertexBuffer));
 
 	return {structSize, pVertexBuffer};
 }
@@ -173,7 +170,7 @@ IBObject Graphics::createIndexBuffer(void* data, size_t dataSize)
 	indexBufferData.pSysMem = data;
 
 	HRESULT hr;
-	GFX_THROW_INFO(m_Device->CreateBuffer(&indexBufferDesc, &indexBufferData, &pIndexBuffer));
+	GFX_CALL(m_Device->CreateBuffer(&indexBufferDesc, &indexBufferData, &pIndexBuffer));
 
 	return {pIndexBuffer};
 }
@@ -186,18 +183,18 @@ void Graphics::initResources()
 	D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
 
 	HRESULT hr;
-	GFX_THROW_INFO(m_Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
+	GFX_CALL(m_Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
 
 	ID3D11VertexShader* pVertexShader{0};
 	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
-	GFX_THROW_INFO(m_Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
+	GFX_CALL(m_Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
 
 	ID3D11InputLayout* pInputLayout;
     const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
         {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 	
-	GFX_THROW_INFO(m_Device->CreateInputLayout(layoutDesc, std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));
+	GFX_CALL(m_Device->CreateInputLayout(layoutDesc, std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));
 	
 	m_Shaders[0] = ShaderObject{pInputLayout, pVertexShader, pPixelShader};
 
@@ -212,7 +209,7 @@ void Graphics::initResources()
 
     D3D11_SUBRESOURCE_DATA vertexShaderCBData{0};
 	vertexShaderCBData.pSysMem = &m_VertexShaderCB;
-    GFX_THROW_INFO(m_Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VSConstantBuffer::id));
+    GFX_CALL(m_Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VSConstantBuffer::id));
 	m_Context->VSSetConstantBuffers(0, 1, &VSConstantBuffer::id);
 	
 
@@ -226,7 +223,7 @@ void Graphics::initResources()
 
     D3D11_SUBRESOURCE_DATA pixelShaderCBData{0};
     pixelShaderCBData.pSysMem = &m_PixelShaderCB;
-    GFX_THROW_INFO(m_Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PSConstantBuffer::id));
+    GFX_CALL(m_Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PSConstantBuffer::id));
 	m_Context->PSSetConstantBuffers(0, 1, &PSConstantBuffer::id);	
 	
 }
@@ -263,7 +260,7 @@ void Graphics::createConstantBuffer(Type& buffer)
     constantBuffer.pSysMem = &buffer;
 
 	HRESULT hr;
-	GFX_THROW_INFO(m_Device->CreateBuffer(&constantBufferDesc, &constantBufferData, &Type::id));
+	GFX_CALL(m_Device->CreateBuffer(&constantBufferDesc, &constantBufferData, &Type::id));
 	
 	if constexpr (isPSBuffer) {
 		m_Context->PSSetConstantBuffers(0, 1, &Type::id);

@@ -1,23 +1,30 @@
 #pragma once
 
-
+#include "Geometry.hpp"
 #include "IncludeWin.h"
 #include "Window.h"
-#include "Mouse.h"
-#include "Keyboard.h"
 
 class App
 {
 public:
 
-	App();
+	void Init(HWND t_Window);
+	void Spin();
 
-	int Go();
-	void processMessages();
+  private:
+	Graphics m_Graphics;
 
-	Window m_Window;
-    Graphics m_Graphics;
-	int m_ReturnValue{0};
-	boolean m_Running{true};
+	std::vector<float> plainGeometrVert;
+	std::vector<size_t> plainGeometryInd;
+
+	GeometryInfo cube;
+	GeometryInfo plane;
+	GeometryInfo sphere;
+
+  public:
+	int ReturnValue{0};
+	boolean Running{true};
+
+	
 	
 };

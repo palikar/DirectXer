@@ -3,8 +3,6 @@
 
 #include "IncludeWin.h"
 #include "Graphics.h"
-#include "Keyboard.h"
-#include "Mouse.h"
 #include "BaseException.h"
 
 #include <optional>
@@ -24,7 +22,6 @@ public:
 		static HINSTANCE GetInstance();
 
 		static constexpr const char* wndClassName = "DirectXer Window";
-		static WindowClass wndClass;
 		HINSTANCE hInst;
 		
 
@@ -59,9 +56,6 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	static std::optional<int> ProcessMessages();
 	void SetTitle(const std::string& title);
@@ -70,8 +64,6 @@ public:
 	int height;
 	HWND hWnd;
 
-    Keyboard m_Keyboard;
-    Mouse m_Mouse;
 };
 
 

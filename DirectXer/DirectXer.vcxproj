@@ -95,6 +95,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExceptionHandling>Sync</ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,8 +159,6 @@
     <ClCompile Include="src\DxgiInfoManager.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\GraphicsException.cpp" />
-    <ClCompile Include="src\Keyboard.cpp" />
-    <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WindowsMessageMap.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
@@ -172,8 +171,7 @@
     <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\GraphicsCommon.h" />
     <ClInclude Include="src\IncludeWin.h" />
-    <ClInclude Include="src\Keyboard.h" />
-    <ClInclude Include="src\Mouse.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\WindowsMessageMap.h" />
   </ItemGroup>
