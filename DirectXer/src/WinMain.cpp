@@ -179,6 +179,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
 	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
+	DXERROR("This is pretty cool, not gonna lie!: {}", 213);
+	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
+	DXERROR("This is pretty cool, not gonna lie!: {}", 213);
+	DXPRINT("This is pretty cool, not gonna lie!: {}", 213);
 	
 	MSG msg;
 	while (true)
