@@ -162,7 +162,6 @@ static void cameraController(Window& t_Win, Camera& t_Camera)
 
 }
 
-
 void App::Init(HWND t_Window)
 {
 	
@@ -240,4 +239,9 @@ void App::Spin()
 	m_Graphics.EndFrame();
 	
 	
+}
+
+void App::Destroy()
+{
+	m_Graphics.Destroy();
 }

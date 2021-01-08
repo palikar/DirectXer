@@ -80,15 +80,14 @@ void Graphics::initZBuffer()
 
 }
 
-Graphics::~Graphics()
+void Graphics::Destroy()
 {
 	
-    m_Target->Release();
+	m_Target->Release();
     m_Context->Release();
     m_Swap->Release();
     m_Device->Release();
     m_DepthStencilView->Release();
-
 }
 
 void Graphics::EndFrame()
@@ -135,7 +134,7 @@ void Graphics::setRasterizationState()
 
 }
 
-VBObject Graphics::createVertexBuffer(size_t structSize, void* data, size_t dataSize)
+VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize)
 {
 	ID3D11Buffer* pVertexBuffer;
 	D3D11_BUFFER_DESC vertexBufferDesc{ 0 };
@@ -155,7 +154,7 @@ VBObject Graphics::createVertexBuffer(size_t structSize, void* data, size_t data
 	return {structSize, pVertexBuffer};
 }
 
-IBObject Graphics::createIndexBuffer(void* data, size_t dataSize)
+IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize)
 {
 	ID3D11Buffer* pIndexBuffer;
 	D3D11_BUFFER_DESC indexBufferDesc{ 0 };
@@ -164,7 +163,7 @@ IBObject Graphics::createIndexBuffer(void* data, size_t dataSize)
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.ByteWidth = dataSize;
-	indexBufferDesc.StructureByteStride = sizeof(size_t);
+	indexBufferDesc.StructureByteStride = sizeof(uint32);
 
 	D3D11_SUBRESOURCE_DATA indexBufferData{0};
 	indexBufferData.pSysMem = data;
@@ -194,7 +193,7 @@ void Graphics::initResources()
         {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 	
-	GFX_CALL(m_Device->CreateInputLayout(layoutDesc, std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));
+	GFX_CALL(m_Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));
 	
 	m_Shaders[0] = ShaderObject{pInputLayout, pVertexShader, pPixelShader};
 
@@ -307,12 +306,12 @@ void Graphics::setIndexBuffer(IBObject t_buffer)
 	m_Context->IASetIndexBuffer(t_buffer.id, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void Graphics::setVertexBuffer(VBObject t_buffer, size_t offset)
+void Graphics::setVertexBuffer(VBObject t_buffer, uint32 offset)
 {
 	m_Context->IASetVertexBuffers(0, 1, &t_buffer.id, &t_buffer.structSize, &offset);
 }
 
-void Graphics::drawIndex(TopolgyType topology, size_t count, size_t offset, size_t base)
+void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
 {
 	switch (topology) {
 	  case TT_TRIANGLES: 

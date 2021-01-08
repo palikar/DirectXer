@@ -1,7 +1,7 @@
 #pragma once
 
-
 #include "IncludeWin.h"
+#include "Types.h"
 #include <unordered_map>
 
 class WindowsMessageMap

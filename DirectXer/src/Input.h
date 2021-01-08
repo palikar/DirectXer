@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "Glm.h"
+#include "Types.h"
 
 enum class KeyCode : uint16_t
 {
@@ -190,12 +191,12 @@ struct Input
 
 	void Update()
 	{
-		for (size_t i = 0; i < MAX_KEYS; ++i)
+		for (uint32 i = 0; i < MAX_KEYS; ++i)
 		{
 			KeyboardReleasedKeys[i] = false;
 		}
 
-		for (size_t i = 0; i < 10; ++i)
+		for (uint32 i = 0; i < 10; ++i)
 		{
 			MouseReleasedKeys[i] = false;
 		}
@@ -221,14 +222,14 @@ struct Input
 		MousePosition = t_Pos;
 	}
 
-	void UpdateMouseButtonPressed(size_t t_Bnt)
+	void UpdateMouseButtonPressed(uint32 t_Bnt)
 	{
 		assert(t_Bnt < 10);
 		MousePressedKeys[t_Bnt] = true;
 		MouseReleasedKeys[t_Bnt] = false;
 	}
 	
-	void UpdateMouseButtonReleased(size_t t_Bnt)
+	void UpdateMouseButtonReleased(uint32 t_Bnt)
 	{
 		assert(t_Bnt < 10);
 		MousePressedKeys[t_Bnt] = false;

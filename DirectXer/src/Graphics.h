@@ -19,6 +19,7 @@
 #include "../../DXError/src/dxerr.h"
 
 #include "GraphicsCommon.h"
+#include "Types.h"
 
 
 #ifndef NDEBUG
@@ -31,7 +32,7 @@ namespace dx = DirectX;
 
 struct VBObject
 {
-	size_t structSize;
+	uint32 structSize;
 	ID3D11Buffer* id{nullptr};
 };
 
@@ -64,8 +65,6 @@ class Graphics
 	};
 
 
-	~Graphics();
-
 	void initSwapChain(HWND hWnd);
 	void initBackBuffer();
 	void initZBuffer();
@@ -73,22 +72,24 @@ class Graphics
 
 	void setRasterizationState();
 	void setShaders(ShaderType t_Shader);
-	void setVertexBuffer(VBObject t_buffer, size_t offset = 0);
+	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
 
 	void updateCBs();
 
-	VBObject createVertexBuffer(size_t structSize, void* data, size_t dataSize);
-	IBObject createIndexBuffer(void* data, size_t dataSize);
+	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
+	IBObject createIndexBuffer(void* data, uint32 dataSize);
 	template<typename Type, bool isPSBuffer>
 	void createConstantBuffer(Type& buffer);
 
-	void drawIndex(TopolgyType topology, size_t count, size_t offset = 0,  size_t base = 0);
+	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
 
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue);
 	void ClearZBuffer();
+
+	void Destroy();
 
 // #ifndef NDEBUG
 // 	DxgiInfoManager infoManager;
@@ -111,11 +112,11 @@ class Graphics
 template<typename VertexType>
 VBObject vertexBufferFactory(Graphics& graphics, std::vector<float> t_VertexList)
 {
-	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), sizeof(VertexType)*t_VertexList.size());
+	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), (uint32)(sizeof(VertexType) * t_VertexList.size()));
 }
 
-template<typename IndexType = size_t>
+template<typename IndexType = uint32>
 IBObject indexBufferFactory(Graphics& graphics, std::vector<IndexType> t_IndexList)
 {
-	return graphics.createIndexBuffer(t_IndexList.data(), sizeof(IndexType)*t_IndexList.size());
+	return graphics.createIndexBuffer(t_IndexList.data(), (uint32)(sizeof(IndexType) * t_IndexList.size()));
 }

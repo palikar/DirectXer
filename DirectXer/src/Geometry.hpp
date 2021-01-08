@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Types.h"
 
 #include <vector>
 #include <cmath>
@@ -19,8 +20,8 @@ struct CubeGeometry
 
 struct PlaneGeometry
 {
-	size_t width{1};
-	size_t height{1};
+	uint32 width{1};
+	uint32 height{1};
 	float width_segments{1.0};
 	float height_segments{1.0};
 };
@@ -38,29 +39,29 @@ struct SphereGeometry
 
 struct GeometryInfo
 {
-	size_t vertexCount{0};
-	size_t indexCount{0};
+	uint32 vertexCount{0};
+	uint32 indexCount{0};
 };
 
 inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 {
 
-	size_t vertices = (size_t)((t_CubeInfo.depthSegments + 1) * (t_CubeInfo.heightSegments + 1));
-	vertices += (size_t)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.depthSegments  + 1));
-	vertices += (size_t)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.heightSegments + 1));
+	uint32 vertices = (uint32)((t_CubeInfo.depthSegments + 1) * (t_CubeInfo.heightSegments + 1));
+	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.depthSegments  + 1));
+	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.heightSegments + 1));
 	vertices *= 2;
 	vertices *= 3;
 
-	size_t indices = (size_t)(t_CubeInfo.depthSegments * t_CubeInfo.heightSegments);
-	indices += (size_t)(t_CubeInfo.widthSegments * t_CubeInfo.depthSegments);
-	indices += (size_t)(t_CubeInfo.widthSegments * t_CubeInfo.heightSegments);
+	uint32 indices = (uint32)(t_CubeInfo.depthSegments * t_CubeInfo.heightSegments);
+	indices += (uint32)(t_CubeInfo.widthSegments * t_CubeInfo.depthSegments);
+	indices += (uint32)(t_CubeInfo.widthSegments * t_CubeInfo.heightSegments);
 	indices *= 2;
 	indices *= 6;
 
 	return {vertices, indices};
 }
 
-inline int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+inline int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 	int numberOfVertices = 0;
 	
@@ -144,16 +145,16 @@ inline int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Ve
 
 inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 {
-	size_t vertices = (size_t)((std::floor(t_PlaneInfo.width_segments) + 1) * (std::floor(t_PlaneInfo.height_segments) + 1));
+	uint32 vertices = (uint32)((std::floor(t_PlaneInfo.width_segments) + 1) * (std::floor(t_PlaneInfo.height_segments) + 1));
 	vertices *= 3;
 
-	size_t indices = (size_t)((std::floor(t_PlaneInfo.width_segments)) * (std::floor(t_PlaneInfo.height_segments)));
+	uint32 indices = (uint32)((std::floor(t_PlaneInfo.width_segments)) * (std::floor(t_PlaneInfo.height_segments)));
 	indices *= 6;
 
 	return {vertices, indices};
 }
 
-inline int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+inline int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 	const auto half_width  = t_PlaneInfo.width / 2.0f;
     const auto half_height = t_PlaneInfo.height / 2.0f;
@@ -165,10 +166,10 @@ inline int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t
     const float segment_width  = t_PlaneInfo.width / grid_x;
     const float segment_height = t_PlaneInfo.height / grid_y;
 
-    for (size_t iy = 0; iy < grid_y1; iy++)
+    for (uint32 iy = 0; iy < grid_y1; iy++)
     {
         auto y = iy * segment_height - half_height;
-        for (size_t ix = 0; ix < grid_x1; ix++)
+        for (uint32 ix = 0; ix < grid_x1; ix++)
         {
             auto x = ix * segment_width - half_width;
 
@@ -179,14 +180,14 @@ inline int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t
     }
 
 
-    for (size_t iy = 0; iy < grid_y; iy++)
+    for (uint32 iy = 0; iy < grid_y; iy++)
     {
-        for (size_t ix = 0; ix < grid_x; ix++)
+        for (uint32 ix = 0; ix < grid_x; ix++)
         {
-            uint32_t a = static_cast<size_t>(ix + grid_x1 * iy);
-            uint32_t b = static_cast<size_t>(ix + grid_x1 * (iy + 1));
-            uint32_t c = static_cast<size_t>((ix + 1) + grid_x1 * (iy + 1));
-            uint32_t d = static_cast<size_t>((ix + 1) + grid_x1 * iy);
+            uint32_t a = static_cast<uint32>(ix + grid_x1 * iy);
+            uint32_t b = static_cast<uint32>(ix + grid_x1 * (iy + 1));
+            uint32_t c = static_cast<uint32>((ix + 1) + grid_x1 * (iy + 1));
+            uint32_t d = static_cast<uint32>((ix + 1) + grid_x1 * iy);
 
             t_Indices.insert(t_Indices.end(), { a, b, d, b, c, d });
         }
@@ -202,11 +203,11 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
     const float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
 	const float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
 	
-	size_t vertices = (size_t)((width_segments + 1) * (height_segments + 1));
+	uint32 vertices = (uint32)((width_segments + 1) * (height_segments + 1));
 	vertices *= 3;
 
 	
-	size_t indices = 0;
+	uint32 indices = 0;
 	int ix, iy;
     for (iy = 0; iy < height_segments; ++iy)
     {
@@ -229,7 +230,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	return {vertices, indices};
 }
 
-inline int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<size_t>& t_Indices)
+inline int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 
 	float radius = std::max(t_SphereInfo.radius, 1.0f);
@@ -239,12 +240,12 @@ inline int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>
 
     float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
     int ix, iy;
-    size_t index = 0;
-    std::vector<std::vector<size_t>> grid;
+    uint32 index = 0;
+    std::vector<std::vector<uint32>> grid;
 
     for (iy = 0; iy <= height_segments; ++iy)
     {
-        std::vector<size_t> verticesRow;
+        std::vector<uint32> verticesRow;
         float v = iy / height_segments;
 		
         float uOffset = 0;

@@ -4,6 +4,7 @@
 #include "IncludeWin.h"
 #include "Graphics.h"
 #include "BaseException.h"
+#include "Types.h"
 
 #include <optional>
 #include <string>

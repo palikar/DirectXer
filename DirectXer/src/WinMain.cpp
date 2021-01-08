@@ -1,13 +1,16 @@
-
 #include "IncludeWin.h"
 #include "Input.h"
 #include "Glm.h"
 #include "App.h"
+#include "Types.h"
+#include "Logging.h"
 
 #include <fcntl.h>
 #include <stdio.h>
 #include <io.h>
 #include <iostream>
+
+#include <fmt/format.h>
 
 void SetupConsole()
 {
@@ -20,124 +23,6 @@ void SetupConsole()
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
 }
-
-
-
-      // case WM_CLOSE:
-      // {
-      //     PostQuitMessage(0);
-      //     return 0;
-      // }
-
-      // case WM_KILLFOCUS:
-      // {
-      //     m_Keyboard.ClearState();
-      //     break;
-      // }
-
-      // case WM_KEYDOWN:
-      // case WM_SYSKEYDOWN:
-      // {
-      //     if( !(lParam & 0x40000000) || m_Keyboard.AutorepeatIsEnabled() )
-      //     {
-      //         m_Keyboard.OnKeyPressed( static_cast<unsigned char>(wParam) );
-      //     }
-      //     break;
-      // }
-
-      // case WM_KEYUP:
-      // case WM_SYSKEYUP:
-      // {
-      //     m_Keyboard.OnKeyReleased( static_cast<unsigned char>(wParam) );
-      //     break;
-      // }
-
-      // case WM_CHAR:
-      // {
-      //     m_Keyboard.OnChar( static_cast<unsigned char>(wParam) );
-      //     break;
-      // }
-
-      // case WM_MOUSEMOVE:
-      // {
-      //      const POINTS pt = MAKEPOINTS( lParam );
-
-      //     if( pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height )
-      //     {
-      //         m_Mouse.OnMouseMove( pt.x,pt.y );
-      //         if( !m_Mouse.IsInWindow() )
-      //         {
-      //             SetCapture( hWnd );
-      //             m_Mouse.OnMouseEnter();
-      //         }
-      //     }
-
-      //     else
-      //     {
-      //         if( wParam & (MK_LBUTTON | MK_RBUTTON) )
-      //         {
-      //             m_Mouse.OnMouseMove( pt.x,pt.y );
-      //         }
-      //         // button up -> release capture / log event for leaving
-      //         else
-      //         {
-      //             ReleaseCapture();
-      //             m_Mouse.OnMouseLeave();
-      //         }
-      //     }
-      //     break;
-      // }
-
-      // case WM_LBUTTONDOWN:
-      // {
-      //     const POINTS pt = MAKEPOINTS( lParam );
-      //     m_Mouse.OnLeftPressed( pt.x,pt.y );
-      //     break;
-      // }
-
-      // case WM_RBUTTONDOWN:
-      // {
-      //     const POINTS pt = MAKEPOINTS( lParam );
-      //     m_Mouse.OnRightPressed( pt.x,pt.y );
-      //     break;
-      // }
-
-      // case WM_LBUTTONUP:
-      // {
-      //     const POINTS pt = MAKEPOINTS( lParam );
-      //     m_Mouse.OnLeftReleased( pt.x,pt.y );
-      //     // release m_Mouse if outside of window
-      //     if( pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height )
-      //     {
-      //         ReleaseCapture();
-      //         m_Mouse.OnMouseLeave();
-      //     }
-      //     break;
-      // }
-
-      // case WM_RBUTTONUP:
-      // {
-      //     const POINTS pt = MAKEPOINTS( lParam );
-      //     m_Mouse.OnRightReleased( pt.x,pt.y );
-      //     // release m_Mouse if outside of window
-      //     if( pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height )
-      //     {
-      //         ReleaseCapture();
-      //         m_Mouse.OnMouseLeave();
-      //     }
-      //     break;
-      // }
-
-      // case WM_MOUSEWHEEL:
-      // {
-      //     const POINTS pt = MAKEPOINTS( lParam );
-      //     const int delta = GET_WHEEL_DELTA_WPARAM( wParam );
-      //     m_Mouse.OnWheelDelta( pt.x,pt.y,delta );
-      //     break;
-      // }
-
-
-    
 
 LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -290,8 +175,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	
 	ShowWindow(windowHanlde, SW_SHOWDEFAULT);
 
-	// SetWindowText(hWnd, title.c_str())
+	//SetWindowText(hWnd, title.c_str())
 
+	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
+	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
+	
 	MSG msg;
 	while (true)
 	{
@@ -311,8 +199,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	}
 
-	 UnregisterClass("DirectXer Window", hInstance);
-	 FreeConsole();
-	 DestroyWindow(windowHanlde);
+	application.Destroy();
+	UnregisterClass("DirectXer Window", hInstance);
+	FreeConsole();
+	DestroyWindow(windowHanlde);
 	return 0;
 }
