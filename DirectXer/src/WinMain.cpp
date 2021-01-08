@@ -125,6 +125,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     SetupConsole();
 	gInput.Init();
+	gDxgiManager.Init();
 
 	WNDCLASSEX windowClass{0};
     windowClass.cbSize = sizeof(windowClass);
@@ -176,13 +177,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	ShowWindow(windowHanlde, SW_SHOWDEFAULT);
 
 	//SetWindowText(hWnd, title.c_str())
-
-	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
-	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
-	DXERROR("This is pretty cool, not gonna lie!: {}", 213);
-	DXLOG("This is pretty cool, not gonna lie!: {}", 213);
-	DXERROR("This is pretty cool, not gonna lie!: {}", 213);
-	DXPRINT("This is pretty cool, not gonna lie!: {}", 213);
 	
 	MSG msg;
 	while (true)
@@ -203,6 +197,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	}
 
+	gDxgiManager.Destroy();
 	application.Destroy();
 	UnregisterClass("DirectXer Window", hInstance);
 	FreeConsole();

@@ -3,6 +3,7 @@
 #include "IncludeWin.h"
 #include "BaseException.h"
 #include "DxgiInfoManager.h"
+#include "Logging.h"
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -23,7 +24,16 @@
 
 
 #ifndef NDEBUG
-#define GFX_CALL(hrcall) if( FAILED( hr = (hrcall) ) ) assert(false && #hrcall);
+#define GFX_CALL(hrcall) do						\
+	{											\
+		gDxgiManager.ResetMessage();			\
+		if( FAILED( hr = (hrcall) ) )			\
+		{										\
+			DXLOGHRESULT(hr);					\
+			gDxgiManager.PrintMessages();		\
+			abort();							\
+		}										\
+	}while(false)
 #else
 #define GFX_CALL(hrcall) (hrcall)
 #endif
