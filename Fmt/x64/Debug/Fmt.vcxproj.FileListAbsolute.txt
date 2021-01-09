@@ -1,2 +1,0 @@
-C:\Users\Stanislav Arnaudov\source\repos\DirectXer\x64\Debug\Fmt.pdb
-C:\Users\Stanislav Arnaudov\source\repos\DirectXer\Fmt\x64\Debug\Fmt.pdb

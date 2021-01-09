@@ -1,2 +1,0 @@
-C:\Users\Stanislav Arnaudov\source\repos\DirectXer\Debug\DXError.pdb
-C:\Users\Stanislav Arnaudov\source\repos\DirectXer\DXError\Debug\DXError.pdb
