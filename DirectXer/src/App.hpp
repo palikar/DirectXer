@@ -1,8 +1,12 @@
 #pragma once
 
 #include "Geometry.hpp"
-#include "IncludeWin.h"
-#include "Window.h"
+#include "IncludeWin.hpp"
+#include "Graphics.hpp"
+
+struct CommandLineSettings
+{
+};
 
 class App
 {

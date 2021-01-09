@@ -41,43 +41,43 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\IncludeWin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BaseException.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WindowsMessageMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DxgiInfoManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Geometry.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GraphicsCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging.h">
+    <ClInclude Include="src\DxgiInfoManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Types.h">
+    <ClInclude Include="src\BaseException.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Glm.h">
+    <ClInclude Include="src\Glm.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsCommon.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IncludeWin.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logging.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WindowsMessageMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\App.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

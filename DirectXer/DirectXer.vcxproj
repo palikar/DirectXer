@@ -180,19 +180,19 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\App.h" />
-    <ClInclude Include="src\BaseException.h" />
-    <ClInclude Include="src\DxgiInfoManager.h" />
+    <ClInclude Include="src\App.hpp" />
+    <ClInclude Include="src\BaseException.hpp" />
+    <ClInclude Include="src\DxgiInfoManager.hpp" />
     <ClInclude Include="src\Geometry.hpp" />
-    <ClInclude Include="src\Glm.h" />
-    <ClInclude Include="src\Graphics.h" />
-    <ClInclude Include="src\GraphicsCommon.h" />
-    <ClInclude Include="src\IncludeWin.h" />
+    <ClInclude Include="src\Glm.hpp" />
+    <ClInclude Include="src\Graphics.hpp" />
+    <ClInclude Include="src\GraphicsCommon.hpp" />
+    <ClInclude Include="src\IncludeWin.hpp" />
     <ClInclude Include="src\Input.h" />
-    <ClInclude Include="src\Logging.h" />
-    <ClInclude Include="src\Types.h" />
-    <ClInclude Include="src\Window.h" />
-    <ClInclude Include="src\WindowsMessageMap.h" />
+    <ClInclude Include="src\Logging.hpp" />
+    <ClInclude Include="src\Types.hpp" />
+    <ClInclude Include="src\Window.hpp" />
+    <ClInclude Include="src\WindowsMessageMap.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">

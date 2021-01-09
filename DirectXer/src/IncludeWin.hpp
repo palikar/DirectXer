@@ -17,7 +17,7 @@
 #define NOCTLMGR
 #define NODRAWTEXT
 #define NOKERNEL
-#define NONLS
+//#define NONLS // @Note: commended out becuse of MultiByteToWideChar 
 #define NOMEMMGR
 #define NOMETAFILE
 #define NOMINMAX

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "Glm.h"
-#include "Types.h"
+#include "Glm.hpp"
+#include "Types.hpp"
 
 enum class KeyCode : uint16_t
 {

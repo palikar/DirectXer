@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include "IncludeWin.h"
-#include "Graphics.h"
-#include "BaseException.h"
-#include "Types.h"
+#include "IncludeWin.hpp"
+#include "Graphics.hpp"
+#include "BaseException.hpp"
+#include "Types.hpp"
 
 #include <optional>
 #include <string>

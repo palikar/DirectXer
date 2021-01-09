@@ -1,5 +1,5 @@
 
-#include "App.h"
+#include "App.hpp"
 
 #include <iostream>
 
@@ -67,7 +67,7 @@ struct Camera
 
 };
 
-static void cameraController(Window& t_Win, Camera& t_Camera)
+static void cameraController(Camera& t_Camera)
 {
 	
 	// if (t_Win.m_Keyboard.KeyIsPressed(0x57))

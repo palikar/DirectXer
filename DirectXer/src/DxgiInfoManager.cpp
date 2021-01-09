@@ -1,6 +1,6 @@
-#include "DxgiInfoManager.h"
-#include "Window.h"
-#include "Graphics.h"
+#include "DxgiInfoManager.hpp"
+#include "Window.hpp"
+#include "Graphics.hpp"
 #include <dxgidebug.h>
 #include <memory>
 

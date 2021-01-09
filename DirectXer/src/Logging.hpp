@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "IncludeWin.h"
+#include "Types.hpp"
+#include "IncludeWin.hpp"
 
 #include <fmt/format.h>
 #include <fmt/color.h>
@@ -77,12 +77,8 @@ struct Logger
 		SetConsoleTextAttribute(hOutHandle, (DWORD)ConsoleForeground::WHITE);
 		fmt::basic_memory_buffer<char, 512> out;
 		fmt::format_to(out, t_Format, t_Args ... );
-		fmt::format_to(out, "\n");
 		WriteFile(hOutHandle, out.data(), (DWORD)out.size(), NULL, NULL);
 	}
-
-
-
 
 	void LogHResult(const char* t_File, uint32 t_Line, HRESULT t_Hr)
 	{

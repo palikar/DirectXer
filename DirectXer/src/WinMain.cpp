@@ -1,14 +1,16 @@
-#include "IncludeWin.h"
-#include "Input.h"
-#include "Glm.h"
-#include "App.h"
-#include "Types.h"
-#include "Logging.h"
+#include "IncludeWin.hpp"
+#include "Input.hpp"
+#include "Glm.hpp"
+#include "App.hpp"
+#include "Types.hpp"
+#include "Logging.hpp"
 
 #include <fcntl.h>
 #include <stdio.h>
 #include <io.h>
 #include <iostream>
+#include <Stringapiset.h>
+#include <shellapi.h>
 
 #include <fmt/format.h>
 
@@ -57,11 +59,6 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
           break;
       }
 
-      // case WM_CHAR:
-      // {
-      //     break;
-      // }
-
       case WM_MBUTTONUP:
 	  {
 		  auto mouseBtn = (unsigned int) (wParam & 3);
@@ -80,30 +77,6 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		  gInput.UpdateMousePos({pt.x, pt.y});
 		  break;
       }
-	  
-      // case WM_LBUTTONDOWN:
-      // {
-	  // 	  gInput.UpdateMouseLeftPressed();
-      //     break;
-      // }
-
-      // case WM_RBUTTONDOWN:
-      // {
-	  // 	  gInput.UpdateMouseRightPressed();
-      //     break;
-      // }
-
-      // case WM_LBUTTONUP:
-      // {
-	  // 	  gInput.UpdateMouseLeftReleased();
-      //     break;
-      // }
-
-      // case WM_RBUTTONUP:
-      // {
-	  // 	  gInput.UpdateMouseLeftReleased();
-      //     break;
-      // }
 
       case WM_MOUSEWHEEL:
       {
@@ -120,12 +93,102 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 }
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdSHow)
+LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT *pNumArgs)
+{
+    int retval;
+    retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
+    if (!SUCCEEDED(retval))
+        return NULL;
+
+    LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
+    if (lpWideCharStr == NULL)
+        return NULL;
+
+    retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
+    if (!SUCCEEDED(retval))
+    {
+        free(lpWideCharStr);
+        return NULL;
+    }
+
+    int numArgs;
+    LPWSTR* args;
+    args = CommandLineToArgvW(lpWideCharStr, &numArgs);
+    free(lpWideCharStr);
+    if (args == NULL)
+        return NULL;
+
+    int storage = numArgs * sizeof(LPSTR);
+    for (int i = 0; i < numArgs; ++ i)
+    {
+        BOOL lpUsedDefaultChar = FALSE;
+        retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
+        if (!SUCCEEDED(retval))
+        {
+            LocalFree(args);
+            return NULL;
+        }
+
+        storage += retval;
+    }
+
+    LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
+    if (result == NULL)
+    {
+        LocalFree(args);
+        return NULL;
+    }
+
+    int bufLen = storage - numArgs * sizeof(LPSTR);
+    LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
+    for (int i = 0; i < numArgs; ++ i)
+    {
+        assert(bufLen > 0);
+        BOOL lpUsedDefaultChar = FALSE;
+        retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
+        if (!SUCCEEDED(retval))
+        {
+            LocalFree(result);
+            LocalFree(args);
+            return NULL;
+        }
+
+        result[i] = buffer;
+        buffer += retval;
+        bufLen -= retval;
+    }
+
+    LocalFree(args);
+
+    *pNumArgs = numArgs;
+    return result;
+}
+
+void ParseCommandLineArguments(CommandLineSettings& t_Settings, char **argv, int argc)
+{
+
+	for (size_t  i = 1; i < argc; ++i)
+	{
+        DXPRINT("Argument: {}\n", argv[i]);
+	}
+
+
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdSHow)
 {
 
     SetupConsole();
 	gInput.Init();
 	gDxgiManager.Init();
+
+
+    CommandLineSettings arguments;
+	char **argv;
+    int argc;
+	argv = CommandLineToArgvA(GetCommandLine(), &argc);
+    ParseCommandLineArguments(arguments, argv, argc);
+ 
 
 	WNDCLASSEX windowClass{0};
     windowClass.cbSize = sizeof(windowClass);
@@ -197,10 +260,58 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	}
 
+	
 	gDxgiManager.Destroy();
 	application.Destroy();
 	UnregisterClass("DirectXer Window", hInstance);
 	FreeConsole();
 	DestroyWindow(windowHanlde);
+	
 	return 0;
 }
+
+
+// @Todo: Buffering the logging output
+// @Todo: Allcating some amount of memory upfront
+// @Todo: Pool temporary allocation strategy
+// @Todo: Temporary Vector and Map
+// @Todo: Robing hood map from the github repo
+// @Todo: Basic setup for command line arguments passig
+
+
+// @Todo: Ability to transform vertices on the CPU
+
+
+// @Todo: Loading textures from file
+// @Todo: Texture catalog but a good one, not holding textures in memory all the time
+
+// @Todo: Lines "geometry" + ability to use lines primiteves
+// @Todo: Cylinsder geometry
+// @Todo: Cone geometry
+// @Todo: Torus geometry
+
+// @Todo: Rendering groups
+// @Todo: Loading obj files
+// @Todo: Rendering sky box
+// @Todo: Rendering fog
+
+
+// @Todo: Axis helper
+// @Todo: Grid Helper
+
+// @Todo: Grid Helper
+// @Todo: Spot light helper
+// @Todo: Point light helper
+
+// @Todo: Camara controller
+// @Todo: Point light
+
+
+// @Todo: Resizing
+
+
+
+// @Note: In a scene, some things are dynamic, and some things are static
+
+
+

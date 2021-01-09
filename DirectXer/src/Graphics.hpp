@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IncludeWin.h"
-#include "BaseException.h"
-#include "DxgiInfoManager.h"
-#include "Logging.h"
+#include "IncludeWin.hpp"
+#include "BaseException.hpp"
+#include "DxgiInfoManager.hpp"
+#include "Logging.hpp"
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -19,8 +19,8 @@
 // @Fix (Stanislav) : this is so dumb. Visual Studio is fightning me yet again
 #include "../../DXError/src/dxerr.h"
 
-#include "GraphicsCommon.h"
-#include "Types.h"
+#include "GraphicsCommon.hpp"
+#include "Types.hpp"
 
 
 #ifndef NDEBUG

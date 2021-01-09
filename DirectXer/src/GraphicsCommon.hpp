@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 
-#include "Types.h"
+#include "Types.hpp"
 
 namespace dx = DirectX;
 
