@@ -200,6 +200,8 @@ struct Input
 		{
 			MouseReleasedKeys[i] = false;
 		}
+		
+		LastMousePosition = MousePosition;
 	}
 
 	void UpdateKeyboardButtonPressed(uint16_t t_Key)
@@ -225,6 +227,7 @@ struct Input
 	void UpdateMouseButtonPressed(uint32 t_Bnt)
 	{
 		assert(t_Bnt < 10);
+		
 		MousePressedKeys[t_Bnt] = true;
 		MouseReleasedKeys[t_Bnt] = false;
 	}
@@ -234,22 +237,6 @@ struct Input
 		assert(t_Bnt < 10);
 		MousePressedKeys[t_Bnt] = false;
 		MouseReleasedKeys[t_Bnt] = true;
-	}
-		
-	void UpdateMouseLeftPressed()
-	{
-	}
-
-	void UpdateMouseRightPressed()
-	{
-	}
-
-	void UpdateMouseLeftReleased()
-	{
-	}
-
-	void UpdateMouseRightReleased()
-	{
 	}
 
 	void UpdateMouseScroll(float m_Delta)

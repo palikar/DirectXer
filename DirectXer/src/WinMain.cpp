@@ -59,16 +59,36 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
           break;
       }
 
+      case WM_RBUTTONUP:
+	  {
+		  gInput.UpdateMouseButtonReleased(1);
+          break;
+	  }
+      case WM_LBUTTONUP:
+	  {
+		  gInput.UpdateMouseButtonReleased(0);
+          break;
+	  }
       case WM_MBUTTONUP:
 	  {
-		  auto mouseBtn = (unsigned int) (wParam & 3);
-		  gInput.UpdateMouseButtonReleased(mouseBtn);
+		  gInput.UpdateMouseButtonReleased(2);
+          break;
 	  }
 
+      case WM_LBUTTONDOWN:
+	  {
+		  gInput.UpdateMouseButtonPressed(0);
+          break;
+	  }
+      case WM_RBUTTONDOWN:
+	  {
+		  gInput.UpdateMouseButtonPressed(1);
+          break;
+	  }
       case WM_MBUTTONDOWN:
 	  {
-		  auto mouseBtn = (unsigned int) (wParam & 3);
-		  gInput.UpdateMouseButtonPressed(mouseBtn);
+		  gInput.UpdateMouseButtonPressed(2);
+          break;
 	  }
 
       case WM_MOUSEMOVE:
