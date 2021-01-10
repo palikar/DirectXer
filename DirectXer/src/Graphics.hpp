@@ -73,10 +73,14 @@ class Graphics
 	};
 
 
-	void initSwapChain(HWND hWnd);
+	void initSwapChain(HWND hWnd, float t_Width, float t_Height);
 	void initBackBuffer();
-	void initZBuffer();
+	void initZBuffer(float width, float height);
 	void initResources();
+
+	void resizeBackBuffer(float width, float height);
+
+	void destroyZBuffer();
 
 	void setRasterizationState();
 	void setShaders(ShaderType t_Shader);
@@ -99,21 +103,19 @@ class Graphics
 
 	void Destroy();
 
-// #ifndef NDEBUG
-// 	DxgiInfoManager infoManager;
-// #endif
-
-	ID3D11Device* m_Device{ nullptr };
-	IDXGISwapChain* m_Swap{ nullptr };
-	ID3D11DeviceContext* m_Context{ nullptr };
-	ID3D11RenderTargetView* m_Target{ nullptr };
-	ID3D11DepthStencilView* m_DepthStencilView{ nullptr };
+  public:
+	// @Note: We should probably have a maximum of 8 pointers here (1 cahce line)
+	ID3D11Device* Device{ nullptr };
+	IDXGISwapChain* Swap{ nullptr };
+	ID3D11DeviceContext* Context{ nullptr };
+	
+	ID3D11RenderTargetView* RenderTargetView{ nullptr };
+	ID3D11DepthStencilView* DepthStencilView{ nullptr };
 
 	std::array<ShaderObject, SHADER_COUNT> m_Shaders;
 
 	PSConstantBuffer m_PixelShaderCB;
-	VSConstantBuffer m_VertexShaderCB;
-	
+	VSConstantBuffer m_VertexShaderCB;	
 
 };
 

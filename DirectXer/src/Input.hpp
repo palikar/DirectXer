@@ -189,6 +189,24 @@ struct Input
 	{
 	}
 
+	
+	void Reset()
+	{
+		for (uint32 i = 0; i < MAX_KEYS; ++i)
+		{
+			KeyboardReleasedKeys[i] = false;
+			KeyboardPressedKeys[i] = false;
+		}
+
+		for (uint32 i = 0; i < 10; ++i)
+		{
+			MouseReleasedKeys[i] = false;
+			MousePressedKeys[i] = false;
+		}
+		
+		LastMousePosition = MousePosition;
+	}
+
 	void Update()
 	{
 		for (uint32 i = 0; i < MAX_KEYS; ++i)

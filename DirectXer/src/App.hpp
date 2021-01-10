@@ -63,8 +63,10 @@ public:
 
 	void Destroy();
 
+	void Resize();
+
   private:
-	Graphics m_Graphics;
+	Graphics Graphics;
 
 	std::vector<float> plainGeometrVert;
 	std::vector<uint32> plainGeometryInd;
@@ -76,6 +78,9 @@ public:
 	Camera camera;
 
   public:
+	float32 Width;
+	float32 Height;
+	
 	int ReturnValue{0};
 	boolean Running{true};
 
