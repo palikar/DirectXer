@@ -171,18 +171,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
-    <ClCompile Include="src\BaseException.cpp" />
-    <ClCompile Include="src\DxgiInfoManager.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
-    <ClCompile Include="src\GraphicsException.cpp" />
-    <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WindowsMessageMap.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.hpp" />
-    <ClInclude Include="src\BaseException.hpp" />
-    <ClInclude Include="src\DxgiInfoManager.hpp" />
     <ClInclude Include="src\Geometry.hpp" />
     <ClInclude Include="src\Glm.hpp" />
     <ClInclude Include="src\Graphics.hpp" />
@@ -191,7 +185,6 @@
     <ClInclude Include="src\Input.hpp" />
     <ClInclude Include="src\Logging.hpp" />
     <ClInclude Include="src\Types.hpp" />
-    <ClInclude Include="src\Window.hpp" />
     <ClInclude Include="src\WindowsMessageMap.hpp" />
   </ItemGroup>
   <ItemGroup>

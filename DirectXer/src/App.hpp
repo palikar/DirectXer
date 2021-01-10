@@ -40,9 +40,14 @@ struct Camera
 		return forward(Rot);
 	}
 
+	glm::vec3 up()
+    {
+        return glm::vec3(0, 1, 0);
+    }
+
 	inline glm::vec3 left()
 	{
-		return ::left(Rot);
+		return -glm::normalize(glm::cross(at(), up()));
 	}
 
 

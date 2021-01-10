@@ -1,8 +1,6 @@
 #pragma once
 
 #include "IncludeWin.hpp"
-#include "BaseException.hpp"
-#include "DxgiInfoManager.hpp"
 #include "Logging.hpp"
 
 #include <d3d11.h>

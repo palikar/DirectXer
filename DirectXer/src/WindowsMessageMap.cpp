@@ -1,5 +1,5 @@
-#include "WindowsMessageMap.h"
-#include "IncludeWin.h"
+#include "IncludeWin.hpp"
+#include "WindowsMessageMap.hpp"
 
 #include <string>
 #include <sstream>
@@ -17,9 +17,8 @@
 #define REGISTER_MESSAGE(msg){msg,#msg}
 
 
-WindowsMessageMap::WindowsMessageMap()
-	:
-    m_Map ( {
+WindowsMessageMap::WindowsMessageMap() :
+    Map ( {
             REGISTER_MESSAGE( WM_CREATE ),
             REGISTER_MESSAGE( WM_DESTROY ),
             REGISTER_MESSAGE( WM_MOVE ),
@@ -200,10 +199,10 @@ WindowsMessageMap::WindowsMessageMap()
 std::string WindowsMessageMap::operator()(DWORD msg, LPARAM lp, WPARAM wp) const
 {
 	constexpr int firstColWidth = 25;
-	const auto i = m_Map.find( msg );
+	const auto i = Map.find( msg );
 
 	std::ostringstream oss;
-	if( i != m_Map.end() )
+	if( i != Map.end() )
 	{
 		oss << std::left << std::setw( firstColWidth ) << i->second << std::right;
 	}

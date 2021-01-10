@@ -1,14 +1,16 @@
 #pragma once
 
-#include "IncludeWin.h"
-#include "Types.h"
+#include "IncludeWin.hpp"
+#include "Types.hpp"
+
 #include <unordered_map>
 
 class WindowsMessageMap
 {
 public:
     WindowsMessageMap();
-    std::string operator()( DWORD msg,LPARAM lp,WPARAM wp ) const;
-private:
-    std::unordered_map<DWORD,std::string> m_Map;
+
+	std::string operator()(DWORD msg, LPARAM lp, WPARAM wp) const;
+
+	std::unordered_map<DWORD, std::string> Map;
 };
