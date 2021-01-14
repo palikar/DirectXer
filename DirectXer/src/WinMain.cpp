@@ -321,9 +321,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 
 
-// @Todo: Ability to transform vertices on the CPU
+// @Done: Ability to transform vertices on the CPU
 
-// @Todo: Buffering the logging output
+// @TODO: Proper Vertex struct format
+// @TODO: Transformation per vertex type
+
+// @todo: Buffering the logging output
 // @Todo: Allcating some amount of memory upfront
 // @Todo: Pool temporary allocation strategy
 // @Todo: Temporary Vector and Map

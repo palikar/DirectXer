@@ -177,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.hpp" />
+    <ClInclude Include="src\Camera.hpp" />
     <ClInclude Include="src\Geometry.hpp" />
     <ClInclude Include="src\Glm.hpp" />
     <ClInclude Include="src\Graphics.hpp" />

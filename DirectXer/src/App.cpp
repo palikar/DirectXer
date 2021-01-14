@@ -2,87 +2,10 @@
 #include "Glm.hpp"
 #include "Input.hpp"
 #include "Logging.hpp"
+#include "Math.hpp"
 
 #include <iostream>
 
-
-static void cameraController(Camera& t_Camera)
-{
-
-	if (gInput.IsKeyPressed(KeyCode::W))
-	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * 0.01f;
-	}
-
-	if (gInput.IsKeyPressed(KeyCode::S))
-	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -0.01f;
-	}
-
-	if (gInput.IsKeyPressed(KeyCode::A))
-	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 0.01f;
-	}
-	
-	if (gInput.IsKeyPressed(KeyCode::D))
-	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -0.01f;
-	}
-
-
-
-	static bool initialClick = false;
-	static glm::vec2 look{0,0};
-
-	if (gInput.IsKeyPressed(MouseCode::BUTTON_2))
-	{
-		if (!initialClick)
-		{
-			initialClick = true;
-			return;
-		}
-		else
-		{
-			const auto diff = (gInput.MousePosition - gInput.LastMousePosition) * 0.01f;
-			look += diff;
-
-			float x = -look.x;
-			float y = look.y;
-
-			if (y < -1.57)
-			{
-				y = -1.57;
-			}
-
-			if (y > 1.57)
-			{
-				y = 1.57;
-			}
-
-			if (x > 2 * 3.14)
-			{
-				x -= 2 * 3.14f;
-			}
-
-			if (x < -2 * 3.14)
-			{
-				x += 2 * 3.14f;
-			}
-
-			const float camX = -2.0f * sin(x) * cos(y);
-			const float camY = -2.0f * sin(y);
-			const float camZ = -2.0f * cos(x) * cos(y);
-			
-			t_Camera.lookAt(glm::vec3{camX, camY, camZ} + t_Camera.Pos);
-		}
-	}
-	else
-	{
-		initialClick = false;
-	}
-
-
-}
 
 void App::Init(HWND t_Window)
 {
@@ -90,7 +13,7 @@ void App::Init(HWND t_Window)
 	Graphics.initSwapChain(t_Window, Width, Height);
 	Graphics.initBackBuffer();
 	Graphics.initZBuffer(Width, Height);
-
+	
 	Graphics.initResources();
 
 
@@ -101,6 +24,11 @@ void App::Init(HWND t_Window)
 	CubeGeometry({}, plainGeometrVert, plainGeometryInd);
 	PlaneGeometry({1, 1, 5.0, 5.0}, plainGeometrVert, plainGeometryInd);
 	SphereGeometry({2}, plainGeometrVert, plainGeometryInd);
+
+	glm::mat4 trans{1};
+	trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(1, 0, 0));
+	trans = glm::scale(trans, glm::vec3{ 0.3f, 0.3f, 0.3f });
+	TransformVertices(trans, plainGeometrVert.data(), cube.vertexCount/3);
 
 	auto vb = vertexBufferFactory<SimpleVertex>(Graphics, plainGeometrVert);
 	auto ib = indexBufferFactory(Graphics, plainGeometryInd);
@@ -129,7 +57,7 @@ void App::Resize()
 void App::Spin()
 {
 
-	cameraController(camera);
+	ControlCameraFPS(camera);
 
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics.ClearZBuffer();
