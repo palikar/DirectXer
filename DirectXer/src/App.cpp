@@ -17,13 +17,15 @@ void App::Init(HWND t_Window)
 	Graphics.initResources();
 
 
-	cube = CubeGeometryInfo({});
-	plane = CylinderGeometryInfo({1, 1, 5.0, 5.0});
+	// cube = CubeGeometryInfo({});
+	// plane = CylinderGeometryInfo({1, 1, 5.0, 5.0});
 	//sphere = SphereGeometryInfo({2});
+	cylinder = CylinderGeometryInfo({});
 
-	CubeGeometryData({}, plainGeometrVert, plainGeometryInd);
-	CylinderGeometryData({1, 1, 5.0, 5.0}, plainGeometrVert, plainGeometryInd);
-	//SphereGeometryData({2}, plainGeometrVert, plainGeometryInd);
+	// CubeGeometryData({}, plainGeometrVert, plainGeometryInd);
+	// SphereGeometryData({2}, plainGeometrVert, plainGeometryInd);
+	CylinderGeometryData({}, plainGeometrVert, plainGeometryInd);
+
 
 	glm::mat4 trans{1};
 	trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(1, 0, 0));
@@ -69,18 +71,18 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.model = glm::mat4(1);
 
 	Graphics.updateCBs();
-	Graphics.drawIndex(Graphics::TT_TRIANGLES, cube.indexCount);
+	Graphics.drawIndex(Graphics::TT_TRIANGLES, cylinder.indexCount);
 
-	Graphics.m_PixelShaderCB.color = { 1.0, 0.0, 0.0, 1.0};
-	Graphics.m_VertexShaderCB.model = init_translate(0.5, 0.0, 0.0);
+	// Graphics.m_PixelShaderCB.color = { 1.0, 0.0, 0.0, 1.0};
+	// Graphics.m_VertexShaderCB.model = init_translate(0.5, 0.0, 0.0);
 
-	Graphics.updateCBs();
-	Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
+	// Graphics.updateCBs();
+	// Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
 
-	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 0.0, 1.0 };
-	Graphics.m_VertexShaderCB.model = init_translate(3.0, 0.0, 3.0) * init_scale(0.3, 0.3, 0.3);
+	// Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 0.0, 1.0 };
+	// Graphics.m_VertexShaderCB.model = init_translate(3.0, 0.0, 3.0) * init_scale(0.3, 0.3, 0.3);
 
-	Graphics.updateCBs();
+	// Graphics.updateCBs();
 	//Graphics.drawIndex(Graphics::TT_TRIANGLES, sphere.indexCount, cube.indexCount + plane.indexCount, cube.vertexCount/3 + plane.vertexCount/3);
 
 	Graphics.EndFrame();

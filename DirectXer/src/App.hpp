@@ -29,7 +29,8 @@ public:
 	GeometryInfo cube;
 	GeometryInfo plane;
 	GeometryInfo sphere;
-
+	GeometryInfo cylinder;
+	
 	Camera camera;
 
   public:

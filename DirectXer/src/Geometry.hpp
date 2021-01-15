@@ -59,26 +59,28 @@ struct GeometryInfo
 
 inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 {
-	uint32 vertices = (uint32)((t_CylinderInfo.heightSegments + 1) * (t_CylinderInfo.radialSegments + 1));
-    uint32 indices = (uint32)(t_CylinderInfo.radialSegments * t_CylinderInfo.heightSegments) * 2u;
 
+	uint32 vertices = (uint32)((t_CylinderInfo.heightSegments + 1u) * (t_CylinderInfo.radialSegments + 1u));
+
+    uint32 indices = (uint32)((t_CylinderInfo.heightSegments) * (t_CylinderInfo.radialSegments)) * 2u;
 
 	if (!t_CylinderInfo.openEnded)
 	{
 		if (t_CylinderInfo.radiusTop > 0)
         {
+			vertices += (uint32)t_CylinderInfo.radialSegments;
             vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
-			indices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			indices += (uint32)t_CylinderInfo.radialSegments;
         }
-
+		
         if (t_CylinderInfo.radiusBottom > 0)
         {
+            vertices += (uint32)t_CylinderInfo.radialSegments;
             vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
-			indices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			indices += (uint32)t_CylinderInfo.radialSegments;
         }
-    
-	}
-	
+	}	
+	indices *= 3u;
 	
 	return {vertices, indices};
 }
@@ -97,12 +99,11 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, std::vec
 
     for (y = 0; y <= t_CylinderInfo.heightSegments; y++)
     {
-
 		std::vector<uint32_t> indexRow;
 
         float v = y / t_CylinderInfo.heightSegments;
         float radius = v * (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) + t_CylinderInfo.radiusTop;
-
+		
         for (x = 0; x <= t_CylinderInfo.radialSegments; x++)
         {
             const float u = x / t_CylinderInfo.radialSegments;
@@ -122,11 +123,10 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, std::vec
 
             indexRow.push_back((uint32)(index++));
         }
-
         indexArray.push_back(indexRow);
     }
-
-    for (x = 0; x < t_CylinderInfo.radialSegments; x++)
+	
+	for (x = 0; x < t_CylinderInfo.radialSegments; x++)
     {
         for (y = 0; y < t_CylinderInfo.heightSegments; y++)
         {
@@ -152,7 +152,6 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, std::vec
             t_Vertices.insert(t_Vertices.end(), { 0, halfHeight * sign, 0 });
             // normals.insert(normals.end(), { 0, sign, 0 });
             // uv.insert(uv.end(), { 0.5, 0.5 });
-
             ++index;
         }
 
@@ -214,7 +213,6 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, std::vec
 
 inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 {
-
 	uint32 vertices = (uint32)((t_CubeInfo.depthSegments + 1) * (t_CubeInfo.heightSegments + 1));
 	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.depthSegments  + 1));
 	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.heightSegments + 1));
@@ -348,7 +346,7 @@ inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, std::vector<float
         }
     }
 
-
+	
     for (uint32 iy = 0; iy < grid_y; iy++)
     {
         for (uint32 ix = 0; ix < grid_x; ix++)
