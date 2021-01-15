@@ -69,7 +69,8 @@ class Graphics
 
 	enum TopolgyType
 	{
-		TT_TRIANGLES = 0
+		TT_TRIANGLES = 0,
+		TT_LINES = 1
 	};
 
 

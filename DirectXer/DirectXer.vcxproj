@@ -185,6 +185,7 @@
     <ClInclude Include="src\IncludeWin.hpp" />
     <ClInclude Include="src\Input.hpp" />
     <ClInclude Include="src\Logging.hpp" />
+    <ClInclude Include="src\Math.hpp" />
     <ClInclude Include="src\Types.hpp" />
     <ClInclude Include="src\WindowsMessageMap.hpp" />
   </ItemGroup>

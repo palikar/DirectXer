@@ -30,6 +30,8 @@ public:
 	GeometryInfo plane;
 	GeometryInfo sphere;
 	GeometryInfo cylinder;
+
+	GeometryInfo lines;
 	
 	Camera camera;
 

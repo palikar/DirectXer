@@ -50,6 +50,15 @@ struct CylinderGeometry
 	float thetaLength{2.0f * PI};
 };
 
+struct LinesGeometry
+{
+	float vertSize{5.0};
+	float horizSize{5.0};
+	float vertCount{10.0};
+	float horizCount{10.0};
+	
+};
+
 struct GeometryInfo
 {
 	uint32 vertexCount{0};
@@ -470,4 +479,51 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, std::vector<fl
     }
 
 	return 0;
+}
+
+inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+{
+
+	uint32 index = 0;
+	for (float i = 0; i < t_LinesInfo.horizCount + 1; i+=1)
+	{
+		const auto nextZ = (-t_LinesInfo.horizSize / 2.0f) + i * (t_LinesInfo.horizSize / t_LinesInfo.horizCount);
+		
+		t_Vertices.insert(t_Vertices.end(), {t_LinesInfo.horizSize /  2.0f, 0.0f, nextZ});
+		t_Vertices.insert(t_Vertices.end(), {-t_LinesInfo.horizSize / 2.0f, 0.0f, nextZ});
+
+		t_Indices.push_back(index++);
+		t_Indices.push_back(index++);
+
+		t_Indices.push_back(index++);
+		t_Indices.push_back(index++);
+	}
+
+	for (float i = 0; i < t_LinesInfo.vertCount + 1; i+=1)
+	{
+		const float nextX = (-t_LinesInfo.vertSize / 2.0f) + i * (t_LinesInfo.vertSize / t_LinesInfo.vertCount);
+
+		t_Vertices.insert(t_Vertices.end(), {nextX, 0.0f, t_LinesInfo.vertSize / 2.0f});
+		t_Vertices.insert(t_Vertices.end(), {nextX, 0.0f, -t_LinesInfo.vertSize / 2.0f});
+		
+		t_Indices.push_back(index++);
+		t_Indices.push_back(index++);
+
+		t_Indices.push_back(index++);
+		t_Indices.push_back(index++);
+		
+	}
+
+	return 0;
+}
+
+inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
+{
+	uint32 vertices = (uint32)(t_LinesInfo.horizCount + 1) * 2u;
+	vertices += (uint32)(t_LinesInfo.vertCount + 1) * 2u;
+	
+	uint32 indices = (uint32)t_LinesInfo.vertCount * 2u + 2u;
+	indices += (uint32)t_LinesInfo.horizCount * 2u + 2u;
+
+	return {vertices, indices};
 }

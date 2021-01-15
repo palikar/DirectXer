@@ -336,8 +336,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Loading textures from file
 // @Todo: Texture catalog but a good one, not holding textures in memory all the time
 
-// @Todo: Lines "geometry" + ability to use lines primiteves
-// @Todo: Cylinsder geometry
+// @Done: Lines "geometry" + ability to use lines primiteves
+// @Done: Cylinsder geometry
 // @Todo: Cone geometry
 // @Todo: Torus geometry
 

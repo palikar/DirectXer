@@ -20,17 +20,18 @@ void App::Init(HWND t_Window)
 	// cube = CubeGeometryInfo({});
 	// plane = CylinderGeometryInfo({1, 1, 5.0, 5.0});
 	//sphere = SphereGeometryInfo({2});
-	cylinder = CylinderGeometryInfo({});
+	// cylinder = CylinderGeometryInfo({});
+	lines = LinesGeometryInfo({});
 
 	// CubeGeometryData({}, plainGeometrVert, plainGeometryInd);
 	// SphereGeometryData({2}, plainGeometrVert, plainGeometryInd);
-	CylinderGeometryData({}, plainGeometrVert, plainGeometryInd);
-
-
-	glm::mat4 trans{1};
-	trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(1, 0, 0));
-	trans = glm::scale(trans, glm::vec3{ 0.3f, 0.3f, 0.3f });
-	TransformVertices(trans, plainGeometrVert.data(), cube.vertexCount/3);
+	// CylinderGeometryData({}, plainGeometrVert, plainGeometryInd);
+	LinesGeometryData({}, plainGeometrVert, plainGeometryInd);
+	
+	// glm::mat4 trans{1};
+	// trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(1, 0, 0));
+	// trans = glm::scale(trans, glm::vec3{ 0.3f, 0.3f, 0.3f });
+	// TransformVertices(trans, plainGeometrVert.data(), cube.vertexCount/3);
 
 	auto vb = vertexBufferFactory<SimpleVertex>(Graphics, plainGeometrVert);
 	auto ib = indexBufferFactory(Graphics, plainGeometryInd);
@@ -43,7 +44,6 @@ void App::Init(HWND t_Window)
 	Graphics.setRasterizationState();
 
 	camera.Pos = {0.0f, 0.0f, -0.5f};
-
 }
 
 void App::Resize()
@@ -68,10 +68,11 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.view = glm::transpose(camera.view());
 
 	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
+	// Graphics.m_VertexShaderCB.model = glm::transpose(glm::mat4(1) * init_scale({ 1.0f, 1.0f, 3.0f / 4.0f }));
 	Graphics.m_VertexShaderCB.model = glm::mat4(1);
 
 	Graphics.updateCBs();
-	Graphics.drawIndex(Graphics::TT_TRIANGLES, cylinder.indexCount);
+	Graphics.drawIndex(Graphics::TT_LINES, lines.indexCount);
 
 	// Graphics.m_PixelShaderCB.color = { 1.0, 0.0, 0.0, 1.0};
 	// Graphics.m_VertexShaderCB.model = init_translate(0.5, 0.0, 0.0);

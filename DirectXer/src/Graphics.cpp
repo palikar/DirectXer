@@ -326,9 +326,14 @@ void Graphics::setVertexBuffer(VBObject t_buffer, uint32 offset)
 
 void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
 {
+	
+	// @Todo: Make this in a function of its own
 	switch (topology) {
 	  case TT_TRIANGLES: 
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		  break;
+	  case TT_LINES: 
+		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		  break;
 	}
 	
