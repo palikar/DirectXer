@@ -18,12 +18,12 @@ void App::Init(HWND t_Window)
 
 
 	cube = CubeGeometryInfo({});
-	plane = PlaneGeometryInfo({1, 1, 5.0, 5.0});
-	sphere = SphereGeometryInfo({2});
+	plane = CylinderGeometryInfo({1, 1, 5.0, 5.0});
+	//sphere = SphereGeometryInfo({2});
 
-	CubeGeometry({}, plainGeometrVert, plainGeometryInd);
-	PlaneGeometry({1, 1, 5.0, 5.0}, plainGeometrVert, plainGeometryInd);
-	SphereGeometry({2}, plainGeometrVert, plainGeometryInd);
+	CubeGeometryData({}, plainGeometrVert, plainGeometryInd);
+	CylinderGeometryData({1, 1, 5.0, 5.0}, plainGeometrVert, plainGeometryInd);
+	//SphereGeometryData({2}, plainGeometrVert, plainGeometryInd);
 
 	glm::mat4 trans{1};
 	trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(1, 0, 0));
@@ -81,7 +81,7 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.model = init_translate(3.0, 0.0, 3.0) * init_scale(0.3, 0.3, 0.3);
 
 	Graphics.updateCBs();
-	Graphics.drawIndex(Graphics::TT_TRIANGLES, sphere.indexCount, cube.indexCount + plane.indexCount, cube.vertexCount/3 + plane.vertexCount/3);
+	//Graphics.drawIndex(Graphics::TT_TRIANGLES, sphere.indexCount, cube.indexCount + plane.indexCount, cube.vertexCount/3 + plane.vertexCount/3);
 
 	Graphics.EndFrame();
 

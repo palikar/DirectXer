@@ -271,8 +271,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 
-	application.Width = INITIAL_WIDTH;
-	application.Height = INITIAL_HEIGHT;
+	application.Width = (float32)INITIAL_WIDTH;
+	application.Height = (float32)INITIAL_HEIGHT;
 
 
 	auto windowHanlde = CreateWindow(

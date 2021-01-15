@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.hpp"
+#include "Glm.hpp"
 
 #include <vector>
 #include <cmath>
@@ -37,11 +38,179 @@ struct SphereGeometry
 	float theta_length{1.0f*PI};
 };
 
+struct CylinderGeometry
+{
+	float radiusTop {1.0};
+	float radiusBottom{1.0};
+	float height{1.0};
+	float radialSegments{10.0f};
+	float heightSegments{1.0f};
+	bool openEnded{false};
+	float thetaStart{ 0.0f};
+	float thetaLength{2.0f * PI};
+};
+
 struct GeometryInfo
 {
 	uint32 vertexCount{0};
 	uint32 indexCount{0};
 };
+
+
+inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
+{
+	uint32 vertices = (uint32)((t_CylinderInfo.heightSegments + 1) * (t_CylinderInfo.radialSegments + 1));
+    uint32 indices = (uint32)(t_CylinderInfo.radialSegments * t_CylinderInfo.heightSegments) * 2u;
+
+
+	if (!t_CylinderInfo.openEnded)
+	{
+		if (t_CylinderInfo.radiusTop > 0)
+        {
+            vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			indices += (uint32)t_CylinderInfo.radialSegments + 1u;
+        }
+
+        if (t_CylinderInfo.radiusBottom > 0)
+        {
+            vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			indices += (uint32)t_CylinderInfo.radialSegments + 1u;
+        }
+    
+	}
+	
+	
+	return {vertices, indices};
+}
+
+inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+{
+
+    float index = 0;
+    std::vector<std::vector<uint32_t>> indexArray;
+    float halfHeight = t_CylinderInfo.height / 2;
+
+    int x, y;
+
+    // this will be used to calculate the normal
+    float slope = (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) / t_CylinderInfo.height;
+
+    for (y = 0; y <= t_CylinderInfo.heightSegments; y++)
+    {
+
+		std::vector<uint32_t> indexRow;
+
+        float v = y / t_CylinderInfo.heightSegments;
+        float radius = v * (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) + t_CylinderInfo.radiusTop;
+
+        for (x = 0; x <= t_CylinderInfo.radialSegments; x++)
+        {
+            const float u = x / t_CylinderInfo.radialSegments;
+            const float theta = u * t_CylinderInfo.thetaLength + t_CylinderInfo.thetaStart;
+            const float sinTheta = std::sin(theta);
+            const float cosTheta = std::cos(theta);
+
+            const float vert_x = radius * sinTheta;
+            const float vert_y = -v * t_CylinderInfo.height + halfHeight;
+            const float vert_z = radius * cosTheta;
+
+            auto norm = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
+
+            t_Vertices.insert(t_Vertices.end(), { vert_x, vert_y, vert_z });
+            // normals.insert(normals.end(), { norm.x, norm.y, norm.z });
+            // uv.insert(uv.end(), { u, 1 - v });
+
+            indexRow.push_back((uint32)(index++));
+        }
+
+        indexArray.push_back(indexRow);
+    }
+
+    for (x = 0; x < t_CylinderInfo.radialSegments; x++)
+    {
+        for (y = 0; y < t_CylinderInfo.heightSegments; y++)
+        {
+            uint32_t a = indexArray[y][x];
+            uint32_t b = indexArray[y + 1][x];
+            uint32_t c = indexArray[y + 1][x + 1];
+            uint32_t d = indexArray[y][x + 1];
+
+            t_Indices.insert(t_Indices.end(), { b, a, d, c, b, d });
+        }
+    }
+
+    const auto generate_cap = [&](bool top) {
+        int p_x, centerIndexStart, centerIndexEnd;
+
+        const float radius = (top) ? t_CylinderInfo.radiusTop : t_CylinderInfo.radiusBottom;
+        const float sign = (top) ? 1.0f : -1.0f;
+
+        centerIndexStart = (int)index;
+
+        for (p_x = 1; p_x <= t_CylinderInfo.radialSegments; p_x++)
+        {
+            t_Vertices.insert(t_Vertices.end(), { 0, halfHeight * sign, 0 });
+            // normals.insert(normals.end(), { 0, sign, 0 });
+            // uv.insert(uv.end(), { 0.5, 0.5 });
+
+            ++index;
+        }
+
+        centerIndexEnd = (int)index;
+
+        for (p_x = 0; p_x <= t_CylinderInfo.radialSegments; p_x++)
+        {
+            const float u = p_x / t_CylinderInfo.radialSegments;
+            const float theta = u * t_CylinderInfo.thetaLength + t_CylinderInfo.thetaStart;
+            const float cosTheta = std::cos(theta);
+            const float sinTheta = std::sin(theta);
+
+            // vertex
+            const float vert_x = radius * sinTheta;
+            const float vert_y = halfHeight * sign;
+            const float vert_z = radius * cosTheta;
+
+            t_Vertices.insert(t_Vertices.end(), { vert_x, vert_y, vert_z });
+
+            // normals.insert(normals.end(), { 0, sign, 0 });
+            // uv.insert(uv.end(),
+            //           { (cosTheta * 0.5f) + 0.5f, (sinTheta * 0.5f * sign) + 0.5f });
+
+            index++;
+        }
+
+        for (p_x = 0; p_x < t_CylinderInfo.radialSegments; ++p_x)
+        {
+
+            uint32_t c = centerIndexStart + p_x;
+            uint32_t i = centerIndexEnd + p_x;
+
+            if (top)
+            {
+                t_Indices.insert(t_Indices.end(), { c, i + 1, i });
+            }
+            else
+            {
+                t_Indices.insert(t_Indices.end(), { i + 1, c, i });
+            }
+        }
+    };
+
+    if (!t_CylinderInfo.openEnded)
+    {
+        if (t_CylinderInfo.radiusTop > 0)
+        {
+            generate_cap(true);
+        }
+
+        if (t_CylinderInfo.radiusBottom > 0)
+        {
+            generate_cap(false);
+        }
+    }
+
+    return 0;
+}
 
 inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 {
@@ -61,7 +230,7 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	return {vertices, indices};
 }
 
-inline int CubeGeometry(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 	int numberOfVertices = 0;
 	
@@ -154,7 +323,7 @@ inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 	return {vertices, indices};
 }
 
-inline int PlaneGeometry(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 	const auto half_width  = t_PlaneInfo.width / 2.0f;
     const auto half_height = t_PlaneInfo.height / 2.0f;
@@ -230,7 +399,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	return {vertices, indices};
 }
 
-inline int SphereGeometry(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 
 	float radius = std::max(t_SphereInfo.radius, 1.0f);
