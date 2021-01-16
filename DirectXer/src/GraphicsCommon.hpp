@@ -30,7 +30,18 @@ struct SimpleVertex
 	glm::vec3 pos;
 };
 
-void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)
+struct ColorVertex
 {
-	t_Vertex.pos = t_Mat * t_Vertex.pos;	
+	glm::vec3 pos;
+	glm::vec3 color;
+};
+
+inline void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)
+{
+	t_Vertex.pos = t_Mat * glm::vec4(t_Vertex.pos, 1.0f);
+}
+
+inline void TransformVertex(ColorVertex& t_Vertex, glm::mat4 t_Mat)
+{
+	t_Vertex.pos = t_Mat * glm::vec4(t_Vertex.pos, 1.0f);
 }

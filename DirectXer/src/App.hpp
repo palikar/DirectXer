@@ -23,16 +23,8 @@ public:
   private:
 	Graphics Graphics;
 
-	std::vector<float> plainGeometrVert;
-	std::vector<uint32> plainGeometryInd;
+	GeometryInfo axisHelper;
 
-	GeometryInfo cube;
-	GeometryInfo plane;
-	GeometryInfo sphere;
-	GeometryInfo cylinder;
-
-	GeometryInfo lines;
-	
 	Camera camera;
 
   public:

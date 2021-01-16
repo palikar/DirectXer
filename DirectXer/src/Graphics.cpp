@@ -133,14 +133,14 @@ void Graphics::ClearZBuffer()
 
 void Graphics::setRasterizationState()
 {
-
+	
 	ID3D11RasterizerState* rastState;
 	D3D11_RASTERIZER_DESC rastDesc{0};
 	rastDesc.CullMode = D3D11_CULL_NONE;
 	rastDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;
-
+		
 	HRESULT hr;
 	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastState));
 	Context->RSSetState(rastState);
@@ -204,6 +204,7 @@ void Graphics::initResources()
 	ID3D11InputLayout* pInputLayout;
     const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
         {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 	
 	GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));

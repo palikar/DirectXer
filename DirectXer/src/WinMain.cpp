@@ -348,8 +348,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Todo: Color vertex type -- hence solid color material (ish)
 
-// @Todo: Axis helper
-// @Todo: Grid Helper
+// @Done: Axis helper
+// @Done: Grid Helper
+
 
 // @Todo: Grid Helper
 // @Todo: Spot light helper
@@ -364,6 +365,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Done: FPS Camara controller
 // @Todo: Point light
+
+// @Todo: Adjust all of the geometry generators
+
+// @Todo: Container for geometry info!
 
 // @Done: Resizing
 

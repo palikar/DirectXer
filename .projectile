@@ -2,6 +2,10 @@
 -External/csl
 -External/scripting
 
+-DirectXer/libs
+
+-Fmt
+
 -Build
 -Release
 -Debug

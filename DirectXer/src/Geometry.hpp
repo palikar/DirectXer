@@ -56,7 +56,7 @@ struct LinesGeometry
 	float horizSize{5.0};
 	float vertCount{10.0};
 	float horizCount{10.0};
-	
+
 };
 
 struct GeometryInfo
@@ -71,153 +71,172 @@ inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 
 	uint32 vertices = (uint32)((t_CylinderInfo.heightSegments + 1u) * (t_CylinderInfo.radialSegments + 1u));
 
-    uint32 indices = (uint32)((t_CylinderInfo.heightSegments) * (t_CylinderInfo.radialSegments)) * 2u;
+	uint32 indices = (uint32)((t_CylinderInfo.heightSegments) * (t_CylinderInfo.radialSegments)) * 2u;
 
 	if (!t_CylinderInfo.openEnded)
 	{
 		if (t_CylinderInfo.radiusTop > 0)
-        {
+		{
 			vertices += (uint32)t_CylinderInfo.radialSegments;
-            vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
 			indices += (uint32)t_CylinderInfo.radialSegments;
-        }
-		
-        if (t_CylinderInfo.radiusBottom > 0)
-        {
-            vertices += (uint32)t_CylinderInfo.radialSegments;
-            vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
+		}
+
+		if (t_CylinderInfo.radiusBottom > 0)
+		{
+			vertices += (uint32)t_CylinderInfo.radialSegments;
+			vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
 			indices += (uint32)t_CylinderInfo.radialSegments;
-        }
-	}	
+		}
+	}
+
 	indices *= 3u;
-	
+
 	return {vertices, indices};
 }
 
-inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, float* t_Vertices, std::vector<uint32>& t_Indices, size_t t_VertexSize, uint32 t_BaseIndex = 0)
 {
 
-    float index = 0;
-    std::vector<std::vector<uint32_t>> indexArray;
-    float halfHeight = t_CylinderInfo.height / 2;
+	float index = 0;
+	std::vector<std::vector<uint32_t>> indexArray;
+	float halfHeight = t_CylinderInfo.height / 2;
 
-    int x, y;
+	int x, y;
 
-    // this will be used to calculate the normal
-    float slope = (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) / t_CylinderInfo.height;
+	// this will be used to calculate the normal
+	float slope = (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) / t_CylinderInfo.height;
 
-    for (y = 0; y <= t_CylinderInfo.heightSegments; y++)
-    {
+	for (y = 0; y <= t_CylinderInfo.heightSegments; y++)
+	{
 		std::vector<uint32_t> indexRow;
 
-        float v = y / t_CylinderInfo.heightSegments;
-        float radius = v * (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) + t_CylinderInfo.radiusTop;
-		
-        for (x = 0; x <= t_CylinderInfo.radialSegments; x++)
-        {
-            const float u = x / t_CylinderInfo.radialSegments;
-            const float theta = u * t_CylinderInfo.thetaLength + t_CylinderInfo.thetaStart;
-            const float sinTheta = std::sin(theta);
-            const float cosTheta = std::cos(theta);
+		float v = y / t_CylinderInfo.heightSegments;
+		float radius = v * (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) + t_CylinderInfo.radiusTop;
 
-            const float vert_x = radius * sinTheta;
-            const float vert_y = -v * t_CylinderInfo.height + halfHeight;
-            const float vert_z = radius * cosTheta;
+		for (x = 0; x <= t_CylinderInfo.radialSegments; x++)
+		{
+			const float u = x / t_CylinderInfo.radialSegments;
+			const float theta = u * t_CylinderInfo.thetaLength + t_CylinderInfo.thetaStart;
+			const float sinTheta = std::sin(theta);
+			const float cosTheta = std::cos(theta);
 
-            auto norm = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
+			const float vert_x = radius * sinTheta;
+			const float vert_y = -v * t_CylinderInfo.height + halfHeight;
+			const float vert_z = radius * cosTheta;
 
-            t_Vertices.insert(t_Vertices.end(), { vert_x, vert_y, vert_z });
-            // normals.insert(normals.end(), { norm.x, norm.y, norm.z });
-            // uv.insert(uv.end(), { u, 1 - v });
+			auto norm = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
 
-            indexRow.push_back((uint32)(index++));
-        }
-        indexArray.push_back(indexRow);
-    }
-	
+			*t_Vertices++ = vert_x;
+			*t_Vertices++ = vert_y;
+			*t_Vertices++ = vert_z;
+
+			// skip the rest of the fields
+			t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
+
+			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
+			// uv.insert(uv.end(), { u, 1 - v });
+
+			indexRow.push_back((uint32)(index++));
+		}
+		indexArray.push_back(indexRow);
+	}
+
 	for (x = 0; x < t_CylinderInfo.radialSegments; x++)
-    {
-        for (y = 0; y < t_CylinderInfo.heightSegments; y++)
-        {
-            uint32_t a = indexArray[y][x];
-            uint32_t b = indexArray[y + 1][x];
-            uint32_t c = indexArray[y + 1][x + 1];
-            uint32_t d = indexArray[y][x + 1];
+	{
+		for (y = 0; y < t_CylinderInfo.heightSegments; y++)
+		{
+			uint32_t a = indexArray[y][x] + t_BaseIndex;
+			uint32_t b = indexArray[y + 1][x] + t_BaseIndex;
+			uint32_t c = indexArray[y + 1][x + 1] + t_BaseIndex;
+			uint32_t d = indexArray[y][x + 1] + t_BaseIndex;
 
-            t_Indices.insert(t_Indices.end(), { b, a, d, c, b, d });
-        }
-    }
+			t_Indices.insert(t_Indices.end(), { b, a, d, c, b, d });
+		}
+	}
 
-    const auto generate_cap = [&](bool top) {
-        int p_x, centerIndexStart, centerIndexEnd;
+	const auto generate_cap = [&](bool top) {
+		int p_x, centerIndexStart, centerIndexEnd;
 
-        const float radius = (top) ? t_CylinderInfo.radiusTop : t_CylinderInfo.radiusBottom;
-        const float sign = (top) ? 1.0f : -1.0f;
+		const float radius = (top) ? t_CylinderInfo.radiusTop : t_CylinderInfo.radiusBottom;
+		const float sign = (top) ? 1.0f : -1.0f;
 
-        centerIndexStart = (int)index;
+		centerIndexStart = (int)index;
 
-        for (p_x = 1; p_x <= t_CylinderInfo.radialSegments; p_x++)
-        {
-            t_Vertices.insert(t_Vertices.end(), { 0, halfHeight * sign, 0 });
+		for (p_x = 1; p_x <= t_CylinderInfo.radialSegments; p_x++)
+		{
+			*t_Vertices++ = 0.0f;
+			*t_Vertices++ = halfHeight * sign;
+			*t_Vertices++ = 0;
+
+            // skip the rest of the fields
+			t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
+
+			// normals.insert(normals.end(), { 0, sign, 0 });
+			// uv.insert(uv.end(), { 0.5, 0.5 });
+
+			++index;
+		}
+
+		centerIndexEnd = (int)index;
+
+		for (p_x = 0; p_x <= t_CylinderInfo.radialSegments; p_x++)
+		{
+			const float u = p_x / t_CylinderInfo.radialSegments;
+			const float theta = u * t_CylinderInfo.thetaLength + t_CylinderInfo.thetaStart;
+			const float cosTheta = std::cos(theta);
+			const float sinTheta = std::sin(theta);
+
+			// vertex
+			const float vert_x = radius * sinTheta;
+			const float vert_y = halfHeight * sign;
+			const float vert_z = radius * cosTheta;
+
+			*t_Vertices++ = vert_x;
+			*t_Vertices++ = vert_y;
+			*t_Vertices++ = vert_z;
+
+            // skip the rest of the fields
+			t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
+			
             // normals.insert(normals.end(), { 0, sign, 0 });
-            // uv.insert(uv.end(), { 0.5, 0.5 });
-            ++index;
-        }
+			// uv.insert(uv.end(),
+			//           { (cosTheta * 0.5f) + 0.5f, (sinTheta * 0.5f * sign) + 0.5f });
 
-        centerIndexEnd = (int)index;
+			index++;
+		}
 
-        for (p_x = 0; p_x <= t_CylinderInfo.radialSegments; p_x++)
-        {
-            const float u = p_x / t_CylinderInfo.radialSegments;
-            const float theta = u * t_CylinderInfo.thetaLength + t_CylinderInfo.thetaStart;
-            const float cosTheta = std::cos(theta);
-            const float sinTheta = std::sin(theta);
+		for (p_x = 0; p_x < t_CylinderInfo.radialSegments; ++p_x)
+		{
 
-            // vertex
-            const float vert_x = radius * sinTheta;
-            const float vert_y = halfHeight * sign;
-            const float vert_z = radius * cosTheta;
+			uint32_t c = centerIndexStart + p_x  + t_BaseIndex;
+			uint32_t i = centerIndexEnd + p_x  + t_BaseIndex;
 
-            t_Vertices.insert(t_Vertices.end(), { vert_x, vert_y, vert_z });
+			if (top)
+			{
+				t_Indices.insert(t_Indices.end(), { c, i + 1, i });
+			}
+			else
+			{
+				t_Indices.insert(t_Indices.end(), { i + 1, c, i });
+			}
+		}
+	};
 
-            // normals.insert(normals.end(), { 0, sign, 0 });
-            // uv.insert(uv.end(),
-            //           { (cosTheta * 0.5f) + 0.5f, (sinTheta * 0.5f * sign) + 0.5f });
+	if (!t_CylinderInfo.openEnded)
+	{
+		if (t_CylinderInfo.radiusTop > 0)
+		{
+			generate_cap(true);
+		}
 
-            index++;
-        }
+		if (t_CylinderInfo.radiusBottom > 0)
+		{
+			generate_cap(false);
+		}
+	}
 
-        for (p_x = 0; p_x < t_CylinderInfo.radialSegments; ++p_x)
-        {
-
-            uint32_t c = centerIndexStart + p_x;
-            uint32_t i = centerIndexEnd + p_x;
-
-            if (top)
-            {
-                t_Indices.insert(t_Indices.end(), { c, i + 1, i });
-            }
-            else
-            {
-                t_Indices.insert(t_Indices.end(), { i + 1, c, i });
-            }
-        }
-    };
-
-    if (!t_CylinderInfo.openEnded)
-    {
-        if (t_CylinderInfo.radiusTop > 0)
-        {
-            generate_cap(true);
-        }
-
-        if (t_CylinderInfo.radiusBottom > 0)
-        {
-            generate_cap(false);
-        }
-    }
-
-    return 0;
+	return 0;
 }
 
 inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
@@ -240,7 +259,7 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 	int numberOfVertices = 0;
-	
+
 	const auto buildPlane = [&](char u,
 	char v,
 	char w,
@@ -251,71 +270,71 @@ inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, std::vector<float>& 
 	float t_depth,
 	float gridX,
 	float gridY) {
-        float segmentWidth  = t_width / gridX;
-        float segmentHeight = t_height / gridY;
-        float widthHalf     = t_width / 2;
-        float heightHalf    = t_height / 2;
-        float depthHalf     = t_depth / 2;
-        float gridX1        = gridX + 1;
-        float gridY1        = gridY + 1;
-        int vertexCounter   = 0;
-        int ix, iy;
+		float segmentWidth  = t_width / gridX;
+		float segmentHeight = t_height / gridY;
+		float widthHalf     = t_width / 2;
+		float heightHalf    = t_height / 2;
+		float depthHalf     = t_depth / 2;
+		float gridX1        = gridX + 1;
+		float gridY1        = gridY + 1;
+		int vertexCounter   = 0;
+		int ix, iy;
 
-        for (iy = 0; iy < gridY1; iy++)
-        {
-            float y = iy * segmentHeight - heightHalf;
-            for (ix = 0; ix < gridX1; ix++)
-            {
-                float x = ix * segmentWidth - widthHalf;
+		for (iy = 0; iy < gridY1; iy++)
+		{
+			float y = iy * segmentHeight - heightHalf;
+			for (ix = 0; ix < gridX1; ix++)
+			{
+				float x = ix * segmentWidth - widthHalf;
 
 				// vertex[u] = x * udir;
-                // vertex[v] = y * vdir;
-                // vertex[w] = depthHalf;
+				// vertex[v] = y * vdir;
+				// vertex[w] = depthHalf;
 
-                // vertex[3 + u] = 0;
-                // vertex[3 + v] = 0;
-                // vertex[3 + w] = t_depth > 0 ? 1 : -1;
+				// vertex[3 + u] = 0;
+				// vertex[3 + v] = 0;
+				// vertex[3 + w] = t_depth > 0 ? 1 : -1;
 
-                // vertex[6] = (ix / gridX);
-                // vertex[7] = (1 - (iy / gridY));
+				// vertex[6] = (ix / gridX);
+				// vertex[7] = (1 - (iy / gridY));
 
 				float vert[3];
 				*(vert + u) = x * udir;
 				*(vert + v) = y * vdir;
 				*(vert + w) = depthHalf;
-				
-                t_Vertices.insert(t_Vertices.end(), {vert[0], vert[1], vert[2]});
-                // normals.insert(normals.end(), { vertex[3], vertex[4], vertex[5] });
-                // uv.insert(uv.end(), { ix / gridX, 1 - (iy / gridY) });
-                // vertecies.push_back(vertex);
 
-                vertexCounter += 1;
-            };
-        }
+				t_Vertices.insert(t_Vertices.end(), {vert[0], vert[1], vert[2]});
+				// normals.insert(normals.end(), { vertex[3], vertex[4], vertex[5] });
+				// uv.insert(uv.end(), { ix / gridX, 1 - (iy / gridY) });
+				// vertecies.push_back(vertex);
 
-        for (iy = 0; iy < gridY; iy++)
-        {
-            for (ix = 0; ix < gridX; ix++)
-            {
-                uint32_t a = (uint32_t)(numberOfVertices + ix + gridX1 * iy);
-                uint32_t b = (uint32_t)(numberOfVertices + ix + gridX1 * (iy + 1));
-                uint32_t c = (uint32_t)(numberOfVertices + (ix + 1) + gridX1 * (iy + 1));
-                uint32_t d = (uint32_t)(numberOfVertices + (ix + 1) + gridX1 * iy);
+				vertexCounter += 1;
+			};
+		}
+
+		for (iy = 0; iy < gridY; iy++)
+		{
+			for (ix = 0; ix < gridX; ix++)
+			{
+				uint32_t a = (uint32_t)(numberOfVertices + ix + gridX1 * iy);
+				uint32_t b = (uint32_t)(numberOfVertices + ix + gridX1 * (iy + 1));
+				uint32_t c = (uint32_t)(numberOfVertices + (ix + 1) + gridX1 * (iy + 1));
+				uint32_t d = (uint32_t)(numberOfVertices + (ix + 1) + gridX1 * iy);
 
 				t_Indices.insert(t_Indices.end(), { d, b, a, d, c, b });
-            }
-        }
+			}
+		}
 
-        numberOfVertices += vertexCounter;
-    };
+		numberOfVertices += vertexCounter;
+	};
 
 	buildPlane(2, 1, 0, -1, -1, t_CubeInfo.depth, t_CubeInfo.height, t_CubeInfo.width, t_CubeInfo.depthSegments, t_CubeInfo.heightSegments);
-    buildPlane(2, 1, 0, 1, -1, t_CubeInfo.depth, t_CubeInfo.height, -t_CubeInfo.width, t_CubeInfo.depthSegments, t_CubeInfo.heightSegments);
-    buildPlane(0, 2, 1, 1, 1, t_CubeInfo.width, t_CubeInfo.depth, t_CubeInfo.height, t_CubeInfo.widthSegments, t_CubeInfo.depthSegments);
+	buildPlane(2, 1, 0, 1, -1, t_CubeInfo.depth, t_CubeInfo.height, -t_CubeInfo.width, t_CubeInfo.depthSegments, t_CubeInfo.heightSegments);
+	buildPlane(0, 2, 1, 1, 1, t_CubeInfo.width, t_CubeInfo.depth, t_CubeInfo.height, t_CubeInfo.widthSegments, t_CubeInfo.depthSegments);
 	buildPlane(0, 2, 1, 1, -1, t_CubeInfo.width, t_CubeInfo.depth, -t_CubeInfo.height, t_CubeInfo.widthSegments, t_CubeInfo.depthSegments);
-    buildPlane(0, 1, 2, 1, -1, t_CubeInfo.width, t_CubeInfo.height, t_CubeInfo.depth, t_CubeInfo.widthSegments, t_CubeInfo.heightSegments);
-    buildPlane(0, 1, 2, -1, -1, t_CubeInfo.width, t_CubeInfo.height, -t_CubeInfo.depth, t_CubeInfo.widthSegments, t_CubeInfo.heightSegments);
-	
+	buildPlane(0, 1, 2, 1, -1, t_CubeInfo.width, t_CubeInfo.height, t_CubeInfo.depth, t_CubeInfo.widthSegments, t_CubeInfo.heightSegments);
+	buildPlane(0, 1, 2, -1, -1, t_CubeInfo.width, t_CubeInfo.height, -t_CubeInfo.depth, t_CubeInfo.widthSegments, t_CubeInfo.heightSegments);
+
 	return 0;
 }
 
@@ -333,41 +352,41 @@ inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
 {
 	const auto half_width  = t_PlaneInfo.width / 2.0f;
-    const auto half_height = t_PlaneInfo.height / 2.0f;
+	const auto half_height = t_PlaneInfo.height / 2.0f;
 
-    const auto grid_x          = (std::floor(t_PlaneInfo.width_segments));
-    const auto grid_y          = (std::floor(t_PlaneInfo.height_segments));
-    const auto grid_x1         = grid_x + 1;
-    const auto grid_y1         = grid_y + 1;
-    const float segment_width  = t_PlaneInfo.width / grid_x;
-    const float segment_height = t_PlaneInfo.height / grid_y;
+	const auto grid_x          = (std::floor(t_PlaneInfo.width_segments));
+	const auto grid_y          = (std::floor(t_PlaneInfo.height_segments));
+	const auto grid_x1         = grid_x + 1;
+	const auto grid_y1         = grid_y + 1;
+	const float segment_width  = t_PlaneInfo.width / grid_x;
+	const float segment_height = t_PlaneInfo.height / grid_y;
 
-    for (uint32 iy = 0; iy < grid_y1; iy++)
-    {
-        auto y = iy * segment_height - half_height;
-        for (uint32 ix = 0; ix < grid_x1; ix++)
-        {
-            auto x = ix * segment_width - half_width;
+	for (uint32 iy = 0; iy < grid_y1; iy++)
+	{
+		auto y = iy * segment_height - half_height;
+		for (uint32 ix = 0; ix < grid_x1; ix++)
+		{
+			auto x = ix * segment_width - half_width;
 
-            t_Vertices.insert(t_Vertices.end(), { x, -y, 0 });
-            // normals.insert(normals.end(), { 0, 0, -1 });
-            // uv.insert(uv.end(), { ix / grid_x, 1 - (iy / grid_y) });
-        }
-    }
+			t_Vertices.insert(t_Vertices.end(), { x, -y, 0 });
+			// normals.insert(normals.end(), { 0, 0, -1 });
+			// uv.insert(uv.end(), { ix / grid_x, 1 - (iy / grid_y) });
+		}
+	}
 
-	
-    for (uint32 iy = 0; iy < grid_y; iy++)
-    {
-        for (uint32 ix = 0; ix < grid_x; ix++)
-        {
-            uint32_t a = static_cast<uint32>(ix + grid_x1 * iy);
-            uint32_t b = static_cast<uint32>(ix + grid_x1 * (iy + 1));
-            uint32_t c = static_cast<uint32>((ix + 1) + grid_x1 * (iy + 1));
-            uint32_t d = static_cast<uint32>((ix + 1) + grid_x1 * iy);
 
-            t_Indices.insert(t_Indices.end(), { a, b, d, b, c, d });
-        }
-    }
+	for (uint32 iy = 0; iy < grid_y; iy++)
+	{
+		for (uint32 ix = 0; ix < grid_x; ix++)
+		{
+			uint32_t a = static_cast<uint32>(ix + grid_x1 * iy);
+			uint32_t b = static_cast<uint32>(ix + grid_x1 * (iy + 1));
+			uint32_t c = static_cast<uint32>((ix + 1) + grid_x1 * (iy + 1));
+			uint32_t d = static_cast<uint32>((ix + 1) + grid_x1 * iy);
+
+			t_Indices.insert(t_Indices.end(), { a, b, d, b, c, d });
+		}
+	}
 
 	return 0;
 }
@@ -376,32 +395,32 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 {
 
 	const float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
-    const float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
+	const float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
 	const float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
-	
+
 	uint32 vertices = (uint32)((width_segments + 1) * (height_segments + 1));
 	vertices *= 3;
 
-	
+
 	uint32 indices = 0;
 	int ix, iy;
-    for (iy = 0; iy < height_segments; ++iy)
-    {
+	for (iy = 0; iy < height_segments; ++iy)
+	{
 
-        for (ix = 0; ix < width_segments; ++ix)
-        {
+		for (ix = 0; ix < width_segments; ++ix)
+		{
 
 			if (iy != 0 || t_SphereInfo.theta_start > 0)
-            {
-                indices+=3;
-            }
+			{
+				indices+=3;
+			}
 
-            if (iy != height_segments - 1 || theta_end < PI)
-            {
-                indices+=3;
-            }
-        }
-    }
+			if (iy != height_segments - 1 || theta_end < PI)
+			{
+				indices+=3;
+			}
+		}
+	}
 
 	return {vertices, indices};
 }
@@ -411,72 +430,72 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, std::vector<fl
 
 	float radius = std::max(t_SphereInfo.radius, 1.0f);
 
-    float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
-    float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
+	float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
+	float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
 
-    float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
-    int ix, iy;
-    uint32 index = 0;
-    std::vector<std::vector<uint32>> grid;
+	float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
+	int ix, iy;
+	uint32 index = 0;
+	std::vector<std::vector<uint32>> grid;
 
-    for (iy = 0; iy <= height_segments; ++iy)
-    {
-        std::vector<uint32> verticesRow;
-        float v = iy / height_segments;
-		
-        float uOffset = 0;
-        if (iy == 0 && t_SphereInfo.theta_start == 0)
-        {
-            uOffset = 0.5f / width_segments;
-        }
-        else if (iy == height_segments && theta_end == PI)
-        {
-            uOffset = -0.5f / width_segments;
-        }
+	for (iy = 0; iy <= height_segments; ++iy)
+	{
+		std::vector<uint32> verticesRow;
+		float v = iy / height_segments;
 
-        for (ix = 0; ix <= width_segments; ix++)
-        {
-            float u       = ix / width_segments;
-            const float x = -radius * std::cos(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
-                            * std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
-            const float y = radius * std::cos(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
-            const float z = radius * std::sin(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
-                            * std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
+		float uOffset = 0;
+		if (iy == 0 && t_SphereInfo.theta_start == 0)
+		{
+			uOffset = 0.5f / width_segments;
+		}
+		else if (iy == height_segments && theta_end == PI)
+		{
+			uOffset = -0.5f / width_segments;
+		}
 
-            t_Vertices.insert(t_Vertices.end(), { x, y, z });
+		for (ix = 0; ix <= width_segments; ix++)
+		{
+			float u       = ix / width_segments;
+			const float x = -radius * std::cos(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
+							* std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
+			const float y = radius * std::cos(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
+			const float z = radius * std::sin(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
+							* std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
 
-            // auto norm = glm::normalize(glm::vec3(x, y, z));
-            // normals.insert(normals.end(), { norm.x, norm.y, norm.z });
-            // uv.insert(uv.end(), { u + uOffset, 1 - v });
+			t_Vertices.insert(t_Vertices.end(), { x, y, z });
 
-            verticesRow.push_back(index++);
-        }
+			// auto norm = glm::normalize(glm::vec3(x, y, z));
+			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
+			// uv.insert(uv.end(), { u + uOffset, 1 - v });
 
-        grid.push_back(verticesRow);
-    }
+			verticesRow.push_back(index++);
+		}
 
-    for (iy = 0; iy < height_segments; ++iy)
-    {
+		grid.push_back(verticesRow);
+	}
 
-        for (ix = 0; ix < width_segments; ++ix)
-        {
+	for (iy = 0; iy < height_segments; ++iy)
+	{
 
-            uint32_t a = grid[iy][ix + 1];
-            uint32_t b = grid[iy][ix];
-            uint32_t c = grid[iy + 1][ix];
-            uint32_t d = grid[iy + 1][ix + 1];
+		for (ix = 0; ix < width_segments; ++ix)
+		{
 
-            if (iy != 0 || t_SphereInfo.theta_start > 0)
-            {
-                t_Indices.insert(t_Indices.end(), { d, b, a });
-            }
+			uint32_t a = grid[iy][ix + 1];
+			uint32_t b = grid[iy][ix];
+			uint32_t c = grid[iy + 1][ix];
+			uint32_t d = grid[iy + 1][ix + 1];
 
-            if (iy != height_segments - 1 || theta_end < PI)
-            {
-                t_Indices.insert(t_Indices.end(), { d, c, b });
-            }
-        }
-    }
+			if (iy != 0 || t_SphereInfo.theta_start > 0)
+			{
+				t_Indices.insert(t_Indices.end(), { d, b, a });
+			}
+
+			if (iy != height_segments - 1 || theta_end < PI)
+			{
+				t_Indices.insert(t_Indices.end(), { d, c, b });
+			}
+		}
+	}
 
 	return 0;
 }
@@ -488,7 +507,7 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float
 	for (float i = 0; i < t_LinesInfo.horizCount + 1; i+=1)
 	{
 		const auto nextZ = (-t_LinesInfo.horizSize / 2.0f) + i * (t_LinesInfo.horizSize / t_LinesInfo.horizCount);
-		
+
 		t_Vertices.insert(t_Vertices.end(), {t_LinesInfo.horizSize /  2.0f, 0.0f, nextZ});
 		t_Vertices.insert(t_Vertices.end(), {-t_LinesInfo.horizSize / 2.0f, 0.0f, nextZ});
 
@@ -505,13 +524,13 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float
 
 		t_Vertices.insert(t_Vertices.end(), {nextX, 0.0f, t_LinesInfo.vertSize / 2.0f});
 		t_Vertices.insert(t_Vertices.end(), {nextX, 0.0f, -t_LinesInfo.vertSize / 2.0f});
-		
+
 		t_Indices.push_back(index++);
 		t_Indices.push_back(index++);
 
 		t_Indices.push_back(index++);
 		t_Indices.push_back(index++);
-		
+
 	}
 
 	return 0;
@@ -521,7 +540,7 @@ inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
 {
 	uint32 vertices = (uint32)(t_LinesInfo.horizCount + 1) * 2u;
 	vertices += (uint32)(t_LinesInfo.vertCount + 1) * 2u;
-	
+
 	uint32 indices = (uint32)t_LinesInfo.vertCount * 2u + 2u;
 	indices += (uint32)t_LinesInfo.horizCount * 2u + 2u;
 

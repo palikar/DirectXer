@@ -121,7 +121,7 @@ class Graphics
 };
 
 template<typename VertexType>
-VBObject vertexBufferFactory(Graphics& graphics, std::vector<float> t_VertexList)
+VBObject vertexBufferFactory(Graphics& graphics, std::vector<VertexType> t_VertexList)
 {
 	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), (uint32)(sizeof(VertexType) * t_VertexList.size()));
 }
