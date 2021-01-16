@@ -346,6 +346,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Rendering sky box
 // @Todo: Rendering fog
 
+// @Todo: Color vertex type -- hence solid color material (ish)
 
 // @Todo: Axis helper
 // @Todo: Grid Helper
@@ -354,12 +355,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Spot light helper
 // @Todo: Point light helper
 
+// @Todo: Phong material
+// @Todo: PBR material
+
+// @Todo: Text rendering
+// @Todo: Mouse picking
+// @Todo: Drop down console
+
 // @Done: FPS Camara controller
 // @Todo: Point light
 
 // @Done: Resizing
 
 // @Note: In a scene, some things are dynamic, and some things are static
-
-
-

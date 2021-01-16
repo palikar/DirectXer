@@ -27,10 +27,10 @@ struct VSConstantBuffer
 
 struct SimpleVertex
 {
-	struct
-	{
-		float x;
-		float y;
-		float z;
-	} pos;
+	glm::vec3 pos;
 };
+
+void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)
+{
+	t_Vertex.pos = t_Mat * t_Vertex.pos;	
+}
