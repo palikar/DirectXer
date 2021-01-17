@@ -323,14 +323,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Done: Ability to transform vertices on the CPU
 
-// @TODO: Proper Vertex struct format
-// @TODO: Transformation per vertex type
+// @Done: Proper Vertex struct format
+// @Done: Transformation per vertex type
 
-// @todo: Buffering the logging output
+// @Todo: Buffering the logging output
 // @Todo: Allcating some amount of memory upfront
 // @Todo: Pool temporary allocation strategy
 // @Todo: Temporary Vector and Map
-// @Todo: Robing hood map from the github repo
+// @Done: Robing hood map from the github repo
 // @Done: Basic setup for command line arguments passig
 
 // @Todo: Loading textures from file
@@ -352,12 +352,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Grid Helper
 
 
-// @Todo: Grid Helper
 // @Todo: Spot light helper
 // @Todo: Point light helper
 
 // @Todo: Phong material
 // @Todo: PBR material
+// @Todo: Sollid color material
 
 // @Todo: Text rendering
 // @Todo: Mouse picking

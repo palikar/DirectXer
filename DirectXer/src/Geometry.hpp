@@ -91,6 +91,7 @@ inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 	}
 
 	indices *= 3u;
+	// vertices *= 3u;
 
 	return {vertices, indices};
 }
@@ -102,7 +103,7 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, float* t
 	std::vector<std::vector<uint32_t>> indexArray;
 	float halfHeight = t_CylinderInfo.height / 2;
 
-	int x, y;
+	uint32 x, y;
 
 	// this will be used to calculate the normal
 	float slope = (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) / t_CylinderInfo.height;
@@ -245,7 +246,7 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.depthSegments  + 1));
 	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.heightSegments + 1));
 	vertices *= 2;
-	vertices *= 3;
+	// vertices *= 3;
 
 	uint32 indices = (uint32)(t_CubeInfo.depthSegments * t_CubeInfo.heightSegments);
 	indices += (uint32)(t_CubeInfo.widthSegments * t_CubeInfo.depthSegments);
@@ -256,7 +257,7 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	return {vertices, indices};
 }
 
-inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, float* t_Vertices, std::vector<uint32>& t_Indices, size_t t_VertexSize, uint32 t_BaseIndex = 0)
 {
 	int numberOfVertices = 0;
 
@@ -298,12 +299,12 @@ inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, std::vector<float>& 
 				// vertex[6] = (ix / gridX);
 				// vertex[7] = (1 - (iy / gridY));
 
-				float vert[3];
-				*(vert + u) = x * udir;
-				*(vert + v) = y * vdir;
-				*(vert + w) = depthHalf;
+				*(t_Vertices + u) = x * udir;
+				*(t_Vertices + v) = y * vdir;
+				*(t_Vertices + w) = depthHalf;
+				t_Vertices += 3;
+				t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
 
-				t_Vertices.insert(t_Vertices.end(), {vert[0], vert[1], vert[2]});
 				// normals.insert(normals.end(), { vertex[3], vertex[4], vertex[5] });
 				// uv.insert(uv.end(), { ix / gridX, 1 - (iy / gridY) });
 				// vertecies.push_back(vertex);
@@ -341,7 +342,7 @@ inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, std::vector<float>& 
 inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 {
 	uint32 vertices = (uint32)((std::floor(t_PlaneInfo.width_segments) + 1) * (std::floor(t_PlaneInfo.height_segments) + 1));
-	vertices *= 3;
+	// vertices *= 3;
 
 	uint32 indices = (uint32)((std::floor(t_PlaneInfo.width_segments)) * (std::floor(t_PlaneInfo.height_segments)));
 	indices *= 6;
@@ -349,7 +350,7 @@ inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 	return {vertices, indices};
 }
 
-inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, float* t_Vertices, std::vector<uint32>& t_Indices, size_t t_VertexSize, uint32 t_BaseIndex = 0)
 {
 	const auto half_width  = t_PlaneInfo.width / 2.0f;
 	const auto half_height = t_PlaneInfo.height / 2.0f;
@@ -368,7 +369,12 @@ inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, std::vector<float
 		{
 			auto x = ix * segment_width - half_width;
 
-			t_Vertices.insert(t_Vertices.end(), { x, -y, 0 });
+			*t_Vertices++ = x;
+			*t_Vertices++ = -y;
+			*t_Vertices++ = 0;
+
+			t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
+
 			// normals.insert(normals.end(), { 0, 0, -1 });
 			// uv.insert(uv.end(), { ix / grid_x, 1 - (iy / grid_y) });
 		}
@@ -399,7 +405,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	const float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
 
 	uint32 vertices = (uint32)((width_segments + 1) * (height_segments + 1));
-	vertices *= 3;
+	// vertices *= 3;
 
 
 	uint32 indices = 0;
@@ -425,7 +431,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	return {vertices, indices};
 }
 
-inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, float* t_Vertices, std::vector<uint32>& t_Indices, size_t t_VertexSize, uint32 t_BaseIndex = 0)
 {
 
 	float radius = std::max(t_SphereInfo.radius, 1.0f);
@@ -462,7 +468,11 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, std::vector<fl
 			const float z = radius * std::sin(t_SphereInfo.phi_start + u * t_SphereInfo.phi_length)
 							* std::sin(t_SphereInfo.theta_start + v * t_SphereInfo.theta_length);
 
-			t_Vertices.insert(t_Vertices.end(), { x, y, z });
+			*t_Vertices++ = x;
+			*t_Vertices++ = y;
+			*t_Vertices++ = z;
+			
+			t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
 
 			// auto norm = glm::normalize(glm::vec3(x, y, z));
 			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
@@ -500,7 +510,18 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, std::vector<fl
 	return 0;
 }
 
-inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float>& t_Vertices, std::vector<uint32>& t_Indices)
+inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
+{
+	uint32 vertices = (uint32)(t_LinesInfo.horizCount + 1) * 2u;
+	vertices += (uint32)(t_LinesInfo.vertCount + 1) * 2u;
+
+	uint32 indices = (uint32)t_LinesInfo.vertCount * 2u + 2u;
+	indices += (uint32)t_LinesInfo.horizCount * 2u + 2u;
+
+	return {vertices, indices};
+}
+
+inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, float* t_Vertices, std::vector<uint32>& t_Indices, size_t t_VertexSize, uint32 t_BaseIndex = 0)
 {
 
 	uint32 index = 0;
@@ -508,8 +529,15 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float
 	{
 		const auto nextZ = (-t_LinesInfo.horizSize / 2.0f) + i * (t_LinesInfo.horizSize / t_LinesInfo.horizCount);
 
-		t_Vertices.insert(t_Vertices.end(), {t_LinesInfo.horizSize /  2.0f, 0.0f, nextZ});
-		t_Vertices.insert(t_Vertices.end(), {-t_LinesInfo.horizSize / 2.0f, 0.0f, nextZ});
+		*t_Vertices++ = t_LinesInfo.horizSize /  2.0f;
+		*t_Vertices++ = 0.0f;
+		*t_Vertices++ = nextZ;
+		t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
+
+		*t_Vertices++ = -t_LinesInfo.horizSize /  2.0f;
+		*t_Vertices++ = 0.0f;
+		*t_Vertices++ = nextZ;
+		t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
 
 		t_Indices.push_back(index++);
 		t_Indices.push_back(index++);
@@ -522,9 +550,16 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float
 	{
 		const float nextX = (-t_LinesInfo.vertSize / 2.0f) + i * (t_LinesInfo.vertSize / t_LinesInfo.vertCount);
 
-		t_Vertices.insert(t_Vertices.end(), {nextX, 0.0f, t_LinesInfo.vertSize / 2.0f});
-		t_Vertices.insert(t_Vertices.end(), {nextX, 0.0f, -t_LinesInfo.vertSize / 2.0f});
+		*t_Vertices++ = nextX;
+		*t_Vertices++ = 0.0f;
+		*t_Vertices++ = t_LinesInfo.vertSize / 2.0f;
+		t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
 
+		*t_Vertices++ = nextX;
+		*t_Vertices++ = 0.0f;
+		*t_Vertices++ = -t_LinesInfo.vertSize / 2.0f;
+		t_Vertices += (t_VertexSize - sizeof(float)*3) / sizeof(float);
+		
 		t_Indices.push_back(index++);
 		t_Indices.push_back(index++);
 
@@ -534,15 +569,4 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, std::vector<float
 	}
 
 	return 0;
-}
-
-inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
-{
-	uint32 vertices = (uint32)(t_LinesInfo.horizCount + 1) * 2u;
-	vertices += (uint32)(t_LinesInfo.vertCount + 1) * 2u;
-
-	uint32 indices = (uint32)t_LinesInfo.vertCount * 2u + 2u;
-	indices += (uint32)t_LinesInfo.horizCount * 2u + 2u;
-
-	return {vertices, indices};
 }

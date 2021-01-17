@@ -3,65 +3,10 @@
 #include "Input.hpp"
 #include "Logging.hpp"
 #include "Math.hpp"
+#include "Debug.hpp"
 
 #include <iostream>
 
-static GeometryInfo AxisHelperInfo()
-{
-	// @Todo: This is a number that is know all the time!
-	CylinderGeometry cylinderShape{0.005f, 0.005f, 0.25f, 10.0f};
-	auto cylinderInfo = CylinderGeometryInfo(cylinderShape);
-	return {cylinderInfo.vertexCount*3, cylinderInfo.indexCount*3};
-}
-
-static int AxisHelperData(std::vector<ColorVertex>& t_Vertices, std::vector<uint32>& t_Indices)
-{
-
-	// @Todo: We _know_ the numbers that are in here
-	CylinderGeometry cylinderShape{0.005f, 0.005f, 0.25f, 10.0f};
-	auto cylinderInfo = CylinderGeometryInfo(cylinderShape);
-
-	// @Todo: We can make everything without this vector
-	std::vector<ColorVertex> vertices;
-	vertices.resize(cylinderInfo.vertexCount*3);
-
-	CylinderGeometryData(cylinderShape, &vertices[cylinderInfo.vertexCount*0].pos.x, t_Indices, sizeof(ColorVertex), cylinderInfo.vertexCount * 0u);
-	CylinderGeometryData(cylinderShape, &vertices[cylinderInfo.vertexCount*1].pos.x, t_Indices, sizeof(ColorVertex), cylinderInfo.vertexCount * 1u);
-	CylinderGeometryData(cylinderShape, &vertices[cylinderInfo.vertexCount*2].pos.x, t_Indices, sizeof(ColorVertex), cylinderInfo.vertexCount * 2u);
-
-	glm::mat4 transform(1);
-	transform = glm::translate(transform, glm::vec3(0.0f, 0.25f * 0.5f, 0.0f));
-	TransformVertices(transform, &vertices[cylinderInfo.vertexCount*0], cylinderInfo.vertexCount);
-	
-	transform = glm::mat4(1);
-	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(1, 0, 0));
-	transform = glm::translate(transform, glm::vec3(0.0f, 0.25f * 0.5f, 0.0f));
-	TransformVertices(transform, &vertices[cylinderInfo.vertexCount*1], cylinderInfo.vertexCount);
-
-	transform = glm::mat4(1);
-	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0, 0, 1));
-	transform = glm::translate(transform, glm::vec3(0.0f, 0.25f * 0.5f, 0.0f));
-	TransformVertices(transform, &vertices[cylinderInfo.vertexCount*2], cylinderInfo.vertexCount);
-	
-	for (size_t i = 0; i < cylinderInfo.vertexCount; ++i)
-	{
-		vertices[i].color = glm::vec3{0.0f, 1.0f, 0.0f};
-	}
-
-	for (size_t i = cylinderInfo.vertexCount; i < cylinderInfo.vertexCount*2; ++i)
-	{
-		vertices[i].color = glm::vec3{1.0f, 0.0f, 0.0f};
-	}
-
-	for (size_t i = cylinderInfo.vertexCount*2; i < cylinderInfo.vertexCount*3; ++i)
-	{
-		vertices[i].color = glm::vec3{0.0f, 0.0f, 1.0f};
-	}
-	
-	t_Vertices.insert(t_Vertices.end(), vertices.begin(), vertices.end());
-	
-	return 0;
-}
 
 void App::Init(HWND t_Window)
 {
@@ -72,13 +17,31 @@ void App::Init(HWND t_Window)
 	Graphics.initResources();
 	
 
+	// Create the infos needed for drawing
+	auto axisInfo = AxisHelperInfo();
+	auto cubeInfo = CubeGeometryInfo(CubeGeometry{});
+	auto planeInfo = PlaneGeometryInfo(PlaneGeometry{});
+		
+	PutGeometry(geometryBuffer, axisInfo);
+	PutGeometry(geometryBuffer, cubeInfo);
+	PutGeometry(geometryBuffer, planeInfo);
+
+	// Create actual resources
 	std::vector<ColorVertex> debugVertices;
 	std::vector<uint32> debugIndices;
 
-	axisHelper = AxisHelperInfo();
-	
 	AxisHelperData(debugVertices, debugIndices);
-	
+
+	debugVertices.resize(axisInfo.vertexCount + cubeInfo.vertexCount + planeInfo.vertexCount);
+
+	CubeGeometryData(CubeGeometry{}, &debugVertices[axisInfo.vertexCount].pos.x, debugIndices, sizeof(ColorVertex));
+	PlaneGeometryData(PlaneGeometry{}, &debugVertices[axisInfo.vertexCount  + cubeInfo.vertexCount].pos.x, debugIndices, sizeof(ColorVertex));
+
+	for (auto& v : debugVertices)
+	{
+		v.color = glm::vec3{ 1.0f, 0.0f, 0.0f };
+	}	
+
 	auto vb = vertexBufferFactory<ColorVertex>(Graphics, debugVertices);
 	auto ib = indexBufferFactory(Graphics, debugIndices);
 
@@ -113,10 +76,32 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.view = glm::transpose(camera.view());
 
 	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
-	Graphics.m_VertexShaderCB.model = glm::mat4(1);
+	
 
-	Graphics.updateCBs();
-	Graphics.drawIndex(Graphics::TT_TRIANGLES, axisHelper.indexCount);
+	PutDraw(geometryBuffer, 0u, init_translate(0.0f, 0.0f, 0.0f));
+	PutDraw(geometryBuffer, 1u, init_translate(1.0f, 0.0f, 0.0f));
+	PutDraw(geometryBuffer, 2u, init_translate(-1.0f, 0.0f, 0.0f));
+
+
+	for (size_t i = 0; i < geometryBuffer.Draws.size(); ++i)
+	{
+		const auto &draw = geometryBuffer.Draws[i];
+
+		Graphics.m_VertexShaderCB.model = draw.Transform;
+		Graphics.updateCBs();
+
+		uint32 indexCount = geometryBuffer.Infos[draw.Index].indexCount;
+		uint32 indexOffset = 0;
+		uint32 baseIndex = 0;
+		
+		for (size_t j = 0; j < draw.Index; ++j)
+		{
+			indexOffset += geometryBuffer.Infos[j].indexCount;
+			baseIndex += geometryBuffer.Infos[j].vertexCount;
+		}
+		Graphics.drawIndex(Graphics::TT_TRIANGLES, indexCount, indexOffset, baseIndex);
+	}
+
 
 	// Graphics.m_PixelShaderCB.color = { 1.0, 0.0, 0.0, 1.0};
 	// Graphics.m_VertexShaderCB.model = init_translate(0.5, 0.0, 0.0);
@@ -124,7 +109,7 @@ void App::Spin()
 	// Graphics.updateCBs();
 	// Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
 
-
+	ResetBuffer(geometryBuffer);
 	Graphics.EndFrame();
 
 }
