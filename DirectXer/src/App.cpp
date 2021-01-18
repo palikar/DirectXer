@@ -18,16 +18,17 @@ enum GeometryType
 
 struct BufferBuilder
 {
-
+	// @Todo: These two should become one
 	std::vector<GeometryType> Objects;
 	std::vector<GeometryInfo> Geometries;
 
+	// @Todo: all of that stuff should be placed on some random ass memory
 	std::vector<CubeGeometry> Cubes;
 	std::vector<PlaneGeometry> Planes;
-
 	std::vector<glm::vec3> Colors;
-	GeometryBuffer buf;
+
 	
+	GeometryBuffer buf;
 	
 	uint32 TotalIndices{0};
 	uint32 TotalVertices{0};
@@ -45,7 +46,7 @@ struct BufferBuilder
 
 		Colors.push_back(t_Color);
 
-		return PutGeometry(buf, cubeInfo);
+		return buf.PutGeometry(cubeInfo);
 	}
 
 	uint32 InitPlane(PlaneGeometry t_Plane, glm::vec3 t_Color)
@@ -61,16 +62,11 @@ struct BufferBuilder
 
 		Colors.push_back(t_Color);
 
-		return PutGeometry(buf, planeInfo);
-	}
-	
-	
+		return buf.PutGeometry(planeInfo);
+	}	
 
 	GeometryBuffer CreateBuffer(Graphics graphics)
 	{
-		
-		
-
 		uint16 cube{0};
 		uint16 plane{0};
 
@@ -92,8 +88,9 @@ struct BufferBuilder
 			{
 			  case GT_CUBE:
 			  {
-					CubeGeometryData(Cubes[cube++], &Vertices[offset].pos.x, Indices, sizeof(ColorVertex));
-					for (size_t i = offset; i < offset + Geometries[geometry++].vertexCount; i++)
+					CubeGeometryData(Cubes[cube++], &Vertices[offset], Indices, sizeof(ColorVertex));
+					
+					for (size_t i = offset; i < offset + Geometries[geometry].vertexCount; i++)
 					{
 						Vertices[i].color = Colors[color];
 					}
@@ -104,8 +101,16 @@ struct BufferBuilder
 			  }
 			  case GT_PLANE:
 			  {
-				  PlaneGeometryData(Planes[plane++], &Vertices[offset].pos.x, Indices, sizeof(ColorVertex));
+				  PlaneGeometryData(Planes[plane++], &Vertices[offset], Indices, sizeof(ColorVertex));
+				  
+				  for (size_t i = offset; i < offset + Geometries[geometry].vertexCount ; i++)
+				  {
+					  Vertices[i].color = Colors[color];
+				  }
+
 				  offset += Geometries[geometry++].vertexCount;
+				  ++color;
+
 				  break;
 			  }
 
@@ -135,22 +140,17 @@ void App::Init(HWND t_Window)
 	Graphics.initBackBuffer();
 	Graphics.initZBuffer(Width, Height);
 	Graphics.initResources();
-	
 
-	// Create the infos needed for drawing
-	//auto axisInfo = AxisHelperInfo();
-	//auto cubeInfo = CubeGeometryInfo();
-	//auto planeInfo = PlaneGeometryInfo(PlaneGeometry{});
-
+    // @Todo: This should some sort of arena storage to do its thing
 	BufferBuilder builder;
 
 	builder.InitCube(CubeGeometry{}, glm::vec3{1.0f, 0.0f, 0.0f});
 	builder.InitPlane(PlaneGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 
+	// @Todo: This should return "BufferDescriptor" -- VBO, IBO, GeometryDescriptor
 	geometryBuffer = builder.CreateBuffer(Graphics);
 
-
-
+	
 	Graphics.setShaders(Graphics::SHADER_SIMPLE);
 	Graphics.setViewport(0, 0, 800, 600);
 	Graphics.setRasterizationState();
@@ -181,38 +181,23 @@ void App::Spin()
 	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
 	
 
-	 PutDraw(geometryBuffer, 0u, init_translate(0.0f, 0.0f, 0.0f));
-	// PutDraw(geometryBuffer, 1u, init_translate(1.0f, 0.0f, 0.0f));
-	// PutDraw(geometryBuffer, 2u, init_translate(-1.0f, 0.0f, 0.0f));
+	// @Todo: this becomes simply geometryBuffer.Draw(Graphics, CUBE_1)
+	Graphics.m_VertexShaderCB.model = init_translate(0.5f, 0.0f, 0.0f);
+	Graphics.updateCBs();
+	geometryBuffer.DrawGeometry(Graphics, 0);
+
+	
+	Graphics.m_VertexShaderCB.model = init_translate(-0.5f, 0.0f, 0.0f);
+	Graphics.updateCBs();
+	geometryBuffer.DrawGeometry(Graphics, 1);
 
 
-	for (size_t i = 0; i < geometryBuffer.Draws.size(); ++i)
-	{
-		const auto &draw = geometryBuffer.Draws[i];
-
-		Graphics.m_VertexShaderCB.model = draw.Transform;
-		Graphics.updateCBs();
-
-		uint32 indexCount = geometryBuffer.Infos[draw.Index].indexCount;
-		uint32 indexOffset = 0;
-		uint32 baseIndex = 0;
-		
-		for (size_t j = 0; j < draw.Index; ++j)
-		{
-			indexOffset += geometryBuffer.Infos[j].indexCount;
-			baseIndex += geometryBuffer.Infos[j].vertexCount;
-		}
-		Graphics.drawIndex(Graphics::TT_TRIANGLES, indexCount, indexOffset, baseIndex);
-	}
-
-
-	// Graphics.m_PixelShaderCB.color = { 1.0, 0.0, 0.0, 1.0};
+	// 
 	// Graphics.m_VertexShaderCB.model = init_translate(0.5, 0.0, 0.0);
 
 	// Graphics.updateCBs();
 	// Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
 
-	ResetBuffer(geometryBuffer);
 	Graphics.EndFrame();
 
 }

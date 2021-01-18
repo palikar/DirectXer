@@ -8,11 +8,6 @@
 struct CommandLineSettings
 {};
 
-struct GeometryDraw
-{
-	uint32 Index{0};
-	glm::mat4 Transform{1};
-};
 
 struct GeometryIndex
 {
@@ -23,28 +18,33 @@ struct GeometryIndex
 
 struct GeometryBuffer
 {
+	// @Todo: This shold be something that does not allocate!
 	std::vector<GeometryInfo> Infos;
 
-	std::vector<GeometryDraw> Draws;
+	void DrawGeometry(Graphics graphics, uint32 t_Index)
+	{
+
+		uint32 indexOffset = 0;
+		uint32 baseIndex = 0;
+
+		for (size_t j = 0; j < t_Index; ++j)
+		{
+			indexOffset += Infos[j].indexCount;
+			baseIndex += Infos[j].vertexCount;
+		}
+
+		const uint32 indexCount = Infos[t_Index].indexCount;
+		graphics.drawIndex(Graphics::TT_TRIANGLES, indexCount, indexOffset, baseIndex);
+
+	}
+
+	uint32 PutGeometry(GeometryInfo t_Info)
+	{
+		Infos.push_back(t_Info);
+		return (uint32)Infos.size();
+	}
+
 };
-
-static void ResetBuffer(GeometryBuffer& t_Buffer)
-{
-	t_Buffer.Draws.clear();
-}
-
-
-static void PutDraw(GeometryBuffer& t_Buffer, uint32 t_Index, glm::mat4 t_Transfrom)
-{
-	t_Buffer.Draws.push_back({t_Index, t_Transfrom});
-}
-
-
-static uint32 PutGeometry(GeometryBuffer& t_Buffer, GeometryInfo t_Info)
-{
-	t_Buffer.Infos.push_back(t_Info);
-	return (uint32)t_Buffer.Infos.size();
-}
 
 
 class App

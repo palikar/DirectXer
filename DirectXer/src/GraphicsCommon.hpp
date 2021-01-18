@@ -2,6 +2,8 @@
 
 #include <DirectXMath.h>
 #include <d3d11.h>
+#undef max
+#undef min
 
 #include "Types.hpp"
 #include "Glm.hpp"
