@@ -19,7 +19,7 @@ struct GeometryIndex
 	uint32 BaseIndex;
 	uint32 IndexOffset;
 	uint32 IndexCount;
-}
+};
 
 struct GeometryBuffer
 {

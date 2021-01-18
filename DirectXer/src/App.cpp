@@ -8,6 +8,126 @@
 #include <iostream>
 
 
+enum GeometryType
+{
+	GT_CUBE = 1,
+	GT_PLANE = 2,
+	GT_AXISHELPER = 4,
+};
+
+
+struct BufferBuilder
+{
+
+	std::vector<GeometryType> Objects;
+	std::vector<GeometryInfo> Geometries;
+
+	std::vector<CubeGeometry> Cubes;
+	std::vector<PlaneGeometry> Planes;
+
+	std::vector<glm::vec3> Colors;
+	GeometryBuffer buf;
+	
+	
+	uint32 TotalIndices{0};
+	uint32 TotalVertices{0};
+	
+	uint32 InitCube(CubeGeometry t_Cube, glm::vec3 t_Color)
+	{
+		auto cubeInfo = CubeGeometryInfo(t_Cube);
+
+		TotalIndices += cubeInfo.indexCount;
+		TotalVertices += cubeInfo.vertexCount;
+
+		Objects.push_back(GT_CUBE);
+		Cubes.push_back(t_Cube);
+		Geometries.push_back(cubeInfo);
+
+		Colors.push_back(t_Color);
+
+		return PutGeometry(buf, cubeInfo);
+	}
+
+	uint32 InitPlane(PlaneGeometry t_Plane, glm::vec3 t_Color)
+	{
+		auto planeInfo = PlaneGeometryInfo(t_Plane);
+
+		TotalIndices += planeInfo.indexCount;
+		TotalVertices += planeInfo.vertexCount;
+		
+		Objects.push_back(GT_PLANE);
+		Planes.push_back(t_Plane);
+		Geometries.push_back(planeInfo);
+
+		Colors.push_back(t_Color);
+
+		return PutGeometry(buf, planeInfo);
+	}
+	
+	
+
+	GeometryBuffer CreateBuffer(Graphics graphics)
+	{
+		
+		
+
+		uint16 cube{0};
+		uint16 plane{0};
+
+		uint32 offset{0};
+		uint32 color{0};
+		
+		uint32 geometry{0};
+
+		std::vector<ColorVertex> Vertices;
+		std::vector<uint32> Indices;
+	
+		Vertices.resize(TotalVertices);
+		Indices.reserve(TotalIndices);
+		
+		for (auto obj : Objects)
+		{
+
+			switch(obj)
+			{
+			  case GT_CUBE:
+			  {
+					CubeGeometryData(Cubes[cube++], &Vertices[offset].pos.x, Indices, sizeof(ColorVertex));
+					for (size_t i = offset; i < offset + Geometries[geometry++].vertexCount; i++)
+					{
+						Vertices[i].color = Colors[color];
+					}
+				  
+					offset += Geometries[geometry++].vertexCount; 
+					++color;
+					break;
+			  }
+			  case GT_PLANE:
+			  {
+				  PlaneGeometryData(Planes[plane++], &Vertices[offset].pos.x, Indices, sizeof(ColorVertex));
+				  offset += Geometries[geometry++].vertexCount;
+				  break;
+			  }
+
+			}
+			
+		}
+
+			
+		auto vb = vertexBufferFactory<ColorVertex>(graphics, Vertices);
+		auto ib = indexBufferFactory(graphics, Indices);
+
+		graphics.setVertexBuffer(vb);
+		graphics.setIndexBuffer(ib);
+
+		return buf;
+
+	}
+
+};
+
+
+
 void App::Init(HWND t_Window)
 {
 
@@ -18,35 +138,18 @@ void App::Init(HWND t_Window)
 	
 
 	// Create the infos needed for drawing
-	auto axisInfo = AxisHelperInfo();
-	auto cubeInfo = CubeGeometryInfo(CubeGeometry{});
-	auto planeInfo = PlaneGeometryInfo(PlaneGeometry{});
-		
-	PutGeometry(geometryBuffer, axisInfo);
-	PutGeometry(geometryBuffer, cubeInfo);
-	PutGeometry(geometryBuffer, planeInfo);
+	//auto axisInfo = AxisHelperInfo();
+	//auto cubeInfo = CubeGeometryInfo();
+	//auto planeInfo = PlaneGeometryInfo(PlaneGeometry{});
 
-	// Create actual resources
-	std::vector<ColorVertex> debugVertices;
-	std::vector<uint32> debugIndices;
+	BufferBuilder builder;
 
-	AxisHelperData(debugVertices, debugIndices);
+	builder.InitCube(CubeGeometry{}, glm::vec3{1.0f, 0.0f, 0.0f});
+	builder.InitPlane(PlaneGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 
-	debugVertices.resize(axisInfo.vertexCount + cubeInfo.vertexCount + planeInfo.vertexCount);
+	geometryBuffer = builder.CreateBuffer(Graphics);
 
-	CubeGeometryData(CubeGeometry{}, &debugVertices[axisInfo.vertexCount].pos.x, debugIndices, sizeof(ColorVertex));
-	PlaneGeometryData(PlaneGeometry{}, &debugVertices[axisInfo.vertexCount  + cubeInfo.vertexCount].pos.x, debugIndices, sizeof(ColorVertex));
 
-	for (auto& v : debugVertices)
-	{
-		v.color = glm::vec3{ 1.0f, 0.0f, 0.0f };
-	}	
-
-	auto vb = vertexBufferFactory<ColorVertex>(Graphics, debugVertices);
-	auto ib = indexBufferFactory(Graphics, debugIndices);
-
-	Graphics.setVertexBuffer(vb);
-	Graphics.setIndexBuffer(ib);
 
 	Graphics.setShaders(Graphics::SHADER_SIMPLE);
 	Graphics.setViewport(0, 0, 800, 600);
@@ -78,9 +181,9 @@ void App::Spin()
 	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
 	
 
-	PutDraw(geometryBuffer, 0u, init_translate(0.0f, 0.0f, 0.0f));
-	PutDraw(geometryBuffer, 1u, init_translate(1.0f, 0.0f, 0.0f));
-	PutDraw(geometryBuffer, 2u, init_translate(-1.0f, 0.0f, 0.0f));
+	 PutDraw(geometryBuffer, 0u, init_translate(0.0f, 0.0f, 0.0f));
+	// PutDraw(geometryBuffer, 1u, init_translate(1.0f, 0.0f, 0.0f));
+	// PutDraw(geometryBuffer, 2u, init_translate(-1.0f, 0.0f, 0.0f));
 
 
 	for (size_t i = 0; i < geometryBuffer.Draws.size(); ++i)
