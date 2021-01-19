@@ -106,7 +106,7 @@ inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 
 	indices *= 3u;
 
-	return {vertices, indices, GT_CUBE};
+	return {vertices, indices, GT_CYLINDER};
 }
 
 inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
@@ -139,7 +139,7 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 			const float vert_y = -v * t_CylinderInfo.height + halfHeight;
 			const float vert_z = radius * cosTheta;
 
-			auto norm = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
+			// auto norm = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
 
 			t_Vertices->pos.x = vert_x;
 			t_Vertices->pos.y = vert_y;
@@ -257,7 +257,6 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.depthSegments  + 1));
 	vertices += (uint32)((t_CubeInfo.widthSegments + 1) * (t_CubeInfo.heightSegments + 1));
 	vertices *= 2;
-	// vertices *= 3;
 
 	uint32 indices = (uint32)(t_CubeInfo.depthSegments * t_CubeInfo.heightSegments);
 	indices += (uint32)(t_CubeInfo.widthSegments * t_CubeInfo.depthSegments);
@@ -418,18 +417,17 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	int ix, iy;
 	for (iy = 0; iy < height_segments; ++iy)
 	{
-
 		for (ix = 0; ix < width_segments; ++ix)
 		{
 
 			if (iy != 0 || t_SphereInfo.theta_start > 0)
 			{
-				indices+=3;
+				indices += 3;
 			}
 
 			if (iy != height_segments - 1 || theta_end < PI)
 			{
-				indices+=3;
+				indices += 3;
 			}
 		}
 	}

@@ -41,7 +41,7 @@ struct GeometryBuffer
 	uint32 PutGeometry(GeometryInfo t_Info)
 	{
 		Infos.push_back(t_Info);
-		return (uint32)Infos.size();
+		return (uint32)Infos.size() - 1;
 	}
 
 };
