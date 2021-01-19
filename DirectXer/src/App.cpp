@@ -8,26 +8,17 @@
 #include <iostream>
 
 
-enum GeometryType
-{
-	GT_CUBE = 1,
-	GT_PLANE = 2,
-	GT_AXISHELPER = 4,
-};
-
-
 struct BufferBuilder
 {
-	// @Todo: These two should become one
-	std::vector<GeometryType> Objects;
 	std::vector<GeometryInfo> Geometries;
 
 	// @Todo: all of that stuff should be placed on some random ass memory
 	std::vector<CubeGeometry> Cubes;
 	std::vector<PlaneGeometry> Planes;
+	std::vector<CylinderGeometry> Cylinders;
+	std::vector<SphereGeometry> Spheres;
 	std::vector<glm::vec3> Colors;
 
-	
 	GeometryBuffer buf;
 	
 	uint32 TotalIndices{0};
@@ -40,7 +31,6 @@ struct BufferBuilder
 		TotalIndices += cubeInfo.indexCount;
 		TotalVertices += cubeInfo.vertexCount;
 
-		Objects.push_back(GT_CUBE);
 		Cubes.push_back(t_Cube);
 		Geometries.push_back(cubeInfo);
 
@@ -56,7 +46,6 @@ struct BufferBuilder
 		TotalIndices += planeInfo.indexCount;
 		TotalVertices += planeInfo.vertexCount;
 		
-		Objects.push_back(GT_PLANE);
 		Planes.push_back(t_Plane);
 		Geometries.push_back(planeInfo);
 
@@ -73,48 +62,55 @@ struct BufferBuilder
 		uint32 offset{0};
 		uint32 color{0};
 		
-		uint32 geometry{0};
-
 		std::vector<ColorVertex> Vertices;
 		std::vector<uint32> Indices;
 	
 		Vertices.resize(TotalVertices);
 		Indices.reserve(TotalIndices);
 		
-		for (auto obj : Objects)
+		for (auto& geometry : Geometries)
 		{
 
-			switch(obj)
+			switch(geometry.type)
 			{
 			  case GT_CUBE:
 			  {
 					CubeGeometryData(Cubes[cube++], &Vertices[offset], Indices, sizeof(ColorVertex));
-					
-					for (size_t i = offset; i < offset + Geometries[geometry].vertexCount; i++)
-					{
-						Vertices[i].color = Colors[color];
-					}
-				  
-					offset += Geometries[geometry++].vertexCount; 
-					++color;
 					break;
 			  }
+
 			  case GT_PLANE:
 			  {
 				  PlaneGeometryData(Planes[plane++], &Vertices[offset], Indices, sizeof(ColorVertex));
-				  
-				  for (size_t i = offset; i < offset + Geometries[geometry].vertexCount ; i++)
-				  {
-					  Vertices[i].color = Colors[color];
-				  }
+				  break;
+			  }
 
-				  offset += Geometries[geometry++].vertexCount;
-				  ++color;
+			  case GT_CYLINDER:
+			  {
+				  CylinderGeometryData(Cylinders[cylinder++], &Vertices[offset], Indices, sizeof(ColorVertex));
+				  break;
+			  }
 
+			  case GT_SPHERE:
+			  {
+				  SphereGeometryData(Sphere[cylinder++], &Vertices[offset], Indices, sizeof(ColorVertex));
+				  break;
+			  }
+
+			  case GT_UNKNOWN:
+			  {
+				  // @Todo: Warning here!
 				  break;
 			  }
 
 			}
+
+			for (size_t i = offset; i < offset + geometry.vertexCount ; i++)
+			{
+				Vertices[i].color = Colors[color];
+			}				  
+			offset += geometry.vertexCount; 
+			++color;
 			
 		}
 
@@ -130,8 +126,6 @@ struct BufferBuilder
 	}
 
 };
-
-
 
 void App::Init(HWND t_Window)
 {
@@ -180,8 +174,6 @@ void App::Spin()
 
 	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
 	
-
-	// @Todo: this becomes simply geometryBuffer.Draw(Graphics, CUBE_1)
 	Graphics.m_VertexShaderCB.model = init_translate(0.5f, 0.0f, 0.0f);
 	Graphics.updateCBs();
 	geometryBuffer.DrawGeometry(Graphics, 0);
@@ -190,13 +182,6 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.model = init_translate(-0.5f, 0.0f, 0.0f);
 	Graphics.updateCBs();
 	geometryBuffer.DrawGeometry(Graphics, 1);
-
-
-	// 
-	// Graphics.m_VertexShaderCB.model = init_translate(0.5, 0.0, 0.0);
-
-	// Graphics.updateCBs();
-	// Graphics.drawIndex(Graphics::TT_TRIANGLES, plane.indexCount, cube.indexCount, cube.vertexCount/3);
 
 	Graphics.EndFrame();
 

@@ -7,7 +7,7 @@ static GeometryInfo AxisHelperInfo()
 	// @Todo: This is a number that is know all the time!
 	CylinderGeometry cylinderShape{0.005f, 0.005f, 0.25f, 10.0f};
 	auto cylinderInfo = CylinderGeometryInfo(cylinderShape);
-	return {cylinderInfo.vertexCount*3, cylinderInfo.indexCount*3};
+	return {cylinderInfo.vertexCount*3, cylinderInfo.indexCount*3, GT_AXISHELPER};
 }
 
 static int AxisHelperData(ColorVertex* t_Vertices, std::vector<uint32>& t_Indices)

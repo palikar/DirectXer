@@ -368,6 +368,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Todo: Adjust all of the geometry generators
 
+// @Todo: Add the normals and uvs to the color vertex
+
 // @Todo: Container for geometry info!
 
 // @Done: Resizing

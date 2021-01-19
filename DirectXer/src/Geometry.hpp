@@ -9,6 +9,17 @@
 
 inline constexpr float PI = 3.14159265358979323846;
 
+enum GeometryType : uint16
+{
+	GT_UNKNOWN = 0,
+	GT_CUBE,
+	GT_PLANE,
+	GT_CYLINDER,
+	GT_SPHERE,
+	GT_LINES,
+	GT_AXISHELPER,
+};
+
 struct CubeGeometry
 {
 	float width{1.0};
@@ -64,6 +75,8 @@ struct GeometryInfo
 {
 	uint32 vertexCount{0};
 	uint32 indexCount{0};
+
+	GeometryType type{0};
 };
 
 
@@ -92,9 +105,8 @@ inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 	}
 
 	indices *= 3u;
-	// vertices *= 3u;
 
-	return {vertices, indices};
+	return {vertices, indices, GT_CUBE};
 }
 
 inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
@@ -253,7 +265,7 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	indices *= 2;
 	indices *= 6;
 
-	return {vertices, indices};
+	return {vertices, indices, GT_CUBE};
 }
 
 inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
@@ -286,10 +298,6 @@ inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, ColorVertex* t_Verti
 			for (ix = 0; ix < gridX1; ix++)
 			{
 				float x = ix * segmentWidth - widthHalf;
-
-				// vertex[u] = x * udir;
-				// vertex[v] = y * vdir;
-				// vertex[w] = depthHalf;
 
 				// vertex[3 + u] = 0;
 				// vertex[3 + v] = 0;
@@ -347,7 +355,7 @@ inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 	uint32 indices = (uint32)((std::floor(t_PlaneInfo.width_segments)) * (std::floor(t_PlaneInfo.height_segments)));
 	indices *= 6;
 
-	return {vertices, indices};
+	return {vertices, indices, GT_PLANE};
 }
 
 inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
@@ -405,8 +413,6 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	const float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
 
 	uint32 vertices = (uint32)((width_segments + 1) * (height_segments + 1));
-	// vertices *= 3;
-
 
 	uint32 indices = 0;
 	int ix, iy;
@@ -428,7 +434,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 		}
 	}
 
-	return {vertices, indices};
+	return {vertices, indices, GT_SPHERE};
 }
 
 inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
@@ -518,7 +524,7 @@ inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
 	uint32 indices = (uint32)t_LinesInfo.vertCount * 2u + 2u;
 	indices += (uint32)t_LinesInfo.horizCount * 2u + 2u;
 
-	return {vertices, indices};
+	return {vertices, indices, GT_LINES};
 }
 
 inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
