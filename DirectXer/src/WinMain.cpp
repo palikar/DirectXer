@@ -327,7 +327,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Temporary Vector and Map
 // @Todo: Have a separate palce for "debug" memory
 
-
 // @Done: Ability to transform vertices on the CPU
 // @Done: Proper Vertex struct format
 // @Done: Transformation per vertex type
@@ -336,7 +335,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Graphics
 // @Todo: Loading textures from file
-
+// @Todo: Creating textures in the graphics
+// @Todo: Shader types setup
 
 // @Todo: Texture catalog but a good one, not holding textures in memory all the time
 // @Done: Lines "geometry" + ability to use lines primiteves
@@ -344,39 +344,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Cone geometry
 // @Todo: Torus geometry
 
+// @Rendering
 // @Todo: Rendering sky box
-// @Todo: Loading textures from file
-// @Todo: Creating textures in the graphics
-
 // @Todo: Rendering groups
-// @Todo: Loading obj files
 // @Todo: Rendering fog
-// @Done: Axis helper
-// @Done: Grid Helper
-// @Done: Color vertex type -- hence solid color material (ish)
-
-// @Todo: Spot light helper
-// @Todo: Point light helper
-
 // @Todo: Phong material
 // @Todo: PBR material
 // @Todo: Sollid color material
-
 // @Todo: Text rendering
-// @Todo: Mouse picking
-// @Todo: Drop down console
-
-// @Done: FPS Camara controller
 // @Todo: Point light
 
-// @Todo: Adjust all of the geometry generators
-
-// @Todo: Add the normals and uvs to the color vertex
-
-// @Todo: Shader types setup
-
+// @Data management
+// @Todo: Loading obj files
+// @Done: Color vertex type -- hence solid color material (ish)
+// @Todo: Mouse picking
 // @Done: Container for geometry info!
 
+// @Debug
+// @Done: Axis helper
+// @Done: Grid Helper
+// @Todo: Spot light helper
+// @Todo: Point light helper
+// @Todo: Drop down console
+// @Done: FPS Camara controller
+// @Todo: Adjust all of the geometry generators
+// @Todo: Add the normals and uvs to the color vertex
+
+// @Architecture
 // @Done: Resizing
 
+// @Notes
 // @Note: In a scene, some things are dynamic, and some things are static
+
+
