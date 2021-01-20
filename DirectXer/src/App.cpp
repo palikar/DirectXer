@@ -8,6 +8,14 @@
 #include <iostream>
 
 
+struct BufferDescriptor
+{
+	GeometryBuffer Description;
+	VBObject Vbo;
+	IBObject Ibo;
+	
+};
+
 struct BufferBuilder
 {
 	std::vector<GeometryInfo> Geometries;
@@ -101,7 +109,7 @@ struct BufferBuilder
 		return buf.PutGeometry(linesInfo);
 	}
 
-	GeometryBuffer CreateBuffer(Graphics graphics)
+	BufferDescriptor CreateBuffer(Graphics graphics)
 	{
 		uint16 cube{0};
 		uint16 plane{0};
@@ -173,14 +181,10 @@ struct BufferBuilder
 
 		}
 
-
 		auto vb = vertexBufferFactory<ColorVertex>(graphics, Vertices);
 		auto ib = indexBufferFactory(graphics, Indices);
 
-		graphics.setVertexBuffer(vb);
-		graphics.setIndexBuffer(ib);
-
-		return buf;
+		return {buf, vb, ib};
 
 	}
 
@@ -211,8 +215,12 @@ void App::Init(HWND t_Window)
 	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 
 
-	// @Todo: This should return "BufferDescriptor" -- VBO, IBO, GeometryDescriptor
-	geometryBuffer = builder.CreateBuffer(Graphics);
+	auto desc = builder.CreateBuffer(Graphics);
+
+	geometryBuffer = desc.Description;
+
+	Graphics.setIndexBuffer(desc.Ibo);
+	Graphics.setVertexBuffer(desc.Vbo);
 
 
 	Graphics.setShaders(Graphics::SHADER_SIMPLE);

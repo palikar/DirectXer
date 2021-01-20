@@ -341,16 +341,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Cone geometry
 // @Todo: Torus geometry
 
+// @Todo: Rendering sky box
+// @Todo: Loading textures from file
+// @Todo: Creating textures in the graphics
+
 // @Todo: Rendering groups
 // @Todo: Loading obj files
-// @Todo: Rendering sky box
 // @Todo: Rendering fog
-
-// @Todo: Color vertex type -- hence solid color material (ish)
-
 // @Done: Axis helper
 // @Done: Grid Helper
-
+// @Done: Color vertex type -- hence solid color material (ish)
 
 // @Todo: Spot light helper
 // @Todo: Point light helper
@@ -370,7 +370,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Todo: Add the normals and uvs to the color vertex
 
-// @Todo: Container for geometry info!
+// @Todo: Shader types setup
+
+// @Done: Container for geometry info!
 
 // @Done: Resizing
 
