@@ -212,7 +212,7 @@ void App::Init(HWND t_Window)
 	PLANE = builder.InitPlane(PlaneGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 	SPHERE = builder.InitSphere(SphereGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 	CYLINDER = builder.InitCylinder(CylinderGeometry{0.25, 0.25, 1.5}, glm::vec3{1.0f, 1.0f, 0.0f});
-	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
+	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{1.0f, 0.0f, 1.0f});
 
 
 	auto desc = builder.CreateBuffer(Graphics);
@@ -269,6 +269,11 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.model = init_scale(0.5f, 0.5f, 0.5f)*init_translate(0.0f, 1.5f, 0.0f);
 	Graphics.updateCBs();
 	geometryBuffer.DrawGeometry(Graphics, SPHERE);
+
+	Graphics.m_VertexShaderCB.model = init_translate(0.0f, -2.5f, 0.0f);
+	Graphics.updateCBs();
+	geometryBuffer.DrawGeometry(Graphics, LINES);
+
 
 
 	Graphics.EndFrame();

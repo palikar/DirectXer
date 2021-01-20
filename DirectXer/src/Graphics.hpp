@@ -67,10 +67,10 @@ class Graphics
 		SHADER_COUNT
 	};
 
-	enum TopolgyType
+	enum TopolgyType : uint8
 	{
 		TT_TRIANGLES = 0,
-		TT_LINES = 1
+		TT_LINES     = 1
 	};
 
 

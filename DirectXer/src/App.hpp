@@ -34,7 +34,8 @@ struct GeometryBuffer
 		}
 
 		const uint32 indexCount = Infos[t_Index].indexCount;
-		graphics.drawIndex(Graphics::TT_TRIANGLES, indexCount, indexOffset, baseIndex);
+		const auto topology = Graphics::TopolgyType((Infos[t_Index].type & ~255) >> 8);
+		graphics.drawIndex(topology, indexCount, indexOffset, baseIndex);
 
 	}
 

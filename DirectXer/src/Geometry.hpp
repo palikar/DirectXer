@@ -11,13 +11,13 @@ inline constexpr float PI = 3.14159265358979323846;
 
 enum GeometryType : uint16
 {
-	GT_UNKNOWN = 0,
-	GT_CUBE,
-	GT_PLANE,
-	GT_CYLINDER,
-	GT_SPHERE,
-	GT_LINES,
-	GT_AXISHELPER,
+	GT_UNKNOWN    = 0 | (0x00 << 8),
+	GT_CUBE       = 1 | (0x00 << 8),
+	GT_PLANE      = 2 | (0x00 << 8),
+	GT_CYLINDER   = 3 | (0x00 << 8),
+	GT_SPHERE     = 4 | (0x00 << 8),
+	GT_LINES      = 5 | (0x01 << 8),
+	GT_AXISHELPER = 6 | (0x00 << 8),
 };
 
 struct CubeGeometry

@@ -320,22 +320,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return 0;
 }
 
-
-// @Done: Ability to transform vertices on the CPU
-
-// @Done: Proper Vertex struct format
-// @Done: Transformation per vertex type
-
+// @Memory magament
 // @Todo: Buffering the logging output
 // @Todo: Allcating some amount of memory upfront
 // @Todo: Pool temporary allocation strategy
 // @Todo: Temporary Vector and Map
+// @Todo: Have a separate palce for "debug" memory
+
+
+// @Done: Ability to transform vertices on the CPU
+// @Done: Proper Vertex struct format
+// @Done: Transformation per vertex type
 // @Done: Robing hood map from the github repo
 // @Done: Basic setup for command line arguments passig
 
+// @Graphics
 // @Todo: Loading textures from file
-// @Todo: Texture catalog but a good one, not holding textures in memory all the time
 
+
+// @Todo: Texture catalog but a good one, not holding textures in memory all the time
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
 // @Todo: Cone geometry
