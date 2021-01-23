@@ -339,6 +339,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Creating textures in the graphics
 // @Todo: Shader types setup
 // @Done: Rasterization state types setup
+// @Todo: Scissor test support
 
 // @Todo: Texture catalog but a good one, not holding textures in memory all the time
 // @Done: Lines "geometry" + ability to use lines primiteves

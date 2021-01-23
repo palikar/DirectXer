@@ -49,13 +49,19 @@ struct IBObject
 	ID3D11Buffer* id{nullptr};
 };
 
+struct TextureObject
+{
+	ID3D11Texture2D* tp{nullptr};
+	ID3D11ShaderResourceView* srv{nullptr};
+	ID3D11RenderTargetView* rtv{nullptr};
+};
+
 struct ShaderObject
 {
 	ID3D11InputLayout* il{nullptr};
 	ID3D11VertexShader* vs{nullptr};
 	ID3D11PixelShader* ps{nullptr};
 };
-
 
 enum RasterizationState : uint8
 {
@@ -101,6 +107,39 @@ class Graphics
 
 	void updateCBs();
 
+	TextureObject createTexute(uint16 t_Width, uint16 t_Height, void* t_Data, uint64 t_Length)
+	{
+		TextureObject to;
+
+		D3D11_TEXTURE2D_DESC desc;
+		desc.Width = t_Width;
+		desc.Height = t_Height;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc.CPUAccessFlags = 0;
+		desc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA data;
+		data.pSysMem = t_Data;
+
+		Device->CreateTexture2D(&desc, &data, &to.tp);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		srvDesc.Format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = 1;
+		
+		Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv);
+
+		return to;
+	}
+	
 	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
 	IBObject createIndexBuffer(void* data, uint32 dataSize);
 	template<typename Type, bool isPSBuffer>
