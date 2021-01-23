@@ -79,6 +79,33 @@ void Graphics::initZBuffer(float width, float height)
 
 }
 
+void Graphics::initRasterizationsStates()
+{
+
+	
+	ID3D11RasterizerState* rastStateNormal;
+	ID3D11RasterizerState* rastStateDebug;
+	
+	D3D11_RASTERIZER_DESC rastDesc{0};
+	rastDesc.CullMode = D3D11_CULL_NONE;
+	rastDesc.FillMode = D3D11_FILL_SOLID;
+	rastDesc.FrontCounterClockwise = false;
+	rastDesc.ScissorEnable  = false;
+		
+	HRESULT hr;
+	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateNormal));
+
+	rastDesc.CullMode = D3D11_CULL_NONE;
+	rastDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rastDesc.FrontCounterClockwise = false;
+	rastDesc.ScissorEnable  = false;
+	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateDebug));
+
+	rasterizationsStates[RS_NORMAL] = rastStateNormal;
+	rasterizationsStates[RS_DEBUG] = rastStateDebug;
+	
+}
+
 void Graphics::resizeBackBuffer(float width, float height)
 {
 
@@ -131,20 +158,9 @@ void Graphics::ClearZBuffer()
 	Context->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0u);
 }
 
-void Graphics::setRasterizationState()
+void Graphics::setRasterizationState(RasterizationState t_State)
 {
-	
-	ID3D11RasterizerState* rastState;
-	D3D11_RASTERIZER_DESC rastDesc{0};
-	rastDesc.CullMode = D3D11_CULL_NONE;
-	rastDesc.FillMode = D3D11_FILL_WIREFRAME;
-	rastDesc.FrontCounterClockwise = false;
-	rastDesc.ScissorEnable  = false;
-		
-	HRESULT hr;
-	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastState));
-	Context->RSSetState(rastState);
-
+	Context->RSSetState(rasterizationsStates[t_State]);
 }
 
 VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize)
@@ -329,16 +345,19 @@ void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint
 {
 	
 	// @Todo: Make this in a function of its own
+
+	uint32 factor = 1;
 	switch (topology) {
 	  case TT_TRIANGLES: 
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		  break;
 	  case TT_LINES: 
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		  factor = 2;
 		  break;
 	}
 	
-	Context->DrawIndexed(count, offset, base);
+	Context->DrawIndexed(count/factor, offset, base);
 }
 
 

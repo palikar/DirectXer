@@ -80,6 +80,7 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
 	{
+		
 		gInput.UpdateKeyboardButtonReleased(static_cast<uint16_t>(wParam));
 		break;
 	}
@@ -337,6 +338,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Loading textures from file
 // @Todo: Creating textures in the graphics
 // @Todo: Shader types setup
+// @Done: Rasterization state types setup
 
 // @Todo: Texture catalog but a good one, not holding textures in memory all the time
 // @Done: Lines "geometry" + ability to use lines primiteves
@@ -351,14 +353,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Phong material
 // @Todo: PBR material
 // @Todo: Sollid color material
-// @Todo: Text rendering
 // @Todo: Point light
+// @Todo: Text rendering
 
 // @Data management
 // @Todo: Loading obj files
 // @Done: Color vertex type -- hence solid color material (ish)
-// @Todo: Mouse picking
 // @Done: Container for geometry info!
+// @Todo: Mouse picking
 
 // @Debug
 // @Done: Axis helper
@@ -372,6 +374,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Architecture
 // @Done: Resizing
+// @Todo: Some job\task system for basic multithreading support
 
 // @Notes
 // @Note: In a scene, some things are dynamic, and some things are static

@@ -23,7 +23,6 @@ struct GeometryBuffer
 
 	void DrawGeometry(Graphics graphics, uint32 t_Index)
 	{
-
 		uint32 indexOffset = 0;
 		uint32 baseIndex = 0;
 
@@ -61,12 +60,12 @@ public:
 
   private:
 	Graphics Graphics;
-
-	GeometryInfo axisHelper;
-
 	GeometryBuffer geometryBuffer;
-
 	Camera camera;
+
+	RasterizationState CurrentRastState = RS_DEBUG;
+
+	
 
   public:
 	float32 Width;

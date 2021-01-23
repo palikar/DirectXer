@@ -56,6 +56,15 @@ struct ShaderObject
 	ID3D11PixelShader* ps{nullptr};
 };
 
+
+enum RasterizationState : uint8
+{
+	RS_NORMAL = 0,
+	RS_DEBUG,
+
+	RS_COUNT
+};
+
 class Graphics
 {
   public:
@@ -78,12 +87,13 @@ class Graphics
 	void initBackBuffer();
 	void initZBuffer(float width, float height);
 	void initResources();
+	void initRasterizationsStates();
 
 	void resizeBackBuffer(float width, float height);
 
 	void destroyZBuffer();
 
-	void setRasterizationState();
+	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void setShaders(ShaderType t_Shader);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
@@ -106,12 +116,16 @@ class Graphics
 
   public:
 	// @Note: We should probably have a maximum of 8 pointers here (1 cahce line)
+	// not sure which data has to be inlined though; what is that we use most commonly
+	// together?
 	ID3D11Device* Device{ nullptr };
 	IDXGISwapChain* Swap{ nullptr };
 	ID3D11DeviceContext* Context{ nullptr };
 	
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };
 	ID3D11DepthStencilView* DepthStencilView{ nullptr };
+
+	ID3D11RasterizerState* rasterizationsStates[RS_COUNT];
 
 	std::array<ShaderObject, SHADER_COUNT> m_Shaders;
 

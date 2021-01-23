@@ -92,14 +92,14 @@ inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 		if (t_CylinderInfo.radiusTop > 0)
 		{
 			vertices += (uint32)t_CylinderInfo.radialSegments;
-			vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			vertices += (uint32)t_CylinderInfo.radialSegments + 2u;
 			indices += (uint32)t_CylinderInfo.radialSegments;
 		}
 
 		if (t_CylinderInfo.radiusBottom > 0)
 		{
 			vertices += (uint32)t_CylinderInfo.radialSegments;
-			vertices += (uint32)t_CylinderInfo.radialSegments + 1u;
+			vertices += (uint32)t_CylinderInfo.radialSegments + 2u;
 			indices += (uint32)t_CylinderInfo.radialSegments;
 		}
 	}
@@ -519,8 +519,10 @@ inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
 	uint32 vertices = (uint32)(t_LinesInfo.horizCount + 1) * 2u;
 	vertices += (uint32)(t_LinesInfo.vertCount + 1) * 2u;
 
-	uint32 indices = (uint32)t_LinesInfo.vertCount * 2u + 2u;
-	indices += (uint32)t_LinesInfo.horizCount * 2u + 2u;
+	uint32 indices = (uint32)(t_LinesInfo.vertCount + 1) * 2u;
+	indices += (uint32)(t_LinesInfo.horizCount + 1) * 2u;
+
+	indices *= 2;
 
 	return {vertices, indices, GT_LINES};
 }

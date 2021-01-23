@@ -44,6 +44,11 @@ inline glm::mat4 init_rotation(glm::vec3 forward, glm::vec3 up)
     return init_rotation(f, u, r);
 }
 
+inline glm::mat4 init_rotation(float angle, glm::vec3 axis)
+{
+    return glm::rotate(angle, axis);
+}
+
 inline glm::mat4 init_scale(float x, float y, float z)
 {
 
