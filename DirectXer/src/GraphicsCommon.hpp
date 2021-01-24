@@ -15,7 +15,8 @@ struct PSConstantBuffer
     inline static ID3D11Buffer* id{nullptr};
     
 	glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
-	uint32 shaderType
+	uint32 shaderType;
+	uint64 _padding0;
 };
 
 struct VSConstantBuffer

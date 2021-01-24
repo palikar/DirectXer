@@ -677,6 +677,11 @@ class basic_memory_buffer final : public detail::buffer<T> {
   }
   ~basic_memory_buffer() { deallocate(); }
 
+  const char* c_str() {
+      this->ptr_[this->size_] = '\0';
+      return this->ptr_;
+  }
+
  private:
   // Move data from other to this buffer.
   void move(basic_memory_buffer& other) {

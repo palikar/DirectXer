@@ -64,14 +64,6 @@ enum TextureFormat
 	TF_UNKNOWN,
 };
 
-inline TextureFormat PngFormat(int channels)
-{
-	if(channels == 1) return TF_A;
-	if(channels == 4) return TF_RGBA;
-
-	return TF_UNKNOWN;
-}
-
 inline DXGI_FORMAT TFToDXGI(TextureFormat format)
 {
 	switch (format)
@@ -80,6 +72,8 @@ inline DXGI_FORMAT TFToDXGI(TextureFormat format)
 	  case TF_A: return DXGI_FORMAT_A8_UNORM;
 	}
 
+	assert(false);
+	return DXGI_FORMAT_UNKNOWN;
 }
 
 struct ShaderObject

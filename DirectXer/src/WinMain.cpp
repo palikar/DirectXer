@@ -338,13 +338,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Basic setup for command line arguments passig
 
 // @Graphics
-// @Todo: Loading textures from file
-// @Todo: Creating textures in the graphics
-// @Todo: Shader types setup
+// @Done: Loading textures from file
+// @Done: Creating textures in the graphics
 // @Done: Rasterization state types setup
+// @Todo: Shader types setup
+// -> Shader files(switching the actual shaders), Shader types(value in a CB)
+// -> Debug Shader -- can draw with color or texture mapped (to test materials and stuff)
 // @Todo: Scissor test support
+// @Todo: Input layout tpyes setup
+// -- debug layout (pos, color, uv, normals, tangents, bitangents)
+// -- standard layout (pos, uv, normals, tangents, bitangents)
 
-// @Todo: Texture catalog but a good one, not holding textures in memory all the time
+
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
 // @Todo: Cone geometry
@@ -361,10 +366,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Text rendering
 
 // @Data management
-// @Todo: Loading obj files
-// @Done: Color vertex type -- hence solid color material (ish)
 // @Done: Container for geometry info!
+// @Done: Color vertex type -- hence solid color material (ish)
+// @Todo: Loading obj files
 // @Todo: Mouse picking
+// @Done: Texture catalog but a good one, not holding textures in memory all the time
+// @Todo: Tags for the textures -- for certain level, for certain material instance
+//     -- load all textures in a level
+//     -- get textures for some material instance
 
 // @Debug
 // @Done: Axis helper

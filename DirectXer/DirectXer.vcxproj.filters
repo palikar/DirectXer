@@ -65,7 +65,13 @@
     <ClInclude Include="src\Math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Debug.hpp">
+    <ClInclude Include="src\GeometryUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GeometryDebug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureCatalog.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

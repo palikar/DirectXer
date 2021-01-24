@@ -663,7 +663,7 @@ inline Container& get_container(std::back_insert_iterator<Container> it) {
   \endrst
  */
 template <typename T> class buffer {
- private:
+ public:
   T* ptr_;
   size_t size_;
   size_t capacity_;

@@ -180,8 +180,9 @@
   <ItemGroup>
     <ClInclude Include="src\App.hpp" />
     <ClInclude Include="src\Camera.hpp" />
-    <ClInclude Include="src\Debug.hpp" />
+    <ClInclude Include="src\GeometryDebug.hpp" />
     <ClInclude Include="src\Geometry.hpp" />
+    <ClInclude Include="src\GeometryUtils.hpp" />
     <ClInclude Include="src\Glm.hpp" />
     <ClInclude Include="src\Graphics.hpp" />
     <ClInclude Include="src\GraphicsCommon.hpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="src\Input.hpp" />
     <ClInclude Include="src\Logging.hpp" />
     <ClInclude Include="src\Math.hpp" />
+    <ClInclude Include="src\TextureCatalog.hpp" />
     <ClInclude Include="src\Types.hpp" />
     <ClInclude Include="src\WindowsMessageMap.hpp" />
   </ItemGroup>
