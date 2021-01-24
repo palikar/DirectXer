@@ -15,6 +15,7 @@ struct PSConstantBuffer
     inline static ID3D11Buffer* id{nullptr};
     
 	glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	uint32 shaderType
 };
 
 struct VSConstantBuffer
@@ -36,6 +37,7 @@ struct ColorVertex
 {
 	glm::vec3 pos;
 	glm::vec3 color;
+	glm::vec2 uv;
 };
 
 inline void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)

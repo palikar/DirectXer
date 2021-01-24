@@ -87,7 +87,7 @@ struct Logger
 		char errorDescription[512];
 		DXGetErrorDescription(t_Hr, errorDescription, (DWORD)sizeof(errorDescription) );
 
-		PrintError(t_File, t_Line, "{} : \n\t", errorString, errorDescription);
+		PrintError(t_File, t_Line, "{} :", errorString, errorDescription);
 
 		// DWORD nMsgLen = FormatMessage(
 		// 	FORMAT_MESSAGE_ALLOCATE_BUFFER |

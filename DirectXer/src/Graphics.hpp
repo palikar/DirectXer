@@ -56,6 +56,32 @@ struct TextureObject
 	ID3D11RenderTargetView* rtv{nullptr};
 };
 
+enum TextureFormat
+{
+	TF_RGBA = 0,
+	TF_A,
+
+	TF_UNKNOWN,
+};
+
+inline TextureFormat PngFormat(int channels)
+{
+	if(channels == 1) return TF_A;
+	if(channels == 4) return TF_RGBA;
+
+	return TF_UNKNOWN;
+}
+
+inline DXGI_FORMAT TFToDXGI(TextureFormat format)
+{
+	switch (format)
+	{
+	  case TF_RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
+	  case TF_A: return DXGI_FORMAT_A8_UNORM;
+	}
+
+}
+
 struct ShaderObject
 {
 	ID3D11InputLayout* il{nullptr};
@@ -94,57 +120,28 @@ class Graphics
 	void initZBuffer(float width, float height);
 	void initResources();
 	void initRasterizationsStates();
+	void initSamplers();
 
 	void resizeBackBuffer(float width, float height);
 
 	void destroyZBuffer();
 
+	void bindTexture(uint32 t_Slot, TextureObject t_Texture);
 	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void setShaders(ShaderType t_Shader);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
 
-	void updateCBs();
-
-	TextureObject createTexute(uint16 t_Width, uint16 t_Height, void* t_Data, uint64 t_Length)
-	{
-		TextureObject to;
-
-		D3D11_TEXTURE2D_DESC desc;
-		desc.Width = t_Width;
-		desc.Height = t_Height;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		desc.CPUAccessFlags = 0;
-		desc.MiscFlags = 0;
-
-		D3D11_SUBRESOURCE_DATA data;
-		data.pSysMem = t_Data;
-
-		Device->CreateTexture2D(&desc, &data, &to.tp);
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-		srvDesc.Format;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.Texture2D.MipLevels = 1;
-		
-		Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv);
-
-		return to;
-	}
 	
+	TextureObject createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
 	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
 	IBObject createIndexBuffer(void* data, uint32 dataSize);
 	template<typename Type, bool isPSBuffer>
 	void createConstantBuffer(Type& buffer);
 
+	void updateCBs();
+	
 	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
 
 	void EndFrame();

@@ -6,7 +6,9 @@
 #include "Camera.hpp"
 
 struct CommandLineSettings
-{};
+{
+	std::string_view ResourcesPath;
+};
 
 
 struct GeometryIndex
@@ -70,9 +72,10 @@ public:
   public:
 	float32 Width;
 	float32 Height;
-	
 	int ReturnValue{0};
 	boolean Running{true};
+
+	CommandLineSettings Arguments;
 
 	
 	

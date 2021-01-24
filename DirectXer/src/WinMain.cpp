@@ -57,7 +57,7 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		app->Height = (float32)height;
 		app->Resize();
 		
-		DXPRINT("Resize!");
+		DXLOG("[EVENT] Resize");
 		return 0;
 	}
 
@@ -215,7 +215,14 @@ void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int
 
 	for (size_t i = 1; i < argc; ++i)
 	{
-		DXPRINT("Argument: {}\n", argv[i]);
+		if (strcmp(argv[i], "--resources") == 0)
+		{
+			DXLOG("[INIT] Argument: {} -> {}", argv[i], argv[i + 1]);
+			t_Settings.ResourcesPath = argv[i + 1];
+			++i;
+		}
+
+		
 	}
 
 
@@ -228,16 +235,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	gInput.Init();
 	gDxgiManager.Init();
 
+	App application;
 
-	CommandLineSettings arguments;
 	char** argv;
 	int argc;
 	argv = CommandLineToArgvA(GetCommandLine(), &argc);
-	ParseCommandLineArguments(arguments, argv, argc);
-
-	
- 
-	App application;
+	ParseCommandLineArguments(application.Arguments, argv, argc);
 	
 	WNDCLASSEX windowClass{ 0 };
 	windowClass.cbSize = sizeof(windowClass);

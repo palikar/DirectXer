@@ -310,11 +310,13 @@ inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, ColorVertex* t_Verti
 				*(pos + u)= x * udir;
 				*(pos + v) = y * vdir;
 				*(pos + w) = depthHalf;
+
+				t_Vertices->uv = { ix / gridX, 1 - (iy / gridY) };
 				
 				++t_Vertices;
 
 				// normals.insert(normals.end(), { vertex[3], vertex[4], vertex[5] });
-				// uv.insert(uv.end(), { ix / gridX, 1 - (iy / gridY) });
+				// uv.insert(uv.end(), {});
 
 				vertexCounter += 1;
 			};
@@ -380,10 +382,12 @@ inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Ve
 			t_Vertices->pos.y = -y;
 			t_Vertices->pos.z = 0;
 
+			t_Vertices->uv = {ix / grid_x, 1 - (iy / grid_y)};
+
 			++t_Vertices;
 
 			// normals.insert(normals.end(), { 0, 0, -1 });
-			// uv.insert(uv.end(), { ix / grid_x, 1 - (iy / grid_y) });
+			// uv.insert(uv.end(), {});
 		}
 	}
 
@@ -476,11 +480,13 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t
 			t_Vertices->pos.y = y;
 			t_Vertices->pos.z = z;
 
+			t_Vertices->uv = {u + uOffset, 1 - v}; 
+
 			++t_Vertices;
 
 			// auto norm = glm::normalize(glm::vec3(x, y, z));
 			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
-			// uv.insert(uv.end(), { u + uOffset, 1 - v });
+			// uv.insert(uv.end(), {});
 
 			verticesRow.push_back(index++);
 		}

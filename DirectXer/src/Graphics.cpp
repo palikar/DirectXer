@@ -106,6 +106,29 @@ void Graphics::initRasterizationsStates()
 	
 }
 
+void Graphics::initSamplers()
+{
+	D3D11_SAMPLER_DESC desc;
+	desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc.MipLODBias = 0.0f;
+	desc.MaxAnisotropy = 1;
+	desc.ComparisonFunc = D3D11_COMPARISON_NOT_EQUAL;
+	desc.BorderColor[0] = 0.0f;
+	desc.BorderColor[1] = 0.0f;
+	desc.BorderColor[2] = 0.0f;
+	desc.BorderColor[3] = 0.0f;
+	desc.MinLOD = 0.0f;
+	desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	ID3D11SamplerState* state;
+	Device->CreateSamplerState(&desc, &state);
+
+	Context->PSSetSamplers(0, 1, &state);
+}
+
 void Graphics::resizeBackBuffer(float width, float height)
 {
 
@@ -161,6 +184,41 @@ void Graphics::ClearZBuffer()
 void Graphics::setRasterizationState(RasterizationState t_State)
 {
 	Context->RSSetState(rasterizationsStates[t_State]);
+}
+
+TextureObject Graphics::createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
+{
+	TextureObject to;
+
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = t_Width;
+	desc.Height = t_Height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = TFToDXGI(t_Format);
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA data;
+	data.pSysMem = t_Data;
+	data.SysMemPitch = t_Width*4;
+
+	HRESULT hr;
+	GFX_CALL(Device->CreateTexture2D(&desc, &data, &to.tp));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = desc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = 1;
+		
+	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
+
+	return to;
 }
 
 VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize)
@@ -221,6 +279,7 @@ void Graphics::initResources()
     const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
         {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"Texcoord", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 	
 	GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));
@@ -256,7 +315,6 @@ void Graphics::initResources()
 	Context->PSSetConstantBuffers(0, 1, &PSConstantBuffer::id);	
 	
 }
-
 
 void Graphics::updateCBs()
 {
@@ -299,6 +357,11 @@ void Graphics::createConstantBuffer(Type& buffer)
 	
 }
 
+void Graphics::bindTexture(uint32 t_Slot, TextureObject t_Texture)
+{
+	Context->PSSetShaderResources(t_Slot, 1, &t_Texture.srv);
+}
+	
 void Graphics::setViewport(float x, float y, float width, float height)
 {
 	D3D11_VIEWPORT vp;

@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include <stb_image.h>
 
 struct BufferDescriptor
 {
@@ -217,6 +218,9 @@ static uint32 AXIS;
 
 void App::Init(HWND t_Window)
 {
+	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
+
+	
 	// @Todo: Refactor this into functions
 	Graphics.initSwapChain(t_Window, Width, Height);
 	Graphics.initBackBuffer();
@@ -226,21 +230,33 @@ void App::Init(HWND t_Window)
 
 	// @Todo: This should some sort of arena storage to do its thing
 	BufferBuilder builder;
-
 	CUBE = builder.InitCube(CubeGeometry{}, glm::vec3{1.0f, 0.0f, 0.0f});
 	PLANE = builder.InitPlane(PlaneGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 	SPHERE = builder.InitSphere(SphereGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 	CYLINDER = builder.InitCylinder(CylinderGeometry{0.25, 0.25, 1.5}, glm::vec3{1.0f, 1.0f, 0.0f});
 	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{0.8f, 0.8f, 0.8f});
 	AXIS = builder.InitAxisHelper();
-
-
 	auto desc = builder.CreateBuffer(Graphics);
 
-	geometryBuffer = desc.Description;
 
+
+	geometryBuffer = desc.Description;
 	Graphics.setIndexBuffer(desc.Ibo);
 	Graphics.setVertexBuffer(desc.Vbo);
+
+
+
+	auto path = fmt::format("{}/{}", Arguments.ResourcesPath, "borat.png");
+	int width, height, channels;
+	stbi_set_flip_vertically_on_load(1);
+	unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+	auto textureHandle = Graphics.createTexute(width, height, PngFormat(channels), data, width*height*channels);
+	stbi_image_free(data);
+
+	Graphics.bindTexture(0, textureHandle);
+	
+
+	
 
 
 	Graphics.setShaders(Graphics::SHADER_SIMPLE);
@@ -284,15 +300,16 @@ void App::Spin()
 
 	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
 
-	// Graphics.m_VertexShaderCB.model = init_rotation(t*0.25, {0.0f, 1.0f, 0.0f}) * init_translate(0.0f, 1.0f, 0.0f);
+	Graphics.m_VertexShaderCB.model = init_rotation(t*0.25, {0.0f, 1.0f, 0.0f}) * init_translate(0.0f, 1.0f, 0.0f);
 	// Graphics.m_VertexShaderCB.model = glm::transpose(Graphics.m_VertexShaderCB.model);
-	// Graphics.updateCBs();
-	// geometryBuffer.DrawGeometry(Graphics, CUBE);	 
+	Graphics.updateCBs();
+	geometryBuffer.DrawGeometry(Graphics, CUBE);	 
 
 
-	// Graphics.m_VertexShaderCB.model = init_translate(-0.5f, 0.0f, 0.0f);
-	// Graphics.updateCBs();
-	// geometryBuffer.DrawGeometry(Graphics, PLANE);
+	Graphics.m_VertexShaderCB.model = init_translate(1.0f, 0.0f, 1.0f);
+	
+	Graphics.updateCBs();
+	geometryBuffer.DrawGeometry(Graphics, PLANE);
 
 	// Graphics.m_VertexShaderCB.model = init_scale(0.5f, 0.5f, 0.5f)*init_translate(-1.5f, 0.0f, 0.0f);
 	// Graphics.updateCBs();
@@ -303,14 +320,14 @@ void App::Spin()
 	// Graphics.updateCBs();
 	// geometryBuffer.DrawGeometry(Graphics, SPHERE);
 
-	Graphics.m_VertexShaderCB.model = init_translate(0.0f, 0.0f, 0.0f);
-	Graphics.updateCBs();
-	geometryBuffer.DrawGeometry(Graphics, LINES);
+	// Graphics.m_VertexShaderCB.model = init_translate(0.0f, 0.0f, 0.0f);
+	// Graphics.updateCBs();
+	// geometryBuffer.DrawGeometry(Graphics, LINES);
 
 	// Graphics.m_VertexShaderCB.model = init_translate(t * 0.01f, 0.0f, 0.0f);
-	Graphics.m_VertexShaderCB.model = init_translate(0.0f, 0.0f, t * 0.01f);
-	Graphics.updateCBs();
-	geometryBuffer.DrawGeometry(Graphics, AXIS);
+	// Graphics.m_VertexShaderCB.model = init_translate(0.0f, 0.0f, t * 0.01f);
+	// Graphics.updateCBs();
+	// geometryBuffer.DrawGeometry(Graphics, AXIS);
 
 	Graphics.EndFrame();
 
