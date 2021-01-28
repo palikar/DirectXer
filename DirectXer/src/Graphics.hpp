@@ -64,18 +64,6 @@ enum TextureFormat
 	TF_UNKNOWN,
 };
 
-inline DXGI_FORMAT TFToDXGI(TextureFormat format)
-{
-	switch (format)
-	{
-	  case TF_RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
-	  case TF_A: return DXGI_FORMAT_A8_UNORM;
-	}
-
-	assert(false);
-	return DXGI_FORMAT_UNKNOWN;
-}
-
 struct ShaderObject
 {
 	ID3D11InputLayout* il{nullptr};
@@ -91,16 +79,32 @@ enum RasterizationState : uint8
 	RS_COUNT
 };
 
+enum ShaderFile : uint8
+{
+	SF_DEBUG = 0,
+
+	SF_COUNT
+};
+
+enum ShaderType : uint8
+{
+  ST_TEX = 0,
+  ST_COLOR,
+
+  ST_COUNT
+};
+
+enum ShaderConfig
+{
+	SC_DEBUG_COLOR  = SF_DEBUG | (ST_COLOR << 8),
+	SC_DEBUG_TEX    = SF_DEBUG | (ST_TEX   << 8),
+	
+	SC_COUNT
+};
+
 class Graphics
 {
   public:
-
-	enum ShaderType
-	{
-		SHADER_SIMPLE = 0,
-
-		SHADER_COUNT
-	};
 
 	enum TopolgyType : uint8
 	{
@@ -122,10 +126,11 @@ class Graphics
 
 	void bindTexture(uint32 t_Slot, TextureObject t_Texture);
 	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
-	void setShaders(ShaderType t_Shader);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
+
+	void setShaderConfiguration(ShaderConfig t_Confing);
 
 	
 	TextureObject createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
@@ -157,12 +162,13 @@ class Graphics
 
 	ID3D11RasterizerState* rasterizationsStates[RS_COUNT];
 
-	std::array<ShaderObject, SHADER_COUNT> m_Shaders;
-
 	PSConstantBuffer m_PixelShaderCB;
-	VSConstantBuffer m_VertexShaderCB;	
+	VSConstantBuffer m_VertexShaderCB;
+
+	ShaderObject Shaders[SF_COUNT];
 
 };
+
 
 template<typename VertexType>
 VBObject vertexBufferFactory(Graphics& graphics, std::vector<VertexType> t_VertexList)

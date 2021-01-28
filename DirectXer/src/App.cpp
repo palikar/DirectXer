@@ -44,7 +44,7 @@ void App::Init(HWND t_Window)
 
 	Graphics.bindTexture(0, CHECKER_TEXTURE.Handle);
 
-	Graphics.setShaders(Graphics::SHADER_SIMPLE);
+	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
 	Graphics.setRasterizationState(CurrentRastState);
 
@@ -83,16 +83,14 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(65.0f, ratio, 0.0001f, 1000.0f));
 	Graphics.m_VertexShaderCB.view = glm::transpose(camera.view());
 
-	Graphics.m_PixelShaderCB.color = { 0.0, 1.0, 1.0, 1.0 };
-
+	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.m_VertexShaderCB.model = init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}) * init_translate(0.0f, 1.0f, 0.0f);
-	// Graphics.m_VertexShaderCB.model = glm::transpose(Graphics.m_VertexShaderCB.model);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, CUBE);	 
 
-
+	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
 	Graphics.m_VertexShaderCB.model = init_translate(1.0f, 0.0f, 1.0f);
-	
+	Graphics.m_PixelShaderCB.color = {1.0f, 0.0f, 0.0f, 1.0f};
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, PLANE);
 

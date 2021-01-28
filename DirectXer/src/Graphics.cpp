@@ -4,6 +4,18 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
 
+static DXGI_FORMAT TFToDXGI(TextureFormat format)
+{
+	switch (format)
+	{
+	  case TF_RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
+	  case TF_A: return DXGI_FORMAT_A8_UNORM;
+	}
+
+	assert(false);
+	return DXGI_FORMAT_UNKNOWN;
+}
+
 void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 {
 	
@@ -264,28 +276,29 @@ IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize)
 void Graphics::initResources()
 {
 
-	ID3DBlob* pBlob;
-	ID3D11PixelShader* pPixelShader{0};
-	D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
-
 	HRESULT hr;
-	GFX_CALL(Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
+	{
+		// Debug shader
+		
+		ID3DBlob* pBlob;
+		ShaderObject shaderObject;
+		D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
+		GFX_CALL(Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.ps));
 
-	ID3D11VertexShader* pVertexShader{0};
-	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
-	GFX_CALL(Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
+		ID3D11VertexShader* pVertexShader{0};
+		D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
+		GFX_CALL(Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.vs));
 
-	ID3D11InputLayout* pInputLayout;
-    const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
-        {"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"Texcoord", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
+		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
+			{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Texcoord", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &shaderObject.il));
 	
-	GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout));
-	
-	m_Shaders[0] = ShaderObject{pInputLayout, pVertexShader, pPixelShader};
+		Shaders[0] = shaderObject;
 
+	}
 
 	D3D11_BUFFER_DESC vertexShaderCBDesc{ 0 };
     vertexShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -298,6 +311,7 @@ void Graphics::initResources()
     D3D11_SUBRESOURCE_DATA vertexShaderCBData{0};
 	vertexShaderCBData.pSysMem = &m_VertexShaderCB;
     GFX_CALL(Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VSConstantBuffer::id));
+
 	Context->VSSetConstantBuffers(0, 1, &VSConstantBuffer::id);
 	
 
@@ -383,15 +397,18 @@ void Graphics::setViewport(float x, float y, float width, float height)
 	
 }
 
-void Graphics::setShaders(ShaderType t_Shader)
+void Graphics::setShaderConfiguration(ShaderConfig t_Confing)
 {
+	uint8 shaderObjectIndex = 0xFF & t_Confing;
+	uint8 shaderType = (0xFF00 & t_Confing) >> 8;
 
-	auto& shaderObject = m_Shaders[t_Shader];
+	auto& shaderObject = Shaders[shaderObjectIndex];
 
 	Context->PSSetShader(shaderObject.ps, nullptr, 0);
 	Context->VSSetShader(shaderObject.vs, nullptr, 0);
 	Context->IASetInputLayout(shaderObject.il);
 
+	m_PixelShaderCB.shaderType = shaderType;
 }
 
 void Graphics::setIndexBuffer(IBObject t_buffer)

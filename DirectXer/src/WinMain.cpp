@@ -341,13 +341,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Loading textures from file
 // @Done: Creating textures in the graphics
 // @Done: Rasterization state types setup
-// @Todo: Shader types setup
+// @Done: Shader types setup
 // -> Shader files(switching the actual shaders), Shader types(value in a CB)
 // -> Debug Shader -- can draw with color or texture mapped (to test materials and stuff)
 // @Todo: Scissor test support
 // @Todo: Input layout tpyes setup
 // -- debug layout (pos, color, uv, normals, tangents, bitangents)
 // -- standard layout (pos, uv, normals, tangents, bitangents)
+// @Todo: Constant buffers setup
 
 
 // @Done: Lines "geometry" + ability to use lines primiteves

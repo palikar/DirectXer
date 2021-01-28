@@ -19,8 +19,14 @@ Texture2D tex;
 
 float4 main(PSIn input) : SV_Target
 {
-    
-    /* return float4(input.color, 1.0f); */
-    return tex.Sample(samp, input.uv);
-    
+    if (shaderType == 0) // Tex
+    {
+	return tex.Sample(samp, input.uv);
+    }
+    else if(shaderType == 1) // Color
+    {
+	return float4(input.color, 1.0f);
+    }
+
+    return float4(1.0f, 0.0f, 0.5f, 1.0f);
 }
