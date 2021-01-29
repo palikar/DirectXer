@@ -198,6 +198,16 @@ void Graphics::setRasterizationState(RasterizationState t_State)
 	Context->RSSetState(rasterizationsStates[t_State]);
 }
 
+void Graphics::bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
+{
+	Context->PSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
+}
+
+void Graphics::bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
+{
+	Context->VSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
+}
+
 TextureObject Graphics::createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
 {
 	TextureObject to;
@@ -330,6 +340,29 @@ void Graphics::initResources()
 	
 }
 
+CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
+{
+
+	CBObject cb;
+		
+	D3D11_BUFFER_DESC desc{ 0 };
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = t_Size;
+	desc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA data{0};
+    data.pSysMem = &m_PixelShaderCB;
+
+	HRESULT hr;
+    GFX_CALL(Device->CreateBuffer(&desc, &data, &cb.id));
+
+	return cb;
+
+}
+
 void Graphics::updateCBs()
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
@@ -344,31 +377,13 @@ void Graphics::updateCBs()
 	
 }
 
-template<typename Type, bool isPSBuffer>
-void Graphics::createConstantBuffer(Type& buffer)
+void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 {
+	D3D11_MAPPED_SUBRESOURCE msr;
 
-	ID3D11Buffer* constantBuffer{0};
-    D3D11_BUFFER_DESC constantBufferDesc{ 0 };
-    constantBuffer.Usage = D3D11_USAGE_DYNAMIC;
-	constantBuffer.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	constantBuffer.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	constantBuffer.MiscFlags = 0;
-	constantBuffer.ByteWidth = sizeof(Type);
-	constantBuffer.StructureByteStride = 0;
-
-    D3D11_SUBRESOURCE_DATA constantBufferData{0};
-    constantBuffer.pSysMem = &buffer;
-
-	HRESULT hr;
-	GFX_CALL(Device->CreateBuffer(&constantBufferDesc, &constantBufferData, &Type::id));
-	
-	if constexpr (isPSBuffer) {
-		Context->PSSetConstantBuffers(0, 1, &Type::id);
-	}else {
-		Context->VSSetConstantBuffers(0, 1, &Type::id);
-	}
-	
+	Context->Map(t_CbObject.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	memcpy(msr.pData, t_Data, t_Length);
+	Context->Unmap(t_CbObject.id, 0);
 }
 
 void Graphics::bindTexture(uint32 t_Slot, TextureObject t_Texture)

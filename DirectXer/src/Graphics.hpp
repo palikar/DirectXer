@@ -49,6 +49,11 @@ struct IBObject
 	ID3D11Buffer* id{nullptr};
 };
 
+struct CBObject
+{
+	ID3D11Buffer* id{ nullptr };
+};
+
 struct TextureObject
 {
 	ID3D11Texture2D* tp{nullptr};
@@ -122,31 +127,31 @@ class Graphics
 
 	void resizeBackBuffer(float width, float height);
 
-	void destroyZBuffer();
-
 	void bindTexture(uint32 t_Slot, TextureObject t_Texture);
+	void bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
+	void bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
+	
 	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
-
 	void setShaderConfiguration(ShaderConfig t_Confing);
 
-	
 	TextureObject createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
 	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
 	IBObject createIndexBuffer(void* data, uint32 dataSize);
-	template<typename Type, bool isPSBuffer>
-	void createConstantBuffer(Type& buffer);
+	CBObject createConstantBuffer(uint32 t_Size, void* t_InitData);
 
 	void updateCBs();
+	void updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);
 	
 	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
 
-	void EndFrame();
 	void ClearBuffer(float red, float green, float blue);
 	void ClearZBuffer();
+	void EndFrame();
 
+	void destroyZBuffer();
 	void Destroy();
 
   public:
