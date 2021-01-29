@@ -350,11 +350,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // -- standard layout (pos, uv, normals, tangents, bitangents)
 // @Todo: Constant buffers setup
 
-
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
-// @Todo: Cone geometry
-// @Todo: Torus geometry
+// @Done: Cone geometry
+// @Done: Torus geometry
 
 // @Rendering
 // @Todo: Rendering sky box

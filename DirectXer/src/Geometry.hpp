@@ -18,6 +18,8 @@ enum GeometryType : uint16
 	GT_SPHERE     = 4 | (0x00 << 8),
 	GT_LINES      = 5 | (0x01 << 8),
 	GT_AXISHELPER = 6 | (0x00 << 8),
+	GT_TORUS      = 7 | (0x00 << 8),
+	GT_CONE       = 8 | (0x00 << 8),
 };
 
 struct CubeGeometry
@@ -77,6 +79,26 @@ struct GeometryInfo
 	uint32 indexCount{0};
 
 	GeometryType type{0};
+};
+
+struct TorusGeometry
+{
+	float radius{ 1.0f };
+	float tube{ 0.4f };
+	float radialSegments{ 8 };
+	float tubularSegments{ 6 };
+	float arc{ 2.0f * PI };
+};
+
+struct ConeGeometry
+{
+	float radius{1.0};
+	float height{2.0};
+	float radialSegments{10.0f};
+	float heightSegments{1.0f};
+	bool openEnded{false};
+	float thetaStart{0.0f};
+	float thetaLength{2.0f * PI};	
 };
 
 
@@ -585,4 +607,100 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, ColorVertex* t_Ve
 	}
 
 	return 0;
+}
+
+inline int TorusGeometryData(const TorusGeometry& t_TorusInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+{
+	auto radialSegments  = std::floor(t_TorusInfo.radialSegments);
+    auto tubularSegments = std::floor(t_TorusInfo.tubularSegments);
+
+    float j, i;
+
+    for (j = 0.0f; j <= radialSegments; j++)
+    {
+        for (i = 0.0f; i <= tubularSegments; i++)
+        {
+            const float u = i / tubularSegments * t_TorusInfo.arc;
+            const float v = j / radialSegments * PI * 2.0f;
+
+            const float x = (t_TorusInfo.radius + t_TorusInfo.tube * std::cos(v)) * std::cos(u);
+            const float y = (t_TorusInfo.radius + t_TorusInfo.tube * std::cos(v)) * std::sin(u);
+            const float z = (t_TorusInfo.tube * std::sin(v));
+
+			t_Vertices->pos.x = x;
+			t_Vertices->pos.y = y;
+			t_Vertices->pos.z = z;
+
+			t_Vertices->uv.x = i / tubularSegments;
+			t_Vertices->uv.x = j / radialSegments;
+				
+            // auto n = glm::normalize(
+            //   glm::vec3(x, y, z)
+            //   - glm::vec3(radius * std::cos(u), radius * std::sin(u), 0.0f));
+            // normals.insert(normals.end(), { n.x, n.y, n.z });
+			
+        }
+    }
+
+    for (j = 1.0f; j <= radialSegments; j++)
+    {
+        for (i = 1.0f; i <= tubularSegments; i++)
+        {
+
+            const uint32 a = (uint32)(t_BaseIndex + (tubularSegments + 1) * (j + i) - 1);
+            const uint32 b = (uint32)(t_BaseIndex + (tubularSegments + 1) * (j - 1) + i - 1);
+            const uint32 c = (uint32)(t_BaseIndex + (tubularSegments + 1) * (j - 1) + i);
+            const uint32 d = (uint32)(t_BaseIndex + (tubularSegments + 1) * (j + i));
+
+            t_Indices.insert(t_Indices.end(), { d, b, a, d, c, b });
+        }
+    }
+
+	return 0;
+
+}
+
+inline GeometryInfo TorusGeometryInfo(const TorusGeometry& t_TorusInfo)
+{
+	auto radialSegments  = std::floor(t_TorusInfo.radialSegments);
+    auto tubularSegments = std::floor(t_TorusInfo.tubularSegments);
+
+	uint32 vertices = (uint32)((radialSegments + 1) * (tubularSegments + 1));
+	
+	uint32 indices = (uint32)((radialSegments) * (tubularSegments)) * 2;
+
+	indices *= 3;
+
+	return { vertices, indices, GT_TORUS};
+}
+
+inline int ConeGeometryData(const ConeGeometry& t_ConeInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+{
+	return CylinderGeometryData({
+		0.0f,
+		t_ConeInfo.radius,
+		t_ConeInfo.height,
+		t_ConeInfo.radialSegments,
+		t_ConeInfo.heightSegments,
+		t_ConeInfo.openEnded,
+		t_ConeInfo.thetaStart,
+		t_ConeInfo.thetaLength
+	}, t_Vertices, t_Indices, t_BaseIndex);
+}
+
+inline GeometryInfo ConeGeometryInfo(const ConeGeometry& t_ConeInfo)
+{
+	auto info = CylinderGeometryInfo({
+		0.0f,
+		t_ConeInfo.radius,
+		t_ConeInfo.height,
+		t_ConeInfo.radialSegments,
+		t_ConeInfo.heightSegments,
+		t_ConeInfo.openEnded,
+		t_ConeInfo.thetaStart,
+		t_ConeInfo.thetaLength
+	});
+
+	info.type = GT_CONE;
+	return info;
 }
