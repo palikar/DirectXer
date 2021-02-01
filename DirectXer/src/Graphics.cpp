@@ -208,7 +208,7 @@ void Graphics::bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16
 	Context->VSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
 }
 
-TextureObject Graphics::createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
+TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
 {
 	TextureObject to;
 

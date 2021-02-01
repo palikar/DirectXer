@@ -137,7 +137,7 @@ class Graphics
 	void setViewport(float x, float y, float width, float height);
 	void setShaderConfiguration(ShaderConfig t_Confing);
 
-	TextureObject createTexute(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
+	TextureObject createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
 	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
 	IBObject createIndexBuffer(void* data, uint32 dataSize);
 	CBObject createConstantBuffer(uint32 t_Size, void* t_InitData);

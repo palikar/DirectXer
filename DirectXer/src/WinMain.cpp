@@ -344,11 +344,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Shader types setup
 // -> Shader files(switching the actual shaders), Shader types(value in a CB)
 // -> Debug Shader -- can draw with color or texture mapped (to test materials and stuff)
-// @Todo: Scissor test support
 // @Done: Input layout tpyes setup
 // -- debug layout (pos, color, uv, normals, tangents, bitangents)
 // -- standard layout (pos, uv, normals, tangents, bitangents)
-// @Todo: Constant buffers setup
+// @Done: Constant buffers setup
+// @Todo: Depth Stencil State Setup
+// @Todo: Scissor test support
 
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry

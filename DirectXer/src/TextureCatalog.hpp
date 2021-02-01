@@ -20,7 +20,7 @@ inline TextureObject LoadTexture(Graphics graphics, const char* t_Resources, con
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(1);
 	unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-	auto textureHandle = graphics.createTexute(width, height, PngFormat(channels), data, width*height*channels);
+	auto textureHandle = graphics.createTexture(width, height, PngFormat(channels), data, width*height*channels);
 	stbi_image_free(data);
 	return textureHandle;
 
@@ -69,7 +69,7 @@ struct TextureCatalog
 				DXERROR("Can't load texture {} at {}. Reason: {}", tex.Path, buf.c_str(), stbi_failure_reason());
 			}
 			
-			tex.Handle = graphics.createTexute(width, height, PngFormat(channels), data, width*height*channels);
+			tex.Handle = graphics.createTexture(width, height, PngFormat(channels), data, width*height*channels);
 			tex.State = LS_LOADED;
 			stbi_image_free(data);
 			buf.clear();
