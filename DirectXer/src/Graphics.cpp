@@ -243,6 +243,46 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	return to;
 }
 
+TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6])
+{
+
+	TextureObject to;
+
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = t_Width;
+	desc.Height = t_Height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 6;
+	desc.Format = TFToDXGI(t_Format);
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+	D3D11_SUBRESOURCE_DATA data[6];
+	for (size_t i = 0; i < 6; ++i)
+	{
+		data[i].pSysMem = t_Data[i];
+		data[i].SysMemPitch = t_Width*4;
+	}
+	
+	HRESULT hr;
+	GFX_CALL(Device->CreateTexture2D(&desc, data, &to.tp));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = desc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+ 	srvDesc.Texture2D.MipLevels = 1;
+		
+	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
+
+	return to;
+
+}
+
 VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize)
 {
 	ID3D11Buffer* pVertexBuffer;
@@ -424,6 +464,7 @@ void Graphics::setShaderConfiguration(ShaderConfig t_Confing)
 	Context->IASetInputLayout(shaderObject.il);
 
 	m_PixelShaderCB.shaderType = shaderType;
+	m_VertexShaderCB.shaderType = shaderType;
 }
 
 void Graphics::setIndexBuffer(IBObject t_buffer)

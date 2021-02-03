@@ -59,9 +59,10 @@ struct TextureCatalog
 		{
 			auto& tex = g_Textures[i];
 			fmt::format_to(buf, "{}/{}", t_Resources, tex.Path);
+
+            // @Todo: Use some sort of temporary memory here
 			int width, height, channels;
-			stbi_set_flip_vertically_on_load(1);
-			
+			stbi_set_flip_vertically_on_load(1);			
 			unsigned char *data = stbi_load(buf.c_str(), &width, &height, &channels, 0);
 			
 			if (data == nullptr)
@@ -75,6 +76,33 @@ struct TextureCatalog
 			buf.clear();
 			
 		}			
+	}
+
+	TextureObject LoadCube(Graphics graphics, std::string_view t_Resources, const char* name[6])
+	{
+
+		fmt::basic_memory_buffer<char, 512> buf;
+
+		int width, height, channels;
+		// @Todo: Use temporary memory here
+		void* data[6];
+		stbi_set_flip_vertically_on_load(1);			
+		for (size_t i = 0; i < 6; ++i)
+		{
+			auto& tex = name[i];
+			fmt::format_to(buf, "{}/{}", t_Resources, tex);
+			data[i] = stbi_load(buf.c_str(), &width, &height, &channels, 0);
+			buf.clear();
+		}
+
+		auto hand = graphics.createCubeTexture(width, height, PngFormat(channels), data);
+
+		for (size_t i = 0; i < 6; ++i)
+		{
+			stbi_image_free(data[i]);
+		}
+		return hand;
+		
 	}
 	
 };

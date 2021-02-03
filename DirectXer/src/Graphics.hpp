@@ -95,6 +95,7 @@ enum ShaderType : uint8
 {
   ST_TEX = 0,
   ST_COLOR,
+  ST_SKY,
 
   ST_COUNT
 };
@@ -103,6 +104,7 @@ enum ShaderConfig
 {
 	SC_DEBUG_COLOR  = SF_DEBUG | (ST_COLOR << 8),
 	SC_DEBUG_TEX    = SF_DEBUG | (ST_TEX   << 8),
+	SC_DEBUG_SKY    = SF_DEBUG | (ST_SKY   << 8),
 	
 	SC_COUNT
 };
@@ -138,6 +140,7 @@ class Graphics
 	void setShaderConfiguration(ShaderConfig t_Confing);
 
 	TextureObject createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
+	TextureObject createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
 	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
 	IBObject createIndexBuffer(void* data, uint32 dataSize);
 	CBObject createConstantBuffer(uint32 t_Size, void* t_InitData);

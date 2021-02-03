@@ -42,7 +42,20 @@ void App::Init(HWND t_Window)
 	Graphics.setIndexBuffer(desc.Ibo);
 	Graphics.setVertexBuffer(desc.Vbo);
 
+	const char* cube_fils[] = {
+		"sky/left.png",
+		"sky/right.png",
+		"sky/down.png",
+		"sky/up.png",
+		"sky/front.png",
+		"sky/back.png",
+	};
+	auto cube = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
+
+	
 	Graphics.bindTexture(0, CHECKER_TEXTURE.Handle);
+
+	Graphics.bindTexture(1, cube);
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
@@ -84,15 +97,23 @@ void App::Spin()
 	Graphics.m_VertexShaderCB.view = glm::transpose(camera.view());
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
+
+	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.m_VertexShaderCB.model = init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}) * init_translate(0.0f, 1.0f, 0.0f);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, CUBE);	 
 
-	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
-	Graphics.m_VertexShaderCB.model = init_translate(1.0f, 0.0f, 1.0f);
-	Graphics.m_PixelShaderCB.color = {1.0f, 0.0f, 0.0f, 1.0f};
+	//Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
+	//Graphics.m_VertexShaderCB.model = init_translate(1.0f, 0.0f, 1.0f);
+	//Graphics.m_PixelShaderCB.color = {1.0f, 0.0f, 0.0f, 1.0f};
+	//Graphics.updateCBs();
+	//DebugGeometry.DrawGeometry(Graphics, PLANE);
+
+
+	Graphics.setShaderConfiguration(SC_DEBUG_SKY);
+	Graphics.m_VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
 	Graphics.updateCBs();
-	DebugGeometry.DrawGeometry(Graphics, PLANE);
+	DebugGeometry.DrawGeometry(Graphics, CUBE);
 
 	// Graphics.m_VertexShaderCB.model = init_scale(0.5f, 0.5f, 0.5f)*init_translate(-1.5f, 0.0f, 0.0f);
 	// Graphics.updateCBs();

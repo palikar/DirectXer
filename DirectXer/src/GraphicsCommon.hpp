@@ -26,7 +26,9 @@ struct VSConstantBuffer
 	glm::mat4 model{};
 	glm::mat4 view{};
 	glm::mat4 projection{};
-	
+	uint32 shaderType;
+	uint64 _padding0;
+
 };
 
 struct SimpleVertex

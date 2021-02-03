@@ -357,7 +357,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Torus geometry
 
 // @Rendering
-// @Todo: Rendering sky box
+// @Done: Rendering sky box
 // @Todo: Rendering groups
 // @Todo: Rendering fog
 // @Todo: Phong material
