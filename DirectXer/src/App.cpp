@@ -75,7 +75,7 @@ void App::Resize()
 
 }
 
-void App::Spin()
+void App::Spin(float dt)
 {
 	if(gInput.IsKeyReleased(KeyCode::F11))
 	{
@@ -85,7 +85,7 @@ void App::Spin()
 	
 
 	static float t = 0.0;
-	t += 0.1;
+	t += 1.1 * dt;
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera);
 

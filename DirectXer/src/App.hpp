@@ -17,7 +17,7 @@ class App
 public:
 
 	void Init(HWND t_Window);
-	void Spin();
+	void Spin(float dt);
 	void Destroy();
 	void Resize();
 

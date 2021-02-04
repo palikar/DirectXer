@@ -11,10 +11,12 @@
 #include <iostream>
 #include <Stringapiset.h>
 #include <shellapi.h>
+#include <time.h>
+
 
 #include <fmt/format.h>
 
-void SetupConsole()
+static void SetupConsole()
 {
 
 	AllocConsole();
@@ -26,7 +28,7 @@ void SetupConsole()
 
 }
 
-LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 
 	switch (msg)
@@ -139,7 +141,7 @@ LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 }
 
-LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
+static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 {
 	int retval;
 	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
@@ -210,7 +212,7 @@ LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 	return result;
 }
 
-void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
+static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
 
 	for (size_t i = 1; i < argc; ++i)
@@ -226,6 +228,10 @@ void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int
 	}
 
 
+}
+
+static double clockToMilliseconds(clock_t ticks){
+    return (ticks/(double)CLOCKS_PER_SEC)*1000.0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdSHow)
@@ -294,6 +300,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(windowHanlde, SW_SHOWDEFAULT);
 
 	//SetWindowText(hWnd, title.c_str())
+	
+	clock_t deltaTime = 0;
+	clock_t dt = 0;
+	unsigned int frames = 0;
+	double  frameRate = 30;
+	double  averageFrameTimeMilliseconds = 33.333;
+
 
 	MSG msg;
 	while (true)
@@ -310,7 +323,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			DispatchMessage(&msg);
 		}
 
-		application.Spin();
+		clock_t beginFrame = clock();
+		application.Spin((float)clockToMilliseconds(dt) / 1000.0);
+		clock_t endFrame = clock();
+
+		dt = endFrame - beginFrame;
+		deltaTime += endFrame - beginFrame;
+		frames++;
+
+		if( clockToMilliseconds(deltaTime)>1000.0)
+		{
+			frameRate = (double)frames*0.5 +  frameRate*0.5; //more stable
+			deltaTime -= CLOCKS_PER_SEC;
+			averageFrameTimeMilliseconds  = 1000.0/(frameRate ==0 ? 0.001 : frameRate);
+
+			DXLOG("[SYS] Frame time: {:.2} ms; FPS: {} ", averageFrameTimeMilliseconds, frames);
+			
+			frames = 0;
+		}
 
 	}
 
@@ -350,6 +380,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Constant buffers setup
 // @Todo: Depth Stencil State Setup
 // @Todo: Scissor test support
+// @Todo: Render target support
 
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
@@ -360,6 +391,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Rendering sky box
 // @Todo: Rendering groups
 // @Todo: Rendering fog
+// @Todo: Material setup
 // @Todo: Phong material
 // @Todo: PBR material
 // @Todo: Sollid color material

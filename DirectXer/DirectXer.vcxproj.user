@@ -23,6 +23,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(Outdir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>--resources ../resources/</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--resources  ../../../resources</LocalDebuggerCommandArguments>
+    <RemoteDebuggerCommandArguments>--resources  ../../../resources</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
