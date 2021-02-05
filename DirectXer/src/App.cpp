@@ -50,29 +50,53 @@ void App::Init(HWND t_Window)
 		"sky/front.png",
 		"sky/back.png",
 	};
-	auto cube = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
+	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
 
 	
-	Graphics.bindTexture(0, CHECKER_TEXTURE.Handle);
-
-	Graphics.bindTexture(1, cube);
-
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
 	Graphics.setRasterizationState(CurrentRastState);
 
-	camera.Pos = {0.0f, 0.0f, -0.5f};
-	Graphics.EndFrame();
+	camera.Pos = {1.0f, 0.5f, 1.0f};
+	camera.lookAt({0.0f, 0.0f, 0.0f});
 }
 
 void App::Resize()
 {
-
 	Graphics.resizeBackBuffer(Width, Height);
 	Graphics.destroyZBuffer();
 	Graphics.initZBuffer(Width, Height);
 	Graphics.setViewport(0, 0, Width, Height);
 
+}
+
+void App::RenderSkyBox()
+{
+	// @Speed: The texture will be bount most of the time
+	Graphics.bindTexture(0, SkyboxTexture);
+	Graphics.setShaderConfiguration(SC_DEBUG_SKY);
+	Graphics.m_VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
+	Graphics.updateCBs();
+	DebugGeometry.DrawGeometry(Graphics, CUBE);
+
+}
+
+void App::SetupCamera(Camera t_Camera)
+{
+	const float ratio =  Width/Height;
+	const float pov =  65.0f;
+	const float nearPlane = 0.0001f;
+	const float farPlane = 1000.0f;
+
+	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
+	Graphics.m_VertexShaderCB.view = glm::transpose(t_Camera.view());
+}
+
+void App::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
+{
+	Graphics.m_VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
+	Graphics.updateCBs();
+	DebugGeometry.DrawGeometry(Graphics, t_Id);
 }
 
 void App::Spin(float dt)
@@ -82,56 +106,41 @@ void App::Spin(float dt)
 		CurrentRastState = RasterizationState{(CurrentRastState + 1) % RS_COUNT};
 		Graphics.setRasterizationState(CurrentRastState);
 	}
-	
+
 
 	static float t = 0.0;
 	t += 1.1 * dt;
 	t = t > 100.0f ? 0.0f : t;
-	ControlCameraFPS(camera);
+	ControlCameraFPS(camera, dt);
 
+
+	// @Note: Rendering begins here
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics.ClearZBuffer();
 
-	const float ratio =  Width/Height;
-	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(65.0f, ratio, 0.0001f, 1000.0f));
-	Graphics.m_VertexShaderCB.view = glm::transpose(camera.view());
+	SetupCamera(camera);	
+
+
+	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
+	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 
-	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
-	Graphics.m_VertexShaderCB.model = init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}) * init_translate(0.0f, 1.0f, 0.0f);
-	Graphics.updateCBs();
-	DebugGeometry.DrawGeometry(Graphics, CUBE);	 
+	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
+	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	//Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
-	//Graphics.m_VertexShaderCB.model = init_translate(1.0f, 0.0f, 1.0f);
-	//Graphics.m_PixelShaderCB.color = {1.0f, 0.0f, 0.0f, 1.0f};
-	//Graphics.updateCBs();
-	//DebugGeometry.DrawGeometry(Graphics, PLANE);
+	Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
+	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
+	Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
+	RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
-	Graphics.setShaderConfiguration(SC_DEBUG_SKY);
-	Graphics.m_VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
-	Graphics.updateCBs();
-	DebugGeometry.DrawGeometry(Graphics, CUBE);
-
-	// Graphics.m_VertexShaderCB.model = init_scale(0.5f, 0.5f, 0.5f)*init_translate(-1.5f, 0.0f, 0.0f);
-	// Graphics.updateCBs();
-	// DebugGeometry.DrawGeometry(Graphics, CYLINDER);
-
+	Graphics.bindTexture(1, ROCKS_TEXTURE.Handle);
+	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 	
-	// Graphics.m_VertexShaderCB.model = init_scale(0.5f, 0.5f, 0.5f)*init_translate(0.0f, 1.5f, 0.0f);
-	// Graphics.updateCBs();
-	// DebugGeometry.DrawGeometry(Graphics, SPHERE);
+	
 
-	// Graphics.m_VertexShaderCB.model = init_translate(0.0f, 0.0f, 0.0f);
-	// Graphics.updateCBs();
-	// DebugGeometry.DrawGeometry(Graphics, LINES);
-
-	// Graphics.m_VertexShaderCB.model = init_translate(t * 0.01f, 0.0f, 0.0f);
-	// Graphics.m_VertexShaderCB.model = init_translate(0.0f, 0.0f, t * 0.01f);
-	// Graphics.updateCBs();
-	// DebugGeometry.DrawGeometry(Graphics, AXIS);
+	RenderSkyBox();
 
 	Graphics.EndFrame();
 

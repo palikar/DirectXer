@@ -16,8 +16,8 @@ cbuffer CbBuf : register(b0)
 
 SamplerState samp;
 
-Texture2D tex : register(t0);
-TextureCube sky : register(t1);
+TextureCube sky : register(t0);
+Texture2D tex : register(t1);
 
 float4 main(PSIn input) : SV_Target
 {

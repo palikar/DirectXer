@@ -49,28 +49,39 @@ struct Camera
 
 };
 
-static void ControlCameraFPS(Camera& t_Camera)
+static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 {
 
 	if (gInput.IsKeyPressed(KeyCode::W))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * 0.01f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * 1.0f * dt;
 	}
 
 	if (gInput.IsKeyPressed(KeyCode::S))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -0.01f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -1.0f * dt;
 	}
 
 	if (gInput.IsKeyPressed(KeyCode::A))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 0.01f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 1.0f * dt;
 	}
 	
 	if (gInput.IsKeyPressed(KeyCode::D))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -0.01f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -1.0f * dt;
 	}
+		
+	if (gInput.IsKeyPressed(KeyCode::E))
+	{
+		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * 1.0f * dt;
+	}
+
+	if (gInput.IsKeyPressed(KeyCode::Q))
+	{
+		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * -1.0f * dt;
+	}
+
 
 
 
@@ -86,7 +97,7 @@ static void ControlCameraFPS(Camera& t_Camera)
 		}
 		else
 		{
-			const auto diff = (gInput.MousePosition - gInput.LastMousePosition) * 0.01f;
+			const auto diff = (gInput.MousePosition - gInput.LastMousePosition) * 0.8f * dt;
 			look += diff;
 
 			float x = -look.x;

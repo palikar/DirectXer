@@ -167,10 +167,14 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 			t_Vertices->pos.y = vert_y;
 			t_Vertices->pos.z = vert_z;
 
+			t_Vertices->uv.x = u;
+			t_Vertices->uv.y = 1 - v;
+
+
 			++t_Vertices;
 			
 			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
-			// uv.insert(uv.end(), { u, 1 - v });
+			// uv.insert(uv.end(), {});
 
 			indexRow.push_back((uint32)(index++));
 		}
@@ -401,8 +405,8 @@ inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Ve
 			auto x = ix * segment_width - half_width;
 
 			t_Vertices->pos.x = x;
-			t_Vertices->pos.y = -y;
-			t_Vertices->pos.z = 0;
+			t_Vertices->pos.y = 0;
+			t_Vertices->pos.z = -y;
 
 			t_Vertices->uv = {ix / grid_x, 1 - (iy / grid_y)};
 

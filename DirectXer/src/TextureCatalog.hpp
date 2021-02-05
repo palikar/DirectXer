@@ -42,9 +42,13 @@ struct TextureLoadEntry
 inline TextureLoadEntry g_Textures[] 
 {
 	{"checker.png"},
+	{"rocks_color.png"},
+	{"floor_color.png"}
 };
 
 #define CHECKER_TEXTURE g_Textures[0]
+#define ROCKS_TEXTURE g_Textures[1]
+#define FLOOR_TEXTURE g_Textures[2]
 
 
 struct TextureCatalog
@@ -59,6 +63,8 @@ struct TextureCatalog
 		{
 			auto& tex = g_Textures[i];
 			fmt::format_to(buf, "{}/{}", t_Resources, tex.Path);
+
+			DXLOG("[RES] Loading {}", buf.c_str());
 
             // @Todo: Use some sort of temporary memory here
 			int width, height, channels;
@@ -86,7 +92,7 @@ struct TextureCatalog
 		int width, height, channels;
 		// @Todo: Use temporary memory here
 		void* data[6];
-		stbi_set_flip_vertically_on_load(1);			
+		stbi_set_flip_vertically_on_load(1);
 		for (size_t i = 0; i < 6; ++i)
 		{
 			auto& tex = name[i];

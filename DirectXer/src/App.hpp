@@ -21,11 +21,21 @@ public:
 	void Destroy();
 	void Resize();
 
+	void SetupCamera(Camera t_Camera);
+
+
+	void RenderSkyBox();
+	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4{0}, glm::mat4 t_Scale = glm::mat4{1}, glm::mat4 t_Rotation = glm::mat4{1});
+	
+		
+
 	
 	Graphics Graphics;
 	BufferDescriptor DebugGeometry;
 	Camera camera;
-	RasterizationState CurrentRastState = RS_DEBUG;
+	RasterizationState CurrentRastState = RS_NORMAL;
+
+	TextureObject SkyboxTexture;
 
 	float32 Width;
 	float32 Height;

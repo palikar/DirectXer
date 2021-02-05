@@ -420,6 +420,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 // @Architecture
 // @Done: Resizing
+// @Done: FPS independence
 // @Todo: Some job\task system for basic multithreading support
 
 // @Notes
