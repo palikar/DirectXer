@@ -31,17 +31,16 @@ VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord)
 
 	vso.pos = mul(float4(pos, 1.0), mul(model, mul(view_m, projection)));
 	vso.world_pos = mul(float4(pos.x, pos.y, pos.z, 1.0), model);
-	/* vso.world_pos = pos; */
-	//vso.pos.z = vso.pos.w;
+	
 	
 	return vso;
     }
 
     VSOut vso;
     vso.pos = mul(float4(pos.x, pos.y, pos.z, 1.0), mul(model, mul(view, projection)));
+    vso.world_pos = mul(float4(pos.x, pos.y, pos.z, 1.0), model);
     vso.color = color;
     vso.uv = uv;
-    
 
     
 	

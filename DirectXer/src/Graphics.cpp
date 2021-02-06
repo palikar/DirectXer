@@ -393,11 +393,11 @@ CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
 	desc.ByteWidth = t_Size;
 	desc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA data{0};
-    data.pSysMem = &m_PixelShaderCB;
+	// D3D11_SUBRESOURCE_DATA data{0};
+    // data.pSysMem = &m_PixelShaderCB;
 
 	HRESULT hr;
-    GFX_CALL(Device->CreateBuffer(&desc, &data, &cb.id));
+    GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
 	return cb;
 
@@ -421,7 +421,8 @@ void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 
-	Context->Map(t_CbObject.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	HRESULT hr;
+	GFX_CALL(Context->Map(t_CbObject.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, t_Data, t_Length);
 	Context->Unmap(t_CbObject.id, 0);
 }

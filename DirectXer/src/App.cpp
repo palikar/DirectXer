@@ -15,21 +15,10 @@ static uint32 AXIS;
 static uint32 CAMERA;
 
 
-
-
 void App::Init(HWND t_Window)
 {
 	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
 
-	const float ratio = Width / Height;
-	const float pov = 65.0f;
-	const float nearPlane = 0.0001f;
-	const float farPlane = 1000.0f;
-
-	camera.Pos = {1.0f, 0.5f, 1.0f};
-	camera.lookAt({0.0f, 0.0f, 0.0f});
-
-	auto proj = glm::perspective(pov, ratio, nearPlane, farPlane);
 
 	// @Todo: Refactor this into functions
 	Graphics.initSwapChain(t_Window, Width, Height);
@@ -67,9 +56,24 @@ void App::Init(HWND t_Window)
 	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
 
 
+	texMat.config = SC_DEBUG_TEX;
+	texMat.data = Graphics.createConstantBuffer(sizeof(TexturedMaterialData), &texMatData);
+	texMat.BaseMap = ROCKS_TEXTURE.Handle;
+	texMat.AoMap = ROCKS_AO_TEXTURE.Handle;
+	texMat.EnvMap = SkyboxTexture;
+
+
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
 	Graphics.setRasterizationState(CurrentRastState);
+
+	camera.Pos = {1.0f, 0.5f, 1.0f};
+	camera.lookAt({0.0f, 0.0f, 0.0f});
+
+	const float ratio = Width / Height;
+	const float pov = 65.0f;
+	const float nearPlane = 0.0001f;
+	const float farPlane = 1000.0f;
 
 	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
 }
@@ -93,8 +97,8 @@ void App::Resize()
 void App::RenderSkyBox()
 {
 	// @Speed: The texture will be bount most of the time
-	Graphics.bindTexture(0, SkyboxTexture);
 	Graphics.setShaderConfiguration(SC_DEBUG_SKY);
+	Graphics.bindTexture(0, SkyboxTexture);
 	Graphics.m_VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, CUBE);
@@ -104,6 +108,7 @@ void App::RenderSkyBox()
 void App::SetupCamera(Camera t_Camera)
 {
 	Graphics.m_VertexShaderCB.view = glm::transpose(t_Camera.view());
+	Graphics.m_PixelShaderCB.cameraPos = t_Camera.Pos;
 }
 
 void App::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
@@ -143,24 +148,38 @@ void App::Spin(float dt)
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
 
-	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-	RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
+	// RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	// RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
 
 
 	
+
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
+	Graphics.bindTexture(0, texMat.EnvMap);
+	Graphics.bindTexture(1, texMat.BaseMap);
+	Graphics.bindTexture(2, texMat.AoMap);
+	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 
-	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
-	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
+	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	texMatData.ColorIntensity = 0.5 * std::abs(std::sin(t));
+	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 
-	Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
 	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
+	
 
-	Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
-	RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
+	
+	
+	// Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
+	// RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	Graphics.bindTexture(1, ROCKS_TEXTURE.Handle);
-	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
+	// Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
+	// RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
+
+	// Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
+	// RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
+
+	// Graphics.bindTexture(1, ROCKS_TEXTURE.Handle);
+	// RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 
 
 
