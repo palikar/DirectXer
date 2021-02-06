@@ -12,12 +12,25 @@ static uint32 LINES;
 static uint32 CYLINDER;
 static uint32 SPHERE;
 static uint32 AXIS;
+static uint32 CAMERA;
+
+
+
 
 void App::Init(HWND t_Window)
 {
 	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
 
-	
+	const float ratio = Width / Height;
+	const float pov = 65.0f;
+	const float nearPlane = 0.0001f;
+	const float farPlane = 1000.0f;
+
+	camera.Pos = {1.0f, 0.5f, 1.0f};
+	camera.lookAt({0.0f, 0.0f, 0.0f});
+
+	auto proj = glm::perspective(pov, ratio, nearPlane, farPlane);
+
 	// @Todo: Refactor this into functions
 	Graphics.initSwapChain(t_Window, Width, Height);
 	Graphics.initBackBuffer();
@@ -28,7 +41,7 @@ void App::Init(HWND t_Window)
 
 	Textures.LoadTextures(Graphics, Arguments.ResourcesPath.data());
 
-	// @Todo: This should some sort of arena storage to do its thing
+	// @Todo: This should use some sort of arena storage to do its thing
 	BufferBuilder builder;
 	CUBE = builder.InitCube(CubeGeometry{}, glm::vec3{1.0f, 0.0f, 0.0f});
 	PLANE = builder.InitPlane(PlaneGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
@@ -36,6 +49,7 @@ void App::Init(HWND t_Window)
 	CYLINDER = builder.InitCylinder(CylinderGeometry{0.25, 0.25, 1.5}, glm::vec3{1.0f, 1.0f, 0.0f});
 	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{0.8f, 0.8f, 0.8f});
 	AXIS = builder.InitAxisHelper();
+	CAMERA = builder.InitCameraHelper({glm::perspective(45.0f, 3.0f/4.0f, 1.50f, 4.0f)});
 
 	GPUGeometry desc = builder.CreateBuffer(Graphics);
 	DebugGeometry = desc.Description;
@@ -52,13 +66,12 @@ void App::Init(HWND t_Window)
 	};
 	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
 
-	
+
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
 	Graphics.setRasterizationState(CurrentRastState);
 
-	camera.Pos = {1.0f, 0.5f, 1.0f};
-	camera.lookAt({0.0f, 0.0f, 0.0f});
+	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
 }
 
 void App::Resize()
@@ -67,6 +80,13 @@ void App::Resize()
 	Graphics.destroyZBuffer();
 	Graphics.initZBuffer(Width, Height);
 	Graphics.setViewport(0, 0, Width, Height);
+
+	const float ratio =  Width/Height;
+	const float pov =  65.0f;
+	const float nearPlane = 0.0001f;
+	const float farPlane = 1000.0f;
+
+	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
 
 }
 
@@ -83,18 +103,19 @@ void App::RenderSkyBox()
 
 void App::SetupCamera(Camera t_Camera)
 {
-	const float ratio =  Width/Height;
-	const float pov =  65.0f;
-	const float nearPlane = 0.0001f;
-	const float farPlane = 1000.0f;
-
-	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
 	Graphics.m_VertexShaderCB.view = glm::transpose(t_Camera.view());
 }
 
 void App::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
 {
 	Graphics.m_VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
+	Graphics.updateCBs();
+	DebugGeometry.DrawGeometry(Graphics, t_Id);
+}
+
+void App::RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform)
+{
+	Graphics.m_VertexShaderCB.model = t_Transform;
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, t_Id);
 }
@@ -107,23 +128,26 @@ void App::Spin(float dt)
 		Graphics.setRasterizationState(CurrentRastState);
 	}
 
-
 	static float t = 0.0;
 	t += 1.1 * dt;
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
-
+	
 	// @Note: Rendering begins here
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics.ClearZBuffer();
 
-	SetupCamera(camera);	
+	SetupCamera(camera);
 
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
-	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 
+	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
+
+
+	
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 
 	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
@@ -137,8 +161,8 @@ void App::Spin(float dt)
 
 	Graphics.bindTexture(1, ROCKS_TEXTURE.Handle);
 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
-	
-	
+
+
 
 	RenderSkyBox();
 

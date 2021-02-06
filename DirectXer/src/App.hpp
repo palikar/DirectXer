@@ -25,9 +25,10 @@ public:
 
 
 	void RenderSkyBox();
-	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4{0}, glm::mat4 t_Scale = glm::mat4{1}, glm::mat4 t_Rotation = glm::mat4{1});
+	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4(1), glm::mat4 t_Scale = glm::mat4(1), glm::mat4 t_Rotation = glm::mat4(1));
+	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
 	
-		
+
 
 	
 	Graphics Graphics;

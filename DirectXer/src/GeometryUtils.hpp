@@ -52,6 +52,9 @@ struct BufferBuilder
 	std::vector<SphereGeometry> Spheres;
 	std::vector<LinesGeometry> Lines;
 
+	std::vector<CameraHelper> Cameras;
+
+
 	std::vector<glm::vec3> Colors;
 
 	BufferDescriptor buf;
@@ -146,6 +149,20 @@ struct BufferBuilder
 		return buf.PutGeometry(axisInfo);
 	}
 
+	uint32 InitCameraHelper(CameraHelper t_CameraHelper)
+	{
+		auto cameraInfo = CameraHelperInfo(t_CameraHelper);
+
+		TotalIndices += cameraInfo.indexCount;
+		TotalVertices += cameraInfo.vertexCount;
+
+		Geometries.push_back(cameraInfo);
+
+		Cameras.push_back(t_CameraHelper);
+
+		return buf.PutGeometry(cameraInfo);
+	}
+
 	GPUGeometry CreateBuffer(Graphics graphics)
 	{
 		uint16 cube{0};
@@ -153,6 +170,7 @@ struct BufferBuilder
 		uint16 cylinder{0};
 		uint16 sphere{0};
 		uint16 lines{0};
+		uint16 camera{0};
 
 		uint32 offset{0};
 		uint32 color{0};
@@ -192,7 +210,6 @@ struct BufferBuilder
 				  break;
 			  }
 
-
 			  case GT_LINES:
 			  {
 				  LinesGeometryData(Lines[lines++], &Vertices[offset], Indices);
@@ -202,6 +219,13 @@ struct BufferBuilder
 			  case GT_AXISHELPER:
 			  {
 				  AxisHelperData(&Vertices[offset], Indices);
+				  offset += geometry.vertexCount;
+				  continue;
+			  }
+
+			  case GT_CAMHELPER:
+			  {
+				  CameraHelperData(Cameras[camera++], &Vertices[offset], Indices);
 				  offset += geometry.vertexCount;
 				  continue;
 			  }
