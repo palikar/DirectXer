@@ -11,7 +11,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
 #pragma once
-#define _WIN32_WINNT 0x0601
+//#define _WIN32_WINNT 0x0601
 
 #include <sdkddkver.h>
 
@@ -50,7 +50,7 @@
 #define NOIMAGE
 #define NOTAPE
 
-#define STRICT
+//#define STRICT
 
 #include <Windows.h>
 #include <sal.h>

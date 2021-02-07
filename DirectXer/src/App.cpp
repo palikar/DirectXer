@@ -136,8 +136,8 @@ void App::Spin(float dt)
 		Graphics.setRasterizationState(CurrentRastState);
 	}
 
-	static float t = 0.0;
-	t += 1.1 * dt;
+	static float t = 0.0f;
+	t += 1.1f * dt;
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
@@ -160,7 +160,7 @@ void App::Spin(float dt)
 	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 
 	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-	texMatData.ColorIntensity = 0.5 * std::abs(std::sin(t*3));
+	texMatData.ColorIntensity = 0.5f * std::abs(std::sin(t*3));
 	texMatData.Reflectivity = 0.0f;
 	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));

@@ -23,7 +23,7 @@ VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord, flo
 
     if (shaderType == 2)
     {
-	VSOut vso;
+        VSOut vso = (VSOut)0;
 
 	matrix view_m = view;
 	
@@ -32,16 +32,16 @@ VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord, flo
 	view_m[3][2] = 0.0f;
 
 	vso.pos = mul(float4(pos, 1.0), mul(model, mul(view_m, projection)));
-	vso.world_pos = mul(float4(pos.x, pos.y, pos.z, 1.0), model);
+	vso.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);
 	
 	
 	return vso;
     }
 
-    VSOut output;
+    VSOut output = (VSOut)0;
     output.pos = mul(float4(pos.x, pos.y, pos.z, 1.0), mul(model, mul(view, projection)));
     output.color = color;
-    output.world_pos = mul(float4(pos.x, pos.y, pos.z, 1.0), model);
+    output.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);
     output.normal = mul((float3x3)(transpose(invModel)), norm);
     output.uv = uv;    
 	

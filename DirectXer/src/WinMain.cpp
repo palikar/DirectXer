@@ -44,6 +44,7 @@ static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 		auto app = (App*)((LPCREATESTRUCTA)lParam)->lpCreateParams;
 
+		// @Todo: Move this in init code somewhere
 		app->Init(hWnd);
 		ImGui_ImplWin32_Init(hWnd);
 		ImGui_ImplDX11_Init(app->Graphics.Device, app->Graphics.Context);
@@ -352,7 +353,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ImGui::NewFrame();
 
 
-		application.Spin((float)clockToMilliseconds(dt) / 1000.0);
+		application.Spin((float)clockToMilliseconds(dt) / 1000.0f);
 
 		
 		ImGui::Render();
