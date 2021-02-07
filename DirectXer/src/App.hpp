@@ -20,6 +20,7 @@ public:
 
 	void Init(HWND t_Window);
 	void Spin(float dt);
+	void EndFrame();
 	void Destroy();
 	void Resize();
 

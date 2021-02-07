@@ -13,6 +13,9 @@
 #include <shellapi.h>
 #include <time.h>
 
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
 
 #include <fmt/format.h>
 
@@ -28,15 +31,23 @@ static void SetupConsole()
 
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		return true;
 
 	switch (msg)
 	{
 	case WM_CREATE:
 	{
 		auto app = (App*)((LPCREATESTRUCTA)lParam)->lpCreateParams;
+
 		app->Init(hWnd);
+		ImGui_ImplWin32_Init(hWnd);
+		ImGui_ImplDX11_Init(app->Graphics.Device, app->Graphics.Context);
+		
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)app);
 		break;
 	}
@@ -280,6 +291,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
 
 	application.Width = (float32)INITIAL_WIDTH;
 	application.Height = (float32)INITIAL_HEIGHT;
@@ -324,7 +346,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 		clock_t beginFrame = clock();
+		
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+
 		application.Spin((float)clockToMilliseconds(dt) / 1000.0);
+
+		
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+		application.Graphics.EndFrame();
+
 		clock_t endFrame = clock();
 
 		dt = endFrame - beginFrame;
@@ -344,6 +379,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	}
 
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 
 	gDxgiManager.Destroy();
 	application.Destroy();

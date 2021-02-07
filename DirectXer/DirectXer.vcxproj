@@ -219,6 +219,9 @@
     <ProjectReference Include="..\Fmt\Fmt.vcxproj">
       <Project>{9281a33e-e029-4278-8752-ebc0cca25940}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\ImGui\ImGui.vcxproj">
+      <Project>{648f47b9-1348-4d49-ac41-9858961beda2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Stb\Stb.vcxproj">
       <Project>{e9da2eb9-160a-4133-b4b5-109eb283280c}</Project>
     </ProjectReference>

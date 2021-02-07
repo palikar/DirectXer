@@ -4,6 +4,7 @@
 #include "Logging.hpp"
 #include "Math.hpp"
 
+#include <imgui.h>
 
 
 static uint32 CUBE;
@@ -181,10 +182,19 @@ void App::Spin(float dt)
 	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
+	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strin
+
+	ImGui::End();
+
 	RenderSkyBox();
 
-	Graphics.EndFrame();
+}
 
+void App::EndFrame()
+{
+	
 }
 
 void App::Destroy()
