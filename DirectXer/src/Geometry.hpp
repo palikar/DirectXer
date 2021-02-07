@@ -162,8 +162,6 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 			const float vert_y = -v * t_CylinderInfo.height + halfHeight;
 			const float vert_z = radius * cosTheta;
 
-			// auto norm = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
-
 			t_Vertices->pos.x = vert_x;
 			t_Vertices->pos.y = vert_y;
 			t_Vertices->pos.z = vert_z;
@@ -171,11 +169,9 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 			t_Vertices->uv.x = u;
 			t_Vertices->uv.y = 1 - v;
 
+			t_Vertices->normal = glm::normalize(glm::vec3(sinTheta, slope, cosTheta));
 
 			++t_Vertices;
-			
-			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
-			// uv.insert(uv.end(), {});
 
 			indexRow.push_back((uint32)(index++));
 		}
@@ -209,11 +205,9 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 			t_Vertices->pos.y = halfHeight * sign;
 			t_Vertices->pos.z = 0;
 
+			t_Vertices->normal = glm::vec3{ 0, sign, 0 };
+
 			++t_Vertices;
-
-
-			// normals.insert(normals.end(), { 0, sign, 0 });
-			// uv.insert(uv.end(), { 0.5, 0.5 });
 
 			++index;
 		}
@@ -236,11 +230,12 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 			t_Vertices->pos.y = vert_y;
 			t_Vertices->pos.z = vert_z;
 
+
+			t_Vertices->uv= glm::vec2{ (cosTheta * 0.5f) + 0.5f, (sinTheta * 0.5f * sign) + 0.5f };
+
+			t_Vertices->normal = glm::vec3{ 0, sign, 0 };
+
 			++t_Vertices;
-			
-            // normals.insert(normals.end(), { 0, sign, 0 });
-			// uv.insert(uv.end(),
-			//           { (cosTheta * 0.5f) + 0.5f, (sinTheta * 0.5f * sign) + 0.5f });
 
 			index++;
 		}
@@ -324,26 +319,21 @@ inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, ColorVertex* t_Verti
 			for (ix = 0; ix < gridX1; ix++)
 			{
 				float x = ix * segmentWidth - widthHalf;
-
-				// vertex[3 + u] = 0;
-				// vertex[3 + v] = 0;
-				// vertex[3 + w] = t_depth > 0 ? 1 : -1;
-
-				// vertex[6] = (ix / gridX);
-				// vertex[7] = (1 - (iy / gridY));
-
+				
 				auto pos = &t_Vertices->pos.x;
 				
 				*(pos + u)= x * udir;
 				*(pos + v) = y * vdir;
 				*(pos + w) = depthHalf;
 
+				auto norm = &t_Vertices->normal.x;
+				*(norm + u)= 0.0f;
+				*(norm + v) = 0.0f;
+				*(norm + w) = t_depth > 0 ? 1.0f : -1.0f;
+
 				t_Vertices->uv = { ix / gridX, 1 - (iy / gridY) };
 				
 				++t_Vertices;
-
-				// normals.insert(normals.end(), { vertex[3], vertex[4], vertex[5] });
-				// uv.insert(uv.end(), {});
 
 				vertexCounter += 1;
 			};
@@ -410,11 +400,9 @@ inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Ve
 			t_Vertices->pos.z = -y;
 
 			t_Vertices->uv = {ix / grid_x, 1 - (iy / grid_y)};
+			t_Vertices->normal = glm::vec3{ 0, 1, 0 };
 
 			++t_Vertices;
-
-			// normals.insert(normals.end(), { 0, 0, -1 });
-			// uv.insert(uv.end(), {});
 		}
 	}
 
@@ -507,13 +495,12 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t
 			t_Vertices->pos.y = y;
 			t_Vertices->pos.z = z;
 
-			t_Vertices->uv = {u + uOffset, 1 - v}; 
+			t_Vertices->uv = {u + uOffset, 1 - v};
+			
+			t_Vertices->normal = glm::normalize(glm::vec3(x, y, z));
 
 			++t_Vertices;
 
-			// auto norm = glm::normalize(glm::vec3(x, y, z));
-			// normals.insert(normals.end(), { norm.x, norm.y, norm.z });
-			// uv.insert(uv.end(), {});
 
 			verticesRow.push_back(index++);
 		}
@@ -639,10 +626,10 @@ inline int TorusGeometryData(const TorusGeometry& t_TorusInfo, ColorVertex* t_Ve
 			t_Vertices->uv.x = i / tubularSegments;
 			t_Vertices->uv.x = j / radialSegments;
 				
-            // auto n = glm::normalize(
-            //   glm::vec3(x, y, z)
-            //   - glm::vec3(radius * std::cos(u), radius * std::sin(u), 0.0f));
-            // normals.insert(normals.end(), { n.x, n.y, n.z });
+            t_Vertices->normal = glm::normalize( glm::vec3(x, y, z) - glm::vec3(t_TorusInfo.radius * std::cos(u), t_TorusInfo.radius * std::sin(u), 0.0f));
+
+			++t_Vertices;
+            
 			
         }
     }

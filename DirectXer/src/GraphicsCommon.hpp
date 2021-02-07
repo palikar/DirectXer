@@ -16,8 +16,6 @@ struct PSConstantBuffer
     
 	glm::vec3 cameraPos;
 	uint32 shaderType;
-	// uint64 _padding0;
-	// uint64 _padding0;
 };
 
 struct VSConstantBuffer
@@ -27,8 +25,10 @@ struct VSConstantBuffer
 	glm::mat4 model{};
 	glm::mat4 view{};
 	glm::mat4 projection{};
+	glm::mat4 invModel;
 	uint32 shaderType;
-	uint64 _padding0;
+	uint64 _padding;
+	
 
 };
 
@@ -42,6 +42,7 @@ struct ColorVertex
 	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 uv;
+	glm::vec3 normal;
 };
 
 inline void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)

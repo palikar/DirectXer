@@ -100,6 +100,7 @@ void App::RenderSkyBox()
 	Graphics.setShaderConfiguration(SC_DEBUG_SKY);
 	Graphics.bindTexture(0, SkyboxTexture);
 	Graphics.m_VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
+	Graphics.m_VertexShaderCB.invModel = glm::inverse(Graphics.m_VertexShaderCB.model);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, CUBE);
 
@@ -114,6 +115,7 @@ void App::SetupCamera(Camera t_Camera)
 void App::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
 {
 	Graphics.m_VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
+	Graphics.m_VertexShaderCB.invModel = glm::inverse(Graphics.m_VertexShaderCB.model);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, t_Id);
 }
@@ -145,13 +147,9 @@ void App::Spin(float dt)
 
 	SetupCamera(camera);
 
-
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
-
-	// RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-	// RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
-
-
+	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
 	
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
@@ -161,27 +159,27 @@ void App::Spin(float dt)
 	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 
 	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-	texMatData.ColorIntensity = 0.5 * std::abs(std::sin(t));
+	texMatData.ColorIntensity = 0.5 * std::abs(std::sin(t*3));
+	texMatData.Reflectivity = 0.0f;
 	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
-
 	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
-	
+
+	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
+	texMatData.ColorIntensity = 0.15;
+	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
+
+	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
+	texMatData.ColorIntensity = 0.0;
+
+	texMatData.Reflectivity = 0.5f;
+	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 
 	
-	
-	// Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
-	// RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
-
-	// Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
-	// RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
-
-	// Graphics.bindTexture(1, FLOOR_TEXTURE.Handle);
-	// RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
-
-	// Graphics.bindTexture(1, ROCKS_TEXTURE.Handle);
-	// RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
-
-
+	Graphics.setShaderConfiguration(SC_DEBUG_SIMPLE_TEX);
+	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
+	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
 	RenderSkyBox();
 

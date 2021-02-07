@@ -5,18 +5,20 @@ struct VSOut
     float3 world_pos : PositionOut;
     float2 uv : Texcoord;
     float3 color : COLOR0;
+    float3 normal: Normal;
 };
 
-cbuffer CameraCbBuf : register(b0)
+cbuffer VSPrim : register(b0)
 {
     matrix model;
     matrix view;
     matrix projection;
+    matrix invModel;
     uint shaderType;
 };
 
 
-VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord)
+VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord, float3 norm: Normal)
 {
 
     if (shaderType == 2)
@@ -36,13 +38,12 @@ VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord)
 	return vso;
     }
 
-    VSOut vso;
-    vso.pos = mul(float4(pos.x, pos.y, pos.z, 1.0), mul(model, mul(view, projection)));
-    vso.world_pos = mul(float4(pos.x, pos.y, pos.z, 1.0), model);
-    vso.color = color;
-    vso.uv = uv;
-
-    
+    VSOut output;
+    output.pos = mul(float4(pos.x, pos.y, pos.z, 1.0), mul(model, mul(view, projection)));
+    output.color = color;
+    output.world_pos = mul(float4(pos.x, pos.y, pos.z, 1.0), model);
+    output.normal = mul((float3x3)(transpose(invModel)), norm);
+    output.uv = uv;    
 	
-    return vso;
+    return output;
 }

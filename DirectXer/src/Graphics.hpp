@@ -96,15 +96,17 @@ enum ShaderType : uint8
   ST_TEX = 0,
   ST_COLOR,
   ST_SKY,
+  ST_TEX_SIMPLE,
 
   ST_COUNT
 };
 
 enum ShaderConfig
 {
-	SC_DEBUG_COLOR  = SF_DEBUG | (ST_COLOR << 8),
-	SC_DEBUG_TEX    = SF_DEBUG | (ST_TEX   << 8),
-	SC_DEBUG_SKY    = SF_DEBUG | (ST_SKY   << 8),
+	SC_DEBUG_COLOR       = SF_DEBUG | (ST_COLOR      << 8),
+	SC_DEBUG_TEX         = SF_DEBUG | (ST_TEX        << 8),
+	SC_DEBUG_SKY         = SF_DEBUG | (ST_SKY        << 8),
+	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG | (ST_TEX_SIMPLE << 8),
 	
 	SC_COUNT
 };
