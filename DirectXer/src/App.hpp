@@ -13,6 +13,22 @@ struct CommandLineSettings
 	std::string_view ResourcesPath;
 };
 
+struct Lighting
+{
+	glm::vec3 ambLightColor{0};
+
+	glm::vec3 dirLightColor{0};
+	glm::vec3 dirLightDir{0};
+
+	uint64 _padding0;
+};
+
+
+struct LightSetup
+{
+	Lighting lighting;
+	CBObject bufferId;
+};
 
 class App
 {
@@ -42,6 +58,8 @@ public:
 	RasterizationState CurrentRastState = RS_NORMAL;
 
 	TextureObject SkyboxTexture;
+
+	LightSetup Light;
 
 	float32 Width;
 	float32 Height;

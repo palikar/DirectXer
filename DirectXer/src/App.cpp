@@ -57,12 +57,16 @@ void App::Init(HWND t_Window)
 	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
 
 
+	// Create material
 	texMat.config = SC_DEBUG_TEX;
 	texMat.data = Graphics.createConstantBuffer(sizeof(TexturedMaterialData), &texMatData);
 	texMat.BaseMap = ROCKS_TEXTURE.Handle;
 	texMat.AoMap = ROCKS_AO_TEXTURE.Handle;
 	texMat.EnvMap = SkyboxTexture;
 
+
+	// Create lighing
+	Light.bufferId = Graphics.createConstantBuffer(sizeof(Lighting), &Light.lighting);
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
@@ -132,7 +136,7 @@ void App::Spin(float dt)
 {
 	if(gInput.IsKeyReleased(KeyCode::F11))
 	{
-		CurrentRastState = RasterizationState{(CurrentRastState + 1) % RS_COUNT};
+		CurrentRastState = RasterizationState((CurrentRastState + 1) % RS_COUNT);
 		Graphics.setRasterizationState(CurrentRastState);
 	}
 
@@ -177,16 +181,45 @@ void App::Spin(float dt)
 	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 
+
+	Graphics.bindPSConstantBuffers(&texMat.data, 1, 2);
 	
+
 	Graphics.setShaderConfiguration(SC_DEBUG_SIMPLE_TEX);
 	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+	bool lightChanged = false;
+	
+	ImGui::Begin("Scene Setup");
+	if (ImGui::CollapsingHeader("Ligting"))
+	{
+		if (ImGui::TreeNode("Directional light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
+			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.x, -1.0f, 3.0f, "Direction = %.3f");
+			ImGui::TreePop();
+		}
 
-	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strin
-
+	
+		if (ImGui::TreeNode("Ambient light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
+			ImGui::TreePop();
+		}
+	
+	}
+	ImGui::Text("Scene Setup");
 	ImGui::End();
+
+	if(lightChanged)
+	{
+		Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	}
 
 	RenderSkyBox();
 

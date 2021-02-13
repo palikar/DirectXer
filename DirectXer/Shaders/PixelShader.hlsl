@@ -9,7 +9,7 @@ struct PSIn
     float3 normal: Normal;
 };
 
-cbuffer PSPrim : register(b0)
+cbuffer PSPrimBuf : register(b0)
 {
     float3 CameraPos;
     uint shaderType;
@@ -22,6 +22,15 @@ cbuffer TexturedMaterialBuf : register(b1)
     float AoIntensity;
     float Reflectivity;
     float RefractionRation;  
+};
+
+
+cbuffer LightningBuf : register(b2)
+{
+    float3 AmbLigtColor;
+    
+    float3 DirLigtDir;
+    float3 DirLigtColor;    
 };
 
 
@@ -73,6 +82,13 @@ float4 main(PSIn input) : SV_Target
     else if(shaderType == 3) // Simple texture
     {
         return tex_1.Sample(samp, input.uv);
+    }
+    else if(shaderType == 4) // Phong
+    {
+	float3 finalColor = tex_1.Sample(samp, input.uv).rgb;
+
+	
+        return float4(finalColor, 1.0f);
     }
 
     return float4(1.0f, 0.0f, 0.5f, 1.0f);
