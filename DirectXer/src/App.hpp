@@ -15,12 +15,10 @@ struct CommandLineSettings
 
 struct Lighting
 {
-	glm::vec3 ambLightColor{0};
+	glm::vec4 ambLightColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-	glm::vec3 dirLightColor{0};
-	glm::vec3 dirLightDir{0};
-
-	uint64 _padding0;
+	glm::vec4 dirLightColor{0.0f, 0.0f, 0.0f, 1.0f};
+	glm::vec4 dirLightDir{0.5, 0.5f, 0, 0};
 };
 
 
@@ -48,8 +46,11 @@ public:
 	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
 	
 
-	struct TexturedMaterial texMat;
-	struct TexturedMaterialData texMatData;
+	TexturedMaterial texMat;
+	TexturedMaterialData texMatData;
+
+	PhongMaterial phongMat;
+	PhongMaterialData phongMatData;
 
 	
 	Graphics Graphics;

@@ -64,6 +64,9 @@ void App::Init(HWND t_Window)
 	texMat.AoMap = ROCKS_AO_TEXTURE.Handle;
 	texMat.EnvMap = SkyboxTexture;
 
+	phongMat.config = SC_DEBUG_PHONG;
+	phongMat.data = Graphics.createConstantBuffer(sizeof(PhongMaterialData), &texMatData);
+	
 
 	// Create lighing
 	Light.bufferId = Graphics.createConstantBuffer(sizeof(Lighting), &Light.lighting);
@@ -145,6 +148,41 @@ void App::Spin(float dt)
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
+	bool lightChanged = false;
+	Graphics.bindPSConstantBuffers(&Light.bufferId, 1, 2);
+	ImGui::Begin("Scene Setup");
+	if (ImGui::CollapsingHeader("Ligting"))
+	{
+		if (ImGui::TreeNode("Directional light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
+			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
+			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
+			ImGui::TreePop();
+		}
+
+	
+		if (ImGui::TreeNode("Ambient light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
+			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.ambLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
+			ImGui::TreePop();
+		}
+	
+	}
+	ImGui::End();
+
+	if(lightChanged)
+	{
+		// Light.lighting.dirLightDir.x = 0.0f;
+		// Light.lighting.dirLightDir.z = 0.0f;
+		Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	}
+
 	
 	// @Note: Rendering begins here
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
@@ -182,44 +220,20 @@ void App::Spin(float dt)
 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 
 
-	Graphics.bindPSConstantBuffers(&texMat.data, 1, 2);
-	
-
 	Graphics.setShaderConfiguration(SC_DEBUG_SIMPLE_TEX);
 	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	bool lightChanged = false;
 	
-	ImGui::Begin("Scene Setup");
-	if (ImGui::CollapsingHeader("Ligting"))
-	{
-		if (ImGui::TreeNode("Directional light"))
-		{
-			ImGui::Text("Color");
-			ImGui::SameLine();
-			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
-			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.x, -1.0f, 3.0f, "Direction = %.3f");
-			ImGui::TreePop();
-		}
-
+	Graphics.setShaderConfiguration(SC_DEBUG_PHONG);
+	Graphics.bindPSConstantBuffers(&phongMat.data, 1, 3);
 	
-		if (ImGui::TreeNode("Ambient light"))
-		{
-			ImGui::Text("Color");
-			ImGui::SameLine();
-			lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
-			ImGui::TreePop();
-		}
-	
-	}
-	ImGui::Text("Scene Setup");
-	ImGui::End();
-
-	if(lightChanged)
-	{
-		Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
-	}
+	phongMatData.Ambient  = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
+	Graphics.updateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, - 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
 	RenderSkyBox();
 
