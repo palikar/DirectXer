@@ -62,7 +62,7 @@ struct CameraHelper
 
 static GeometryInfo CameraHelperInfo(CameraHelper t_Camera)
 {
-	return {22, 25 * 2 * 2, GT_CAMHELPER};
+	return {21 + 1, 25 * 2 * 2, GT_CAMHELPER};
 }
 
 static int CameraHelperData(CameraHelper t_Camera, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices)

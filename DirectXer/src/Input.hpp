@@ -8,7 +8,7 @@ enum class KeyCode : uint16_t
 {
     // From glfw3.h
     Space      = 32,
-    Apostrophe = 39, /* ' */
+    // Apostrophe = 39, /* ' */
     Comma      = 44, /* , */
     Minus      = 45, /* - */
     Period     = 46, /* . */
@@ -78,8 +78,8 @@ enum class KeyCode : uint16_t
     Backspace   = 259,
     Insert      = 260,
     Delete      = 261,
-    Right       = 262,
-    Left        = 263,
+    Left        = 37,
+    Right       = 39,
     Down        = 264,
     Up          = 265,
     PageUp      = 266,

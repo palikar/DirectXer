@@ -7,26 +7,20 @@
 #include "TextureCatalog.hpp"
 #include "GeometryUtils.hpp"
 #include "Materials.hpp"
+#include "Lighting.hpp"
 
 struct CommandLineSettings
 {
 	std::string_view ResourcesPath;
 };
 
-struct Lighting
+enum Scene
 {
-	glm::vec4 ambLightColor{0.0f, 0.0f, 0.0f, 1.0f};
-
-	glm::vec4 dirLightColor{0.0f, 0.0f, 0.0f, 1.0f};
-	glm::vec4 dirLightDir{0.5, 0.5f, 0, 0};
+	SCENE_FIRST   = 0,
+	SCENE_PHONGS  = 1,
+	SCENE_COUNT
 };
 
-
-struct LightSetup
-{
-	Lighting lighting;
-	CBObject bufferId;
-};
 
 class App
 {
@@ -44,15 +38,20 @@ public:
 	void RenderSkyBox();
 	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4(1), glm::mat4 t_Scale = glm::mat4(1), glm::mat4 t_Rotation = glm::mat4(1));
 	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
+
+
+	void ProcessFirstScene(float dt);
+	void ProcessPhongScene(float dt);
 	
 
+	// @Note: Rendering data -- used by the scene to
+	// do its rendering
 	TexturedMaterial texMat;
 	TexturedMaterialData texMatData;
 
 	PhongMaterial phongMat;
 	PhongMaterialData phongMatData;
 
-	
 	Graphics Graphics;
 	BufferDescriptor DebugGeometry;
 	Camera camera;
@@ -62,11 +61,16 @@ public:
 
 	LightSetup Light;
 
+
+	// @Note: Application Data -- used by the "application" for
+	// application management stuff
 	float32 Width;
 	float32 Height;
 	int ReturnValue{0};
 	boolean Running{true};
 	CommandLineSettings Arguments;
 	TextureCatalog Textures;
+
+	Scene CurrentScene{SCENE_FIRST};
 	
 };

@@ -139,52 +139,56 @@ void App::RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform)
 
 void App::Spin(float dt)
 {
+
 	if(gInput.IsKeyReleased(KeyCode::F11))
 	{
 		CurrentRastState = RasterizationState((CurrentRastState + 1) % RS_COUNT);
 		Graphics.setRasterizationState(CurrentRastState);
 	}
 
+	if(gInput.IsKeyReleased(KeyCode::Left))
+	{
+		CurrentScene = Scene(std::abs(CurrentScene - 1) % SCENE_COUNT);
+	}
+
+	if(gInput.IsKeyReleased(KeyCode::Right))
+	{
+		CurrentScene = Scene((CurrentScene + 1) % SCENE_COUNT);
+	}
+
+	
+	switch (CurrentScene)
+	{
+		case SCENE_FIRST:
+		  ProcessFirstScene(dt);
+		  break;
+	  case SCENE_PHONGS:
+		  ProcessPhongScene(dt);
+		  break;
+	}
+}
+
+void App::EndFrame()
+{
+	
+}
+
+void App::Destroy()
+{
+	Graphics.Destroy();
+}
+
+
+void App::ProcessFirstScene(float dt)
+{
+	
 	static float t = 0.0f;
 	t += 1.1f * dt;
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
-	bool lightChanged = false;
-	Graphics.bindPSConstantBuffers(&Light.bufferId, 1, 2);
-	ImGui::Begin("Scene Setup");
-	if (ImGui::CollapsingHeader("Ligting"))
-	{
-		if (ImGui::TreeNode("Directional light"))
-		{
-			ImGui::Text("Color");
-			ImGui::SameLine();
-			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
-			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
-			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
-			ImGui::TreePop();
-		}
 
-	
-		if (ImGui::TreeNode("Ambient light"))
-		{
-			ImGui::Text("Color");
-			ImGui::SameLine();
-			lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
-			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.ambLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
-			ImGui::TreePop();
-		}
-	
-	}
-	ImGui::End();
-
-	if(lightChanged)
-	{
-		Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
-	}
-
-	
-	// @Note: Rendering begins here
+    // @Note: Rendering begins here
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics.ClearZBuffer();
 
@@ -192,14 +196,6 @@ void App::Spin(float dt)
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-
-	Graphics.setRasterizationState(RS_DEBUG);
-	RenderDebugGeometry(POINTLIGHT, init_translate(0.0f, 1.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-	Graphics.setRasterizationState(RS_NORMAL);
-	// RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
-
-	
-	
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.bindTexture(0, texMat.EnvMap);
@@ -231,26 +227,75 @@ void App::Spin(float dt)
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
 	
-	Graphics.setShaderConfiguration(SC_DEBUG_PHONG);
-	Graphics.bindPSConstantBuffers(&phongMat.data, 1, 3);
-	
-	phongMatData.Ambient  = {1.0f, 0.0f, 0.0f, 0.0f };
-	phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };
-	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
-	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
-	Graphics.updateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
-	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, - 4.0f), init_scale(0.25f, 0.25f, 0.25f));
-
 	RenderSkyBox();
 
 }
 
-void App::EndFrame()
-{
-	
-}
 
-void App::Destroy()
+void App::ProcessPhongScene(float dt)
 {
-	Graphics.Destroy();
+	static float t = 0.0f;
+	t += 1.1f * dt;
+	t = t > 100.0f ? 0.0f : t;
+	ControlCameraFPS(camera, dt);
+
+	// bool lightChanged = false;
+	// Graphics.bindPSConstantBuffers(&Light.bufferId, 1, 2);
+	// ImGui::Begin("Scene Setup");
+	// if (ImGui::CollapsingHeader("Ligting"))
+	// {
+	// 	if (ImGui::TreeNode("Directional light"))
+	// 	{
+	// 		ImGui::Text("Color");
+	// 		ImGui::SameLine();
+	// 		lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
+	// 		lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
+	// 		lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
+	// 		ImGui::TreePop();
+	// 	}
+
+	
+	// 	if (ImGui::TreeNode("Ambient light"))
+	// 	{
+	// 		ImGui::Text("Color");
+	// 		ImGui::SameLine();
+	// 		lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
+	// 		lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.ambLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
+	// 		ImGui::TreePop();
+	// 	}
+	
+	// }
+	// ImGui::End();
+
+	// if(lightChanged)
+	// {
+	// 	Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	// }
+
+	// Graphics.setShaderConfiguration(SC_DEBUG_PHONG);
+	// Graphics.bindPSConstantBuffers(&phongMat.data, 1, 3);
+	
+	// phongMatData.Ambient  = {1.0f, 0.0f, 0.0f, 0.0f };
+	// phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };
+	// phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
+	// phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
+	// Graphics.updateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	// RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, - 4.0f), init_scale(0.25f, 0.25f, 0.25f));
+
+	// Graphics.setRasterizationState(RS_DEBUG);
+	// RenderDebugGeometry(POINTLIGHT, init_translate(0.0f, 1.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	// Graphics.setRasterizationState(RS_NORMAL);
+
+
+
+	// @Note: Rendering begins here
+	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics.ClearZBuffer();
+
+	SetupCamera(camera);
+
+	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
+	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+
+	RenderSkyBox();
 }

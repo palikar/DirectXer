@@ -430,10 +430,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Rendering sky box
 // @Todo: Rendering groups
 // @Todo: Rendering fog
-// @Todo: Material setup
-// @Todo: Phong material
+// @Done: Material setup
+// @Done: Phong material
+// @Dibe: Sollid color material
 // @Todo: PBR material
-// @Todo: Sollid color material
 // @Todo: Point light
 // @Todo: Text rendering
 
