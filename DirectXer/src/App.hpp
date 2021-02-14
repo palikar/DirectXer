@@ -71,6 +71,6 @@ public:
 	CommandLineSettings Arguments;
 	TextureCatalog Textures;
 
-	Scene CurrentScene{SCENE_FIRST};
+	Scene CurrentScene = SCENE_PHONGS;
 	
 };

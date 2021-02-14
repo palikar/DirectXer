@@ -432,9 +432,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Rendering fog
 // @Done: Material setup
 // @Done: Phong material
-// @Dibe: Sollid color material
+// @Done: Sollid color material
 // @Todo: PBR material
-// @Todo: Point light
+// @Done: Point light
 // @Todo: Text rendering
 
 // @Data management
@@ -450,12 +450,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Debug
 // @Done: Axis helper
 // @Done: Grid Helper
-// @Todo: Spot light helper
-// @Todo: Point light helper
-// @Todo: Drop down console
+// @Done: Point light helper
 // @Done: FPS Camara controller
-// @Todo: Adjust all of the geometry generators
-// @Todo: Add the normals and uvs to the color vertex
+// @Done: Adjust all of the geometry generators
+// @Done: Add the normals and uvs to the color vertex
+// @Todo: Spot light helper
+// @Todo: Drop down console
 
 // @Architecture
 // @Done: Resizing

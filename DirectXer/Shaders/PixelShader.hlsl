@@ -7,6 +7,16 @@ struct PSIn
     float3 normal: Normal;
 };
 
+
+struct PointLight
+{
+    float4 Color;
+    float4 Position;
+    float4 Params;
+    bool active;
+};
+
+
 cbuffer PSPrimBuf : register(b0)
 {
     float3 CameraPos;
@@ -28,6 +38,9 @@ cbuffer LightningBuf : register(b2)
 
     float4 DirLightColor;
     float4 DirLightDir;
+
+    PointLight PointLights[5];
+    
 };
 
 cbuffer PhongMaterialBuf : register(b3)
@@ -36,6 +49,7 @@ cbuffer PhongMaterialBuf : register(b3)
     float4 Diffuse;
     float4 Specular;
     float4 Emissive;
+    float SpecularShininess;
 };
 
 
@@ -59,6 +73,26 @@ float3 apply_dir_light(in PSIn input)
     return diffuse;
 }
 
+
+float3 apply_point_light(PointLight light, float3 normal, float3 surface_pos, float3 surface_to_camera)
+{
+    float3 light_to_surface  = normalize(light.Position - surface_pos);
+    float dist_to_light = length(light.Position - surface_pos);
+
+    float attenuation = 1.0f / (light.Params.r + light.Params.g * dist_to_light +
+                                light.Params.b * (dist_to_light * dist_to_light));
+
+
+    float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
+    float3 diffuse = diffuse_coefficient * Diffuse.rgb * light.Color.rgb;
+
+    float specular_coefficient = 0.0;
+    if(diffuse_coefficient > 0.0)
+        specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), SpecularShininess);
+    float3 specular = Specular.rgb * light.Color.rgb * 1.0f;
+
+    return (diffuse + specular) * attenuation;
+}
 
 float4 main(PSIn input) : SV_Target
 {
@@ -107,11 +141,21 @@ float4 main(PSIn input) : SV_Target
     {
 
 
-
+	float3 to_camera = -normalize(input.world_pos - CameraPos);
+	
 	float3 outgoingLight = float3(0.0f, 0.0f, 0.0f);
 
 	outgoingLight += apply_ambient_light(input);
         outgoingLight += apply_dir_light(input);
+
+	for (int i = 0; i < 5; ++i)
+	{
+	    if (PointLights[i].active)
+	    {
+		outgoingLight += apply_point_light(PointLights[i], input.normal, input.world_pos, to_camera);
+	    }
+	}
+
 
 	return float4(outgoingLight, 1.0f);
     }

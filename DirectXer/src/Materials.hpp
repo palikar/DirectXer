@@ -45,4 +45,6 @@ struct PhongMaterialData
 	glm::vec4 Diffuse{ 0.0f, 0.0f, 0.0f, 0.0f};
 	glm::vec4 Specular{ 0.0f, 0.0f, 0.0f, 0.0f};
 	glm::vec4 Emissive{ 0.0f, 0.0f, 0.0f, 0.0f};
+	float SpecularChininess {1.0};
+	glm::vec3 _padding;
 };
