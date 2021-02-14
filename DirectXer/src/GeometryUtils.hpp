@@ -163,6 +163,18 @@ struct BufferBuilder
 		return buf.PutGeometry(cameraInfo);
 	}
 
+	uint32 InitPointLightHelper()
+	{
+		auto lightInfo = PointLightHelperInfo();
+
+		TotalIndices += lightInfo.indexCount;
+		TotalVertices += lightInfo.vertexCount;
+
+		Geometries.push_back(lightInfo);
+
+		return buf.PutGeometry(lightInfo);
+	}
+
 	GPUGeometry CreateBuffer(Graphics graphics)
 	{
 		uint16 cube{0};
@@ -226,6 +238,13 @@ struct BufferBuilder
 			  case GT_CAMHELPER:
 			  {
 				  CameraHelperData(Cameras[camera++], &Vertices[offset], Indices);
+				  offset += geometry.vertexCount;
+				  continue;
+			  }
+
+			  case GT_POINGHTLIGHTHELPER:
+			  {
+				  PointLightHelperData(&Vertices[offset], Indices);
 				  offset += geometry.vertexCount;
 				  continue;
 			  }

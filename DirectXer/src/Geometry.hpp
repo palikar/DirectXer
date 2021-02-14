@@ -11,16 +11,17 @@ inline constexpr float PI = 3.14159265358979323846;
 
 enum GeometryType : uint16
 {
-	GT_UNKNOWN    = 0 | (0x00 << 8),
-	GT_CUBE       = 1 | (0x00 << 8),
-	GT_PLANE      = 2 | (0x00 << 8),
-	GT_CYLINDER   = 3 | (0x00 << 8),
-	GT_SPHERE     = 4 | (0x00 << 8),
-	GT_LINES      = 5 | (0x01 << 8),
-	GT_AXISHELPER = 6 | (0x00 << 8),
-	GT_TORUS      = 7 | (0x00 << 8),
-	GT_CONE       = 8 | (0x00 << 8),
-	GT_CAMHELPER  = 9 | (0x01 << 8),
+	GT_UNKNOWN             = 0  | (0x00 << 8),
+	GT_CUBE                = 1  | (0x00 << 8),
+	GT_PLANE               = 2  | (0x00 << 8),
+	GT_CYLINDER            = 3  | (0x00 << 8),
+	GT_SPHERE              = 4  | (0x00 << 8),
+	GT_LINES               = 5  | (0x01 << 8),
+	GT_AXISHELPER          = 6  | (0x00 << 8),
+	GT_TORUS               = 7  | (0x00 << 8),
+	GT_CONE                = 8  | (0x00 << 8),
+	GT_CAMHELPER           = 9  | (0x01 << 8),
+	GT_POINGHTLIGHTHELPER  = 10 | (0x00 << 8),
 };
 
 struct CubeGeometry
@@ -457,7 +458,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 
-	float radius = std::max(t_SphereInfo.radius, 1.0f);
+	float radius = std::max(t_SphereInfo.radius, 0.01f);
 
 	float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
 	float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));

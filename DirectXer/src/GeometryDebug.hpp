@@ -3,6 +3,7 @@
 #include "Geometry.hpp"
 
 static CylinderGeometry cylinderShape{0.005f, 0.005f, 0.25f, 10.0f, 1.0f};
+static SphereGeometry lightSphere{0.1f, 4.0f, 2.0f};
 
 static GeometryInfo AxisHelperInfo()
 {
@@ -136,7 +137,7 @@ static int CameraHelperData(CameraHelper t_Camera, ColorVertex* t_Vertices, std:
 
 	t_Indices.insert(t_Indices.end(), {10, 11}); // u1-u2
 	t_Indices.insert(t_Indices.end(), {11, 12}); // u2-u3
-	t_Indices.insert(t_Indices.end(), {12, 10}); // u3-u1
+	t_Indices.insert(t_Indices.end(), {12, 10}); // u3-u1 
 	
 	t_Indices.insert(t_Indices.end(), {0,  1}); // c-t
 	t_Indices.insert(t_Indices.end(), {21, 0}); // p-c
@@ -148,4 +149,25 @@ static int CameraHelperData(CameraHelper t_Camera, ColorVertex* t_Vertices, std:
 	t_Indices.insert(t_Indices.end(), {15, 16}); // cf3-cf4
 
 	return 0;
+}
+
+static GeometryInfo PointLightHelperInfo()
+{
+	auto sphereInfo = SphereGeometryInfo(lightSphere);
+	sphereInfo.type = GT_POINGHTLIGHTHELPER;
+	return sphereInfo;
+}
+
+static int PointLightHelperData(ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+{
+	auto res = SphereGeometryData(lightSphere, t_Vertices, t_Indices, t_BaseIndex);
+	auto info = SphereGeometryInfo(lightSphere);
+
+	for (size_t i = 0; i < info.vertexCount; ++i)
+	{
+		(t_Vertices + i)->color = {1.0f, 1.0f, 0.0f};
+	}
+
+
+	return res;
 }

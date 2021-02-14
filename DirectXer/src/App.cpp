@@ -14,6 +14,7 @@ static uint32 CYLINDER;
 static uint32 SPHERE;
 static uint32 AXIS;
 static uint32 CAMERA;
+static uint32 POINTLIGHT;
 
 
 void App::Init(HWND t_Window)
@@ -39,8 +40,9 @@ void App::Init(HWND t_Window)
 	CYLINDER = builder.InitCylinder(CylinderGeometry{0.25, 0.25, 1.5}, glm::vec3{1.0f, 1.0f, 0.0f});
 	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{0.8f, 0.8f, 0.8f});
 	AXIS = builder.InitAxisHelper();
+	POINTLIGHT = builder.InitPointLightHelper();
 	CAMERA = builder.InitCameraHelper({glm::perspective(45.0f, 3.0f/4.0f, 1.50f, 4.0f)});
-
+	
 	GPUGeometry desc = builder.CreateBuffer(Graphics);
 	DebugGeometry = desc.Description;
 	Graphics.setIndexBuffer(desc.Ibo);
@@ -178,8 +180,6 @@ void App::Spin(float dt)
 
 	if(lightChanged)
 	{
-		// Light.lighting.dirLightDir.x = 0.0f;
-		// Light.lighting.dirLightDir.z = 0.0f;
 		Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 	}
 
@@ -192,7 +192,13 @@ void App::Spin(float dt)
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-	RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
+
+	Graphics.setRasterizationState(RS_DEBUG);
+	RenderDebugGeometry(POINTLIGHT, init_translate(0.0f, 1.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	Graphics.setRasterizationState(RS_NORMAL);
+	// RenderDebugGeometry(CAMERA, init_translate(2.0f, 3.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f), init_rotation({0.0, 0.0, 0.0}, {0.0f, 1.0f, 0.0f}));
+
+	
 	
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
