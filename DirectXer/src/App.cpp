@@ -15,6 +15,7 @@ static uint32 SPHERE;
 static uint32 AXIS;
 static uint32 CAMERA;
 static uint32 POINTLIGHT;
+static uint32 SPOTLIGHT;
 
 
 void App::Init(HWND t_Window)
@@ -41,7 +42,8 @@ void App::Init(HWND t_Window)
 	LINES = builder.InitLines(LinesGeometry{}, glm::vec3{0.8f, 0.8f, 0.8f});
 	AXIS = builder.InitAxisHelper();
 	POINTLIGHT = builder.InitPointLightHelper();
-	CAMERA = builder.InitCameraHelper({glm::perspective(45.0f, 3.0f/4.0f, 1.50f, 4.0f)});
+	SPOTLIGHT = builder.InitSpotLightHelper();
+	// CAMERA = builder.InitCameraHelper({glm::perspective(45.0f, 3.0f/4.0f, 1.50f, 4.0f)});
 
 	GPUGeometry desc = builder.CreateBuffer(Graphics);
 	DebugGeometry = desc.Description;
@@ -302,6 +304,7 @@ void App::ProcessPhongScene(float dt)
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	RenderDebugGeometry(SPOTLIGHT, init_translate(2.0f *std::sin(t), 1.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f));
 
 	Graphics.setRasterizationState(RS_DEBUG);
 	RenderDebugGeometry(POINTLIGHT, init_translate(lightX, 0.5f, lightY), init_scale(1.0f, 1.0f, 1.0f));

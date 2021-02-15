@@ -17,6 +17,18 @@ struct PointLight
 };
 
 
+struct SpotLight
+{
+    float4 Color;
+    float4 Position;
+    float4 Dir;
+    float4 Params;
+    bool active;
+};
+
+
+
+
 cbuffer PSPrimBuf : register(b0)
 {
     float3 CameraPos;
@@ -40,6 +52,7 @@ cbuffer LightningBuf : register(b2)
     float4 DirLightDir;
 
     PointLight PointLights[5];
+    SpotLight SpotLights[5];
     
 };
 
@@ -73,7 +86,6 @@ float3 apply_dir_light(in PSIn input)
     return diffuse;
 }
 
-
 float3 apply_point_light(PointLight light, float3 normal, float3 surface_pos, float3 surface_to_camera)
 {
     float3 light_to_surface  = normalize(light.Position - surface_pos);
@@ -92,6 +104,31 @@ float3 apply_point_light(PointLight light, float3 normal, float3 surface_pos, fl
     float3 specular = Specular.rgb * light.Color.rgb * 1.0f;
 
     return (diffuse + specular) * attenuation;
+}
+
+float3 apply_spot_light(SpotLight light, float3 normal, float3 surface_pos, float3 surface_to_camera)
+{
+    float3 light_to_surface  = normalize(light.Position - surface_pos);
+    float theta = acos(dot(light_to_surface, normalize(-light.Dir)));
+
+    if(theta < light.Params.r) {
+        float epsilon  = light.Params.g - light.Params.r;
+        float intensity = clamp((theta - light.Params.r) / epsilon, 0.0, 1.0);
+        /* float distance_to_light = length(light.position - surface_pos); */
+
+        float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
+        float3 diffuse = Diffuse.rgb * light.Color.rgb * diffuse_coefficient;
+
+        float specular_coefficient = 0.0;
+        if(diffuse_coefficient > 0.0) {
+            specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), SpecularShininess);
+        }
+        float3 specular = specular_coefficient * Specular.rgb * light.Color.rgb;
+
+        return (diffuse + specular) * intensity;
+    }
+    return float3(0.0, 0.0, 0.0);
+
 }
 
 float4 main(PSIn input) : SV_Target
@@ -153,6 +190,11 @@ float4 main(PSIn input) : SV_Target
 	    if (PointLights[i].active)
 	    {
 		outgoingLight += apply_point_light(PointLights[i], input.normal, input.world_pos, to_camera);
+	    }
+
+	    if (SpotLights[i].active)
+	    {
+		outgoingLight += apply_spot_light(SpotLights[i], input.normal, input.world_pos, to_camera);
 	    }
 	}
 

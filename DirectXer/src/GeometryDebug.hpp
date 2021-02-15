@@ -60,6 +60,13 @@ struct CameraHelper
 	glm::mat4 projection;
 };
 
+
+struct SpotLightHelper
+{
+	float angle;
+	float distance;
+};
+
 static GeometryInfo CameraHelperInfo(CameraHelper t_Camera)
 {
 	return {21 + 1, 25 * 2 * 2, GT_CAMHELPER};
@@ -170,4 +177,45 @@ static int PointLightHelperData(ColorVertex* t_Vertices, std::vector<uint32>& t_
 
 
 	return res;
+}
+static GeometryInfo SpotLightHelperInfo(SpotLightHelper t_SpotLight)
+{
+	return {5u + 32*2, (4u + 32)*4, GT_SPOTLIGHTHELPER};
+}	
+static int SpotLightHelperData(SpotLightHelper t_SpotLight, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+{
+
+	const glm::vec3 yellow{1.0f, 1.0f, 0.0f};
+	
+	auto addPoint = [&](glm::vec3 point, glm::vec3 color = glm::vec3{1.0f, 1.0f, 1.0f})
+	{
+		t_Vertices->pos = point;
+		t_Vertices->color = color;
+		++t_Vertices;
+	};
+
+	addPoint({0.0f, 0.0f, 0.0f}, yellow);
+
+	addPoint({0.0f, -1.0f, 0.5f}, yellow);
+	addPoint({0.0f, -1.0f, -0.5f}, yellow);
+	addPoint({0.5f, -1.0f, 0.0f}, yellow);
+	addPoint({-0.5f, -1.0f, 0.0f}, yellow);
+
+	t_Indices.insert(t_Indices.end(), {0 + t_BaseIndex, 1 + t_BaseIndex});
+	t_Indices.insert(t_Indices.end(), {0 + t_BaseIndex, 2 + t_BaseIndex});
+	t_Indices.insert(t_Indices.end(), {0 + t_BaseIndex, 3 + t_BaseIndex});
+	t_Indices.insert(t_Indices.end(), {0 + t_BaseIndex, 4 + t_BaseIndex});
+
+	for (unsigned i = 0, j = 1, l = 32; i < l; i++, j++)
+    {
+        const float p1 = ((float)(i) / l) * PI * 2;
+        const float p2 = ((float)(j) / l) * PI * 2;
+
+		addPoint({0.5f * std::cos(p1), -1.0f, 0.5f * std::sin(p1)}, yellow);
+		addPoint({0.5f * std::cos(p2), -1.0f, 0.5f * std::sin(p2)}, yellow);
+		
+		t_Indices.insert(t_Indices.end(), {5u + 2*i + t_BaseIndex, 5u + 2*i + 1 + t_BaseIndex});
+    }
+
+	return 0;
 }

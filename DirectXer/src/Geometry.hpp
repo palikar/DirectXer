@@ -22,6 +22,7 @@ enum GeometryType : uint16
 	GT_CONE                = 8  | (0x00 << 8),
 	GT_CAMHELPER           = 9  | (0x01 << 8),
 	GT_POINGHTLIGHTHELPER  = 10 | (0x00 << 8),
+	GT_SPOTLIGHTHELPER     = 11 | (0x01 << 8),
 };
 
 struct CubeGeometry

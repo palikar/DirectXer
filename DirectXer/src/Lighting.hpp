@@ -14,6 +14,17 @@ struct PointLight
 	uint64 _padding;
 };
 
+struct SpotLight
+{
+
+	glm::vec4 color{ 0.0f, 0.0f, 0.0f, 0.0f };
+    glm::vec4 position{ 0.0f, 0.0f, 0.0f, 0.0f };
+    glm::vec4 dir{ 0.0f, 0.0f, 0.0f, 0.0f};
+    glm::vec4 Params{ 0.0f, 0.0f, 0.0f, 0.0f};
+    uint64 Active{0};
+	uint64 _padding;
+};
+
 	
 struct Lighting
 {
@@ -23,6 +34,7 @@ struct Lighting
 	glm::vec4 dirLightDir{0.5, 0.5f, 0, 0};
 
 	PointLight pointLights[5];
+	SpotLight  spotLights[5];
 	
 };
 
