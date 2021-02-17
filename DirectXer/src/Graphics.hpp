@@ -86,7 +86,8 @@ enum RasterizationState : uint8
 
 enum ShaderFile : uint8
 {
-	SF_DEBUG = 0,
+	SF_DEBUG   = 0,
+	SF_2D      = 1,
 
 	SF_COUNT
 };

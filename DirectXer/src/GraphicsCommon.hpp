@@ -37,6 +37,13 @@ struct SimpleVertex
 	glm::vec3 pos;
 };
 
+struct Colorertex
+{
+	glm::vec2 pos;
+	glm::vec2 uv;
+	glm::vec3 color;
+};
+	
 struct ColorVertex
 {
 	glm::vec3 pos;
