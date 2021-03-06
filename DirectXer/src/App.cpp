@@ -45,11 +45,11 @@ void App::Init(HWND t_Window)
 	SPOTLIGHT = builder.InitSpotLightHelper();
 	// CAMERA = builder.InitCameraHelper({glm::perspective(45.0f, 3.0f/4.0f, 1.50f, 4.0f)});
 
-	GPUGeometry desc = builder.CreateBuffer(Graphics);
-	DebugGeometry = desc.Description;
-	Graphics.setIndexBuffer(desc.Ibo);
-	Graphics.setVertexBuffer(desc.Vbo);
-
+	GPUGeometryDesc = builder.CreateBuffer(Graphics);
+	DebugGeometry = GPUGeometryDesc.Description;
+	Graphics.setIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics.setVertexBuffer(GPUGeometryDesc.Vbo);
+     
 	const char* cube_fils[] = {
 		"sky/left.png",
 		"sky/right.png",
@@ -91,27 +91,23 @@ void App::Init(HWND t_Window)
 	camera.Pos = {1.0f, 0.5f, 1.0f};
 	camera.lookAt({0.0f, 0.0f, 0.0f});
 
-	const float ratio = Width / Height;
-	const float pov = 65.0f;
-	const float nearPlane = 0.0001f;
-	const float farPlane = 1000.0f;
+	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 
-	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
+	Renderer2D.InitRenderer(&Graphics, { Width, Height });
+
 }
 
 void App::Resize()
 {
+	Renderer2D.Params.Width = Width;
+	Renderer2D.Params.Height = Height;
+	
 	Graphics.resizeBackBuffer(Width, Height);
 	Graphics.destroyZBuffer();
 	Graphics.initZBuffer(Width, Height);
 	Graphics.setViewport(0, 0, Width, Height);
 
-	const float ratio =  Width/Height;
-	const float pov =  65.0f;
-	const float nearPlane = 0.0001f;
-	const float farPlane = 1000.0f;
-
-	Graphics.m_VertexShaderCB.projection = glm::transpose(glm::perspective(pov, ratio, nearPlane, farPlane));
+	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 
 }
 
@@ -120,8 +116,8 @@ void App::RenderSkyBox()
 	// @Speed: The texture will be bount most of the time
 	Graphics.setShaderConfiguration(SC_DEBUG_SKY);
 	Graphics.bindTexture(0, SkyboxTexture);
-	Graphics.m_VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
-	Graphics.m_VertexShaderCB.invModel = glm::inverse(Graphics.m_VertexShaderCB.model);
+	Graphics.VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
+	Graphics.VertexShaderCB.invModel = glm::inverse(Graphics.VertexShaderCB.model);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, CUBE);
 
@@ -129,21 +125,21 @@ void App::RenderSkyBox()
 
 void App::SetupCamera(Camera t_Camera)
 {
-	Graphics.m_VertexShaderCB.view = glm::transpose(t_Camera.view());
-	Graphics.m_PixelShaderCB.cameraPos = t_Camera.Pos;
+	Graphics.VertexShaderCB.view = glm::transpose(t_Camera.view());
+	Graphics.PixelShaderCB.cameraPos = t_Camera.Pos;
 }
 
 void App::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
 {
-	Graphics.m_VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
-	Graphics.m_VertexShaderCB.invModel = glm::inverse(Graphics.m_VertexShaderCB.model);
+	Graphics.VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
+	Graphics.VertexShaderCB.invModel = glm::inverse(Graphics.VertexShaderCB.model);
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, t_Id);
 }
 
 void App::RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform)
 {
-	Graphics.m_VertexShaderCB.model = t_Transform;
+	Graphics.VertexShaderCB.model = t_Transform;
 	Graphics.updateCBs();
 	DebugGeometry.DrawGeometry(Graphics, t_Id);
 }
@@ -197,14 +193,17 @@ void App::ProcessFirstScene(float dt)
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
-
 	// @Note: Rendering begins here
+
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics.ClearZBuffer();
 
+	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 	SetupCamera(camera);
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
+	Graphics.setIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics.setVertexBuffer(GPUGeometryDesc.Vbo);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
@@ -236,8 +235,20 @@ void App::ProcessFirstScene(float dt)
 	Graphics.bindTexture(1, CHECKER_TEXTURE.Handle);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-
 	RenderSkyBox();
+
+	// @Note: UI rendering beggins here
+	Renderer2D.BeginScene();
+	
+	Renderer2D.DrawQuad({10.f, 10.f}, {200.f, 200.f}, {1.0f, 0.0f, 0.0f, 1.0f});
+	Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f}); 
+	Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
+
+	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+
+	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+	
+	Renderer2D.EndScene();
 
 }
 
@@ -301,6 +312,9 @@ void App::ProcessPhongScene(float dt)
 	Graphics.ClearZBuffer();
 
 	SetupCamera(camera);
+
+	Graphics.setIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics.setVertexBuffer(GPUGeometryDesc.Vbo);
 
 	Graphics.setShaderConfiguration(SC_DEBUG_COLOR);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));

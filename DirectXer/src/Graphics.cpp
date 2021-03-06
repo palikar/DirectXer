@@ -283,42 +283,55 @@ TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, Textu
 
 }
 
-VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize)
+VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize,  bool dynamic)
 {
 	ID3D11Buffer* pVertexBuffer;
 	D3D11_BUFFER_DESC vertexBufferDesc{ 0 };
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.Usage = dynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.CPUAccessFlags = dynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.ByteWidth = dataSize;
 	vertexBufferDesc.StructureByteStride = structSize;
 
-	D3D11_SUBRESOURCE_DATA bufferData;
-	bufferData.pSysMem = data;
-
 	HRESULT hr;
-	GFX_CALL(Device->CreateBuffer(&vertexBufferDesc, &bufferData, &pVertexBuffer));
+	if (data)
+	{
+		D3D11_SUBRESOURCE_DATA bufferData{ 0 };
+		bufferData.pSysMem = data;
+		GFX_CALL(Device->CreateBuffer(&vertexBufferDesc, &bufferData, &pVertexBuffer));
+	}
+	else
+	{
+		GFX_CALL(Device->CreateBuffer(&vertexBufferDesc, nullptr, &pVertexBuffer));
+	}
+
 
 	return {structSize, pVertexBuffer};
 }
 
-IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize)
+IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize, bool dynamic)
 {
 	ID3D11Buffer* pIndexBuffer;
 	D3D11_BUFFER_DESC indexBufferDesc{ 0 };
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.Usage = dynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.CPUAccessFlags = dynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.ByteWidth = dataSize;
 	indexBufferDesc.StructureByteStride = sizeof(uint32);
 
-	D3D11_SUBRESOURCE_DATA indexBufferData{0};
-	indexBufferData.pSysMem = data;
-
 	HRESULT hr;
-	GFX_CALL(Device->CreateBuffer(&indexBufferDesc, &indexBufferData, &pIndexBuffer));
+	if(data)
+	{
+		D3D11_SUBRESOURCE_DATA indexBufferData{0};
+		indexBufferData.pSysMem = data;
+		GFX_CALL(Device->CreateBuffer(&indexBufferDesc, &indexBufferData, &pIndexBuffer));
+	}
+	else
+	{
+		GFX_CALL(Device->CreateBuffer(&indexBufferDesc, nullptr, &pIndexBuffer));
+	}
 
 	return {pIndexBuffer};
 }
@@ -366,7 +379,9 @@ void Graphics::initResources()
 		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"Texcoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Color", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Additional", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Type", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &shaderObject.il));
 	
@@ -382,7 +397,7 @@ void Graphics::initResources()
 	vertexShaderCBDesc.StructureByteStride = 0;
 
     D3D11_SUBRESOURCE_DATA vertexShaderCBData{0};
-	vertexShaderCBData.pSysMem = &m_VertexShaderCB;
+	vertexShaderCBData.pSysMem = &VertexShaderCB;
     GFX_CALL(Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VSConstantBuffer::id));
 
 	Context->VSSetConstantBuffers(0, 1, &VSConstantBuffer::id);
@@ -397,7 +412,7 @@ void Graphics::initResources()
 	pixelShaderCBDesc.StructureByteStride = 0;
 
     D3D11_SUBRESOURCE_DATA pixelShaderCBData{0};
-    pixelShaderCBData.pSysMem = &m_PixelShaderCB;
+    pixelShaderCBData.pSysMem = &PixelShaderCB;
     GFX_CALL(Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PSConstantBuffer::id));
 	Context->PSSetConstantBuffers(0, 1, &PSConstantBuffer::id);	
 	
@@ -417,7 +432,7 @@ CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
 	desc.StructureByteStride = 0;
 
 	// D3D11_SUBRESOURCE_DATA data{0};
-    // data.pSysMem = &m_PixelShaderCB;
+    // data.pSysMem = &PixelShaderCB;
 
 	HRESULT hr;
     GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
@@ -431,11 +446,11 @@ void Graphics::updateCBs()
 	D3D11_MAPPED_SUBRESOURCE msr;
 
 	Context->Map(VSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-	memcpy(msr.pData, &m_VertexShaderCB, sizeof(m_VertexShaderCB));
+	memcpy(msr.pData, &VertexShaderCB, sizeof(VertexShaderCB));
 	Context->Unmap(VSConstantBuffer::id, 0);
 
 	Context->Map(PSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-	memcpy(msr.pData, &m_PixelShaderCB, sizeof(m_PixelShaderCB));
+	memcpy(msr.pData, &PixelShaderCB, sizeof(PixelShaderCB));
 	Context->Unmap(PSConstantBuffer::id, 0);	
 	
 }
@@ -448,6 +463,24 @@ void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 	GFX_CALL(Context->Map(t_CbObject.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, t_Data, t_Length);
 	Context->Unmap(t_CbObject.id, 0);
+}
+
+void Graphics::updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length)
+{
+	D3D11_MAPPED_SUBRESOURCE msr;
+	HRESULT hr;
+	GFX_CALL(Context->Map(t_Buffer.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
+	memcpy(msr.pData, data, t_Length);
+	Context->Unmap(t_Buffer.id, 0);
+}
+
+void Graphics::updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length)
+{
+	D3D11_MAPPED_SUBRESOURCE msr;
+	HRESULT hr;
+	GFX_CALL(Context->Map(t_Buffer.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
+	memcpy(msr.pData, data, t_Length);
+	Context->Unmap(t_Buffer.id, 0);
 }
 
 void Graphics::bindTexture(uint32 t_Slot, TextureObject t_Texture)
@@ -476,10 +509,10 @@ void Graphics::setViewport(float x, float y, float width, float height)
 	
 }
 
-void Graphics::setShaderConfiguration(ShaderConfig t_Confing)
+void Graphics::setShaderConfiguration(ShaderConfig t_Config)
 {
-	uint8 shaderObjectIndex = 0xFF & t_Confing;
-	uint8 shaderType = (0xFF00 & t_Confing) >> 8;
+	uint8 shaderObjectIndex = 0xFF & t_Config;
+	uint8 shaderType = (0xFF00 & t_Config) >> 8;
 
 	auto& shaderObject = Shaders[shaderObjectIndex];
 
@@ -487,8 +520,8 @@ void Graphics::setShaderConfiguration(ShaderConfig t_Confing)
 	Context->VSSetShader(shaderObject.vs, nullptr, 0);
 	Context->IASetInputLayout(shaderObject.il);
 
-	m_PixelShaderCB.shaderType = shaderType;
-	m_VertexShaderCB.shaderType = shaderType;
+	PixelShaderCB.shaderType = shaderType;
+	VertexShaderCB.shaderType = shaderType;
 }
 
 void Graphics::setIndexBuffer(IBObject t_buffer)

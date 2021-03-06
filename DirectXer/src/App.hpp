@@ -8,6 +8,8 @@
 #include "GeometryUtils.hpp"
 #include "Materials.hpp"
 #include "Lighting.hpp"
+#include "2DRendering.hpp"
+
 
 struct CommandLineSettings
 {
@@ -25,6 +27,12 @@ enum Scene
 class App
 {
 public:
+
+	
+	const static inline float pov =  65.0f;
+	const static inline float nearPlane = 0.0001f;
+	const static inline float farPlane = 1000.0f;
+
 
 	void Init(HWND t_Window);
 	void Spin(float dt);
@@ -61,6 +69,10 @@ public:
 
 	LightSetup Light;
 
+	GPUGeometry GPUGeometryDesc;
+
+	Renderer2D Renderer2D;
+
 
 	// @Note: Application Data -- used by the "application" for
 	// application management stuff
@@ -71,6 +83,6 @@ public:
 	CommandLineSettings Arguments;
 	TextureCatalog Textures;
 
-	Scene CurrentScene = SCENE_PHONGS;
+	Scene CurrentScene = SCENE_FIRST;
 	
 };

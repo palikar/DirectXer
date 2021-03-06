@@ -38,82 +38,6 @@
 
 namespace dx = DirectX;
 
-struct VBObject
-{
-	uint32 structSize;
-	ID3D11Buffer* id{nullptr};
-};
-
-struct IBObject
-{
-	ID3D11Buffer* id{nullptr};
-};
-
-struct CBObject
-{
-	ID3D11Buffer* id{ nullptr };
-};
-
-struct TextureObject
-{
-	ID3D11Texture2D* tp{nullptr};
-	ID3D11ShaderResourceView* srv{nullptr};
-	ID3D11RenderTargetView* rtv{nullptr};
-};
-
-enum TextureFormat
-{
-	TF_RGBA = 0,
-	TF_A,
-
-	TF_UNKNOWN,
-};
-
-struct ShaderObject
-{
-	ID3D11InputLayout* il{nullptr};
-	ID3D11VertexShader* vs{nullptr};
-	ID3D11PixelShader* ps{nullptr};
-};
-
-enum RasterizationState : uint8
-{
-	RS_NORMAL = 0,
-	RS_DEBUG,
-
-	RS_COUNT
-};
-
-enum ShaderFile : uint8
-{
-	SF_DEBUG   = 0,
-	SF_2D      = 1,
-
-	SF_COUNT
-};
-
-enum ShaderType : uint8
-{
-    ST_TEX        = 0,
-	ST_COLOR      = 1,
-	ST_SKY        = 2,
-	ST_TEX_SIMPLE = 3,
-	ST_PHONG      = 4,
-
-	ST_COUNT
-};
-
-enum ShaderConfig
-{
-	SC_DEBUG_COLOR       = SF_DEBUG | (ST_COLOR      << 8),
-	SC_DEBUG_TEX         = SF_DEBUG | (ST_TEX        << 8),
-	SC_DEBUG_SKY         = SF_DEBUG | (ST_SKY        << 8),
-	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG | (ST_TEX_SIMPLE << 8),
-	SC_DEBUG_PHONG       = SF_DEBUG | (ST_PHONG      << 8),
-	
-	SC_COUNT
-};
-
 class Graphics
 {
   public:
@@ -146,13 +70,15 @@ class Graphics
 
 	TextureObject createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
 	TextureObject createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
-	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize);
-	IBObject createIndexBuffer(void* data, uint32 dataSize);
+	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
+	IBObject createIndexBuffer(void* data, uint32 dataSize, bool dynamic = false);
 	CBObject createConstantBuffer(uint32 t_Size, void* t_InitData);
 
 	void updateCBs();
 	void updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);
-	
+	void updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length);
+	void updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length);
+
 	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
 
 	void ClearBuffer(float red, float green, float blue);
@@ -175,8 +101,8 @@ class Graphics
 
 	ID3D11RasterizerState* rasterizationsStates[RS_COUNT];
 
-	PSConstantBuffer m_PixelShaderCB;
-	VSConstantBuffer m_VertexShaderCB;
+	PSConstantBuffer PixelShaderCB;
+	VSConstantBuffer VertexShaderCB;
 
 	ShaderObject Shaders[SF_COUNT];
 

@@ -1,11 +1,39 @@
 struct VSOut
 {
     float4 pos : SV_Position;
+    float4 color : Color;
+    float3 additional : Additional;
+    uint type : Type;
 };
 
-VSOut main(float2 pos : Position, float2 pos : Texcoord, float3 color : Color)
+cbuffer VSPrim : register(b0)
 {
-    VSOut vsout = (VSOut)0;
+    matrix model;
+    matrix view;
+    matrix projection;
+    matrix invModel;
+    uint shaderType;
+};
 
-    return vsout;
+
+struct VSIn
+{
+    float2 pos : Position;
+    float2 uv: Texcoord;
+    float4 color : Color;
+    float3 additional : Additional;
+    uint type : Type;
+};
+
+
+VSOut main(VSIn input)
+{
+    VSOut output = (VSOut)0;
+
+    output.pos = mul(float4(input.pos.x, input.pos.y, 1.0f, 1.0f), projection);
+    output.color = input.color;
+    output.type = input.type;
+    output.additional = input.additional;
+
+    return output;
 }

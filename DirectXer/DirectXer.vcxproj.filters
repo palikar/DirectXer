@@ -80,11 +80,17 @@
     <ClInclude Include="src\Lighting.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\2DRendering.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\VertexShader.hlsl" />
     <FxCompile Include="Shaders\PixelShader.hlsl" />
     <FxCompile Include="Shaders\2DPixelShader.hlsl" />
     <FxCompile Include="Shaders\2DVertexShader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DirectXer.args.json" />
   </ItemGroup>
 </Project>
