@@ -5,6 +5,7 @@
     <ClInclude Include="include\stb_image_resize.h" />
     <ClInclude Include="include\stb_image_write.h" />
     <ClInclude Include="include\stb_sprintf.h" />
+    <ClInclude Include="include\stb_rect_pack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stb.cpp" />

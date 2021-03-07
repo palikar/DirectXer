@@ -155,6 +155,7 @@
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\stb_image_resize.h" />
     <ClInclude Include="include\stb_image_write.h" />
+    <ClInclude Include="include\stb_rect_pack.h" />
     <ClInclude Include="include\stb_sprintf.h" />
   </ItemGroup>
   <ItemGroup>
