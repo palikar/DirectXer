@@ -175,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
+    <ClCompile Include="src\PlatformWindows.cpp" />
     <ClCompile Include="src\WindowsMessageMap.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
@@ -194,6 +195,7 @@
     <ClInclude Include="src\Logging.hpp" />
     <ClInclude Include="src\Materials.hpp" />
     <ClInclude Include="src\Math.hpp" />
+    <ClInclude Include="src\PlatformWindows.hpp" />
     <ClInclude Include="src\TextureCatalog.hpp" />
     <ClInclude Include="src\Types.hpp" />
     <ClInclude Include="src\WindowsMessageMap.hpp" />

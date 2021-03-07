@@ -22,11 +22,8 @@ float4 main(PSIn input) : SV_Target
     }
     else if(input.type == 2 )// Circle
     {
-
 	float dist = sqrt(dot(input.additional.zy, input.additional.zy));
-
-	if (dist > 0.5) discard;
-	
+	if (dist > 1) discard;	
         return input.color;
     }
 
