@@ -47,6 +47,7 @@ public:
 	bool FullscreenMode;
 	UINT WindowStyle;
 	RECT WindowRect;
+	bool Minimized;
 	
 	void Init(WindowsSettings t_Settings);
 	void ToggleFullscreen();

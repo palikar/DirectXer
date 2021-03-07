@@ -40,7 +40,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	window.Application = &application;
 	window.Init(settings);
 	
-	return window.Run();
+	window.Run();
+
+	return 0;
 }
 
 // @Memory magament
@@ -112,7 +114,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: FPS independence
 // @Todo: Some job\task system for basic multithreading support
 // @Todo: Deffered loading of scenes resources
-// @Todo: Windows Abstraction Layer
+// @Done: Windows Abstraction Layer
+// @Todo: Handle Minimization
+
 
 // @Notes
 // @Note: In a scene, some things are dynamic, and some things are static
