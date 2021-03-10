@@ -9,6 +9,7 @@
 #include "Materials.hpp"
 #include "Lighting.hpp"
 #include "2DRendering.hpp"
+#include "Memory.hpp"
 
 
 struct CommandLineSettings
@@ -54,13 +55,15 @@ public:
 
 	// @Note: Rendering data -- used by the scene to
 	// do its rendering
+	Graphics Graphics;
+
+	
 	TexturedMaterial texMat;
 	TexturedMaterialData texMatData;
 
 	PhongMaterial phongMat;
 	PhongMaterialData phongMatData;
 
-	Graphics Graphics;
 	BufferDescriptor DebugGeometry;
 	Camera camera;
 	RasterizationState CurrentRastState = RS_NORMAL;
@@ -76,6 +79,7 @@ public:
 
 	// @Note: Application Data -- used by the "application" for
 	// application management stuff
+	MemoryState Memory;
 	float32 Width;
 	float32 Height;
 	int ReturnValue{0};

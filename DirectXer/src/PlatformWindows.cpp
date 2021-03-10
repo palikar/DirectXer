@@ -1,4 +1,22 @@
 #include "PlatformWindows.hpp"
+#include "App.hpp"
+#include "Input.hpp"
+#include "Glm.hpp"
+#include "Logging.hpp"
+
+#include <fcntl.h>
+#include <stdio.h>
+#include <io.h>
+#include <iostream>
+#include <Stringapiset.h>
+#include <shellapi.h>
+#include <time.h>
+
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+
+#include <fmt/format.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

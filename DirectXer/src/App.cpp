@@ -30,8 +30,21 @@ void App::Init(HWND t_Window)
 	Graphics.initResources();
 	Graphics.initRasterizationsStates();
 	Graphics.initSamplers();
-
+	
 	Textures.LoadTextures(Graphics, Arguments.ResourcesPath.data());
+
+	const char* cube_fils[] = {
+		"sky/left.png",
+		"sky/right.png",
+		"sky/down.png",
+		"sky/up.png",
+		"sky/front.png",
+		"sky/back.png",
+	};
+	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
+
+
+	Renderer2D.InitRenderer(&Graphics, { Width, Height });
 
 	// @Todo: This should use some sort of arena storage to do its thing
 	BufferBuilder builder;
@@ -49,16 +62,6 @@ void App::Init(HWND t_Window)
 	DebugGeometry = GPUGeometryDesc.Description;
 	Graphics.setIndexBuffer(GPUGeometryDesc.Ibo);
 	Graphics.setVertexBuffer(GPUGeometryDesc.Vbo);
-     
-	const char* cube_fils[] = {
-		"sky/left.png",
-		"sky/right.png",
-		"sky/down.png",
-		"sky/up.png",
-		"sky/front.png",
-		"sky/back.png",
-	};
-	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
 
 
 	// Create material
@@ -83,7 +86,6 @@ void App::Init(HWND t_Window)
 	
 	Graphics.updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
-
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.setViewport(0, 0, 800, 600);
 	Graphics.setRasterizationState(CurrentRastState);
@@ -92,8 +94,6 @@ void App::Init(HWND t_Window)
 	camera.lookAt({0.0f, 0.0f, 0.0f});
 
 	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
-
-	Renderer2D.InitRenderer(&Graphics, { Width, Height });
 
 }
 
@@ -147,7 +147,7 @@ void App::RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform)
 void App::Spin(float dt)
 {
 
-	if(gInput.IsKeyReleased(KeyCode::F11))
+	if(gInput.IsKeyReleased(KeyCode::F1))
 	{
 		CurrentRastState = RasterizationState((CurrentRastState + 1) % RS_COUNT);
 		Graphics.setRasterizationState(CurrentRastState);
@@ -166,7 +166,7 @@ void App::Spin(float dt)
 
 	switch (CurrentScene)
 	{
-		case SCENE_FIRST:
+	  case SCENE_FIRST:
 		  ProcessFirstScene(dt);
 		  break;
 	  case SCENE_PHONGS:

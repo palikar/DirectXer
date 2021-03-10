@@ -1,4 +1,6 @@
 #include "PlatformWindows.hpp"
+#include "Memory.hpp"
+#include "App.hpp"
 
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
@@ -21,8 +23,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetupConsole();
 	gInput.Init();
 	gDxgiManager.Init();
+	Memory::InitMemoryState();
+
+	size_t InitialStackMemory{0};
+
+	
 
 	App application;
+	// application.Memory = g_Memory;
 
 	char** argv;
 	int argc;
@@ -38,8 +46,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	WindowsWindow window;
 	window.Application = &application;
-	window.Init(settings);
 	
+
+	InitialStackMemory += sizeof(MemoryState);
+	InitialStackMemory += sizeof(App);
+	InitialStackMemory += sizeof(WindowsSettings);
+	InitialStackMemory += sizeof(WindowsWindow);
+
+	DXLOG("[INIT] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
+
+	window.Init(settings);
 	window.Run();
 
 	return 0;
@@ -112,10 +128,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Architecture
 // @Done: Resizing
 // @Done: FPS independence
-// @Todo: Some job\task system for basic multithreading support
-// @Todo: Deffered loading of scenes resources
 // @Done: Windows Abstraction Layer
-// @Todo: Handle Minimization
+// @Done: Handle Minimization
+// @Todo: Some job\task system for basic multithreading support
+//    -- maybe this is only useful for loading resources
+// @Todo: Deffered loading of scenes resources
 
 
 // @Notes

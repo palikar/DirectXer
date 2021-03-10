@@ -65,7 +65,6 @@ cbuffer PhongMaterialBuf : register(b3)
     float SpecularShininess;
 };
 
-
 SamplerState samp;
 
 TextureCube env : register(t0);

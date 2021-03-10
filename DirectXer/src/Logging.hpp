@@ -39,6 +39,7 @@ struct Logger
 	// @Imporve : Get everthing needed upfront
 	// @Imporve : Buffer the thing a little bit
 	// @Imporve : Add logging severities support
+	// @Imporve : Use the platform layer for writing to STD out
 	
     template<typename ... Args>
     void PrintLog(const char* t_File, uint32 t_Line, const char* t_Format, Args ... t_Args)

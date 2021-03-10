@@ -7,14 +7,6 @@
 #include <type_traits>
 
 
-template<typename MatDataType>
-struct Material
-{
-	ShaderConfig config;
-	CBObject cbBufferId;
-	MatDataType data;
-};
-
 struct TexturedMaterial
 {
 	ShaderConfig config;

@@ -1,26 +1,7 @@
 #pragma once
 
-#include "IncludeWin.hpp"
-#include "Input.hpp"
-#include "Glm.hpp"
-#include "App.hpp"
 #include "Types.hpp"
-#include "Logging.hpp"
-
-#include <fcntl.h>
-#include <stdio.h>
-#include <io.h>
-#include <iostream>
-#include <Stringapiset.h>
-#include <shellapi.h>
-#include <time.h>
-
-#include <imgui.h>
-#include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
-
-#include <fmt/format.h>
-
+#include "IncludeWin.hpp"
 
 void SetupConsole();
 	
@@ -37,6 +18,7 @@ struct WindowsSettings
 
 };
 
+class App;
 class WindowsWindow
 {
 public:
@@ -56,4 +38,13 @@ public:
 	void InitAfterCreate(HWND t_hWnd);
 	void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+};
+
+
+struct Platform
+{
+	static void* Allocate(size_t t_Size)
+	{
+		return VirtualAlloc(NULL, t_Size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	}
 };
