@@ -4,6 +4,7 @@
 #include "Glm.hpp"
 #include "GraphicsCommon.hpp"
 #include "Graphics.hpp"
+#include "Memory.hpp"
 
 
 struct Init2DParams
@@ -17,8 +18,8 @@ class Renderer2D
 {
 public:
 
-	std::vector<Vertex2D> Vertices;
-	std::vector<uint32> Indices;
+	asl::BulkVector<Vertex2D> Vertices;
+	asl::BulkVector<uint32> Indices;
 	Vertex2D* CurrentVertex;
 
 	uint32 CurrentVertexCount;
@@ -36,8 +37,10 @@ public:
 		Graph = t_Graphics;
 		Params = t_Params;
 
+		
 		Vertices.resize(TotalVertices);
 		Indices.resize(TotalVertices * 3);
+		
 		CurrentVertex = &Vertices[0];
 
 		vbo = Graph->createVertexBuffer(sizeof(Vertex2D), nullptr, (uint32)(sizeof(Vertex2D) * TotalVertices), true);
@@ -53,7 +56,6 @@ public:
 		
 		Indices.clear();
 		Vertices.clear();
-		Vertices.resize(TotalVertices);
 
 		CurrentVertex = &Vertices[0];		
 	}

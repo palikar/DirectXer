@@ -1,6 +1,7 @@
 #include "Glm.hpp"
 #include "Math.hpp"
 #include "Geometry.hpp"
+#include "Memory.hpp"
 
 static CylinderGeometry cylinderShape{0.005f, 0.005f, 0.25f, 10.0f, 1.0f};
 static SphereGeometry lightSphere{0.1f, 4.0f, 2.0f};
@@ -13,7 +14,7 @@ static GeometryInfo AxisHelperInfo()
 	return {cylinderInfo.vertexCount * 3, cylinderInfo.indexCount * 3, GT_AXISHELPER};
 }
 
-static int AxisHelperData(ColorVertex* t_Vertices, std::vector<uint32>& t_Indices)
+static int AxisHelperData(ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices)
 {
 	// @Todo: We _know_ the numbers that are in here
 	auto cylinderInfo = CylinderGeometryInfo(cylinderShape);
@@ -60,7 +61,6 @@ struct CameraHelper
 	glm::mat4 projection;
 };
 
-
 struct SpotLightHelper
 {
 	float angle;
@@ -72,7 +72,7 @@ static GeometryInfo CameraHelperInfo(CameraHelper t_Camera)
 	return {21 + 1, 25 * 2 * 2, GT_CAMHELPER};
 }
 
-static int CameraHelperData(CameraHelper t_Camera, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices)
+static int CameraHelperData(CameraHelper t_Camera, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices)
 {
 	const glm::mat4 invProj = glm::inverse(t_Camera.projection);
 	const float w = 1.0f, h = 1.0f;
@@ -165,7 +165,7 @@ static GeometryInfo PointLightHelperInfo()
 	return sphereInfo;
 }
 
-static int PointLightHelperData(ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+static int PointLightHelperData(ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 	auto res = SphereGeometryData(lightSphere, t_Vertices, t_Indices, t_BaseIndex);
 	auto info = SphereGeometryInfo(lightSphere);
@@ -182,7 +182,7 @@ static GeometryInfo SpotLightHelperInfo(SpotLightHelper t_SpotLight)
 {
 	return {5u + 32*2, (4u + 32)*4, GT_SPOTLIGHTHELPER};
 }	
-static int SpotLightHelperData(SpotLightHelper t_SpotLight, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+static int SpotLightHelperData(SpotLightHelper t_SpotLight, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 
 	const glm::vec3 yellow{1.0f, 1.0f, 0.0f};

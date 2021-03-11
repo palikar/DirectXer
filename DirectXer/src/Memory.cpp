@@ -1,7 +1,7 @@
 #include "Memory.hpp"
 
 
-const size_t Memory::TempMemoryRequired = Megabytes(512);
+const size_t Memory::TempMemoryRequired = Megabytes(256);
 const size_t Memory::BulkMemoryRequired = Megabytes(16);
 const size_t Memory::TotalMemoryRequired = TempMemoryRequired + BulkMemoryRequired;
 
@@ -25,9 +25,14 @@ static void* ArenaAllocation(MemoryArena& t_Arena, size_t t_Size)
 	return memory + 1;
 }
 
-static bool EnoughTempMomory(size_t t_Size)
+static bool EnoughTempMemory(size_t t_Size)
 {
 	return t_Size <= (Memory::g_Memory.TempMemoryMaxSize - Memory::g_Memory.TempMemorySize);
+}
+
+static bool EnoughBulkMemory(size_t t_Size)
+{
+	return t_Size <= (Memory::g_Memory.BulkMemoryMaxSize - Memory::g_Memory.BulkMemorySize);
 }
 
 static size_t BlockSize(void* t_Mem)
@@ -43,15 +48,19 @@ static void SetBlockSize(void* t_Mem, size_t t_Size)
 void Memory::InitMemoryState()
 {
 	g_Memory.TempMemory = (char*)Platform::Allocate(TotalMemoryRequired);
-	g_Memory.BulkMemory = Memory::g_Memory.TempMemory + TempMemoryRequired;
 	g_Memory.TempMemorySize = 0;
 	g_Memory.TempMemoryMaxSize = TempMemoryRequired;
 	g_Memory.TempMemoryCurrent = Memory::g_Memory.TempMemory;
+
+	g_Memory.BulkMemory = Memory::g_Memory.TempMemory + TempMemoryRequired;
+	g_Memory.BulkMemoryCurrent = g_Memory.BulkMemory;
+	g_Memory.BulkMemorySize = 0;
+	g_Memory.BulkMemoryMaxSize = BulkMemoryRequired;
 }
 
 MemoryArena Memory::GetTempArena(size_t t_Size)
 {
-	assert(EnoughTempMomory(t_Size));
+	assert(EnoughTempMemory(t_Size));
 
 	MemoryArena arena;
 	arena.MaxSize = t_Size;
@@ -73,6 +82,7 @@ void Memory::DestoryTempArena(MemoryArena&)
 void Memory::ResetTempMemory()
 {
 	Memory::g_Memory.TempMemoryCurrent = Memory::g_Memory.TempMemory;
+	Memory::g_Memory.TempMemorySize = 0;
 	Memory::g_TempScope = {0};
 }
 
@@ -125,6 +135,20 @@ void* Memory::TempRealloc(void* t_Mem, size_t t_Size)
 	return newBlock;
 }
 
+void Memory::TempDealloc(void*)
+{}
+
+void* Memory::BulkGet(size_t t_Size)
+{
+	assert(EnoughBulkMemory(t_Size));
+	auto res = g_Memory.BulkMemoryCurrent;
+
+	g_Memory.BulkMemoryCurrent += t_Size;
+	g_Memory.BulkMemorySize += t_Size;
+	
+	return res;
+}
+	
 
 void* TempAlloc(size_t size)
 {

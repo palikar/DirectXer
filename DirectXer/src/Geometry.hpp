@@ -3,6 +3,7 @@
 #include "Types.hpp"
 #include "Glm.hpp"
 #include "GraphicsCommon.hpp"
+#include "Memory.hpp"
 
 #include <vector>
 #include <cmath>
@@ -134,11 +135,12 @@ inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 	return {vertices, indices, GT_CYLINDER};
 }
 
-inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 
 	float index = 0;
-	std::vector<std::vector<uint32_t>> indexArray;
+	asl::TempVector<asl::TempVector<uint32_t>> indexArray;
+	indexArray.reserve((size_t)std::ceil(t_CylinderInfo.heightSegments));
 	float halfHeight = t_CylinderInfo.height / 2;
 
 	uint32 x, y;
@@ -148,7 +150,8 @@ inline int CylinderGeometryData(const CylinderGeometry& t_CylinderInfo, ColorVer
 
 	for (y = 0; y <= t_CylinderInfo.heightSegments; y++)
 	{
-		std::vector<uint32_t> indexRow;
+		asl::TempVector<uint32_t> indexRow;
+		indexRow.reserve((size_t)std::ceil(t_CylinderInfo.radialSegments));
 
 		float v = y / t_CylinderInfo.heightSegments;
 		float radius = v * (t_CylinderInfo.radiusBottom - t_CylinderInfo.radiusTop) + t_CylinderInfo.radiusTop;
@@ -291,7 +294,7 @@ inline GeometryInfo CubeGeometryInfo(const CubeGeometry& t_CubeInfo)
 	return {vertices, indices, GT_CUBE};
 }
 
-inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int CubeGeometryData(const CubeGeometry& t_CubeInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 	int numberOfVertices = 0;
 
@@ -378,7 +381,7 @@ inline GeometryInfo PlaneGeometryInfo(const PlaneGeometry& t_PlaneInfo)
 	return {vertices, indices, GT_PLANE};
 }
 
-inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 	const auto half_width  = t_PlaneInfo.width / 2.0f;
 	const auto half_height = t_PlaneInfo.height / 2.0f;
@@ -456,7 +459,7 @@ inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 	return {vertices, indices, GT_SPHERE};
 }
 
-inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 
 	float radius = std::max(t_SphereInfo.radius, 0.01f);
@@ -467,11 +470,13 @@ inline int SphereGeometryData(const SphereGeometry& t_SphereInfo, ColorVertex* t
 	float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);
 	int ix, iy;
 	uint32 index = 0;
-	std::vector<std::vector<uint32>> grid;
+	asl::TempVector<asl::TempVector<uint32>> grid;
+	grid.reserve((size_t)std::ceil(height_segments));
 
 	for (iy = 0; iy <= height_segments; ++iy)
 	{
-		std::vector<uint32> verticesRow;
+		asl::TempVector<uint32> verticesRow;
+		grid.reserve((size_t)std::ceil(width_segments));
 		float v = iy / height_segments;
 
 		float uOffset = 0;
@@ -549,7 +554,7 @@ inline GeometryInfo LinesGeometryInfo(const LinesGeometry& t_LinesInfo)
 	return {vertices, indices, GT_LINES};
 }
 
-inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 
 	uint32 index = 0;
@@ -603,7 +608,7 @@ inline int LinesGeometryData(const LinesGeometry& t_LinesInfo, ColorVertex* t_Ve
 	return 0;
 }
 
-inline int TorusGeometryData(const TorusGeometry& t_TorusInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int TorusGeometryData(const TorusGeometry& t_TorusInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 	auto radialSegments  = std::floor(t_TorusInfo.radialSegments);
     auto tubularSegments = std::floor(t_TorusInfo.tubularSegments);
@@ -668,7 +673,7 @@ inline GeometryInfo TorusGeometryInfo(const TorusGeometry& t_TorusInfo)
 	return { vertices, indices, GT_TORUS};
 }
 
-inline int ConeGeometryData(const ConeGeometry& t_ConeInfo, ColorVertex* t_Vertices, std::vector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
+inline int ConeGeometryData(const ConeGeometry& t_ConeInfo, ColorVertex* t_Vertices, asl::TempVector<uint32>& t_Indices, uint32 t_BaseIndex = 0)
 {
 	return CylinderGeometryData({
 		0.0f,

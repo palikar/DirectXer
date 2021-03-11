@@ -48,7 +48,7 @@ void App::Init(HWND t_Window)
 
 	// @Todo: This should use some sort of arena storage to do its thing
 	BufferBuilder builder;
-	builder.Init();
+	builder.Init(8);
 	CUBE = builder.InitCube(CubeGeometry{}, glm::vec3{1.0f, 0.0f, 0.0f});
 	PLANE = builder.InitPlane(PlaneGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});
 	SPHERE = builder.InitSphere(SphereGeometry{}, glm::vec3{0.0f, 1.0f, 0.0f});

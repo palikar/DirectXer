@@ -8,7 +8,7 @@
 struct BufferDescriptor
 {
 	// @Todo: This shold be something that does not allocate!
-	std::vector<GeometryInfo> Infos;
+	asl::BulkVector<GeometryInfo> Infos;
 
 	void DrawGeometry(Graphics graphics, uint32 t_Index)
 	{
@@ -42,18 +42,36 @@ struct GPUGeometry
 	IBObject Ibo;	
 };
 
+template<typename T>
+static T& ReadBlob(char* &current)
+{
+	auto res = (T*)current;
+	current += sizeof(T);
+	return *res;
+}
+ 
+static void SetColor(asl::TempVector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
+{
+	for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)
+	{
+		t_Vertices[i].color = t_Color;
+	}
+		
+}
+
 struct BufferBuilder
 {
-	BufferDescriptor buf;
-
-	uint32 TotalIndices{0};
-	uint32 TotalVertices{0};
-
+	BufferDescriptor GeometryBuffer;
 	MemoryArena blobArena;
+	
+	uint32 TotalIndices;
+	uint32 TotalVertices;
 
-	void Init()
+	void Init(uint8 t_GeometriesCount)
 	{
-		// blobArena = Memory::GetTempArena(Kilobytes(4));
+		TotalIndices = 0;
+		TotalVertices = 0;
+		GeometryBuffer.Infos.reserve(t_GeometriesCount);
 		blobArena = Memory::GetTempArena(Megabytes(4));
 	}
 
@@ -69,7 +87,7 @@ struct BufferBuilder
 		blobArena.Put(cubeInfo);
 		blobArena.Put(t_Color);
 
-		return buf.PutGeometry(cubeInfo);
+		return GeometryBuffer.PutGeometry(cubeInfo);
 	}
 
 	uint32 InitSphere(SphereGeometry t_Sphere, glm::vec3 t_Color)
@@ -84,7 +102,7 @@ struct BufferBuilder
 		blobArena.Put(sphereInfo);
 		blobArena.Put(t_Color);
 
-		return buf.PutGeometry(sphereInfo);
+		return GeometryBuffer.PutGeometry(sphereInfo);
 	}
 
 	uint32 InitCylinder(CylinderGeometry t_Cylinder, glm::vec3 t_Color)
@@ -99,7 +117,7 @@ struct BufferBuilder
 		blobArena.Put(cylinderInfo);
 		blobArena.Put(t_Color);
 
-		return buf.PutGeometry(cylinderInfo);
+		return GeometryBuffer.PutGeometry(cylinderInfo);
 	}
 
 	uint32 InitPlane(PlaneGeometry t_Plane, glm::vec3 t_Color)
@@ -114,7 +132,7 @@ struct BufferBuilder
 		blobArena.Put(planeInfo);
 		blobArena.Put(t_Color);
 
-		return buf.PutGeometry(planeInfo);
+		return GeometryBuffer.PutGeometry(planeInfo);
 	}
 
 	uint32 InitLines(LinesGeometry t_Lines, glm::vec3 t_Color)
@@ -129,7 +147,7 @@ struct BufferBuilder
 		blobArena.Put(linesInfo);
 		blobArena.Put(t_Color);
 
-		return buf.PutGeometry(linesInfo);
+		return GeometryBuffer.PutGeometry(linesInfo);
 	}
 
 	uint32 InitAxisHelper()
@@ -142,7 +160,7 @@ struct BufferBuilder
 		blobArena.Put(GT_AXISHELPER);
 		blobArena.Put(axisInfo);
 
-		return buf.PutGeometry(axisInfo);
+		return GeometryBuffer.PutGeometry(axisInfo);
 	}
 
 	uint32 InitCameraHelper(CameraHelper t_CameraHelper)
@@ -156,7 +174,7 @@ struct BufferBuilder
 		blobArena.Put(cameraInfo);
 		blobArena.Put(t_CameraHelper);
 
-		return buf.PutGeometry(cameraInfo);
+		return GeometryBuffer.PutGeometry(cameraInfo);
 	}
 
 	uint32 InitPointLightHelper()
@@ -169,7 +187,7 @@ struct BufferBuilder
 		blobArena.Put(GT_POINGHTLIGHTHELPER);
 		blobArena.Put(lightInfo);
 
-		return buf.PutGeometry(lightInfo);
+		return GeometryBuffer.PutGeometry(lightInfo);
 	}
 
 	uint32 InitSpotLightHelper()
@@ -182,44 +200,30 @@ struct BufferBuilder
 		blobArena.Put(GT_SPOTLIGHTHELPER);
 		blobArena.Put(lightInfo);
 
-		return buf.PutGeometry(lightInfo);
-	}
-
-	template<typename T>
-	static T& ReadBlob(char* &current)
-	{
-		auto res = (T*)current;
-		current += sizeof(T);
-		return *res;
-	}
-
-	static void SetColor(std::vector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
-	{
-		for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)
-		{
-			t_Vertices[i].color = t_Color;
-		}
-		
+		return GeometryBuffer.PutGeometry(lightInfo);
 	}
 	
 	GPUGeometry CreateBuffer(Graphics graphics)
 	{
-		uint32 offset{0};
-		uint32 color{0};
+		Memory::EstablishTempScope(Megabytes(4));
 
+		// @Note: This will be the sentinel element at the end of the blob
 		blobArena.Put(GT_UNKNOWN);
-
+		
 		char* current = blobArena.Memory;
 
 		// @Note: Use temp types here;
-		std::vector<ColorVertex> Vertices;
-		std::vector<uint32> Indices;
+		asl::TempVector<ColorVertex> Vertices;
+		asl::TempVector<uint32> Indices;
 
 		Vertices.resize(TotalVertices);
 		Indices.reserve(TotalIndices);
 
+		uint32 offset{0};
+		
 		auto geometryType = *((GeometryType*)current);
 		current += sizeof(GeometryType);
+		
 		while (geometryType != GT_UNKNOWN)
 		{
 			
@@ -310,7 +314,9 @@ struct BufferBuilder
 		auto vb = vertexBufferFactory<ColorVertex>(graphics, Vertices);
 		auto ib = indexBufferFactory(graphics, Indices);
 
-		return {buf, vb, ib};
+		Memory::ResetTempScope();
+
+		return {GeometryBuffer, vb, ib};
 
 	}
 

@@ -3,6 +3,9 @@
 #include "Utils.hpp"
 #include "PlatformWindows.hpp"
 
+#include <vector>
+#include <string>
+
 #include <assert.h>
 
 struct MemoryArena
@@ -51,7 +54,9 @@ struct MemoryState
 	size_t TempMemorySize;
 	
 	char* BulkMemory;
+	char* BulkMemoryCurrent;
 	size_t BulkMemorySize;
+	size_t BulkMemoryMaxSize;
 
 };
 
@@ -62,7 +67,8 @@ struct Memory
 	const static size_t TotalMemoryRequired;
 	static MemoryState g_Memory;
 	static MemoryArena g_TempScope;
-	
+
+	static void* BulkGet(size_t t_Size);
 
 	// @Note: Get some storage in arena form, use it and then
 	// give it back
@@ -79,6 +85,7 @@ struct Memory
 	static void* TempAlloc(size_t len);
 	static void* TempRealloc(void* mem, size_t len);
 	static void ReleaseTempScope();
+	static void TempDealloc(void*);
 
     //  @Note: Reset the current temp global temp scope arena
 	// to its initial state 
@@ -106,4 +113,80 @@ inline void ReadWholeFile(const char* t_Path, MemoryArena& t_Arena)
 	t_Arena.Size += readBytes;
 
 	CloseHandle(handle);
+}
+
+
+template<typename T>
+class TempStdAllocator
+{
+  public:
+
+	TempStdAllocator(){};
+	
+	TempStdAllocator(const TempStdAllocator&){};
+
+	template<typename S>
+	TempStdAllocator(const TempStdAllocator<S>&){};
+	
+	typedef T value_type;
+	typedef size_t size_type;
+	typedef std::ptrdiff_t difference_type;
+	typedef std::true_type is_always_equal;
+
+	T* allocate(size_type t_Size)
+	{
+		return (T*)Memory::TempAlloc(sizeof(T) * t_Size);
+	}
+	
+	void deallocate(T* p, size_type)
+	{
+		return Memory::TempDealloc(p);
+	}
+
+	inline bool operator==(TempStdAllocator const&) const { return true; }
+		
+};
+
+template<typename T>
+class BulkStdAllocator
+{
+  public:
+
+	BulkStdAllocator(){};
+	
+	BulkStdAllocator(const BulkStdAllocator&){};
+
+	template<typename S>
+	BulkStdAllocator(const BulkStdAllocator<S>&){};
+	
+	typedef T value_type;
+	typedef size_t size_type;
+	typedef std::ptrdiff_t difference_type;
+	typedef std::true_type is_always_equal;
+
+	T* allocate(size_type t_Size)
+	{
+		return (T*)Memory::BulkGet(sizeof(T) * t_Size);
+	}
+	
+	void deallocate(T*, size_type){}
+
+	inline bool operator==(BulkStdAllocator const&) const { return true; }
+		
+};
+
+
+namespace asl
+{
+
+template<class T>
+using TempVector = std::vector<T, TempStdAllocator<T>>;
+using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
+using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
+
+template<class T>
+using BulkVector = std::vector<T, BulkStdAllocator<T>>;
+using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
+using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
+
 }

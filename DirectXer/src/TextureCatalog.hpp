@@ -116,7 +116,6 @@ struct TextureCatalog
 		// @Todo: Use temporary memory here
 		void* data[6];
 		stbi_set_flip_vertically_on_load(1);
-		Memory::EstablishTempScope(Megabytes(128));
 
 		for (size_t i = 0; i < 6; ++i)
 		{

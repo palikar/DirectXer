@@ -2,6 +2,7 @@
 
 #include "IncludeWin.hpp"
 #include "Logging.hpp"
+#include "Memory.hpp"
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -110,13 +111,13 @@ class Graphics
 
 
 template<typename VertexType>
-VBObject vertexBufferFactory(Graphics& graphics, std::vector<VertexType> t_VertexList)
+VBObject vertexBufferFactory(Graphics& graphics, asl::TempVector<VertexType>& t_VertexList)
 {
 	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), (uint32)(sizeof(VertexType) * t_VertexList.size()));
 }
 
 template<typename IndexType = uint32>
-IBObject indexBufferFactory(Graphics& graphics, std::vector<IndexType> t_IndexList)
+IBObject indexBufferFactory(Graphics& graphics, asl::TempVector<IndexType>& t_IndexList)
 {
 	return graphics.createIndexBuffer(t_IndexList.data(), (uint32)(sizeof(IndexType) * t_IndexList.size()));
 }
