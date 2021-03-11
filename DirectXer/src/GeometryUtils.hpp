@@ -3,6 +3,7 @@
 #include "Graphics.hpp"
 #include "Geometry.hpp"
 #include "GeometryDebug.hpp"
+#include "Memory.hpp"
 
 struct BufferDescriptor
 {
@@ -43,24 +44,18 @@ struct GPUGeometry
 
 struct BufferBuilder
 {
-	std::vector<GeometryInfo> Geometries;
-
-	// @Todo: all of that stuff should be placed on some random ass memory
-	std::vector<CubeGeometry> Cubes;
-	std::vector<PlaneGeometry> Planes;
-	std::vector<CylinderGeometry> Cylinders;
-	std::vector<SphereGeometry> Spheres;
-	std::vector<LinesGeometry> Lines;
-
-	std::vector<CameraHelper> Cameras;
-
-
-	std::vector<glm::vec3> Colors;
-
 	BufferDescriptor buf;
 
 	uint32 TotalIndices{0};
 	uint32 TotalVertices{0};
+
+	MemoryArena blobArena;
+
+	void Init()
+	{
+		// blobArena = Memory::GetTempArena(Kilobytes(4));
+		blobArena = Memory::GetTempArena(Megabytes(4));
+	}
 
 	uint32 InitCube(CubeGeometry t_Cube, glm::vec3 t_Color)
 	{
@@ -69,10 +64,10 @@ struct BufferBuilder
 		TotalIndices += cubeInfo.indexCount;
 		TotalVertices += cubeInfo.vertexCount;
 
-		Cubes.push_back(t_Cube);
-		Geometries.push_back(cubeInfo);
-
-		Colors.push_back(t_Color);
+		blobArena.Put(GT_CUBE);
+		blobArena.Put(t_Cube);
+		blobArena.Put(cubeInfo);
+		blobArena.Put(t_Color);
 
 		return buf.PutGeometry(cubeInfo);
 	}
@@ -84,10 +79,10 @@ struct BufferBuilder
 		TotalIndices += sphereInfo.indexCount;
 		TotalVertices += sphereInfo.vertexCount;
 
-		Spheres.push_back(t_Sphere);
-		Geometries.push_back(sphereInfo);
-
-		Colors.push_back(t_Color);
+		blobArena.Put(GT_SPHERE);
+		blobArena.Put(t_Sphere);
+		blobArena.Put(sphereInfo);
+		blobArena.Put(t_Color);
 
 		return buf.PutGeometry(sphereInfo);
 	}
@@ -99,10 +94,10 @@ struct BufferBuilder
 		TotalIndices += cylinderInfo.indexCount;
 		TotalVertices += cylinderInfo.vertexCount;
 
-		Cylinders.push_back(t_Cylinder);
-		Geometries.push_back(cylinderInfo);
-
-		Colors.push_back(t_Color);
+		blobArena.Put(GT_CYLINDER);
+		blobArena.Put(t_Cylinder);
+		blobArena.Put(cylinderInfo);
+		blobArena.Put(t_Color);
 
 		return buf.PutGeometry(cylinderInfo);
 	}
@@ -114,10 +109,10 @@ struct BufferBuilder
 		TotalIndices += planeInfo.indexCount;
 		TotalVertices += planeInfo.vertexCount;
 
-		Planes.push_back(t_Plane);
-		Geometries.push_back(planeInfo);
-
-		Colors.push_back(t_Color);
+		blobArena.Put(GT_PLANE);
+		blobArena.Put(t_Plane);
+		blobArena.Put(planeInfo);
+		blobArena.Put(t_Color);
 
 		return buf.PutGeometry(planeInfo);
 	}
@@ -129,10 +124,10 @@ struct BufferBuilder
 		TotalIndices += linesInfo.indexCount;
 		TotalVertices += linesInfo.vertexCount;
 
-		Lines.push_back(t_Lines);
-		Geometries.push_back(linesInfo);
-
-		Colors.push_back(t_Color);
+		blobArena.Put(GT_LINES);
+		blobArena.Put(t_Lines);
+		blobArena.Put(linesInfo);
+		blobArena.Put(t_Color);
 
 		return buf.PutGeometry(linesInfo);
 	}
@@ -144,7 +139,8 @@ struct BufferBuilder
 		TotalIndices += axisInfo.indexCount;
 		TotalVertices += axisInfo.vertexCount;
 
-		Geometries.push_back(axisInfo);
+		blobArena.Put(GT_AXISHELPER);
+		blobArena.Put(axisInfo);
 
 		return buf.PutGeometry(axisInfo);
 	}
@@ -156,9 +152,9 @@ struct BufferBuilder
 		TotalIndices += cameraInfo.indexCount;
 		TotalVertices += cameraInfo.vertexCount;
 
-		Geometries.push_back(cameraInfo);
-
-		Cameras.push_back(t_CameraHelper);
+		blobArena.Put(GT_CAMHELPER);
+		blobArena.Put(cameraInfo);
+		blobArena.Put(t_CameraHelper);
 
 		return buf.PutGeometry(cameraInfo);
 	}
@@ -170,7 +166,8 @@ struct BufferBuilder
 		TotalIndices += lightInfo.indexCount;
 		TotalVertices += lightInfo.vertexCount;
 
-		Geometries.push_back(lightInfo);
+		blobArena.Put(GT_POINGHTLIGHTHELPER);
+		blobArena.Put(lightInfo);
 
 		return buf.PutGeometry(lightInfo);
 	}
@@ -182,110 +179,134 @@ struct BufferBuilder
 		TotalIndices += lightInfo.indexCount;
 		TotalVertices += lightInfo.vertexCount;
 
-		Geometries.push_back(lightInfo);
+		blobArena.Put(GT_SPOTLIGHTHELPER);
+		blobArena.Put(lightInfo);
 
 		return buf.PutGeometry(lightInfo);
 	}
 
+	template<typename T>
+	static T& ReadBlob(char* &current)
+	{
+		auto res = (T*)current;
+		current += sizeof(T);
+		return *res;
+	}
+
+	static void SetColor(std::vector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
+	{
+		for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)
+		{
+			t_Vertices[i].color = t_Color;
+		}
+		
+	}
+	
 	GPUGeometry CreateBuffer(Graphics graphics)
 	{
-		uint16 cube{0};
-		uint16 plane{0};
-		uint16 cylinder{0};
-		uint16 sphere{0};
-		uint16 lines{0};
-		uint16 camera{0};
-
 		uint32 offset{0};
 		uint32 color{0};
 
+		blobArena.Put(GT_UNKNOWN);
+
+		char* current = blobArena.Memory;
+
+		// @Note: Use temp types here;
 		std::vector<ColorVertex> Vertices;
 		std::vector<uint32> Indices;
 
 		Vertices.resize(TotalVertices);
 		Indices.reserve(TotalIndices);
 
-		for (auto& geometry : Geometries)
+		auto geometryType = *((GeometryType*)current);
+		current += sizeof(GeometryType);
+		while (geometryType != GT_UNKNOWN)
 		{
-
-			switch(geometry.type)
+			
+			switch(geometryType)
 			{
 			  case GT_CUBE:
 			  {
-					CubeGeometryData(Cubes[cube++], &Vertices[offset], Indices);
-					break;
+				  CubeGeometryData(ReadBlob<CubeGeometry>(current), &Vertices[offset], Indices);
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  SetColor(Vertices, geometryInfo, offset, ReadBlob<glm::vec3>(current));
+				  offset += geometryInfo.vertexCount;
+				  break;
 			  }
 
 			  case GT_PLANE:
 			  {
-				  PlaneGeometryData(Planes[plane++], &Vertices[offset], Indices);
+				  PlaneGeometryData(ReadBlob<PlaneGeometry>(current), &Vertices[offset], Indices);
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  SetColor(Vertices, geometryInfo, offset, ReadBlob<glm::vec3>(current));
+				  offset += geometryInfo.vertexCount;
 				  break;
 			  }
 
 			  case GT_CYLINDER:
 			  {
-				  CylinderGeometryData(Cylinders[cylinder++], &Vertices[offset], Indices);
+				  CylinderGeometryData(ReadBlob<CylinderGeometry>(current), &Vertices[offset], Indices);
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  SetColor(Vertices, geometryInfo, offset, ReadBlob<glm::vec3>(current));
+				  offset += geometryInfo.vertexCount;
 				  break;
 			  }
 
 			  case GT_SPHERE:
 			  {
-				  SphereGeometryData(Spheres[sphere++], &Vertices[offset], Indices);
+				  SphereGeometryData(ReadBlob<SphereGeometry>(current), &Vertices[offset], Indices);
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  SetColor(Vertices, geometryInfo, offset, ReadBlob<glm::vec3>(current));
+				  offset += geometryInfo.vertexCount;
 				  break;
 			  }
 
 			  case GT_LINES:
 			  {
-				  LinesGeometryData(Lines[lines++], &Vertices[offset], Indices);
+				  LinesGeometryData(ReadBlob<LinesGeometry>(current), &Vertices[offset], Indices);
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  SetColor(Vertices, geometryInfo, offset, ReadBlob<glm::vec3>(current));
+				  offset += geometryInfo.vertexCount;
 				  break;
 			  }
 
 			  case GT_AXISHELPER:
 			  {
 				  AxisHelperData(&Vertices[offset], Indices);
-				  offset += geometry.vertexCount;
-				  continue;
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  offset += geometryInfo.vertexCount;
+				  break;
 			  }
 
 			  case GT_CAMHELPER:
 			  {
-				  CameraHelperData(Cameras[camera++], &Vertices[offset], Indices);
-				  offset += geometry.vertexCount;
-				  continue;
+				  CameraHelperData({}, &Vertices[offset], Indices);
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  offset += geometryInfo.vertexCount;
+				  break;
 			  }
 
 			  case GT_POINGHTLIGHTHELPER:
 			  {
 				  PointLightHelperData(&Vertices[offset], Indices);
-				  offset += geometry.vertexCount;
-				  continue;
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  offset += geometryInfo.vertexCount;
+				  break;
 			  }
 
 			  case GT_SPOTLIGHTHELPER:
 			  {
 				  SpotLightHelperData({}, &Vertices[offset], Indices);
-				  offset += geometry.vertexCount;
-				  continue;
-			  }
-
-			  case GT_UNKNOWN:
-			  {
-				  // @Todo: Warning here!
+				  const auto geometryInfo = ReadBlob<GeometryInfo>(current);
+				  offset += geometryInfo.vertexCount;
 				  break;
 			  }
 
 			}
 
-			for (size_t i = offset; i < offset + geometry.vertexCount ; i++)
-			{
-				Vertices[i].color = Colors[color];
-			}
-
-			offset += geometry.vertexCount;
-			++color;
-
+			geometryType = ReadBlob<GeometryType>(current);
 		}
-
+		
 		auto vb = vertexBufferFactory<ColorVertex>(graphics, Vertices);
 		auto ib = indexBufferFactory(graphics, Indices);
 

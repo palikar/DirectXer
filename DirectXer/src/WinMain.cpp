@@ -62,9 +62,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 
 // @Memory magament
+// @Done: Allcating some amount of memory upfront
+// @Done: Pool temporary allocation strategy
 // @Todo: Buffering the logging output
-// @Todo: Allcating some amount of memory upfront
-// @Todo: Pool temporary allocation strategy
 // @Todo: Temporary Vector and Map
 // @Todo: Have a separate palce for "debug" memory
 
@@ -104,6 +104,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: PBR material
 // @Done: Point light
 // @Todo: Text rendering
+// @Todo: Blending State Setup
 
 // @Data management
 // @Done: Container for geometry info!
@@ -122,7 +123,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: FPS Camara controller
 // @Done: Adjust all of the geometry generators
 // @Done: Add the normals and uvs to the color vertex
-// @Todo: Spot light helper
+// @Done: Spot light helper
 // @Todo: Drop down console
 
 // @Architecture

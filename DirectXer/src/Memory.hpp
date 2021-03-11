@@ -12,12 +12,18 @@ struct MemoryArena
 	size_t MaxSize;
 	size_t Size;
 
-	void Put(void* data, size_t len)
+	void Put(const void* data, size_t len)
 	{
 		assert(Size + len <= MaxSize);
 		memcpy(Memory + Size, data, len);
 		Current += len;
 		Size += len;
+	}
+
+	template<typename T>
+	void Put(const T& value)
+	{
+		Put(&value, sizeof(T));
 	}
 
 	template<typename T = void>
