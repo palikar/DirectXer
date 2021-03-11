@@ -105,6 +105,9 @@ class Graphics
 	PSConstantBuffer PixelShaderCB;
 	VSConstantBuffer VertexShaderCB;
 
+	ID3D11Buffer* PixelShaderCBId{nullptr};
+	ID3D11Buffer* VertexShaderCBId{nullptr};
+
 	ShaderObject Shaders[SF_COUNT];
 
 };

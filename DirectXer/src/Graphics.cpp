@@ -18,7 +18,7 @@ static DXGI_FORMAT TFToDXGI(TextureFormat format)
 
 void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 {
-	
+
 	DXGI_SWAP_CHAIN_DESC sd{ 0 };
 	sd.BufferDesc.Width = (uint32)t_Width;
 	sd.BufferDesc.Height = (uint32)t_Height;
@@ -38,9 +38,9 @@ void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 
 
 	HRESULT hr;
-    GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
+	GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
 	D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &sd, &Swap, &Device, nullptr, &Context));
-	
+
 }
 
 void Graphics::initBackBuffer()
@@ -49,7 +49,7 @@ void Graphics::initBackBuffer()
 	ID3D11Resource* pBackBuffer{ nullptr };
 
 	HRESULT hr;
-    GFX_CALL(Swap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)(&pBackBuffer)));
+	GFX_CALL(Swap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)(&pBackBuffer)));
 	GFX_CALL(Device->CreateRenderTargetView(pBackBuffer, nullptr, &RenderTargetView));
 	pBackBuffer->Release();
 }
@@ -57,16 +57,16 @@ void Graphics::initBackBuffer()
 void Graphics::initZBuffer(float width, float height)
 {
 	HRESULT hr;
-	
+
 	D3D11_DEPTH_STENCIL_DESC dsDesc{0};
 	dsDesc.DepthEnable = TRUE;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    
-    ID3D11DepthStencilState *pDSState;
+
+	ID3D11DepthStencilState *pDSState;
 	GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &pDSState));
 	Context->OMSetDepthStencilState(pDSState, 1);
-	
+
 	ID3D11Texture2D *depthStencil;
 	D3D11_TEXTURE2D_DESC descDepth{0};
 	descDepth.Width = (uint32)width;
@@ -80,13 +80,13 @@ void Graphics::initZBuffer(float width, float height)
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	GFX_CALL( Device->CreateTexture2D( &descDepth,nullptr,&depthStencil ) );
 
-    D3D11_DEPTH_STENCIL_VIEW_DESC descDSV{0};
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV{0};
 	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0u;
 	GFX_CALL(Device->CreateDepthStencilView(depthStencil, &descDSV, &DepthStencilView));
- 
-    Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
+
+	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
 	assert(DepthStencilView);
 
 }
@@ -94,16 +94,16 @@ void Graphics::initZBuffer(float width, float height)
 void Graphics::initRasterizationsStates()
 {
 
-	
+
 	ID3D11RasterizerState* rastStateNormal;
 	ID3D11RasterizerState* rastStateDebug;
-	
+
 	D3D11_RASTERIZER_DESC rastDesc{0};
 	rastDesc.CullMode = D3D11_CULL_NONE;
 	rastDesc.FillMode = D3D11_FILL_SOLID;
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;
-		
+
 	HRESULT hr;
 	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateNormal));
 
@@ -115,7 +115,7 @@ void Graphics::initRasterizationsStates()
 
 	rasterizationsStates[RS_NORMAL] = rastStateNormal;
 	rasterizationsStates[RS_DEBUG] = rastStateDebug;
-	
+
 }
 
 void Graphics::initSamplers()
@@ -156,18 +156,18 @@ void Graphics::destroyZBuffer()
 
 void Graphics::Destroy()
 {
-	
-    Context->Release();
-    Swap->Release();
+
+	Context->Release();
+	Swap->Release();
 	Device->Release();
 
 	RenderTargetView->Release();
-    DepthStencilView->Release();
+	DepthStencilView->Release();
 }
 
 void Graphics::EndFrame()
 {
-    HRESULT hr;
+	HRESULT hr;
 	if( FAILED( hr = Swap->Present( 1u,0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
@@ -237,7 +237,7 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
-		
+
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
 	return to;
@@ -267,7 +267,7 @@ TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, Textu
 		data[i].pSysMem = t_Data[i];
 		data[i].SysMemPitch = t_Width*4;
 	}
-	
+
 	HRESULT hr;
 	GFX_CALL(Device->CreateTexture2D(&desc, data, &to.tp));
 
@@ -275,8 +275,8 @@ TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, Textu
 	srvDesc.Format = desc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 	srvDesc.Texture2D.MostDetailedMip = 0;
- 	srvDesc.Texture2D.MipLevels = 1;
-		
+	srvDesc.Texture2D.MipLevels = 1;
+
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
 	return to;
@@ -343,7 +343,7 @@ void Graphics::initResources()
 
 	{
 		// Debug shader
-		
+
 		ID3DBlob* pBlob;
 		ShaderObject shaderObject;
 		D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
@@ -360,13 +360,13 @@ void Graphics::initResources()
 			{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &shaderObject.il));
-	
+
 		Shaders[SF_DEBUG] = shaderObject;
 	}
 
 	{
 		// 2D shader
-		
+
 		ID3DBlob* pBlob;
 		ShaderObject shaderObject;
 		D3DReadFileToBlob(L"2DPixelShader.cso", &pBlob);
@@ -384,47 +384,47 @@ void Graphics::initResources()
 			{"Type", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &shaderObject.il));
-	
+
 		Shaders[SF_2D] = shaderObject;
 	}
 
 	D3D11_BUFFER_DESC vertexShaderCBDesc{ 0 };
-    vertexShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
+	vertexShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
 	vertexShaderCBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	vertexShaderCBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	vertexShaderCBDesc.MiscFlags = 0;
 	vertexShaderCBDesc.ByteWidth = sizeof(VSConstantBuffer);
 	vertexShaderCBDesc.StructureByteStride = 0;
 
-    D3D11_SUBRESOURCE_DATA vertexShaderCBData{0};
+	D3D11_SUBRESOURCE_DATA vertexShaderCBData{0};
 	vertexShaderCBData.pSysMem = &VertexShaderCB;
-    GFX_CALL(Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VSConstantBuffer::id));
+	GFX_CALL(Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VertexShaderCBId));
 
-	Context->VSSetConstantBuffers(0, 1, &VSConstantBuffer::id);
-	
+	Context->VSSetConstantBuffers(0, 1, &VertexShaderCBId);
 
-    D3D11_BUFFER_DESC pixelShaderCBDesc{ 0 };
-    pixelShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
+
+	D3D11_BUFFER_DESC pixelShaderCBDesc{ 0 };
+	pixelShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
 	pixelShaderCBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	pixelShaderCBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	pixelShaderCBDesc.MiscFlags = 0;
 	pixelShaderCBDesc.ByteWidth = sizeof(PSConstantBuffer);
 	pixelShaderCBDesc.StructureByteStride = 0;
 
-    D3D11_SUBRESOURCE_DATA pixelShaderCBData{0};
-    pixelShaderCBData.pSysMem = &PixelShaderCB;
-    GFX_CALL(Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PSConstantBuffer::id));
-	Context->PSSetConstantBuffers(0, 1, &PSConstantBuffer::id);	
-	
+	D3D11_SUBRESOURCE_DATA pixelShaderCBData{0};
+	pixelShaderCBData.pSysMem = &PixelShaderCB;
+	GFX_CALL(Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PixelShaderCBId));
+	Context->PSSetConstantBuffers(0, 1, &PixelShaderCBId);
+
 }
 
 CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
 {
 
 	CBObject cb;
-		
+
 	D3D11_BUFFER_DESC desc{ 0 };
-    desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
@@ -432,10 +432,10 @@ CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
 	desc.StructureByteStride = 0;
 
 	// D3D11_SUBRESOURCE_DATA data{0};
-    // data.pSysMem = &PixelShaderCB;
+	// data.pSysMem = &PixelShaderCB;
 
 	HRESULT hr;
-    GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
+	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
 	return cb;
 
@@ -445,14 +445,14 @@ void Graphics::updateCBs()
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 
-	Context->Map(VSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	Context->Map(VertexShaderCBId, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
 	memcpy(msr.pData, &VertexShaderCB, sizeof(VertexShaderCB));
-	Context->Unmap(VSConstantBuffer::id, 0);
+	Context->Unmap(VertexShaderCBId, 0);
 
-	Context->Map(PSConstantBuffer::id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	Context->Map(PixelShaderCBId, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
 	memcpy(msr.pData, &PixelShaderCB, sizeof(PixelShaderCB));
-	Context->Unmap(PSConstantBuffer::id, 0);	
-	
+	Context->Unmap(PixelShaderCBId, 0);
+
 }
 
 void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
@@ -487,7 +487,7 @@ void Graphics::bindTexture(uint32 t_Slot, TextureObject t_Texture)
 {
 	Context->PSSetShaderResources(t_Slot, 1, &t_Texture.srv);
 }
-	
+
 void Graphics::setViewport(float x, float y, float width, float height)
 {
 	D3D11_VIEWPORT vp;
@@ -506,7 +506,7 @@ void Graphics::setViewport(float x, float y, float width, float height)
 	// sissorRect.top= height;
 	// sissorRect.right= width;
 	// Context->RSSetScissorRects(1, &sissorRect);
-	
+
 }
 
 void Graphics::setShaderConfiguration(ShaderConfig t_Config)
@@ -536,21 +536,19 @@ void Graphics::setVertexBuffer(VBObject t_buffer, uint32 offset)
 
 void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
 {
-	
+
 	// @Todo: Make this in a function of its own
 
 	uint32 factor = 1;
 	switch (topology) {
-	  case TT_TRIANGLES: 
+	  case TT_TRIANGLES:
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		  break;
-	  case TT_LINES: 
+	  case TT_LINES:
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		  factor = 2;
 		  break;
 	}
-	
+
 	Context->DrawIndexed(count/factor, offset, base);
 }
-
-

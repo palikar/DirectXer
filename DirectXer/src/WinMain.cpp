@@ -85,6 +85,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // -- debug layout (pos, color, uv, normals, tangents, bitangents)
 // -- standard layout (pos, uv, normals, tangents, bitangents)
 // @Done: Constant buffers setup
+// @Done: Fix the prim CBs ids place
+// @Todo: Blending State Setup
 // @Todo: Depth Stencil State Setup
 // @Todo: Scissor test support
 // @Todo: Render target support
@@ -104,7 +106,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: PBR material
 // @Done: Point light
 // @Todo: Text rendering
-// @Todo: Blending State Setup
 
 // @Data management
 // @Done: Container for geometry info!
@@ -134,6 +135,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Todo: Some job\task system for basic multithreading support
 //    -- maybe this is only useful for loading resources
 // @Todo: Deffered loading of scenes resources
+// @Todo: Memory tracking -- temp; bulk; GPU memory; general
+// purpose allocations
+//    -- Have some global tracking structs in Memory.hpp and track
+//the memory consumption in Debug
 
 
 // @Notes

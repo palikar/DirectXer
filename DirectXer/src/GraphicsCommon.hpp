@@ -12,15 +12,12 @@ namespace dx = DirectX;
 
 struct PSConstantBuffer
 {
-    inline static ID3D11Buffer* id{nullptr};
-    
 	glm::vec3 cameraPos;
 	uint32 shaderType;
 };
 
 struct VSConstantBuffer
 {
-	inline static ID3D11Buffer* id{nullptr};
     
 	glm::mat4 model{};
 	glm::mat4 view{};
