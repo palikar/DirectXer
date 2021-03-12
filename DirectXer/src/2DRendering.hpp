@@ -7,12 +7,67 @@
 #include "Memory.hpp"
 
 
+#include <stb_rect_pack.h>
+
+
 struct Init2DParams
 {
 	float32 Width;
 	float32 Height;
 };
 
+
+struct Image
+{
+	TextureObject TexHandle;
+	glm::vec2 ScreenPos;
+	glm::vec2 ScreenSize;
+
+};
+
+struct ImageAtlas
+{
+	TextureObject TexHandle;
+	glm::vec2 Size;
+	stbrp_context RectContext;
+	
+
+};
+
+
+
+class ImageLibrary
+{
+  public:
+	std::vector<Image> Images;
+	std::vector<> Textures;
+
+	MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));
+
+	void InitAtlas(glm::vec2 t_Size)
+	{
+
+	}
+
+	uint32 LoadImage(std::string_view t_Resources, std::string_view t_Path)
+	{
+		fmt::basic_memory_buffer<char, 512> buf;
+		fmt::format_to(buf, "{}/{}", t_Resources, t_Path);
+		DXLOG("[RES] Loading {}", buf.c_str());
+		ReadWholeFile(buf.c_str(), fileArena);
+		int width, height, channels;
+		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
+
+
+	}
+
+
+	Image GetImage(uint32 t_id)
+	{
+		return Images[t_id];
+	}
+	
+};
 
 
 class Renderer2D
