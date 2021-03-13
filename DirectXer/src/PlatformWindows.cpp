@@ -102,6 +102,8 @@ void WindowsWindow::InitAfterCreate(HWND t_hWnd)
 	ImGui_ImplWin32_Init(hWnd);
 	ImGui_ImplDX11_Init(Application->Graphics.Device, Application->Graphics.Context);
 
+	Application->Graphics.EndFrame();
+
 }
 
 void WindowsWindow::ToggleFullscreen()

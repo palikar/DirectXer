@@ -3,6 +3,7 @@
 #include "IncludeWin.hpp"
 #include "Logging.hpp"
 #include "Memory.hpp"
+#include "Math.hpp"
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -79,6 +80,7 @@ class Graphics
 	void updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);
 	void updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length);
 	void updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length);
+	void updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data);
 
 	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
 

@@ -208,6 +208,19 @@ void Graphics::bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16
 	Context->VSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
 }
 
+void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data)
+{
+	D3D11_BOX box;
+	box.left = (uint32)(rect.Position.x);
+	box.top = (uint32)(rect.Position.y);
+	box.right = (uint32)(rect.Position.x + rect.Size.x);
+	box.bottom = (uint32)(rect.Position.y + rect.Size.y);
+	box.front = 0;
+	box.back = 1;
+	
+	Context->UpdateSubresource(t_Tex.tp, 0, &box, t_Data, (uint32)(rect.Size.x * 4), 0);
+}
+
 TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
 {
 	TextureObject to;
@@ -222,22 +235,28 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = 0;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = t_Data;
-	data.SysMemPitch = t_Width*4;
-
 	HRESULT hr;
-	GFX_CALL(Device->CreateTexture2D(&desc, &data, &to.tp));
+	if(t_Data)
+	{
+		D3D11_SUBRESOURCE_DATA data;
+		data.pSysMem = t_Data;
+		data.SysMemPitch = t_Width*4;
+		GFX_CALL(Device->CreateTexture2D(&desc, &data, &to.tp));
+	}
+	else
+	{
+		GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &to.tp));
+	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format = desc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
-
+	
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
 	return to;

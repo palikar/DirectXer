@@ -94,6 +94,12 @@ void App::Init(HWND t_Window)
 	camera.Pos = {1.0f, 0.5f, 1.0f};
 	camera.lookAt({0.0f, 0.0f, 0.0f});
 
+	Renderer2D.Images.Init(&Graphics, Arguments.ResourcesPath.data());
+	ImageLibraryBuilder imagebuilder;
+	imagebuilder.PutImage("images/facebook.png");
+	imagebuilder.PutImage("images/instagram.png");
+	Renderer2D.Images.Build(imagebuilder);
+
 	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 
 }
@@ -210,7 +216,9 @@ void App::ProcessFirstScene(float dt)
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.bindTexture(0, texMat.EnvMap);
 	Graphics.bindTexture(1, texMat.BaseMap);
-	Graphics.bindTexture(2, texMat.AoMap);
+	//Graphics.bindTexture(2, texMat.AoMap);
+	Graphics.bindTexture(2, Renderer2D.Images.Atlases[0].TexHandle);
+
 	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 
 	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -248,6 +256,8 @@ void App::ProcessFirstScene(float dt)
 	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
 
 	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+
+	Renderer2D.DrawImage(1, {610.0f, 310.0f}, {160.0f, 160.0f});
 	
 	Renderer2D.EndScene();
 

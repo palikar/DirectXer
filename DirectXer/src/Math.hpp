@@ -13,3 +13,10 @@ static void TransformVertices(glm::mat4 t_Mat, T* t_Vertices, size_t t_Count)
 		TransformVertex(*t_Vertices++, t_Mat);
 	}
 }
+
+struct Rectangle2D
+{
+	glm::vec2 Position;
+	glm::vec2 Size;
+
+};

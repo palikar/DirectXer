@@ -124,9 +124,6 @@ class TempStdAllocator
 	TempStdAllocator(){};
 	
 	TempStdAllocator(const TempStdAllocator&){};
-
-	template<typename S>
-	TempStdAllocator(const TempStdAllocator<S>&){};
 	
 	typedef T value_type;
 	typedef size_t size_type;
@@ -156,8 +153,6 @@ class BulkStdAllocator
 	
 	BulkStdAllocator(const BulkStdAllocator&){};
 
-	template<typename S>
-	BulkStdAllocator(const BulkStdAllocator<S>&){};
 	
 	typedef T value_type;
 	typedef size_t size_type;
@@ -179,14 +174,22 @@ class BulkStdAllocator
 namespace asl
 {
 
-template<class T>
-using TempVector = std::vector<T, TempStdAllocator<T>>;
-using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
-using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
+// template<class T>
+// using TempVector = std::vector<T, TempStdAllocator<T>>;
+// using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
+// using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
+
+// template<class T>
+// using BulkVector = std::vector<T, BulkStdAllocator<T>>;
+// using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
+// using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
 
 template<class T>
-using BulkVector = std::vector<T, BulkStdAllocator<T>>;
-using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
-using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
+using TempVector = std::vector<T>;
+using TempString = std::string;
+
+template<class T>
+using BulkVector = std::vector<T>;
+using BulkString = std::string;
 
 }
