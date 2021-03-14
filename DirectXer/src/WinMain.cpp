@@ -4,7 +4,7 @@
 
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
-
+	
 	for (size_t i = 1; i < argc; ++i)
 	{
 		if (strcmp(argv[i], "--resources") == 0)
@@ -25,12 +25,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	gDxgiManager.Init();
 	Memory::InitMemoryState();
 
-	size_t InitialStackMemory{0};
-
-	
-
 	App application;
-	// application.Memory = g_Memory;
 
 	char** argv;
 	int argc;
@@ -46,15 +41,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	WindowsWindow window;
 	window.Application = &application;
-	
 
-	InitialStackMemory += sizeof(MemoryState);
+	size_t InitialStackMemory{0};
 	InitialStackMemory += sizeof(App);
-	InitialStackMemory += sizeof(WindowsSettings);
 	InitialStackMemory += sizeof(WindowsWindow);
-
+	InitialStackMemory += sizeof(WindowsSettings);
+	InitialStackMemory += sizeof(int);
+	InitialStackMemory += sizeof(char**);
 	DXLOG("[INIT] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
-
+	
 	window.Init(settings);
 	window.Run();
 

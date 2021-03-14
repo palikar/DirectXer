@@ -1,4 +1,5 @@
 #include "Memory.hpp"
+#include "PlatformWindows.hpp"
 
 
 const size_t Memory::TempMemoryRequired = Megabytes(256);
@@ -6,11 +7,11 @@ const size_t Memory::BulkMemoryRequired = Megabytes(16);
 const size_t Memory::TotalMemoryRequired = TempMemoryRequired + BulkMemoryRequired;
 
 MemoryState Memory::g_Memory{0};
-MemoryArena Memory::g_TempScope{0};
+TempScopesHolder Memory::g_TempScopes{0};
 
 static const inline size_t SIZE_BYTES = sizeof(size_t);
 
-static bool ArenaHasPlace(MemoryArena t_Arena, size_t t_Size)
+static bool ArenaHasPlace(MemoryArena& t_Arena, size_t t_Size)
 {
 	return t_Size <= (t_Arena.MaxSize - t_Arena.Size);
 }
@@ -47,7 +48,7 @@ static void SetBlockSize(void* t_Mem, size_t t_Size)
 
 void Memory::InitMemoryState()
 {
-	g_Memory.TempMemory = (char*)Platform::Allocate(TotalMemoryRequired);
+	g_Memory.TempMemory = (char*)PlatformLayer::Allocate(TotalMemoryRequired);
 	g_Memory.TempMemorySize = 0;
 	g_Memory.TempMemoryMaxSize = TempMemoryRequired;
 	g_Memory.TempMemoryCurrent = Memory::g_Memory.TempMemory;
@@ -83,33 +84,35 @@ void Memory::ResetTempMemory()
 {
 	Memory::g_Memory.TempMemoryCurrent = Memory::g_Memory.TempMemory;
 	Memory::g_Memory.TempMemorySize = 0;
-	Memory::g_TempScope = {0};
+	Memory::g_TempScopes = {0};
+	
 }
 
 void Memory::EstablishTempScope(size_t t_Size)
 {
-	g_TempScope = GetTempArena(t_Size);
+	g_TempScopes.PushScope(GetTempArena(t_Size));
+}
+
+void Memory::EndTempScope()
+{
+	g_TempScopes.PopScope();
 }
 
 void Memory::ResetTempScope()
 {
-	g_TempScope.Size = 0;
-	g_TempScope.Current = g_TempScope.Memory;
-}
-
-
-void Memory::ReleaseTempScope()
-{
-	g_TempScope = {0};
+	MemoryArena& arena = g_TempScopes.GetCurrentArena();
+	arena.Size = 0;
+	arena.Current = arena.Memory;
 }
 
 void* Memory::TempAlloc(size_t t_Size)
 {
-	assert(Memory::g_TempScope.Memory);
+	auto& arena = g_TempScopes.GetCurrentArena();
+	assert(arena.Memory);
 
-	if(ArenaHasPlace(Memory::g_TempScope, t_Size))
+	if(ArenaHasPlace(arena, t_Size))
 	{
-		return ArenaAllocation(Memory::g_TempScope, t_Size);
+		return ArenaAllocation(arena, t_Size);
 	}
 
 	assert(false);
@@ -118,14 +121,16 @@ void* Memory::TempAlloc(size_t t_Size)
 
 void* Memory::TempRealloc(void* t_Mem, size_t t_Size)
 {
+	auto& arena = g_TempScopes.GetCurrentArena();
+	
 	if (!t_Mem) return Memory::TempAlloc(t_Size);
 
 	auto oldSize = BlockSize(t_Mem);
 	
-	if(((char*)t_Mem - SIZE_BYTES) == (Memory::g_TempScope.Current - oldSize - SIZE_BYTES))
+	if(((char*)t_Mem - SIZE_BYTES) == (arena.Current - oldSize - SIZE_BYTES))
 	{
-		Memory::g_TempScope.Size += t_Size - oldSize;
-		Memory::g_TempScope.Current += t_Size - oldSize;
+		arena.Size += t_Size - oldSize;
+		arena.Current += t_Size - oldSize;
 		SetBlockSize(t_Mem, t_Size);
 		return t_Mem;
 	}

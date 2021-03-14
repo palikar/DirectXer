@@ -1,5 +1,6 @@
 #pragma once
 
+#define Bytes(num) size_t(num)
 #define Kilobytes(num) size_t(num*1024)
 #define Megabytes(num) size_t(num*1024*1024)
 #define Gigabytes(num) size_t(num*1024*1024*1024)

@@ -79,7 +79,6 @@ public:
 
 	// @Note: Application Data -- used by the "application" for
 	// application management stuff
-	MemoryState Memory;
 	float32 Width;
 	float32 Height;
 	int ReturnValue{0};

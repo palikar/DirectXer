@@ -7,6 +7,7 @@
 #include "Graphics.hpp"
 #include "Memory.hpp"
 #include "Utils.hpp"
+#include "PlatformWindows.hpp"
 
 inline TextureFormat PngFormat(int channels)
 {
@@ -69,6 +70,7 @@ struct TextureCatalog
 
         // @Note: This will be used for the STB allocations
 		Memory::EstablishTempScope(Megabytes(128));
+		Defer { Memory::ResetTempMemory(); };
 		
 		const auto texturesCount = sizeof(g_Textures) / sizeof(TextureLoadEntry);
 		fmt::basic_memory_buffer<char, 512> buf;
@@ -83,7 +85,7 @@ struct TextureCatalog
 
 			DXLOG("[RES] Loading {}", buf.c_str());
 
-			ReadWholeFile(buf.c_str(), fileArena);
+			PlatformLayer::ReadWholeFile(buf.c_str(), fileArena);
 
 			int width, height, channels;
 			unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
@@ -98,8 +100,7 @@ struct TextureCatalog
 			buf.clear();
 			Memory::ResetTempScope();
 		}
-
-		Memory::ResetTempMemory();
+		
 	}
 
 	TextureObject LoadCube(Graphics graphics, std::string_view t_Resources, const char* name[6])
@@ -109,6 +110,7 @@ struct TextureCatalog
 
 		// @Note: This will be used for the STB allocations
 		Memory::EstablishTempScope(Megabytes(128));
+		Defer { Memory::ResetTempMemory(); };
 
 		fmt::basic_memory_buffer<char, 512> buf;
 
@@ -125,14 +127,12 @@ struct TextureCatalog
 			fmt::format_to(buf, "{}/{}", t_Resources, tex);
 			DXLOG("[RES] Loading {}", buf.c_str());
 
-			ReadWholeFile(buf.c_str(), fileArena);
+			PlatformLayer::ReadWholeFile(buf.c_str(), fileArena);
 
 			data[i] = stbi_load(buf.c_str(), &width, &height, &channels, 0);
 			buf.clear();
 
 		}
-		Memory::ResetTempMemory();
-
 
 		auto hand = graphics.createCubeTexture(width, height, PngFormat(channels), data);
 		return hand;

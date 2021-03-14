@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utils.hpp"
-#include "PlatformWindows.hpp"
+#include "Types.hpp"
 
 #include <vector>
 #include <string>
@@ -60,15 +60,45 @@ struct MemoryState
 
 };
 
+struct TempScopesHolder
+{
+	inline static const uint8 MaxTempScopes = 8;
+ 
+	MemoryArena Scopes[MaxTempScopes];
+	uint8 CurrentScope{0};
+
+	inline MemoryArena& GetCurrentArena()
+	{
+		return Scopes[CurrentScope - 1];
+	}
+	
+	inline void PushScope(MemoryArena t_Arena)
+	{
+		assert(CurrentScope < MaxTempScopes);
+		Scopes[CurrentScope++] = t_Arena;
+	}
+
+	inline void PopScope()
+	{
+		Scopes[CurrentScope--] = MemoryArena{0};
+	}
+};
+
 struct Memory
 {
 	const static size_t TempMemoryRequired;
 	const static size_t BulkMemoryRequired;
 	const static size_t TotalMemoryRequired;
 	static MemoryState g_Memory;
-	static MemoryArena g_TempScope;
+	static TempScopesHolder g_TempScopes;
 
 	static void* BulkGet(size_t t_Size);
+
+	template<typename T>
+	static T* BulkGet(size_t t_Size)
+	{
+		return (T*)BulkGet(t_Size*sizeof(T));
+	}
 
 	// @Note: Get some storage in arena form, use it and then
 	// give it back
@@ -82,9 +112,9 @@ struct Memory
 	//   -> Limited reallocations
 	//   -> There are no deallocations
 	static void EstablishTempScope(size_t t_Size);
+	static void EndTempScope();
 	static void* TempAlloc(size_t len);
 	static void* TempRealloc(void* mem, size_t len);
-	static void ReleaseTempScope();
 	static void TempDealloc(void*);
 
     //  @Note: Reset the current temp global temp scope arena
@@ -99,22 +129,6 @@ struct Memory
 	// @Note: Initalize the whole memory by requesting memory from the OS
 	static void InitMemoryState();
 };
-
-inline void ReadWholeFile(const char* t_Path, MemoryArena& t_Arena)
-{
-
-	HANDLE  handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	DWORD fileSize = GetFileSize(handle, NULL);
-	DWORD readBytes;
-
-	assert(fileSize < t_Arena.MaxSize);
-	ReadFile(handle, t_Arena.Memory + t_Arena.Size, fileSize, &readBytes, NULL);
-
-	t_Arena.Size += readBytes;
-
-	CloseHandle(handle);
-}
-
 
 template<typename T>
 class TempStdAllocator
@@ -174,15 +188,19 @@ class BulkStdAllocator
 namespace asl
 {
 
-// template<class T>
-// using TempVector = std::vector<T, TempStdAllocator<T>>;
-// using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
-// using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
+#if 1
 
-// template<class T>
-// using BulkVector = std::vector<T, BulkStdAllocator<T>>;
-// using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
-// using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
+template<class T>
+using TempVector = std::vector<T, TempStdAllocator<T>>;
+using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
+using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
+
+template<class T>
+using BulkVector = std::vector<T, BulkStdAllocator<T>>;
+using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
+using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
+
+#else
 
 template<class T>
 using TempVector = std::vector<T>;
@@ -191,5 +209,7 @@ using TempString = std::string;
 template<class T>
 using BulkVector = std::vector<T>;
 using BulkString = std::string;
+
+#endif
 
 }

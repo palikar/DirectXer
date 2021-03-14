@@ -30,6 +30,7 @@ void App::Init(HWND t_Window)
 	Graphics.initResources();
 	Graphics.initRasterizationsStates();
 	Graphics.initSamplers();
+	Graphics.initBlending();
 	
 	Textures.LoadTextures(Graphics, Arguments.ResourcesPath.data());
 
@@ -44,9 +45,7 @@ void App::Init(HWND t_Window)
 	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
 
 
-	Renderer2D.InitRenderer(&Graphics, { Width, Height });
-
-	// @Todo: This should use some sort of arena storage to do its thing
+    // @Todo: This should use some sort of arena storage to do its thing
 	BufferBuilder builder;
 	builder.Init(8);
 	CUBE = builder.InitCube(CubeGeometry{}, glm::vec3{1.0f, 0.0f, 0.0f});
@@ -94,11 +93,15 @@ void App::Init(HWND t_Window)
 	camera.Pos = {1.0f, 0.5f, 1.0f};
 	camera.lookAt({0.0f, 0.0f, 0.0f});
 
-	Renderer2D.Images.Init(&Graphics, Arguments.ResourcesPath.data());
+	Renderer2D.InitRenderer(&Graphics, { Width, Height });	
+
+	Memory::EstablishTempScope(Bytes(512));
 	ImageLibraryBuilder imagebuilder;
+	imagebuilder.Init(2, Arguments.ResourcesPath.data());
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
-	Renderer2D.Images.Build(imagebuilder);
+	Renderer2D.ImageLib.Build(imagebuilder);
+	Memory::EndTempScope();;
 
 	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 
@@ -216,8 +219,7 @@ void App::ProcessFirstScene(float dt)
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.bindTexture(0, texMat.EnvMap);
 	Graphics.bindTexture(1, texMat.BaseMap);
-	//Graphics.bindTexture(2, texMat.AoMap);
-	Graphics.bindTexture(2, Renderer2D.Images.Atlases[0].TexHandle);
+	Graphics.bindTexture(2, texMat.AoMap);
 
 	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 
@@ -322,6 +324,7 @@ void App::ProcessPhongScene(float dt)
 	Graphics.ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics.ClearZBuffer();
 
+	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 	SetupCamera(camera);
 
 	Graphics.setIndexBuffer(GPUGeometryDesc.Ibo);

@@ -40,6 +40,17 @@
 
 namespace dx = DirectX;
 
+
+enum BlendingState : uint8
+{
+	BS_AlphaBlending = 0,
+	BS_PremultipliedAlpha = 1,
+
+	BS_Count,
+
+};
+
+
 class Graphics
 {
   public:
@@ -57,18 +68,21 @@ class Graphics
 	void initResources();
 	void initRasterizationsStates();
 	void initSamplers();
+	void initBlending();
 
 	void resizeBackBuffer(float width, float height);
 
 	void bindTexture(uint32 t_Slot, TextureObject t_Texture);
+
 	void bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
 	void bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
-	
+
 	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
 	void setShaderConfiguration(ShaderConfig t_Confing);
+	void setBlendingState(BlendingState t_State);
 
 	TextureObject createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
 	TextureObject createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
@@ -98,7 +112,7 @@ class Graphics
 	ID3D11Device* Device{ nullptr };
 	IDXGISwapChain* Swap{ nullptr };
 	ID3D11DeviceContext* Context{ nullptr };
-	
+
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };
 	ID3D11DepthStencilView* DepthStencilView{ nullptr };
 
@@ -109,6 +123,8 @@ class Graphics
 
 	ID3D11Buffer* PixelShaderCBId{nullptr};
 	ID3D11Buffer* VertexShaderCBId{nullptr};
+
+	ID3D11BlendState* BlendingStates[BS_Count];
 
 	ShaderObject Shaders[SF_COUNT];
 

@@ -1,9 +1,6 @@
 #include "Graphics.hpp"
 
 
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "D3DCompiler.lib")
-
 static DXGI_FORMAT TFToDXGI(TextureFormat format)
 {
 	switch (format)
@@ -139,6 +136,48 @@ void Graphics::initSamplers()
 	Device->CreateSamplerState(&desc, &state);
 
 	Context->PSSetSamplers(0, 1, &state);
+}
+
+void Graphics::initBlending()
+{
+	D3D11_BLEND_DESC desc;
+
+	desc.IndependentBlendEnable = FALSE;
+	desc.AlphaToCoverageEnable = FALSE;
+
+	// alpha blending
+	{
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		HRESULT hr;
+		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_AlphaBlending]));
+	}
+
+	// premultiplied alpha
+	{
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		
+		HRESULT hr;
+		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_PremultipliedAlpha]));
+	}	
+
+}
+
+void Graphics::setBlendingState(BlendingState t_State)
+{
+	Context->OMSetBlendState(BlendingStates[t_State], NULL, D3D11_COLOR_WRITE_ENABLE_ALL);
 }
 
 void Graphics::resizeBackBuffer(float width, float height)

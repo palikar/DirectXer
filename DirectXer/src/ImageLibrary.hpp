@@ -1,11 +1,11 @@
 #pragma once
 
-#include <stb_image.h>
-#include <fmt/format.h>
-#include <string>
-#include <string_view>
+#include "Glm.hpp"
+#include "Memory.hpp"
+#include "GraphicsCommon.hpp"
 
-#include "Graphics.hpp"
+#include <string_view>
+#include <stb_rect_pack.h>
 
 /*
   -> Loads images and puts them into textures
@@ -15,20 +15,58 @@ and where exectly in this texture
   -> If the image that is to be loaded is "too big", we create a texure
 for the whole image and do not put it into some shared texture
 */
-class TextureLibrary
+
+struct Image
 {
-  public:
+	TextureObject TexHandle;
+	glm::vec2 ScreenPos;
+	glm::vec2 ScreenSize;
+};
+
+struct ImageAtlas
+{
+	TextureObject TexHandle;
+	stbrp_context RectContext;
+};
+
+class ImageLibraryBuilder
+{
+public:
+
+	struct QueuedImage
+	{
+		std::string_view Path;
+		PlatformLayer::FileHandle Handle;
+		size_t FileSize;
+	};
 
 	std::string_view ResourcesPath;
+	asl::TempVector<QueuedImage> QueuedImages;
+	size_t MaxFileSize;
 
-	void Init(std::string_view t_ResourcesPath)
-	{
-		ResourcesPath = t_ResourcesPath;
-	}
+	void Init(uint16 t_ImageCount,  std::string_view t_Path);
+	uint32 PutImage(std::string_view t_Path);
 
-	void LoadImage(std::string_view t_ImagePath)
-	{}
+};
+
+class Graphics;
+
+class ImageLibrary
+{
+  public:
+	Graphics* Gfx;
+	MemoryArena fileArena;
+	asl::BulkVector<Image> Images;
+	asl::BulkVector<ImageAtlas> Atlases;
+
+	const static inline uint16 RectsCount = 1024u / 2u;
+	const static inline uint16 AtlasSize = 1024u;
+	const static inline uint8 MaxAtlases = 10u;
+
+	void Init(Graphics* Gfx);
+	ImageAtlas InitAtlas();
+	TextureObject Pack(stbrp_rect& t_Rect);
+	void Build(ImageLibraryBuilder t_Builder);
+	Image GetImage(uint32 t_id);
 	
-
-
 };

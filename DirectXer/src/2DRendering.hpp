@@ -4,143 +4,13 @@
 #include "Glm.hpp"
 #include "GraphicsCommon.hpp"
 #include "Graphics.hpp"
-#include "Memory.hpp"
-
-
-#include <stb_rect_pack.h>
+#include "ImageLibrary.hpp"
 
 
 struct Init2DParams
 {
 	float32 Width;
 	float32 Height;
-};
-
-struct Image
-{
-	TextureObject TexHandle;
-	glm::vec2 ScreenPos;
-	glm::vec2 ScreenSize;
-};
-
-struct ImageAtlas
-{
-	TextureObject TexHandle;
-	glm::vec2 Size;
-	stbrp_context RectContext;
-};
-
-class ImageLibraryBuilder
-{
-public:
-
-	std::vector<std::string> ImageFilePaths;
-
-	uint32 PutImage(std::string t_Path)
-	{
-		ImageFilePaths.push_back(t_Path);
-		return (uint32)ImageFilePaths.size() - 1;
-	}
-
-};
-
-class ImageLibrary
-{
-  public:
-	std::vector<Image> Images;
-	std::string_view ResourcesPath;
-	Graphics* Gfx;
-	MemoryArena fileArena;
-	std::vector<ImageAtlas> Atlases;
-
-	const static inline int RectsCount = 1024 / 2;
-
-	void Init(Graphics* Gfx, std::string_view t_Path)
-	{
-		Atlases.reserve(10);
-		
-		this->Gfx = Gfx;
-		InitAtlas({ 1024, 1024 });
-		this->ResourcesPath = t_Path;
-	}
-
-
-	ImageAtlas InitAtlas(glm::vec2 t_Size)
-	{
-		auto space = malloc(sizeof(stbrp_node) * RectsCount);
-		
-		ImageAtlas newAtlas;
-		newAtlas.TexHandle = Gfx->createTexture((uint16)t_Size.x, (uint16)t_Size.y, TF_RGBA, nullptr, 0);
-		newAtlas.Size = t_Size;
-		Atlases.push_back(newAtlas);
-
-		// @Note: 8Kb Per atlas for tect packing; maybe we can bump this to 16KB for best rect packing results		
-		stbrp_init_target(&Atlases.back().RectContext, (int)t_Size.x, (int)t_Size.y, (stbrp_node*)space, RectsCount);
-
-		return newAtlas;
-	}
-
-	void Build(ImageLibraryBuilder t_Builder)
-	{
-		fileArena = Memory::GetTempArena(Megabytes(16));
-		fmt::basic_memory_buffer<char, 512> buf;
-
-		stbi_set_flip_vertically_on_load(0);
-		
-		for (const auto& imagePath : t_Builder.ImageFilePaths)
-		{
-			fmt::format_to(buf, "{}/{}", ResourcesPath, imagePath);
-			DXLOG("[RES] Loading {}", buf.c_str());
-			ReadWholeFile(buf.c_str(), fileArena);
-			int width, height, channels;
-			unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
-			fileArena.Reset();
-			buf.clear();
-
-			stbrp_rect rect;
-			rect.w = (stbrp_coord)width;
-			rect.h = (stbrp_coord)height;
-				
-			for (auto& atlas: Atlases)
-			{
-				stbrp_pack_rects(&atlas.RectContext, &rect, 1);
-				if (rect.was_packed == 0) continue;
-
-				Rectangle2D updateRect{{rect.x, rect.y},{rect.w, rect.h}};
-				Gfx->updateTexture(atlas.TexHandle, updateRect, data);
-				Images.push_back({ atlas.TexHandle, {rect.x / 1024.0f, rect.y / 1024.0f}, {rect.w / 1024.0f, rect.h / 1024.0f} });
-				break;
-			}
-
-			
-			if (rect.was_packed != 0) continue;
-
-			auto atlas = InitAtlas({1024, 1024});
-			stbrp_pack_rects(&atlas.RectContext, &rect, 1);
-			assert(rect.was_packed != 0);
-
-
-			Rectangle2D updateRect { {rect.x, rect.y}, { rect.w, rect.h }};
-			Gfx->updateTexture(atlas.TexHandle, updateRect, data);
-			Images.push_back({ atlas.TexHandle, {rect.x / 1024.0f, rect.y / 1024.0f}, {rect.w / 1024.0f, rect.h / 1024.0f} });
-			
-		}
-
-	}
-
-	ImageAtlas GetOrCreateAtlas(glm::vec2 t_Size)
-	{
-
-		
-	}
-	
-
-
-	Image GetImage(uint32 t_id)
-	{
-		return Images[t_id];
-	}
-	
 };
 
 class Renderer2D
@@ -150,16 +20,18 @@ public:
 	asl::BulkVector<Vertex2D> Vertices;
 	asl::BulkVector<uint32> Indices;
 	Vertex2D* CurrentVertex;
-	ImageLibrary Images;
+	ImageLibrary ImageLib;
 
 	uint32 CurrentVertexCount;
 
-	size_t TotalVertices = 2000;
+	inline static const size_t TotalVertices = 2000;
+	inline static const uint8 MaxTextureSlots = 3;
 
 	VBObject vbo;
 	IBObject ibo;
 
-	TextureObject Tex1;
+	TextureObject TexSlots[MaxTextureSlots];
+	uint8 CurrentTextureSlot;
 
 	Graphics* Graph;
 	Init2DParams Params;
@@ -168,8 +40,10 @@ public:
 	{
 		Graph = t_Graphics;
 		Params = t_Params;
+		CurrentTextureSlot = 0;
 
-		
+		ImageLib.Init(t_Graphics);
+			
 		Vertices.resize(TotalVertices);
 		Indices.resize(TotalVertices * 3);
 		
@@ -181,9 +55,6 @@ public:
 
 	void BeginScene()
 	{
-		Graph->VertexShaderCB.projection = glm::transpose(glm::ortho(0.0f, Params.Width,  Params.Height, 0.0f));
-		Graph->VertexShaderCB.model = glm::mat4(1.0f);
-
 		CurrentVertexCount = 0;
 		
 		Indices.clear();
@@ -194,23 +65,55 @@ public:
 
 	void EndScene()
 	{
+		Graph->VertexShaderCB.projection = glm::transpose(glm::ortho(0.0f, Params.Width, Params.Height, 0.0f));
+		Graph->VertexShaderCB.model = glm::mat4(1.0f);
+
 		Graph->setShaderConfiguration(SC_2D_RECT);
 
 		Graph->setIndexBuffer(ibo);
 		Graph->setVertexBuffer(vbo);
 
-		Graph->updateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount*sizeof(Vertex2D));
-		Graph->updateIndexBuffer(ibo, Indices.data(), 3u*CurrentVertexCount*sizeof(uint32));
+		Graph->updateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount * sizeof(Vertex2D));
+		Graph->updateIndexBuffer(ibo, Indices.data(), 3u * CurrentVertexCount * sizeof(uint32));
 		Graph->updateCBs();
 
-		Graph->bindTexture(0, Tex1);
+		Graph->setBlendingState(BS_AlphaBlending);
+
+		/*for (uint32 i = 0; i < MaxTextureSlots; i++)
+		{
+			Graph->bindTexture(i, TexSlots[i]);
+		}*/
+		Graph->bindTexture(0, TexSlots[0]);
 
 		Graph->drawIndex(Graphics::TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
 
 	}
+
+	uint8 AttachTexture(TextureObject t_Tex)
+	{
+		if(TexSlots[CurrentTextureSlot - 1].srv == t_Tex.srv)
+		{
+			return CurrentTextureSlot;
+		}
+			
+		if (CurrentTextureSlot >= MaxTextureSlots)
+		{
+			EndScene();
+			BeginScene();
+		}
+		TexSlots[CurrentTextureSlot++] = t_Tex;
+
+		return CurrentTextureSlot - 1;
+	}
 	
 	void DrawQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color)
 	{
+		if (CurrentVertexCount + 4 >= TotalVertices)
+		{
+			EndScene();
+			BeginScene();
+		}
+		
 		CurrentVertex->pos = pos;
 		CurrentVertex->color = color;
 		CurrentVertex->type = 1;
@@ -240,6 +143,13 @@ public:
 
 	void DrawCirlce(glm::vec2 pos, float radius, glm::vec4 color)
 	{
+
+		if (CurrentVertexCount + 4 >= TotalVertices)
+		{
+			EndScene();
+			BeginScene();
+		}
+			
 		const float r2 = radius;
 		
 		CurrentVertex->pos = glm::vec2{pos.x - r2, pos.y - r2};
@@ -275,31 +185,38 @@ public:
 
 	void DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size)
 	{
-		assert(t_Id < Images.Images.size());
-		const auto& screenImage = Images.Images[t_Id];
+		if (CurrentVertexCount + 4 >= TotalVertices)
+		{
+			EndScene();
+			BeginScene();
+		}
+		
+		assert(t_Id < ImageLib.Images.size());
+		const auto& screenImage = ImageLib.Images[t_Id];
 
-		Tex1 = screenImage.TexHandle;
+		auto slot = AttachTexture(screenImage.TexHandle);
+		uint32 type = (slot << 8) | (3 << 0);
 		
 		CurrentVertex->pos = pos;
-		CurrentVertex->type = 3;
+		CurrentVertex->type = type;
 		CurrentVertex->additional.x = screenImage.ScreenPos.x;
 		CurrentVertex->additional.y = screenImage.ScreenPos.y;
 		++CurrentVertex;
 
 		CurrentVertex->pos = glm::vec2{pos.x + size.x, pos.y};
-		CurrentVertex->type = 3;
+		CurrentVertex->type = type;
 		CurrentVertex->additional.x = screenImage.ScreenPos.x + screenImage.ScreenSize.x;
 		CurrentVertex->additional.y = screenImage.ScreenPos.y;
 		++CurrentVertex;
 
 		CurrentVertex->pos = glm::vec2{pos.x, pos.y + size.y};
-		CurrentVertex->type = 3;
+		CurrentVertex->type = type;
 		CurrentVertex->additional.x = screenImage.ScreenPos.x;
 		CurrentVertex->additional.y = screenImage.ScreenPos.y + screenImage.ScreenSize.y;
 		++CurrentVertex;
 
 		CurrentVertex->pos = pos + size;
-		CurrentVertex->type = 3;
+		CurrentVertex->type = type;
 		CurrentVertex->additional.x = screenImage.ScreenPos.x + screenImage.ScreenSize.x;
 		CurrentVertex->additional.y = screenImage.ScreenPos.y + screenImage.ScreenSize.y;
 		++CurrentVertex;
@@ -314,15 +231,8 @@ public:
 
 };
 
-// Drawing textured Quad
-	
 // Drawing rounded Quad
-
-// Drawing rounded textured Quad
-
-// Drawing textured circle
-
 
 // Drawing Lines
 
-// Pusing transform matrices?
+// Pusing transform matrices
