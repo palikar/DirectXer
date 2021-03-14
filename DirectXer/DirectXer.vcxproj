@@ -184,6 +184,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\2DRendering.cpp" />
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\ImageLibrary.cpp" />

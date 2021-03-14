@@ -17,9 +17,9 @@ cbuffer PSPrimBuf : register(b0)
 SamplerState samp;
 Texture2D textures[3] : register(t0);
 
+
 float4 main(PSIn input) : SV_Target
 {
-
     if ((0x0F & input.type) == 1 ) // Color Rect
     {
 	return input.color;
@@ -37,6 +37,30 @@ float4 main(PSIn input) : SV_Target
 	float alpha = color4.a;
 	float3 color = color4.rgb * color4.a;
 	return float4(color, alpha);
+    }
+    else if((0x0F & input.type) == 4 )// Rounded rect
+    {
+	float2 pos = (input.additional.yz +1.0f)/2.0f;
+	float r = (input.additional.x + 1.0f)/2.0f;
+	if( (pos.x < r) && (pos.y < r)
+	    || (pos.x < r) && (pos.y > 1.0f - r)
+	    || (pos.x > 1.0f - r) && (pos.y < r)
+	    || (pos.x > 1.0f - r) && (pos.y > 1.0f - r)
+	    
+	    )
+	{
+	    float2 p = float2(pos.x, pos.y);
+	    if(pos.y > 1.0f - r) p.y = 1 - p.y;
+	    if(pos.x > 1.0f - r) p.x = 1 - p.x;
+	    
+	    float dist = sqrt(dot(p-r, p-r));
+	    if (dist > r) discard;
+	    
+	    return input.color;
+	
+	}
+	return input.color;
+	
     }
 
     return float4(1.0f, 0.0f, 1.0f, 1.0f);

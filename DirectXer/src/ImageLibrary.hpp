@@ -3,6 +3,7 @@
 #include "Glm.hpp"
 #include "Memory.hpp"
 #include "GraphicsCommon.hpp"
+#include "PlatformWindows.hpp"
 
 #include <string_view>
 #include <stb_rect_pack.h>
