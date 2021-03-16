@@ -170,7 +170,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Stb\include;$(SolutionDir)DXError\src;$(SolutionDir)IMGui\include;$(SolutionDir)Fmt\include;$(ProjectDir)libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Freetype\include;$(SolutionDir)Stb\include;$(SolutionDir)DXError\src;$(SolutionDir)IMGui\include;$(SolutionDir)Fmt\include;$(ProjectDir)libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>

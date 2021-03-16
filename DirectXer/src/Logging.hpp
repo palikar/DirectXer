@@ -172,9 +172,9 @@ inline DxgiInfoManager gDxgiManager;
 
 #else
 
-#define DXERROR(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__)
-#define DXLOG(MSG, ...) gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
-#define DXPRINT(MSG, ...) gLogger.Print(MSG, __VA_ARGS__)
+#define DXERROR(MSG, ...)
+#define DXLOG(MSG, ...) 
+#define DXPRINT(MSG, ...)
 
 #endif 
 

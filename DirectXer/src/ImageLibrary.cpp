@@ -2,25 +2,23 @@
 
 #include "Graphics.hpp"
 #include "PlatformWindows.hpp"
+#include "Resources.hpp"
 #include "ImageLibrary.hpp"
 
 #include <stb_image.h>
 
-void ImageLibraryBuilder::Init(uint16 t_ImageCount,  std::string_view t_Path)
+void ImageLibraryBuilder::Init(uint16 t_ImageCount)
 {
 	QueuedImages.reserve(t_ImageCount);
-	ResourcesPath = t_Path;
 	MaxFileSize = 0;
 }
 
 uint32 ImageLibraryBuilder::PutImage(std::string_view t_Path)
 {
-	fmt::basic_memory_buffer<char, 512> buf;
-	fmt::format_to(buf, "{}/{}", ResourcesPath, t_Path);
-
+	auto path = Resources::ResolveFilePath(t_Path);
 	QueuedImage newImage;
-	newImage.Handle = PlatformLayer::OpenFileForReading(buf.c_str());
-	newImage.Path = t_Path;
+	newImage.Handle = PlatformLayer::OpenFileForReading(path);
+	newImage.Path = path;
 	newImage.FileSize = PlatformLayer::FileSize(newImage.Handle);
 	QueuedImages.push_back(newImage);
 

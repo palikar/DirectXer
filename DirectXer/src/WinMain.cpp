@@ -1,5 +1,6 @@
 #include "PlatformWindows.hpp"
 #include "Memory.hpp"
+#include "Resources.hpp"
 #include "App.hpp"
 
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
@@ -13,7 +14,6 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 			t_Settings.ResourcesPath = argv[i + 1];
 			++i;
 		}
-
 		
 	}
 }
@@ -31,6 +31,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int argc;
 	argv = CommandLineToArgvA(GetCommandLine(), &argc);
 	ParseCommandLineArguments(application.Arguments, argv, argc);
+
+	Resources::Init(application.Arguments.ResourcesPath);
 
 	WindowsSettings settings{0};
 	settings.ClassName = "DirectXClass";
@@ -51,16 +53,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	DXLOG("[INIT] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
 	
 	window.Init(settings);
-	window.Run();
-
-	return 0;
+	return window.Run();
 }
 
 // @Memory magament
 // @Done: Allcating some amount of memory upfront
 // @Done: Pool temporary allocation strategy
+// @Done: Temporary Vector and Map
+// @Todo: Platform independent logging
 // @Todo: Buffering the logging output
-// @Todo: Temporary Vector and Map
 // @Todo: Have a separate palce for "debug" memory
 
 // @Done: Ability to transform vertices on the CPU
@@ -81,7 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // -- standard layout (pos, uv, normals, tangents, bitangents)
 // @Done: Constant buffers setup
 // @Done: Fix the prim CBs ids place
-// @Todo: Blending State Setup
+// @Done: Blending State Setup
 // @Todo: Depth Stencil State Setup
 // @Todo: Scissor test support
 // @Todo: Render target support
@@ -117,7 +118,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Grid Helper
 // @Done: Point light helper
 // @Done: FPS Camara controller
-// @Done: Adjust all of the geometry generators
+// @Done: Adjust alrl of the geometry generators
 // @Done: Add the normals and uvs to the color vertex
 // @Done: Spot light helper
 // @Todo: Drop down console

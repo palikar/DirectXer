@@ -41,11 +41,10 @@ public:
 		size_t FileSize;
 	};
 
-	std::string_view ResourcesPath;
 	asl::TempVector<QueuedImage> QueuedImages;
 	size_t MaxFileSize;
 
-	void Init(uint16 t_ImageCount,  std::string_view t_Path);
+	void Init(uint16 t_ImageCount);
 	uint32 PutImage(std::string_view t_Path);
 
 };

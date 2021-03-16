@@ -9,7 +9,7 @@ struct Camera
 	glm::quat Rot{0.0, 0.0, 0.0, 1.0};
 
 
-	inline void rotate(float t_Amount, glm::vec3  t_Axis)
+	inline void rotate(float t_Amount, glm::vec3 t_Axis)
 	{
 		Rot *= glm::angleAxis(t_Amount, t_Axis);
 	}

@@ -32,7 +32,7 @@ void App::Init(HWND t_Window)
 	Graphics.initSamplers();
 	Graphics.initBlending();
 	
-	Textures.LoadTextures(Graphics, Arguments.ResourcesPath.data());
+	Textures.LoadTextures(Graphics);
 
 	const char* cube_fils[] = {
 		"sky/left.png",
@@ -42,7 +42,7 @@ void App::Init(HWND t_Window)
 		"sky/front.png",
 		"sky/back.png",
 	};
-	SkyboxTexture = Textures.LoadCube(Graphics, Arguments.ResourcesPath, cube_fils);
+	SkyboxTexture = Textures.LoadCube(Graphics, cube_fils);
 
 
     // @Todo: This should use some sort of arena storage to do its thing
@@ -97,7 +97,7 @@ void App::Init(HWND t_Window)
 
 	Memory::EstablishTempScope(Bytes(512));
 	ImageLibraryBuilder imagebuilder;
-	imagebuilder.Init(2, Arguments.ResourcesPath.data());
+	imagebuilder.Init(2);
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
