@@ -78,6 +78,7 @@ enum TextureFormat
 {
 	TF_RGBA = 0,
 	TF_A,
+	TF_R,
 
 	TF_UNKNOWN,
 };

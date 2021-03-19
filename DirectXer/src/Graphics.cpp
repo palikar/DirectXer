@@ -7,6 +7,7 @@ static DXGI_FORMAT TFToDXGI(TextureFormat format)
 	{
 	  case TF_RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
 	  case TF_A: return DXGI_FORMAT_A8_UNORM;
+	  case TF_R: return DXGI_FORMAT_R8_UNORM;
 	}
 
 	assert(false);
@@ -247,7 +248,7 @@ void Graphics::bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16
 	Context->VSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
 }
 
-void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data)
+void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch)
 {
 	D3D11_BOX box;
 	box.left = (uint32)(rect.Position.x);
@@ -257,7 +258,7 @@ void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* 
 	box.front = 0;
 	box.back = 1;
 	
-	Context->UpdateSubresource(t_Tex.tp, 0, &box, t_Data, (uint32)(rect.Size.x * 4), 0);
+	Context->UpdateSubresource(t_Tex.tp, 0, &box, t_Data, (uint32)(rect.Size.x * t_Pitch), 0);
 }
 
 TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)

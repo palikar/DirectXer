@@ -103,6 +103,8 @@ void App::Init(HWND t_Window)
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();;
 
+	Renderer2D.FontLib.LoadTypeface("fonts/DroidSans.ttf");
+
 	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 
 }
@@ -219,7 +221,9 @@ void App::ProcessFirstScene(float dt)
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.bindTexture(0, texMat.EnvMap);
 	Graphics.bindTexture(1, texMat.BaseMap);
-	Graphics.bindTexture(2, texMat.AoMap);
+	// Graphics.bindTexture(2, texMat.AoMap);
+	Graphics.bindTexture(2, Renderer2D.FontLib.Atlases.back());
+	
 
 	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 

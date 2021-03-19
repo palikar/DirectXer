@@ -15,6 +15,7 @@ void Renderer2D::InitRenderer(Graphics* t_Graphics, Init2DParams t_Params)
 	CurrentTextureSlot = 0;
 
 	ImageLib.Init(t_Graphics);
+	FontLib.Init(t_Graphics);
 			
 	Vertices.resize(TotalVertices);
 	Indices.resize(TotalVertices * 3);

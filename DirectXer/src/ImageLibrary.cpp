@@ -83,7 +83,7 @@ void ImageLibrary::Build(ImageLibraryBuilder t_Builder)
 
 		int width, height, channels;
 		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
-
+ 
 		stbrp_rect rect;
 		rect.w = (stbrp_coord)width;
 		rect.h = (stbrp_coord)height;
