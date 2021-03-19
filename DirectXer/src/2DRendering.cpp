@@ -33,6 +33,8 @@ void Renderer2D::BeginScene()
 	Indices.clear();
 	Vertices.clear();
 
+	CurrentTextureSlot = 0;
+
 	CurrentVertex = &Vertices[0];		
 }
 
@@ -52,11 +54,9 @@ void Renderer2D::EndScene()
 
 	Graph->setBlendingState(BS_AlphaBlending);
 
-	/*for (uint32 i = 0; i < MaxTextureSlots; i++)
-	  {
-	  Graph->bindTexture(i, TexSlots[i]);
-	  }*/
 	Graph->bindTexture(0, TexSlots[0]);
+	Graph->bindTexture(1, TexSlots[1]);
+
 
 	Graph->drawIndex(Graphics::TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
 
@@ -128,7 +128,6 @@ void Renderer2D::DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color,
 	// radius *= 2;
 	radius = (radius * 2.0f) - 1.0f;
 
-#if 1
 	CurrentVertex->pos = pos;
 	CurrentVertex->color = color;
 	CurrentVertex->type = 4;
@@ -152,33 +151,7 @@ void Renderer2D::DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color,
 	CurrentVertex->type = 4;
 	CurrentVertex->additional = glm::vec3{radius, 1.0f, 1.0f};
 	++CurrentVertex;
-#else
 	
-	CurrentVertex->pos = pos;
-	CurrentVertex->color = color;
-	CurrentVertex->type = 4;
-	CurrentVertex->additional = glm::vec3{radius, 0, 0};
-	++CurrentVertex;
-
-	CurrentVertex->pos = glm::vec2{pos.x + size.x, pos.y};
-	CurrentVertex->color = color;
-	CurrentVertex->type = 4;
-	CurrentVertex->additional = glm::vec3{radius, 0, size.y};
-	++CurrentVertex;
-
-	CurrentVertex->pos = glm::vec2{pos.x, pos.y + size.y};
-	CurrentVertex->color = color;
-	CurrentVertex->type = 4;
-	CurrentVertex->additional = glm::vec3{radius, size.x, 0};
-	++CurrentVertex;
-
-	CurrentVertex->pos = pos + size;
-	CurrentVertex->color = color;
-	CurrentVertex->type = 4;
-	CurrentVertex->additional = glm::vec3{radius, size.x, size.y};
-	++CurrentVertex;
-
-#endif
 	Indices.insert(Indices.end(), { CurrentVertexCount , CurrentVertexCount + 1, CurrentVertexCount + 2,
 			CurrentVertexCount + 2 , CurrentVertexCount + 1, CurrentVertexCount + 3});
 

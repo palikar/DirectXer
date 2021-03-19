@@ -2,6 +2,7 @@ struct VSOut
 {
     float4 pos : SV_Position;
     float4 color : Color;
+    float2 uv : Texcoord;
     float3 additional : Additional;
     uint type : Type;
 };
@@ -34,6 +35,7 @@ VSOut main(VSIn input)
     output.color = input.color;
     output.type = input.type;
     output.additional = input.additional;
+    output.uv = input.uv;
 
     return output;
 }

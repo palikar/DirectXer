@@ -2,6 +2,7 @@ struct PSIn
 {
     float4 pos : SV_Position;
     float4 color : Color;
+    float2 uv : Texcoord;
     float3 additional : Additional;
     uint type : Type;
 };
@@ -59,9 +60,15 @@ float4 main(PSIn input) : SV_Target
 	    return input.color;
 	
 	}
-	return input.color;
-	
+	return input.color;	
     }
+    else if((0x0F & input.type) == 5 ) // Text
+    {
+	//uint slot = (0x00F0 & input.type) >> 8;
+	float df = textures[1].Sample(samp, input.uv.xy).r;
+	return df * input.color;
+    }
+
 
     return float4(1.0f, 0.0f, 1.0f, 1.0f);
 

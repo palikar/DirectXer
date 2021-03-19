@@ -221,9 +221,7 @@ void App::ProcessFirstScene(float dt)
 	Graphics.setShaderConfiguration(SC_DEBUG_TEX);
 	Graphics.bindTexture(0, texMat.EnvMap);
 	Graphics.bindTexture(1, texMat.BaseMap);
-	// Graphics.bindTexture(2, texMat.AoMap);
-	Graphics.bindTexture(2, Renderer2D.FontLib.Atlases.back());
-	
+	Graphics.bindTexture(2, texMat.AoMap);
 
 	Graphics.bindPSConstantBuffers(&texMat.data, 1, 1);
 
@@ -262,6 +260,8 @@ void App::ProcessFirstScene(float dt)
 	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
 	Renderer2D.DrawImage(1, {610.0f, 310.0f}, {160.0f, 160.0f});
 	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
+
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f});
 	
 	Renderer2D.EndScene();
 
