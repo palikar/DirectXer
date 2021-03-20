@@ -22,6 +22,13 @@ struct Resources
 		FormatBuffer.clear();
 		fmt::format_to(FormatBuffer, "{}/{}", ResourcesRoot, t_File);
 		return FormatBuffer.c_str();
+	}
+
+	static const char* ResolveFilePath(const char* t_File)
+	{
+		FormatBuffer.clear();
+		fmt::format_to(FormatBuffer, "{}/{}", ResourcesRoot, t_File);
+		return FormatBuffer.c_str();
 
 	}
 

@@ -101,12 +101,15 @@ void App::Init(HWND t_Window)
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
-	Memory::EndTempScope();;
+	Memory::EndTempScope();
 
-	Renderer2D.FontLib.LoadTypeface("fonts/DroidSans.ttf");
-
+	FontBuilder fontBuilder;
+	fontBuilder.Init(2);
+	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans.ttf", 24);
+	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans-Bold.ttf", 24);
+	Renderer2D.FontLib.Build(fontBuilder);
+		
 	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
-
 }
 
 void App::Resize()
@@ -261,7 +264,8 @@ void App::ProcessFirstScene(float dt)
 	Renderer2D.DrawImage(1, {610.0f, 310.0f}, {160.0f, 160.0f});
 	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
 
-	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f});
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, 1);
 	
 	Renderer2D.EndScene();
 
