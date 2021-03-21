@@ -18,7 +18,7 @@ uint32 ImageLibraryBuilder::PutImage(std::string_view t_Path)
 	auto path = Resources::ResolveFilePath(t_Path);
 	QueuedImage newImage;
 	newImage.Handle = PlatformLayer::OpenFileForReading(path);
-	newImage.Path = path;
+	newImage.Path = t_Path;
 	newImage.FileSize = PlatformLayer::FileSize(newImage.Handle);
 	QueuedImages.push_back(newImage);
 
@@ -68,7 +68,10 @@ void ImageLibrary::Build(ImageLibraryBuilder t_Builder)
 {
 	fileArena = Memory::GetTempArena(t_Builder.MaxFileSize + Megabytes(1));
 	Memory::EstablishTempScope(Megabytes(32));
-	Defer { Memory::EndTempScope(); };
+	Defer { 
+		Memory::EndTempScope();
+		Memory::DestoryTempArena(fileArena);
+	};
 	
 	stbi_set_flip_vertically_on_load(0);
 

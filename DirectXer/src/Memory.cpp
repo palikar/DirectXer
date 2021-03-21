@@ -75,9 +75,12 @@ MemoryArena Memory::GetTempArena(size_t t_Size)
 	return arena;
 }
 
-void Memory::DestoryTempArena(MemoryArena&)
+void Memory::DestoryTempArena(MemoryArena& t_Arena)
 {
-	
+	assert(t_Arena.Memory == (Memory::g_Memory.TempMemoryCurrent - t_Arena.MaxSize));
+
+	Memory::g_Memory.TempMemoryCurrent -= t_Arena.MaxSize;
+	Memory::g_Memory.TempMemorySize -= t_Arena.MaxSize;	
 }
 
 void Memory::ResetTempMemory()
@@ -95,6 +98,7 @@ void Memory::EstablishTempScope(size_t t_Size)
 
 void Memory::EndTempScope()
 {
+	DestoryTempArena(g_TempScopes.GetCurrentArena());
 	g_TempScopes.PopScope();
 }
 

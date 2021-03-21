@@ -187,6 +187,7 @@
   <ItemGroup>
     <ClCompile Include="src\2DRendering.cpp" />
     <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\FontLibrary.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\ImageLibrary.cpp" />
     <ClCompile Include="src\Memory.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="src\2DRendering.hpp" />
     <ClInclude Include="src\App.hpp" />
     <ClInclude Include="src\Camera.hpp" />
+    <ClInclude Include="src\FontLibrary.hpp" />
     <ClInclude Include="src\GeometryDebug.hpp" />
     <ClInclude Include="src\Geometry.hpp" />
     <ClInclude Include="src\GeometryUtils.hpp" />

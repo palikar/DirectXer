@@ -43,7 +43,6 @@ inline TextureLoadEntry g_Textures[]
 #define CHECKER_TEXTURE g_Textures[0]
 #define ROCKS_TEXTURE g_Textures[1]
 #define FLOOR_TEXTURE g_Textures[2]
-
 #define ROCKS_AO_TEXTURE g_Textures[3]
 #define ROCKS_NORMAL_TEXTURE g_Textures[4]
 
@@ -55,10 +54,14 @@ struct TextureCatalog
 		// @Note: We'll use this for loading the contents of the file
 		MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));
 
-        // @Note: This will be used for the STB allocations
+		// @Note: This will be used for the STB allocations
 		Memory::EstablishTempScope(Megabytes(128));
-		Defer { Memory::ResetTempMemory(); };
-		
+		Defer {
+			Memory::EndTempScope();
+			Memory::DestoryTempArena(fileArena);
+		};
+
+
 		const auto texturesCount = sizeof(g_Textures) / sizeof(TextureLoadEntry);
 
 		stbi_set_flip_vertically_on_load(1);
@@ -82,10 +85,10 @@ struct TextureCatalog
 
 			tex.Handle = graphics.createTexture(width, height, PngFormat(channels), data, width*height*channels);
 			tex.State = LS_LOADED;
-			
+
 			Memory::ResetTempScope();
 		}
-		
+
 	}
 
 	TextureObject LoadCube(Graphics graphics, const char* name[6])
@@ -97,7 +100,7 @@ struct TextureCatalog
 		Memory::EstablishTempScope(Megabytes(128));
 		Defer { Memory::ResetTempMemory(); };
 
-	
+
 
 		int width, height, channels;
 		// @Todo: Use temporary memory here

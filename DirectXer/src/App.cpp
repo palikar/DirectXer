@@ -104,11 +104,13 @@ void App::Init(HWND t_Window)
 	Memory::EndTempScope();
 
 	FontBuilder fontBuilder;
+	Memory::EstablishTempScope(Kilobytes(1));
 	fontBuilder.Init(2);
 	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans.ttf", 24);
 	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans-Bold.ttf", 24);
 	Renderer2D.FontLib.Build(fontBuilder);
-		
+	Memory::EndTempScope();
+	
 	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
 }
 

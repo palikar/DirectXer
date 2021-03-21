@@ -99,9 +99,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // @Done: Material setup
 // @Done: Phong material
 // @Done: Sollid color material
-// @Todo: PBR material
 // @Done: Point light
-// @Todo: Text rendering
+// @Done: Text rendering
+// @Todo: PBR material
 
 // @Data management
 // @Done: Container for geometry info!
