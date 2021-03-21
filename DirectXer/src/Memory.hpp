@@ -2,6 +2,7 @@
 
 #include "Utils.hpp"
 #include "Types.hpp"
+#include "Config.hpp"
 
 #include <vector>
 #include <string>
@@ -95,7 +96,7 @@ struct Memory
 	static void* BulkGet(size_t t_Size);
 
 	template<typename T>
-	static T* BulkGet(size_t t_Size)
+	static T* BulkGet(size_t t_Size = 1)
 	{
 		return (T*)BulkGet(t_Size*sizeof(T));
 	}
@@ -184,11 +185,7 @@ class BulkStdAllocator
 		
 };
 
-
-namespace asl
-{
-
-#if 1
+#if USE_CUSTOM_ALLOCATORS
 
 template<class T>
 using TempVector = std::vector<T, TempStdAllocator<T>>;
@@ -211,5 +208,3 @@ using BulkVector = std::vector<T>;
 using BulkString = std::string;
 
 #endif
-
-}

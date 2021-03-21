@@ -26,6 +26,9 @@ void FontLibrary::Init(Graphics* t_Graphics)
 {
 	FT_Init_FreeType(&FTLibrary);
 	Gfx = t_Graphics;
+
+	Atlases.reserve(3);
+	
 	InitNewAtlas();
 	CharMap.reserve(Characters.size());
 

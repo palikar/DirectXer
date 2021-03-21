@@ -19,8 +19,8 @@ class Renderer2D
 {
   public:
 
-	asl::BulkVector<Vertex2D> Vertices;
-	asl::BulkVector<uint32> Indices;
+	BulkVector<Vertex2D> Vertices;
+	BulkVector<uint32> Indices;
 	Vertex2D* CurrentVertex;
 	ImageLibrary ImageLib;
 	FontLibrary FontLib;

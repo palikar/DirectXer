@@ -41,7 +41,7 @@ public:
 		size_t FileSize;
 	};
 
-	asl::TempVector<QueuedImage> QueuedImages;
+	TempVector<QueuedImage> QueuedImages;
 	size_t MaxFileSize;
 
 	void Init(uint16 t_ImageCount);
@@ -56,8 +56,8 @@ class ImageLibrary
   public:
 	Graphics* Gfx;
 	MemoryArena fileArena;
-	asl::BulkVector<Image> Images;
-	asl::BulkVector<ImageAtlas> Atlases;
+	BulkVector<Image> Images;
+	BulkVector<ImageAtlas> Atlases;
 
 	const static inline uint16 RectsCount = 1024u / 2u;
 	const static inline uint16 AtlasSize = 1024u;

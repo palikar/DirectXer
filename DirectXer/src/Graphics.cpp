@@ -35,7 +35,7 @@ void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 	sd.Flags = 0;
 
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
 	D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &sd, &Swap, &Device, nullptr, &Context));
 
@@ -46,7 +46,7 @@ void Graphics::initBackBuffer()
 
 	ID3D11Resource* pBackBuffer{ nullptr };
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Swap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)(&pBackBuffer)));
 	GFX_CALL(Device->CreateRenderTargetView(pBackBuffer, nullptr, &RenderTargetView));
 	pBackBuffer->Release();
@@ -54,7 +54,7 @@ void Graphics::initBackBuffer()
 
 void Graphics::initZBuffer(float width, float height)
 {
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 
 	D3D11_DEPTH_STENCIL_DESC dsDesc{0};
 	dsDesc.DepthEnable = TRUE;
@@ -102,7 +102,7 @@ void Graphics::initRasterizationsStates()
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateNormal));
 
 	rastDesc.CullMode = D3D11_CULL_NONE;
@@ -156,7 +156,7 @@ void Graphics::initBlending()
 		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		HRESULT hr;
+		[[maybe_unused]]HRESULT hr;
 		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_AlphaBlending]));
 	}
 
@@ -170,7 +170,7 @@ void Graphics::initBlending()
 		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		
-		HRESULT hr;
+		[[maybe_unused]]HRESULT hr;
 		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_PremultipliedAlpha]));
 	}	
 
@@ -207,7 +207,7 @@ void Graphics::Destroy()
 
 void Graphics::EndFrame()
 {
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	if( FAILED( hr = Swap->Present( 1u,0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
@@ -278,7 +278,7 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	if(t_Data)
 	{
 		D3D11_SUBRESOURCE_DATA data;
@@ -327,7 +327,7 @@ TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, Textu
 		data[i].SysMemPitch = t_Width*4;
 	}
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateTexture2D(&desc, data, &to.tp));
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -353,7 +353,7 @@ VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 data
 	vertexBufferDesc.ByteWidth = dataSize;
 	vertexBufferDesc.StructureByteStride = structSize;
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	if (data)
 	{
 		D3D11_SUBRESOURCE_DATA bufferData{ 0 };
@@ -380,7 +380,7 @@ IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize, bool dynamic)
 	indexBufferDesc.ByteWidth = dataSize;
 	indexBufferDesc.StructureByteStride = sizeof(uint32);
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	if(data)
 	{
 		D3D11_SUBRESOURCE_DATA indexBufferData{0};
@@ -398,7 +398,7 @@ IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize, bool dynamic)
 void Graphics::initResources()
 {
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 
 	{
 		// Debug shader
@@ -493,7 +493,7 @@ CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
 	// D3D11_SUBRESOURCE_DATA data{0};
 	// data.pSysMem = &PixelShaderCB;
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
 	return cb;
@@ -518,7 +518,7 @@ void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Context->Map(t_CbObject.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, t_Data, t_Length);
 	Context->Unmap(t_CbObject.id, 0);
@@ -527,7 +527,7 @@ void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 void Graphics::updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Context->Map(t_Buffer.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, data, t_Length);
 	Context->Unmap(t_Buffer.id, 0);
@@ -536,7 +536,7 @@ void Graphics::updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length
 void Graphics::updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Context->Map(t_Buffer.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, data, t_Length);
 	Context->Unmap(t_Buffer.id, 0);

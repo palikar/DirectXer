@@ -1,14 +1,7 @@
 #pragma once
 
-#include <DirectXMath.h>
-#include <d3d11.h>
-#undef max
-#undef min
-
 #include "Types.hpp"
 #include "Glm.hpp"
-
-namespace dx = DirectX;
 
 struct PSConstantBuffer
 {
@@ -25,8 +18,6 @@ struct VSConstantBuffer
 	glm::mat4 invModel;
 	uint32 shaderType;
 	uint64 _padding;
-	
-
 };
 
 struct SimpleVertex
@@ -51,27 +42,18 @@ struct Vertex2D
 	uint32 type;
 };
 
-struct VBObject
+enum TopolgyType : uint8
 {
-	uint32 structSize;
-	ID3D11Buffer* id{nullptr};
+	TT_TRIANGLES = 0,
+	TT_LINES     = 1
 };
 
-struct IBObject
+enum BlendingState : uint8
 {
-	ID3D11Buffer* id{nullptr};
-};
+	BS_AlphaBlending = 0,
+	BS_PremultipliedAlpha = 1,
 
-struct CBObject
-{
-	ID3D11Buffer* id{ nullptr };
-};
-
-struct TextureObject
-{
-	ID3D11Texture2D* tp{nullptr};
-	ID3D11ShaderResourceView* srv{nullptr};
-	ID3D11RenderTargetView* rtv{nullptr};
+	BS_Count,
 };
 
 enum TextureFormat
@@ -81,13 +63,6 @@ enum TextureFormat
 	TF_R,
 
 	TF_UNKNOWN,
-};
-
-struct ShaderObject
-{
-	ID3D11InputLayout* il{nullptr};
-	ID3D11VertexShader* vs{nullptr};
-	ID3D11PixelShader* ps{nullptr};
 };
 
 enum RasterizationState : uint8

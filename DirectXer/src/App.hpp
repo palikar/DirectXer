@@ -66,7 +66,7 @@ public:
 
 	BufferDescriptor DebugGeometry;
 	Camera camera;
-	RasterizationState CurrentRastState = RS_NORMAL;
+	RasterizationState CurrentRastState;
 
 	TextureObject SkyboxTexture;
 
@@ -86,6 +86,6 @@ public:
 	CommandLineSettings Arguments;
 	TextureCatalog Textures;
 
-	Scene CurrentScene = SCENE_FIRST;
+	Scene CurrentScene;
 	
 };

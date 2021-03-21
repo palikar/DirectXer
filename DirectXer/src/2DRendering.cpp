@@ -34,6 +34,10 @@ void Renderer2D::BeginScene()
 	Vertices.clear();
 
 	CurrentTextureSlot = 0;
+	for (size_t i = 0; i < MaxTextureSlots; ++i)
+	{
+		TexSlots[i] = {0};
+	}
 
 	CurrentVertex = &Vertices[0];		
 }
@@ -54,19 +58,21 @@ void Renderer2D::EndScene()
 
 	Graph->setBlendingState(BS_AlphaBlending);
 
-	Graph->bindTexture(0, TexSlots[0]);
-	Graph->bindTexture(1, TexSlots[1]);
+	for (uint32 i = 0; i < CurrentTextureSlot; ++i)
+	{
+		Graph->bindTexture(i, TexSlots[i]);
+	}
 
 
-	Graph->drawIndex(Graphics::TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
+	Graph->drawIndex(TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
 
 }
 
 uint8 Renderer2D::AttachTexture(TextureObject t_Tex)
 {
-	if(TexSlots[CurrentTextureSlot - 1].srv == t_Tex.srv)
+	for (size_t i = 0; i < MaxTextureSlots; ++i)
 	{
-		return CurrentTextureSlot;
+		if(TexSlots[i].srv == t_Tex.srv) return CurrentTextureSlot;
 	}
 			
 	if (CurrentTextureSlot >= MaxTextureSlots)

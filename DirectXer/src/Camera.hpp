@@ -103,22 +103,22 @@ static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 			float x = -look.x;
 			float y = look.y;
 
-			if (y < -1.57)
+			if (y < -1.57f)
 			{
-				y = -1.57;
+				y = -1.57f;
 			}
 
-			if (y > 1.57)
+			if (y > 1.57f)
 			{
-				y = 1.57;
+				y = 1.57f;
 			}
 
-			if (x > 2 * 3.14)
+			if (x > 2 * 3.14f)
 			{
 				x -= 2 * 3.14f;
 			}
 
-			if (x < -2 * 3.14)
+			if (x < -2 * 3.14f)
 			{
 				x += 2 * 3.14f;
 			}

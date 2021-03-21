@@ -22,6 +22,8 @@ void App::Init(HWND t_Window)
 {
 	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
 
+	CurrentScene = SCENE_FIRST;
+	CurrentRastState = RS_NORMAL;
 
 	// @Todo: Refactor this into functions
 	Graphics.initSwapChain(t_Window, Width, Height);
@@ -97,9 +99,10 @@ void App::Init(HWND t_Window)
 
 	Memory::EstablishTempScope(Bytes(512));
 	ImageLibraryBuilder imagebuilder;
-	imagebuilder.Init(2);
+	imagebuilder.Init(3);
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
+	// imagebuilder.PutImage("assets/sprites.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
@@ -237,7 +240,7 @@ void App::ProcessFirstScene(float dt)
 	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
 	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
-	texMatData.ColorIntensity = 0.15;
+	texMatData.ColorIntensity = 0.15f;
 	Graphics.updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
@@ -263,7 +266,7 @@ void App::ProcessFirstScene(float dt)
 	Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
 	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
 	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
-	Renderer2D.DrawImage(1, {610.0f, 310.0f}, {160.0f, 160.0f});
+	Renderer2D.DrawImage(1, {610.0f, 310.0f}, {64.0f, 64.0f});
 	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
 
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);

@@ -7,8 +7,7 @@
 
 struct BufferDescriptor
 {
-	// @Todo: This shold be something that does not allocate!
-	asl::BulkVector<GeometryInfo> Infos;
+	BulkVector<GeometryInfo> Infos;
 
 	void DrawGeometry(Graphics graphics, uint32 t_Index)
 	{
@@ -22,7 +21,7 @@ struct BufferDescriptor
 		}
 
 		const uint32 indexCount = Infos[t_Index].indexCount;
-		const auto topology = Graphics::TopolgyType((Infos[t_Index].type & ~255) >> 8);
+		const auto topology = TopolgyType((Infos[t_Index].type & ~255) >> 8);
 		graphics.drawIndex(topology, indexCount, indexOffset, baseIndex);
 
 	}
@@ -50,7 +49,7 @@ static T& ReadBlob(char* &current)
 	return *res;
 }
  
-static void SetColor(asl::TempVector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
+static void SetColor(TempVector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
 {
 	for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)
 	{
@@ -213,8 +212,8 @@ struct BufferBuilder
 		char* current = blobArena.Memory;
 
 		// @Note: Use temp types here;
-		asl::TempVector<ColorVertex> Vertices;
-		asl::TempVector<uint32> Indices;
+		TempVector<ColorVertex> Vertices;
+		TempVector<uint32> Indices;
 
 		Vertices.resize(TotalVertices);
 		Indices.reserve(TotalIndices);

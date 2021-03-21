@@ -4,19 +4,63 @@
 #include "Glm.hpp"
 #include "Logging.hpp"
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <io.h>
-#include <iostream>
-#include <Stringapiset.h>
-#include <shellapi.h>
-#include <time.h>
-
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
-
 #include <fmt/format.h>
+
+void PlatformLayer::Init()
+{
+	StdOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	ErrOutHandle = GetStdHandle(STD_ERROR_HANDLE);
+}
+
+void PlatformLayer::SetOuputColor(ConsoleForeground color)
+{
+	SetConsoleTextAttribute(StdOutHandle, (WORD)color);
+}
+		
+void PlatformLayer::WriteStdOut(const char* data, size_t len)
+{
+	WriteFile(StdOutHandle, data, (DWORD)len, NULL, NULL);
+}
+
+void PlatformLayer::WriteErrOut(const char* data, size_t len)
+{
+	WriteFile(ErrOutHandle, data, (DWORD)len, NULL, NULL);
+}
+	
+void* PlatformLayer::Allocate(size_t t_Size)
+{
+	return VirtualAlloc(NULL, t_Size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+}
+
+PlatformLayer::FileHandle PlatformLayer::OpenFileForReading(const char* t_Path)
+{
+	FileHandle handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	return handle;
+}
+
+size_t PlatformLayer::FileSize(FileHandle handle)
+{
+	DWORD fileSize = GetFileSize(handle, NULL);
+	return fileSize;
+}
+
+void PlatformLayer::ReadFileIntoArena(FileHandle handle, size_t size, MemoryArena& t_Arena)
+{
+	DWORD readBytes;
+	ReadFile(handle, t_Arena.Memory + t_Arena.Size, (DWORD)size, &readBytes, NULL);
+	assert(readBytes <= t_Arena.MaxSize - t_Arena.Size);
+	t_Arena.Size += readBytes;
+}
+
+void PlatformLayer::CloseFile(FileHandle handle)
+{
+	// @Todo: Probably queue this in some vector and close them in one go
+	// at some point
+	// CloseHandle(handle);
+}
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -342,74 +386,4 @@ void SetupConsole()
 	freopen_s(&fDummy, "CONOUT$", "w", stderr);
 	freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
-}
-
-LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
-{
-	int retval;
-	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
-	assert(SUCCEEDED(retval));
-
-
-	LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
-	assert(lpWideCharStr != NULL);
-		
-
-	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
-	if (!SUCCEEDED(retval))
-	{
-		free(lpWideCharStr);
-		return NULL;
-	}
-
-	int numArgs;
-	LPWSTR* args;
-	args = CommandLineToArgvW(lpWideCharStr, &numArgs);
-	free(lpWideCharStr);
-	assert(args != NULL);
-
-	int storage = numArgs * sizeof(LPSTR);
-	for (int i = 0; i < numArgs; ++i)
-	{
-		BOOL lpUsedDefaultChar = FALSE;
-		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
-		if (!SUCCEEDED(retval))
-		{
-			LocalFree(args);
-			return NULL;
-		}
-
-		storage += retval;
-	}
-
-	LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
-	if (result == NULL)
-	{
-		LocalFree(args);
-		return NULL;
-	}
-
-	int bufLen = storage - numArgs * sizeof(LPSTR);
-	LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
-	for (int i = 0; i < numArgs; ++i)
-	{
-		assert(bufLen > 0);
-		BOOL lpUsedDefaultChar = FALSE;
-		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
-		if (!SUCCEEDED(retval))
-		{
-			LocalFree(result);
-			LocalFree(args);
-			return NULL;
-		}
-
-		result[i] = buffer;
-		buffer += retval;
-		bufLen -= retval;
-	}
-
-	LocalFree(args);
-
-	*pNumArgs = numArgs;
-	return result;
 }

@@ -40,27 +40,45 @@
 
 namespace dx = DirectX;
 
-
-enum BlendingState : uint8
+struct VBObject
 {
-	BS_AlphaBlending = 0,
-	BS_PremultipliedAlpha = 1,
-
-	BS_Count,
-
+	uint32 structSize;
+	ID3D11Buffer* id{nullptr};
 };
 
+struct IBObject
+{
+	ID3D11Buffer* id{nullptr};
+};
+
+struct CBObject
+{
+	ID3D11Buffer* id{ nullptr };
+};
+
+struct TextureObject
+{
+	ID3D11Texture2D* tp{nullptr};
+	ID3D11ShaderResourceView* srv{nullptr};
+	ID3D11RenderTargetView* rtv{nullptr};
+};
+
+struct ShaderObject
+{
+	ID3D11InputLayout* il{nullptr};
+	ID3D11VertexShader* vs{nullptr};
+	ID3D11PixelShader* ps{nullptr};
+};
 
 class Graphics
 {
   public:
 
-	enum TopolgyType : uint8
-	{
-		TT_TRIANGLES = 0,
-		TT_LINES     = 1
-	};
-
+	using VertexBufferType = VBObject;
+	using IndexBufferType = IBObject;
+	using ConstantBufferType = CBObject;
+	using TextureType = TextureObject;
+	using ShaderType = ShaderObject;
 
 	void initSwapChain(HWND hWnd, float t_Width, float t_Height);
 	void initBackBuffer();
@@ -130,15 +148,14 @@ class Graphics
 
 };
 
-
 template<typename VertexType>
-VBObject vertexBufferFactory(Graphics& graphics, asl::TempVector<VertexType>& t_VertexList)
+VBObject vertexBufferFactory(Graphics& graphics, TempVector<VertexType>& t_VertexList)
 {
 	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), (uint32)(sizeof(VertexType) * t_VertexList.size()));
 }
 
 template<typename IndexType = uint32>
-IBObject indexBufferFactory(Graphics& graphics, asl::TempVector<IndexType>& t_IndexList)
+IBObject indexBufferFactory(Graphics& graphics, TempVector<IndexType>& t_IndexList)
 {
 	return graphics.createIndexBuffer(t_IndexList.data(), (uint32)(sizeof(IndexType) * t_IndexList.size()));
 }

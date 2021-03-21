@@ -9,6 +9,7 @@
 #include "Utils.hpp"
 #include "PlatformWindows.hpp"
 #include "Resources.hpp"
+#include "FileUtils.hpp"
 
 inline TextureFormat PngFormat(int channels)
 {
@@ -74,7 +75,7 @@ struct TextureCatalog
 
 			DXLOG("[RES] Loading {}", path);
 
-			PlatformLayer::ReadWholeFile(path, fileArena);
+			ReadWholeFile(path, fileArena);
 
 			int width, height, channels;
 			unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
@@ -115,7 +116,7 @@ struct TextureCatalog
 			auto path = Resources::ResolveFilePath(tex);
 			DXLOG("[RES] Loading {}", path);
 
-			PlatformLayer::ReadWholeFile(path, fileArena);
+			ReadWholeFile(path, fileArena);
 
 			data[i] = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
 

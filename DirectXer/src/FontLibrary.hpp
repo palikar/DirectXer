@@ -26,7 +26,7 @@ struct FontBuilder
 		size_t FileSize;
 	};
 	
-	asl::TempVector<FontLoadEntry> LoadEntries;
+	TempVector<FontLoadEntry> LoadEntries;
 	size_t MaxFileSize;
 
 	void Init(size_t t_Size);
@@ -57,9 +57,9 @@ public:
 
 	FT_Library FTLibrary;
 	Graphics* Gfx;
-	std::vector<TextureObject> Atlases;
+	BulkVector<TextureObject> Atlases;
 	stbrp_context RectContext;
-	std::vector<AtlasEntry> AtlasGlyphEntries;
+	BulkVector<AtlasEntry> AtlasGlyphEntries;
 	robin_hood::unordered_map<char, size_t> CharMap;
 
 	void Init(Graphics* t_Graphics);

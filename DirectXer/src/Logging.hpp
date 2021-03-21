@@ -2,12 +2,13 @@
 
 #include "Types.hpp"
 #include "IncludeWin.hpp"
+#include "Memory.hpp"
+#include "PlatformWindows.hpp"
 
 #include <fmt/format.h>
 #include <fmt/color.h>
 
 #include <cassert>
-
 #include <dxerr.h>
 #include <dxgidebug.h>
 
@@ -15,88 +16,51 @@
 
 struct Logger
 {
-
-	enum class ConsoleForeground : DWORD
-	{
-		BLACK = 0,
-		DARKBLUE = FOREGROUND_BLUE,
-		DARKGREEN = FOREGROUND_GREEN,
-		DARKCYAN = FOREGROUND_GREEN | FOREGROUND_BLUE,
-		DARKRED = FOREGROUND_RED,
-		DARKMAGENTA = FOREGROUND_RED | FOREGROUND_BLUE,
-		DARKYELLOW = FOREGROUND_RED | FOREGROUND_GREEN,
-		DARKGRAY = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-		GRAY = FOREGROUND_INTENSITY,
-		BLUE = FOREGROUND_INTENSITY | FOREGROUND_BLUE,
-		GREEN = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
-		CYAN = FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE,
-		RED = FOREGROUND_INTENSITY | FOREGROUND_RED,
-		MAGENTA = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
-		YELLOW = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN,
-		WHITE = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	};
-
-	// @Imporve : Get everthing needed upfront
-	// @Imporve : Buffer the thing a little bit
-	// @Imporve : Add logging severities support
-	// @Imporve : Use the platform layer for writing to STD out
+	fmt::basic_memory_buffer<char, Kilobytes(1)> formatBuffer;
 	
     template<typename ... Args>
     void PrintLog(const char* t_File, uint32 t_Line, const char* t_Format, Args ... t_Args)
 	{
+		formatBuffer.clear();
+		fmt::format_to(formatBuffer, "[{}:{}] ", strrchr(t_File, '\\') + 1, t_Line);
+		fmt::format_to(formatBuffer, t_Format, t_Args ... );
+		fmt::format_to(formatBuffer, "\n");
 
-		auto hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hOutHandle, (DWORD)ConsoleForeground::WHITE);
-		fmt::basic_memory_buffer<char, 512> out;
-		fmt::format_to(out, "[{}:{}] ", strrchr(t_File, '\\') + 1, t_Line);
-		fmt::format_to(out, t_Format, t_Args ... );
-		fmt::format_to(out, "\n");
-		
-		WriteFile(hOutHandle, out.data(), (DWORD)out.size(), NULL, NULL);
+		PlatformLayer::SetOuputColor(PlatformLayer::ConsoleForeground::WHITE);
+		PlatformLayer::WriteStdOut(formatBuffer.data(), formatBuffer.size());
 	}
 
 	template<typename ... Args>
     void PrintError(const char* t_File, uint32 t_Line, const char* t_Format, Args ... t_Args)
 	{
+		formatBuffer.clear();
 
-		auto hOutHandle = GetStdHandle(STD_ERROR_HANDLE );
-		SetConsoleTextAttribute(hOutHandle, (DWORD)ConsoleForeground::RED);
-		
-		fmt::basic_memory_buffer<char, 512> out;
-		fmt::format_to(out, "[{}:{}] ", strrchr(t_File, '\\') + 1, t_Line);
-		fmt::format_to(out, t_Format, t_Args ... );
-		fmt::format_to(out, "\n");
-		
-		WriteFile(hOutHandle, out.data(), (DWORD)out.size(), NULL, NULL);
+		fmt::format_to(formatBuffer, "[{}:{}] ", strrchr(t_File, '\\') + 1, t_Line);
+		fmt::format_to(formatBuffer, t_Format, t_Args ... );
+		fmt::format_to(formatBuffer, "\n");
+
+		PlatformLayer::SetOuputColor(PlatformLayer::ConsoleForeground::RED);
+		PlatformLayer::WriteErrOut(formatBuffer.data(), formatBuffer.size());
 	}
 	
     template<typename ... Args>
     void Print(const char* t_Format, Args ... t_Args)
 	{
+		formatBuffer.clear();
 
-		auto hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hOutHandle, (DWORD)ConsoleForeground::WHITE);
-		fmt::basic_memory_buffer<char, 512> out;
-		fmt::format_to(out, t_Format, t_Args ... );
-		WriteFile(hOutHandle, out.data(), (DWORD)out.size(), NULL, NULL);
+		fmt::format_to(formatBuffer, t_Format, t_Args ... );
+		
+		PlatformLayer::SetOuputColor(PlatformLayer::ConsoleForeground::WHITE);
+		PlatformLayer::WriteStdOut(formatBuffer.data(), formatBuffer.size());
 	}
 
 	void LogHResult(const char* t_File, uint32 t_Line, HRESULT t_Hr)
 	{
-
 		auto errorString = DXGetErrorString(t_Hr);
 		char errorDescription[512];
 		DXGetErrorDescription(t_Hr, errorDescription, (DWORD)sizeof(errorDescription) );
 
-		PrintError(t_File, t_Line, "{} :", errorString, errorDescription);
-
-		// DWORD nMsgLen = FormatMessage(
-		// 	FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		// 	FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		// 	nullptr,hr,MAKELANGID( LANG_NEUTRAL,SUBLANG_DEFAULT ),
-		// 	reinterpret_cast<LPSTR>(&pMsgBuf),0,nullptr);
-		// LocalFree( pMsgBuf );
-		 
+		PrintError(t_File, t_Line, "{} :", errorString, errorDescription);		 
 	}
     
 };
@@ -173,7 +137,7 @@ inline DxgiInfoManager gDxgiManager;
 #else
 
 #define DXERROR(MSG, ...)
-#define DXLOG(MSG, ...) 
+#define DXLOG(MSG, ...)  gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
 #define DXPRINT(MSG, ...)
 
 #endif 
