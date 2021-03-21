@@ -17,7 +17,6 @@ static uint32 CAMERA;
 static uint32 POINTLIGHT;
 static uint32 SPOTLIGHT;
 
-
 void App::Init(HWND t_Window)
 {
 	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
@@ -102,7 +101,7 @@ void App::Init(HWND t_Window)
 	imagebuilder.Init(3);
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
-	// imagebuilder.PutImage("assets/sprites.png");
+	imagebuilder.PutImage("assets/sprites.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
@@ -113,8 +112,9 @@ void App::Init(HWND t_Window)
 	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans-Bold.ttf", 24);
 	Renderer2D.FontLib.Build(fontBuilder);
 	Memory::EndTempScope();
-	
-	Graphics.VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Width/Height, nearPlane, farPlane));
+
+	SpriteAnimator.Init(5, &Renderer2D);
+	SpriteAnimator.PutSheet(2, {640.0f, 470.0f}, {8, 5});
 }
 
 void App::Resize()
@@ -209,7 +209,7 @@ void App::ProcessFirstScene(float dt)
 {
 
 	static float t = 0.0f;
-	t += 1.1f * dt;
+	t += 1.0f * dt;
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
@@ -271,7 +271,16 @@ void App::ProcessFirstScene(float dt)
 
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, 1);
-	
+
+	static uint32 spriteIndex = 0;
+	static float acc = 0;
+	acc += t * 0.001f;
+	if (acc > 1.0f/24.0f)
+	{
+		spriteIndex = spriteIndex + 1 >= 7 ? 0 : ++spriteIndex;
+		acc = 0.0f;
+	}
+	SpriteAnimator.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
 	Renderer2D.EndScene();
 
 }

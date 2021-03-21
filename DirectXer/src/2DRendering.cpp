@@ -307,6 +307,54 @@ void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, uint8 typeface)
 	}
 }
 
+void Renderer2D::DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::vec2 subPos, glm::vec2 subSize)
+{
+	if (CurrentVertexCount + 4 >= TotalVertices)
+	{
+		EndScene();
+		BeginScene();
+	}
+		
+	assert(t_Id < ImageLib.Images.size());
+	const auto& screenImage = ImageLib.Images[t_Id];
+
+	auto slot = AttachTexture(screenImage.TexHandle);
+	uint32 type = (slot << 8) | (3 << 0);
+		
+	CurrentVertex->pos = pos;
+	CurrentVertex->type = type;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize;
+	++CurrentVertex;
+
+	CurrentVertex->pos = glm::vec2{pos.x + size.x, pos.y};
+	CurrentVertex->type = type;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize + subSize.x / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize;
+	++CurrentVertex;
+
+	CurrentVertex->pos = glm::vec2{pos.x, pos.y + size.y};
+	CurrentVertex->type = type;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize + subSize.y/ ImageLibrary::AtlasSize;
+	++CurrentVertex;
+
+	CurrentVertex->pos = pos + size;
+	CurrentVertex->type = type;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize + subSize.x / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize + subSize.y / ImageLibrary::AtlasSize;
+	++CurrentVertex;
+
+
+	Indices.insert(Indices.end(), { CurrentVertexCount , CurrentVertexCount + 1, CurrentVertexCount + 2,
+			CurrentVertexCount + 2 , CurrentVertexCount + 1, CurrentVertexCount + 3});
+
+	CurrentVertexCount += 4;
+		
+
+
+}
+
 
 // Drawing Lines
 
