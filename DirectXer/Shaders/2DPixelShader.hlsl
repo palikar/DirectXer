@@ -21,25 +21,29 @@ Texture2D textures[3] : register(t0);
 
 float4 main(PSIn input) : SV_Target
 {
-    if ((0x0F & input.type) == 1 ) // Color Rect
+    if ((0xFF & input.type) == 1 ) // Color Rect
     {
 	return input.color;
     }
-    else if((0x0F & input.type) == 2 )// Circle
+    else if((0xFF & input.type) == 2 )// Circle
     {
 	float dist = sqrt(dot(input.additional.zy, input.additional.zy));
 	if (dist > 1) discard;
 	return input.color;
     }
-    else if((0x0F & input.type) == 3 )// Image
+    else if((0xFF & input.type) == 3 )// Image
     {
-	uint slot = (0x00F0 & input.type) >> 8;
-	float4 color4 = textures[slot].Sample(samp, input.additional.xy).rgba;
+	int slot = (0xFF00 & input.type) >> 8;
+	float4 color4 = (float4)0;
+	if (slot == 0) color4 = textures[0].Sample(samp, input.additional.xy).rgba;
+	if (slot == 1) color4 = textures[1].Sample(samp, input.additional.xy).rgba;
+	if (slot == 2) color4 = textures[2].Sample(samp, input.additional.xy).rgba;
+	
 	float alpha = color4.a;
 	float3 color = color4.rgb * color4.a;
 	return float4(color, alpha);
     }
-    else if((0x0F & input.type) == 4 )// Rounded rect
+    else if((0xFF & input.type) == 4 )// Rounded rect
     {
 	float2 pos = (input.additional.yz +1.0f)/2.0f;
 	float r = (input.additional.x + 1.0f)/2.0f;
@@ -47,7 +51,6 @@ float4 main(PSIn input) : SV_Target
 	    || (pos.x < r) && (pos.y > 1.0f - r)
 	    || (pos.x > 1.0f - r) && (pos.y < r)
 	    || (pos.x > 1.0f - r) && (pos.y > 1.0f - r)
-	    
 	    )
 	{
 	    float2 p = float2(pos.x, pos.y);
@@ -62,10 +65,14 @@ float4 main(PSIn input) : SV_Target
 	}
 	return input.color;	
     }
-    else if((0x0F & input.type) == 5 ) // Text
+    else if((0xFF & input.type) == 5 ) // Text
     {
-	//uint slot = (0x00F0 & input.type) >> 8;
-	float df = textures[1].Sample(samp, input.uv.xy).r;
+	int slot = (0xFF00 & input.type) >> 8;
+	float df;
+	//df = textures[slot].Sample(samp, input.uv.xy).r;
+	if (slot == 0) df = textures[0].Sample(samp, input.uv.xy).r;
+	if (slot == 1) df = textures[1].Sample(samp, input.uv.xy).r;
+	if (slot == 2) df = textures[2].Sample(samp, input.uv.xy).r;
 	return df * input.color;
     }
 

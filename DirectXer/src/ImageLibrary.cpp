@@ -64,14 +64,16 @@ TextureObject ImageLibrary::Pack(stbrp_rect& t_Rect)
 	return {};
 }
 
-void ImageLibrary::Build(ImageLibraryBuilder t_Builder)
+void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 {
 	fileArena = Memory::GetTempArena(t_Builder.MaxFileSize + Megabytes(1));
-	Memory::EstablishTempScope(Megabytes(32));
+	Memory::EstablishTempScope(Megabytes(64));
 	Defer { 
 		Memory::EndTempScope();
 		Memory::DestoryTempArena(fileArena);
 	};
+
+	Images.reserve(t_Builder.QueuedImages.size());
 	
 	stbi_set_flip_vertically_on_load(0);
 
@@ -86,14 +88,21 @@ void ImageLibrary::Build(ImageLibraryBuilder t_Builder)
 
 		int width, height, channels;
 		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
- 
+
+		if (width >= 1024 || height >= 1024)
+		{
+			auto texture = Gfx->createTexture(width, height, TF_RGBA, data, 0);
+			Images.push_back({ texture, {0.0f, 0.0f}, {1.0f, 1.0f}, {width, height}});
+			continue;
+		}
+		
 		stbrp_rect rect;
 		rect.w = (stbrp_coord)width;
 		rect.h = (stbrp_coord)height;
 
 		auto texture = Pack(rect);
 		Gfx->updateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
-		Images.push_back({ texture, {(float)rect.x / AtlasSize, (float)rect.y / AtlasSize}, {(float)rect.w / AtlasSize, (float)rect.h / AtlasSize} });
+		Images.push_back({ texture, {(float)rect.x / AtlasSize, (float)rect.y / AtlasSize}, {(float)rect.w / AtlasSize, (float)rect.h / AtlasSize}, {AtlasSize, AtlasSize} });
 
 
 	}

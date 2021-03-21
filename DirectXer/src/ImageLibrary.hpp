@@ -22,6 +22,7 @@ struct Image
 	TextureObject TexHandle;
 	glm::vec2 ScreenPos;
 	glm::vec2 ScreenSize;
+	glm::vec2 AtlasSize;
 };
 
 struct ImageAtlas
@@ -66,7 +67,7 @@ class ImageLibrary
 	void Init(Graphics* Gfx);
 	ImageAtlas InitAtlas();
 	TextureObject Pack(stbrp_rect& t_Rect);
-	void Build(ImageLibraryBuilder t_Builder);
+	void Build(ImageLibraryBuilder& t_Builder);
 	Image GetImage(uint32 t_id);
 	
 };

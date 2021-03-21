@@ -72,7 +72,7 @@ uint8 Renderer2D::AttachTexture(TextureObject t_Tex)
 {
 	for (size_t i = 0; i < MaxTextureSlots; ++i)
 	{
-		if(TexSlots[i].srv == t_Tex.srv) return CurrentTextureSlot;
+		if(TexSlots[i].srv == t_Tex.srv) return i;
 	}
 			
 	if (CurrentTextureSlot >= MaxTextureSlots)
@@ -268,7 +268,7 @@ void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, uint8 typeface)
 		auto entry = FontLib.GetEntry(typeface, ch);
 
 		auto rect = pos + currentPen - entry.GlyphSize;
-		auto screenSize = glm::vec2{ (entry.Size.x) * 1024.0f, (entry.Size.y) * 1024.0f};
+		auto screenSize = glm::vec2{ (entry.Size.x) * FontLibrary::AtlasSize, (entry.Size.y) * FontLibrary::AtlasSize};
 		currentPen += entry.Advance;
 		if (ch == ' ') continue;
 

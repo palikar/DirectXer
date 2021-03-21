@@ -98,10 +98,11 @@ void App::Init(HWND t_Window)
 
 	Memory::EstablishTempScope(Bytes(512));
 	ImageLibraryBuilder imagebuilder;
-	imagebuilder.Init(3);
+	imagebuilder.Init(5);
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
 	imagebuilder.PutImage("assets/sprites.png");
+	imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
@@ -113,8 +114,8 @@ void App::Init(HWND t_Window)
 	Renderer2D.FontLib.Build(fontBuilder);
 	Memory::EndTempScope();
 
-	SpriteAnimator.Init(5, &Renderer2D);
-	SpriteAnimator.PutSheet(2, {640.0f, 470.0f}, {8, 5});
+	SpriteSheets.Init(5, &Renderer2D);
+	SpriteSheets.PutSheet(2, {640.0f, 470.0f}, {8, 5});
 }
 
 void App::Resize()
@@ -266,21 +267,22 @@ void App::ProcessFirstScene(float dt)
 	Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
 	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
 	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
-	Renderer2D.DrawImage(1, {610.0f, 310.0f}, {64.0f, 64.0f});
 	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
+
+	Renderer2D.DrawImage(3, {610.0f, 310.0f}, {64.0f, 64.0f});
 
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, 1);
 
 	static uint32 spriteIndex = 0;
 	static float acc = 0;
-	acc += t * 0.001f;
+	acc += dt * 0.3f;
 	if (acc > 1.0f/24.0f)
 	{
 		spriteIndex = spriteIndex + 1 >= 7 ? 0 : ++spriteIndex;
 		acc = 0.0f;
 	}
-	SpriteAnimator.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
+	SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
 	Renderer2D.EndScene();
 
 }

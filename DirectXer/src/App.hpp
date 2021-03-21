@@ -76,7 +76,7 @@ public:
 
 	Renderer2D Renderer2D;
 
-	SpriteSheetHolder SpriteAnimator;
+	SpriteSheetHolder SpriteSheets;
 
 	// @Note: Application Data -- used by the "application" for
 	// application management stuff

@@ -79,7 +79,7 @@ struct SpriteSheetHolder
 		Gfx2D = Gfx;
 	}
 
-	uint32 PutSheet(uint32 t_ImageIndex, glm::vec2 t_Size, glm::ivec2 t_GridSize)
+	size_t PutSheet(uint32 t_ImageIndex, glm::vec2 t_Size, glm::ivec2 t_GridSize)
 	{
 		SpriteSheet sheet;
 		sheet.SubSize = glm::vec2{ t_Size.x / t_GridSize.x, t_Size.y / t_GridSize.y };
@@ -90,7 +90,7 @@ struct SpriteSheetHolder
 		return Sheets.size() - 1;
 	}
 
-	void DrawSprite(uint32 spiretSheet, int index, glm::vec2 pos, glm::vec2 size)
+	void DrawSprite(size_t spiretSheet, int index, glm::vec2 pos, glm::vec2 size)
 	{
 		const auto& sheet = Sheets[spiretSheet];
 
