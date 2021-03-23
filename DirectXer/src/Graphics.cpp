@@ -302,6 +302,16 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	return to;
 }
 
+void Graphics::setRenderTarget(RTObject t_RT)
+{
+	Context->OMSetRenderTargets(1, &t_RT.ColorAttachment.rtv, t_RT.DepthAttachment.dsv);
+}
+
+void Graphics::resetRenderTarget()
+{
+	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
+}
+
 RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS)
 {
 	RTObject rt;

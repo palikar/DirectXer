@@ -70,7 +70,7 @@ void Renderer2D::EndScene()
 
 uint8 Renderer2D::AttachTexture(TextureObject t_Tex)
 {
-	for (size_t i = 0; i < MaxTextureSlots; ++i)
+	for (uint8 i = 0; i < MaxTextureSlots; ++i)
 	{
 		if(TexSlots[i].srv == t_Tex.srv) return i;
 	}

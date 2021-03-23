@@ -63,7 +63,6 @@ struct TextureObject
 	ID3D11RenderTargetView* rtv{nullptr};
 };
 
-
 struct DepthStencilTextureObject
 {
 	ID3D11Texture2D* tp{nullptr};
@@ -92,6 +91,7 @@ class Graphics
 	using ConstantBufferType = CBObject;
 	using TextureType = TextureObject;
 	using ShaderType = ShaderObject;
+	using RenderTargetType = RTObject;
 
 	void initSwapChain(HWND hWnd, float t_Width, float t_Height);
 	void initBackBuffer();
@@ -114,6 +114,9 @@ class Graphics
 	void setViewport(float x, float y, float width, float height);
 	void setShaderConfiguration(ShaderConfig t_Confing);
 	void setBlendingState(BlendingState t_State);
+	void setRenderTarget(RTObject t_RT);
+	void resetRenderTarget();
+
 
 	TextureObject createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
 	TextureObject createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
@@ -145,6 +148,7 @@ class Graphics
 	IDXGISwapChain* Swap{ nullptr };
 	ID3D11DeviceContext* Context{ nullptr };
 
+	// @Note: These are the views for the backbuffer
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };
 	ID3D11DepthStencilView* DepthStencilView{ nullptr };
 
