@@ -110,7 +110,7 @@ class Graphics
 	void bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
 
 	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
-	void setDepthStencilState(DepthStencilState t_State = DSS_Normal);
+	void setDepthStencilState(DepthStencilState t_State = DSS_Normal, uint32 t_RefValue = 0);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
 	void setIndexBuffer(IBObject t_buffer);
 	void setViewport(float x, float y, float width, float height);
@@ -154,15 +154,16 @@ class Graphics
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };
 	ID3D11DepthStencilView* DepthStencilView{ nullptr };
 
-	ID3D11RasterizerState* rasterizationsStates[RS_COUNT];
+	ID3D11RasterizerState* RasterizationsStates[RS_COUNT];
 	ID3D11BlendState* BlendingStates[BS_Count];
-	ID3D11DepthStencilState* DepthStencilStates[DSS_Count];
 
 	PSConstantBuffer PixelShaderCB;
 	VSConstantBuffer VertexShaderCB;
 
 	ID3D11Buffer* PixelShaderCBId{nullptr};
 	ID3D11Buffer* VertexShaderCBId{nullptr};
+
+	ID3D11DepthStencilState* DepthStencilStates[DSS_Count];
 
 	ShaderObject Shaders[SF_COUNT];
 

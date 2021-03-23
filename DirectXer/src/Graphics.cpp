@@ -111,8 +111,8 @@ void Graphics::initRasterizationsStates()
 	rastDesc.ScissorEnable  = false;
 	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateDebug));
 
-	rasterizationsStates[RS_NORMAL] = rastStateNormal;
-	rasterizationsStates[RS_DEBUG] = rastStateDebug;
+	RasterizationsStates[RS_NORMAL] = rastStateNormal;
+	RasterizationsStates[RS_DEBUG] = rastStateDebug;
 
 }
 
@@ -235,7 +235,7 @@ void Graphics::ClearZBuffer()
 
 void Graphics::setRasterizationState(RasterizationState t_State)
 {
-	Context->RSSetState(rasterizationsStates[t_State]);
+	Context->RSSetState(RasterizationsStates[t_State]);
 }
 
 void Graphics::setDepthStencilState(DepthStencilState t_State, uint32 t_RefValue)
@@ -656,14 +656,6 @@ void Graphics::setViewport(float x, float y, float width, float height)
 	vp.TopLeftY = 0;
 
 	Context->RSSetViewports(1, &vp);
-
-	// D3D11_RECT sissorRect;
-	// sissorRect.bottom = 0;
-	// sissorRect.left= 0;
-	// sissorRect.top= height;
-	// sissorRect.right= width;
-	// Context->RSSetScissorRects(1, &sissorRect);
-
 }
 
 void Graphics::setShaderConfiguration(ShaderConfig t_Config)

@@ -59,10 +59,9 @@ App* InitMain(char** argv, int argc)
 // @Done: Constant buffers setup
 // @Done: Fix the prim CBs ids place
 // @Done: Blending State Setup
-// @Todo: Depth Stencil State Setup
+// @Done: Depth Stencil State Setup
+// @Done: Render target support
 // @Todo: Scissor test support
-// @Todo: Render target support
-// @Todo: Post Processing setup
 // @Todo: Release the things that are not needed
 
 // @Done: Lines "geometry" + ability to use lines primiteves
@@ -80,6 +79,7 @@ App* InitMain(char** argv, int argc)
 // @Todo: PBR material
 // @Todo: Rendering groups
 // @Todo: Rendering fog
+// @Todo: Post Processing setup
 
 // @Todo: Basic UI rendering using the Renderer2D
 // -> Button
