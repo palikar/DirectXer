@@ -62,6 +62,7 @@ App* InitMain(char** argv, int argc)
 // @Todo: Depth Stencil State Setup
 // @Todo: Scissor test support
 // @Todo: Render target support
+// @Todo: Post Processing setup
 
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
@@ -78,6 +79,12 @@ App* InitMain(char** argv, int argc)
 // @Todo: PBR material
 // @Todo: Rendering groups
 // @Todo: Rendering fog
+
+// @Todo: Basic UI rendering using the Renderer2D
+// -> Button
+// -> Checkbox
+// -> Slider
+// -> Textfield
 
 // == Data management ==
 // @Done: Container for geometry info!
@@ -112,6 +119,10 @@ App* InitMain(char** argv, int argc)
 // purpose allocations
 //    -- Have some global tracking structs in Memory.hpp and track
 //the memory consumption in Debug
+// @Todo: Input Abstraction -- left, right, actionXXX, axis x/y
+// @Todo: 2D Collision detection with something like GJK Algorithm
+// @Todo: Image merger -- take sevaral pngs, put them in a sprite sheet
+// @Todo: Inter image based animator setup
 
 // @Notes
 // @Note: In a scene, some things are dynamic, and some things are static

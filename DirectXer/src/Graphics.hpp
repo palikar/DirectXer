@@ -63,6 +63,19 @@ struct TextureObject
 	ID3D11RenderTargetView* rtv{nullptr};
 };
 
+
+struct DepthStencilTextureObject
+{
+	ID3D11Texture2D* tp{nullptr};
+	ID3D11DepthStencilView* dsv;
+};
+
+struct RTObject
+{
+	TextureObject ColorAttachment;
+	DepthStencilTextureObject DepthAttachment;
+};
+
 struct ShaderObject
 {
 	ID3D11InputLayout* il{nullptr};
@@ -107,6 +120,7 @@ class Graphics
 	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
 	IBObject createIndexBuffer(void* data, uint32 dataSize, bool dynamic = false);
 	CBObject createConstantBuffer(uint32 t_Size, void* t_InitData);
+	RTObject createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS = true);
 
 	void updateCBs();
 	void updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);

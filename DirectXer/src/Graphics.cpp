@@ -169,10 +169,10 @@ void Graphics::initBlending()
 		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		
+
 		[[maybe_unused]]HRESULT hr;
 		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_PremultipliedAlpha]));
-	}	
+	}
 
 }
 
@@ -257,7 +257,7 @@ void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* 
 	box.bottom = (uint32)(rect.Position.y + rect.Size.y);
 	box.front = 0;
 	box.back = 1;
-	
+
 	Context->UpdateSubresource(t_Tex.tp, 0, &box, t_Data, (uint32)(rect.Size.x * t_Pitch), 0);
 }
 
@@ -296,10 +296,67 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
-	
+
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
 	return to;
+}
+
+RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS)
+{
+	RTObject rt;
+
+	// Color attachment creation
+	
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = t_Width;
+	desc.Height = t_Height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = TFToDXGI(t_Format);
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT ;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	[[maybe_unused]]HRESULT hr;
+	
+	GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &rt.ColorAttachment.tp));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = desc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = 1;
+
+	GFX_CALL(Device->CreateShaderResourceView(rt.ColorAttachment.tp, &srvDesc, &rt.ColorAttachment.srv));
+
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+	rtvDesc.Format = desc.Format;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	rtvDesc.Texture2D.MipSlice= 0;
+
+	GFX_CALL(Device->CreateRenderTargetView(rt.ColorAttachment.tp, &rtvDesc, &rt.ColorAttachment.rtv));
+
+	if (needsDS)
+	{
+		// Depth attachment creation
+		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+
+		GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &rt.DepthAttachment.tp));
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+		dsvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.Flags = 0;
+	
+		GFX_CALL(Device->CreateDepthStencilView(rt.DepthAttachment.tp, &dsvDesc, &rt.DepthAttachment.dsv));
+	}
+
+	return rt;
 }
 
 TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6])
