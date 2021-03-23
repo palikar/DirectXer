@@ -109,6 +109,7 @@ class Graphics
 	void bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
 	void bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
 
+	void setScissor(Rectangle2D t_Rect);
 	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void setDepthStencilState(DepthStencilState t_State = DSS_Normal, uint32 t_RefValue = 0);
 	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);

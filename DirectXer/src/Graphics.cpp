@@ -91,8 +91,6 @@ void Graphics::initZBuffer(float width, float height)
 
 void Graphics::initRasterizationsStates()
 {
-
-
 	ID3D11RasterizerState* rastStateNormal;
 	ID3D11RasterizerState* rastStateDebug;
 
@@ -236,6 +234,17 @@ void Graphics::ClearZBuffer()
 void Graphics::setRasterizationState(RasterizationState t_State)
 {
 	Context->RSSetState(RasterizationsStates[t_State]);
+}
+
+void Graphics::setScissor(Rectangle2D t_Rect)
+{
+	D3D11_RECT sissorRect;
+	sissorRect.right= (int)(roundf(t_Rect.Position.x));
+	sissorRect.top= (int)(roundf(t_Rect.Position.y));
+	sissorRect.left = (int)(roundf(t_Rect.Position.x + t_Rect.Size.x));
+	sissorRect.bottom = (int)(roundf(t_Rect.Position.y + t_Rect.Size.y));
+
+	Context->RSSetScissorRects(1, &sissorRect);
 }
 
 void Graphics::setDepthStencilState(DepthStencilState t_State, uint32 t_RefValue)
