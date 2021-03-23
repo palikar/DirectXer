@@ -63,6 +63,7 @@ App* InitMain(char** argv, int argc)
 // @Todo: Scissor test support
 // @Todo: Render target support
 // @Todo: Post Processing setup
+// @Todo: Release the things that are not needed
 
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry

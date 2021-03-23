@@ -238,6 +238,11 @@ void Graphics::setRasterizationState(RasterizationState t_State)
 	Context->RSSetState(rasterizationsStates[t_State]);
 }
 
+void Graphics::setDepthStencilState(DepthStencilState t_State, uint32 t_RefValue)
+{
+	Context->OMSetDepthStencilState(DepthStencilStates[t_State], t_RefValue);
+}
+
 void Graphics::bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
 {
 	Context->PSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
@@ -542,6 +547,32 @@ void Graphics::initResources()
 	GFX_CALL(Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PixelShaderCBId));
 	Context->PSSetConstantBuffers(0, 1, &PixelShaderCBId);
 
+}
+
+void Graphics::initDepthStencilStates()
+{
+	// Normal
+	
+	D3D11_DEPTH_STENCIL_DESC dsDesc{0};
+	dsDesc.DepthEnable = TRUE;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	dsDesc.StencilEnable = FALSE;
+	dsDesc.StencilReadMask = 0x00;
+	dsDesc.StencilWriteMask = 0x00;
+
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	
+	GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_Normal]));	
 }
 
 CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)

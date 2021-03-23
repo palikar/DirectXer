@@ -56,6 +56,13 @@ enum BlendingState : uint8
 	BS_Count,
 };
 
+enum DepthStencilState : uint8
+{
+	DSS_Normal = 0,
+
+	DSS_Count,
+};
+
 enum TextureFormat
 {
 	TF_RGBA = 0,
