@@ -14,9 +14,18 @@ static DXGI_FORMAT TFToDXGI(TextureFormat format)
 	return DXGI_FORMAT_UNKNOWN;
 }
 
+static const char* FeatureLevelToString(D3D_FEATURE_LEVEL level)
+{
+	switch (level) {
+	  case D3D_FEATURE_LEVEL_10_1: return "D3D_FEATURE_LEVEL_10_1";
+	  case D3D_FEATURE_LEVEL_11_0: return "D3D_FEATURE_LEVEL_11_0";
+	  case D3D_FEATURE_LEVEL_11_1: return "D3D_FEATURE_LEVEL_11_1";
+	  default: return "Unknow feature level";
+	}
+}
+
 void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 {
-
 	DXGI_SWAP_CHAIN_DESC sd{ 0 };
 	sd.BufferDesc.Width = (uint32)t_Width;
 	sd.BufferDesc.Height = (uint32)t_Height;
@@ -34,11 +43,23 @@ void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
+	UINT initFlags{0};
+	if (DebugBuild)
+	{
+		initFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		initFlags |= D3D11_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS;
+	}
+
+	D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+	};
 
 	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
-	D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &sd, &Swap, &Device, nullptr, &Context));
+	GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, initFlags,featureLevels,
+										   2, D3D11_SDK_VERSION, &sd, &Swap, &Device, nullptr, &Context));
 
+	DXLOG("[Graphics] Direct3D: {}", FeatureLevelToString(Device->GetFeatureLevel()));
 }
 
 void Graphics::initBackBuffer()
@@ -581,7 +602,7 @@ void Graphics::initDepthStencilStates()
 	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	
-	HRESULT hr;
+	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_Normal]));	
 }
 
