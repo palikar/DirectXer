@@ -4,7 +4,7 @@
 #include "Glm.hpp"
 #include "GraphicsCommon.hpp"
 #include "Graphics.hpp"
-#include "PlatformWindows.hpp"
+#include "Platform.hpp"
 
 #include <robin_hood.h>
 #include <stb_rect_pack.h>

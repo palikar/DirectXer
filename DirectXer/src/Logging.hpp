@@ -3,7 +3,7 @@
 #include "Types.hpp"
 #include "IncludeWin.hpp"
 #include "Memory.hpp"
-#include "PlatformWindows.hpp"
+#include "Platform.hpp"
 
 #include <fmt/format.h>
 #include <fmt/color.h>

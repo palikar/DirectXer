@@ -15,6 +15,9 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 	}
 }
 
+
+// @Note: This is not the true main funtion; this will be called from the platform
+// specific main function (WinMain or main)
 App* InitMain(char** argv, int argc)
 {
 	gInput.Init();
@@ -61,7 +64,14 @@ App* InitMain(char** argv, int argc)
 // @Done: Blending State Setup
 // @Done: Depth Stencil State Setup
 // @Done: Render target support
-// @Todo: Scissor test support
+// @Done: Scissor test support
+// @Todo: Debug marksers
+// @Todo: Timing queries
+// @Todo: DrawInstanced
+// @Todo: Draw
+// @Todo: Memory tracking for common objects
+// @Todo: Texture arrays
+// @Todo: Debug: Print out the current feature level\API
 // @Todo: Release the things that are not needed
 
 // @Done: Lines "geometry" + ability to use lines primiteves

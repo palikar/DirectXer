@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "PlatformWindows.hpp"
+#include "Platform.hpp"
 #include "Memory.hpp"
 #include "Types.hpp"
 

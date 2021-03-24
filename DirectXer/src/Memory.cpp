@@ -1,5 +1,5 @@
 #include "Memory.hpp"
-#include "PlatformWindows.hpp"
+#include "Platform.hpp"
 
 
 const size_t Memory::TempMemoryRequired = Megabytes(256);

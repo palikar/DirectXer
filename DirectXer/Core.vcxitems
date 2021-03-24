@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{3a380954-cd7d-4508-876b-42df7c910d97}</ItemsProjectGuid>
+    <ItemsProjectName>DirectXerCore</ItemsProjectName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\ImageLibrary.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Main.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WinMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\2DRendering.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\App.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Camera.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Config.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\FileUtils.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\FontLibrary.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GameDefinition.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Geometry.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GeometryDebug.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GeometryUtils.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Glm.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Graphics.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsCommon.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\ImageLibrary.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\IncludeWin.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Input.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Lighting.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Logging.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Materials.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Math.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Memory.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Resources.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\TextureCatalog.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Types.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Utils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\2DPixelShader.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\2DVertexShader.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\PixelShader.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\VertexShader.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+  </ItemGroup>
+</Project>

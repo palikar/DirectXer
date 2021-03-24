@@ -39,9 +39,10 @@ public:
 
 };
 
-struct PlatformLayer
+struct WindowsPlatformLayer
 {
 	using FileHandle = HANDLE;
+	using WindowType = WindowsWindow;
 
 	inline static HANDLE StdOutHandle;
 	inline static HANDLE ErrOutHandle;

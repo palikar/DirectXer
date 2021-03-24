@@ -136,18 +136,17 @@ void WindowsWindow::Init(WindowsSettings t_Settings)
 
 void WindowsWindow::InitAfterCreate(HWND t_hWnd)
 {
+	Application->Window = this;
 	Application->Init(t_hWnd);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(hWnd);
 	ImGui_ImplDX11_Init(Application->Graphics.Device, Application->Graphics.Context);
 
 	Application->Graphics.EndFrame();
-
 }
 
 void WindowsWindow::ToggleFullscreen()

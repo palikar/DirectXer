@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Graphics.hpp"
-#include "PlatformWindows.hpp"
 #include "Resources.hpp"
 #include "ImageLibrary.hpp"
 

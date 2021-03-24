@@ -1,7 +1,7 @@
-#include <Platform.hpp>
-#include <Memory.hpp>
-#include <Resources.hpp>
-#include <App.hpp>
+#include "Platform.hpp"
+#include "Memory.hpp"
+#include "Resources.hpp"
+#include "App.hpp"
 
 #include <shellapi.h>
 

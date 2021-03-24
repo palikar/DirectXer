@@ -7,7 +7,7 @@
 #include "Graphics.hpp"
 #include "Memory.hpp"
 #include "Utils.hpp"
-#include "PlatformWindows.hpp"
+#include "Platform.hpp"
 #include "Resources.hpp"
 #include "FileUtils.hpp"
 
