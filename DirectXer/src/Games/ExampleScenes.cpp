@@ -428,7 +428,7 @@ void ExampleScenes::ProcessSpaceScene(float dt)
 	Graphics->bindTexture(1, uiRenderTarget.ColorAttachment);
 	Graphics->setShaderConfiguration(SC_DEBUG_QUAD);
 	Graphics->updateCBs();
-	Graphics->draw(TT_TRIANGLES, 3, 0);
+	Graphics->draw(TT_TRIANGLE_STRIP, 4, 0);
 
 	Graphics->bindPSConstantBuffers(&texMat.data, 1, 1);
 	

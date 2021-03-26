@@ -45,7 +45,8 @@ struct Vertex2D
 enum TopolgyType : uint8
 {
 	TT_TRIANGLES = 0,
-	TT_LINES     = 1
+	TT_LINES     = 1,
+	TT_TRIANGLE_STRIP
 };
 
 enum BlendingState : uint8

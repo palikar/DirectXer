@@ -746,6 +746,9 @@ void Graphics::draw(TopolgyType topology, uint32 count, uint32 base)
 	  case TT_TRIANGLES:
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		  break;
+	  case TT_TRIANGLE_STRIP:
+		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		  break;
 	  case TT_LINES:
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		  break;
