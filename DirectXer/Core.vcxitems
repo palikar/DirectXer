@@ -21,6 +21,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\ImageLibrary.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Main.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp" />
@@ -43,13 +44,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Graphics.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsCommon.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\ImageLibrary.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\IncludeWin.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Input.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Lighting.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Logging.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Materials.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Math.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Memory.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\IncludeWin.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Resources.hpp" />

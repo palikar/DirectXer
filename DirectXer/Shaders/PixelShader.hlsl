@@ -175,10 +175,7 @@ float4 main(PSIn input) : SV_Target
     }
     else if(shaderType == 4) // Phong
     {
-
-
 	float3 to_camera = -normalize(input.world_pos - CameraPos);
-	
 	float3 outgoingLight = float3(0.0f, 0.0f, 0.0f);
 
 	outgoingLight += apply_ambient_light(input);
@@ -199,6 +196,10 @@ float4 main(PSIn input) : SV_Target
 
 
 	return float4(outgoingLight, 1.0f);
+    }
+    else if(shaderType == 7) // Phong
+    {
+	return tex_1.Sample(samp, input.uv);
     }
 
     return float4(1.0f, 0.0f, 0.5f, 1.0f);

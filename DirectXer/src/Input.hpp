@@ -162,7 +162,7 @@ enum class MouseCode : uint16_t
 
 struct Input
 {
-
+	static Input gInput;
 	static constexpr int MAX_KEYS = 360;
 
 
@@ -185,11 +185,10 @@ struct Input
 	glm::vec2 MouseScollOffset{0.0};
 	glm::vec2 MouseLastScollOffset{0.0};
 
-	void Init()
+	void InitInstance()
 	{
 	}
 
-	
 	void Reset()
 	{
 		for (uint32 i = 0; i < MAX_KEYS; ++i)
@@ -283,7 +282,7 @@ struct Input
 		return MouseReleasedKeys[(uint16_t)t_Key];
 	}
 
+    static void Init();
+
 
 };
-
-inline Input gInput;

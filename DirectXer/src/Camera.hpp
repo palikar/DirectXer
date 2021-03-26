@@ -52,32 +52,32 @@ struct Camera
 static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 {
 
-	if (gInput.IsKeyPressed(KeyCode::W))
+	if (Input::gInput.IsKeyPressed(KeyCode::W))
 	{
 		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * 1.0f * dt;
 	}
 
-	if (gInput.IsKeyPressed(KeyCode::S))
+	if (Input::gInput.IsKeyPressed(KeyCode::S))
 	{
 		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -1.0f * dt;
 	}
 
-	if (gInput.IsKeyPressed(KeyCode::A))
+	if (Input::gInput.IsKeyPressed(KeyCode::A))
 	{
 		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 1.0f * dt;
 	}
 	
-	if (gInput.IsKeyPressed(KeyCode::D))
+	if (Input::gInput.IsKeyPressed(KeyCode::D))
 	{
 		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -1.0f * dt;
 	}
 		
-	if (gInput.IsKeyPressed(KeyCode::E))
+	if (Input::gInput.IsKeyPressed(KeyCode::E))
 	{
 		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * 1.0f * dt;
 	}
 
-	if (gInput.IsKeyPressed(KeyCode::Q))
+	if (Input::gInput.IsKeyPressed(KeyCode::Q))
 	{
 		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * -1.0f * dt;
 	}
@@ -88,7 +88,7 @@ static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 	static bool initialClick = false;
 	static glm::vec2 look{0,0};
 
-	if (gInput.IsKeyPressed(MouseCode::BUTTON_2))
+	if (Input::gInput.IsKeyPressed(MouseCode::BUTTON_2))
 	{
 		if (!initialClick)
 		{
@@ -97,7 +97,7 @@ static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 		}
 		else
 		{
-			const auto diff = (gInput.MousePosition - gInput.LastMousePosition) * 0.8f * dt;
+			const auto diff = (Input::gInput.MousePosition - Input::gInput.LastMousePosition) * 0.8f * dt;
 			look += diff;
 
 			float x = -look.x;

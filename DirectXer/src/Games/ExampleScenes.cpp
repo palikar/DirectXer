@@ -20,7 +20,7 @@ static uint32 SPOTLIGHT;
 
 void ExampleScenes::Init()
 {
-	CurrentScene = SCENE_FIRST;
+	CurrentScene = SCENE_SPACE_GAME;
 	CurrentRastState = RS_NORMAL;
 
 	Textures.LoadTextures(*Graphics);
@@ -107,6 +107,9 @@ void ExampleScenes::Init()
 	SpriteSheets.Init(5, &Renderer2D);
 	SpriteSheets.PutSheet(2, { 640.0f, 470.0f }, { 8, 5 });
 
+
+	uiRenderTarget = Graphics->createRenderTarget((uint16)Application->Width, (uint16)Application->Height, TF_RGBA);
+
 }
 
 void ExampleScenes::Resize()
@@ -117,18 +120,18 @@ void ExampleScenes::Resize()
 
 void ExampleScenes::Update(float dt)
 {
-	if (gInput.IsKeyReleased(KeyCode::F1))
+	if (Input::gInput.IsKeyReleased(KeyCode::F1))
 	{
 		CurrentRastState = RasterizationState((CurrentRastState + 1) % RS_COUNT);
 		Graphics->setRasterizationState(CurrentRastState);
 	}
 
-	if (gInput.IsKeyReleased(KeyCode::Left))
+	if (Input::gInput.IsKeyReleased(KeyCode::Left))
 	{
 		CurrentScene = Scene(std::abs(CurrentScene - 1) % SCENE_COUNT);
 	}
 
-	if (gInput.IsKeyReleased(KeyCode::Right))
+	if (Input::gInput.IsKeyReleased(KeyCode::Right))
 	{
 		CurrentScene = Scene((CurrentScene + 1) % SCENE_COUNT);
 	}
@@ -141,6 +144,9 @@ void ExampleScenes::Update(float dt)
 		break;
 	case SCENE_PHONGS:
 		ProcessPhongScene(dt);
+		break;
+	case SCENE_SPACE_GAME:
+		ProcessSpaceScene(dt);
 		break;
 	}
 
@@ -361,4 +367,70 @@ void ExampleScenes::ProcessPhongScene(float dt)
 
 	ImGui::End();
 	RenderSkyBox();
+}
+
+void ExampleScenes::ProcessSpaceScene(float dt)
+{
+	Graphics->setRenderTarget(uiRenderTarget);
+	Graphics->ClearRT(uiRenderTarget);
+
+	Renderer2D.BeginScene();
+	
+	Renderer2D.DrawQuad({10.f, 10.f}, {200.f, 200.f}, {1.0f, 0.0f, 0.0f, 1.0f});
+	Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f}); 
+	Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
+	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
+
+	Renderer2D.DrawImage(3, {610.0f, 310.0f}, {64.0f, 64.0f});
+
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, 1);
+
+	static uint32 spriteIndex = 0;
+	static float acc = 0;
+	acc += dt * 0.3f;
+	if (acc > 1.0f/24.0f)
+	{
+		spriteIndex = spriteIndex + 1 >= 7 ? 0 : ++spriteIndex;
+		acc = 0.0f;
+	}
+	SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
+	Renderer2D.EndScene();
+
+	Graphics->resetRenderTarget();
+
+
+	static float t = 0.0f;
+	t += 1.0f * dt;
+	t = t > 100.0f ? 0.0f : t;
+	ControlCameraFPS(camera, dt);
+
+	// @Note: Rendering begins here
+
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics->ClearZBuffer();
+
+	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
+	SetupCamera(camera);
+
+	Graphics->setShaderConfiguration(SC_DEBUG_COLOR);
+	Graphics->setIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->setVertexBuffer(GPUGeometryDesc.Vbo);
+	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+
+	Graphics->setShaderConfiguration(SC_DEBUG_TEX);
+	Graphics->bindTexture(0, texMat.EnvMap);
+	Graphics->bindTexture(1, texMat.BaseMap);
+	Graphics->bindTexture(2, texMat.AoMap);
+
+	Graphics->bindTexture(1, uiRenderTarget.ColorAttachment);
+	Graphics->setShaderConfiguration(SC_DEBUG_QUAD);
+	Graphics->updateCBs();
+	Graphics->draw(TT_TRIANGLES, 3, 0);
+
+	Graphics->bindPSConstantBuffers(&texMat.data, 1, 1);
+	
+	
 }

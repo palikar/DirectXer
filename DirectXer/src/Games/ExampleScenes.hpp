@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Geometry.hpp>
-#include <IncludeWin.hpp>
 #include <Graphics.hpp>
 #include <Camera.hpp>
 #include <TextureCatalog.hpp>
@@ -15,6 +14,7 @@ enum Scene
 {
 	SCENE_FIRST   = 0,
 	SCENE_PHONGS  = 1,
+	SCENE_SPACE_GAME  = 2,
 	SCENE_COUNT
 };
 
@@ -34,8 +34,10 @@ public:
 	void RenderSkyBox();
 	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4(1), glm::mat4 t_Scale = glm::mat4(1), glm::mat4 t_Rotation = glm::mat4(1));
 	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
+
 	void ProcessFirstScene(float dt);
 	void ProcessPhongScene(float dt);
+	void ProcessSpaceScene(float dt);
 	
 	Graphics* Graphics;
 	App* Application;
@@ -55,5 +57,7 @@ public:
 	Scene CurrentScene;
 	TextureCatalog Textures;
 
+
+	RTObject uiRenderTarget;
 
 };

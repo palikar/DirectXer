@@ -38,6 +38,14 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WinMain.cpp">
       <Filter>PlatformWindows</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\ImageLibrary.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Main.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">
@@ -48,6 +56,32 @@
       <Filter>PlatformWindows</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp">
+      <Filter>PlatformWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\2DRendering.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\App.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Camera.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Config.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\FileUtils.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\FontLibrary.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Geometry.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GeometryDebug.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GeometryUtils.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Glm.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Graphics.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsCommon.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\ImageLibrary.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Input.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Lighting.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Logging.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Materials.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Math.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Memory.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Resources.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\TextureCatalog.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Types.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Utils.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\IncludeWin.hpp">
       <Filter>PlatformWindows</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IncludeWin.hpp"
+#include "PlatformWindows\IncludeWin.hpp"
 #include "Logging.hpp"
 #include "Memory.hpp"
 #include "Math.hpp"
@@ -117,7 +117,7 @@ class Graphics
 	void setViewport(float x, float y, float width, float height);
 	void setShaderConfiguration(ShaderConfig t_Confing);
 	void setBlendingState(BlendingState t_State);
-	void setRenderTarget(RTObject t_RT);
+	void setRenderTarget(RTObject& t_RT);
 	void resetRenderTarget();
 
 
@@ -135,9 +135,11 @@ class Graphics
 	void updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
 	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
+	void draw(TopolgyType topology, uint32 count, uint32 base);
 
 	void ClearBuffer(float red, float green, float blue);
 	void ClearZBuffer();
+	void ClearRT(RTObject& t_RT);
 	void EndFrame();
 
 	void destroyZBuffer();

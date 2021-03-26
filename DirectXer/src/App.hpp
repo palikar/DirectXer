@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Geometry.hpp"
-#include "IncludeWin.hpp"
 #include "Graphics.hpp"
 #include "Camera.hpp"
 #include "TextureCatalog.hpp"

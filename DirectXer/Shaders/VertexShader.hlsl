@@ -18,27 +18,32 @@ cbuffer VSPrim : register(b0)
 };
 
 
-VSOut main(float3 pos : Position, float3 color : Color, float2 uv: Texcoord, float3 norm: Normal)
+VSOut main(uint vI : SV_VERTEXID, float3 pos : Position, float3 color : Color, float2 uv: Texcoord, float3 norm: Normal)
 {
-
+    VSOut output = (VSOut)0;
+	
+    if( shaderType == 7)
+    {
+	float2 texcoord = float2(vI & 1, vI >> 1);
+	output.uv = texcoord;
+	output.pos = float4((texcoord.x - 0.5f) * 2, -(texcoord.y - 0.5f) * 2, 0, 1);
+	return output;
+    }
+    
     if (shaderType == 2)
     {
-        VSOut vso = (VSOut)0;
-
-	matrix view_m = view;
+        matrix view_m = view;
 	
 	view_m[3][0] = 0.0f;
 	view_m[3][1] = 0.0f;
 	view_m[3][2] = 0.0f;
 
-	vso.pos = mul(float4(pos, 1.0), mul(model, mul(view_m, projection)));
-	vso.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);
+	output.pos = mul(float4(pos, 1.0), mul(model, mul(view_m, projection)));
+	output.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);	
 	
-	
-	return vso;
+	return output;
     }
 
-    VSOut output = (VSOut)0;
     output.pos = mul(float4(pos.x, pos.y, pos.z, 1.0), mul(model, mul(view, projection)));
     output.color = color;
     output.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);

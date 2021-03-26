@@ -16,7 +16,6 @@ cbuffer VSPrim : register(b0)
     uint shaderType;
 };
 
-
 struct VSIn
 {
     float2 pos : Position;
@@ -38,4 +37,6 @@ VSOut main(VSIn input)
     output.uv = input.uv;
 
     return output;
+	
+
 }

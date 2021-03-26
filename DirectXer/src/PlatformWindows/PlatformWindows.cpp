@@ -193,7 +193,7 @@ int WindowsWindow::Run()
 
 	while (true)
 	{
-		gInput.Update();
+		Input::gInput.Update();
 			
 		MSG msg;
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -207,7 +207,7 @@ int WindowsWindow::Run()
 			DispatchMessage(&msg);
 		}
 
-		if (gInput.IsKeyReleased(KeyCode::F11))
+		if (Input::gInput.IsKeyReleased(KeyCode::F11))
 		{
 			ToggleFullscreen();
 		}
@@ -304,7 +304,7 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	  case WM_KILLFOCUS:
 	  {
-		  gInput.Reset();
+		  Input::gInput.Reset();
 	  }
 
 	  case WM_KEYDOWN:
@@ -312,7 +312,7 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	  {
 		  if (!(lParam & 0x40000000))
 		  {
-			  gInput.UpdateKeyboardButtonPressed(static_cast<uint16_t>(wParam));
+			  Input::gInput.UpdateKeyboardButtonPressed(static_cast<uint16_t>(wParam));
 		  }
 		  break;
 	  }
@@ -321,46 +321,46 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	  case WM_SYSKEYUP:
 	  {
 		
-		  gInput.UpdateKeyboardButtonReleased(static_cast<uint16_t>(wParam));
+		  Input::gInput.UpdateKeyboardButtonReleased(static_cast<uint16_t>(wParam));
 		  break;
 	  }
 
 	  case WM_RBUTTONUP:
 	  {
-		  gInput.UpdateMouseButtonReleased(1);
+		  Input::gInput.UpdateMouseButtonReleased(1);
 		  break;
 	  }
 	  case WM_LBUTTONUP:
 	  {
-		  gInput.UpdateMouseButtonReleased(0);
+		  Input::gInput.UpdateMouseButtonReleased(0);
 		  break;
 	  }
 	  case WM_MBUTTONUP:
 	  {
-		  gInput.UpdateMouseButtonReleased(2);
+		  Input::gInput.UpdateMouseButtonReleased(2);
 		  break;
 	  }
 
 	  case WM_LBUTTONDOWN:
 	  {
-		  gInput.UpdateMouseButtonPressed(0);
+		  Input::gInput.UpdateMouseButtonPressed(0);
 		  break;
 	  }
 	  case WM_RBUTTONDOWN:
 	  {
-		  gInput.UpdateMouseButtonPressed(1);
+		  Input::gInput.UpdateMouseButtonPressed(1);
 		  break;
 	  }
 	  case WM_MBUTTONDOWN:
 	  {
-		  gInput.UpdateMouseButtonPressed(2);
+		  Input::gInput.UpdateMouseButtonPressed(2);
 		  break;
 	  }
 
 	  case WM_MOUSEMOVE:
 	  {
 		  const POINTS pt = MAKEPOINTS(lParam);
-		  gInput.UpdateMousePos({ pt.x, pt.y });
+		  Input::gInput.UpdateMousePos({ pt.x, pt.y });
 		  break;
 	  }
 
@@ -368,7 +368,7 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	  {
 		  const POINTS pt = MAKEPOINTS(lParam);
 		  const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-		  gInput.UpdateMouseScroll((float)delta);
+		  Input::gInput.UpdateMouseScroll((float)delta);
 		  break;
 	  }
 	  

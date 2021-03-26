@@ -20,7 +20,7 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 // specific main function (WinMain or main)
 App* InitMain(char** argv, int argc)
 {
-	gInput.Init();
+	Input::Init();
 	gDxgiManager.Init();
 	Memory::InitMemoryState();
 	PlatformLayer::Init();

@@ -243,13 +243,19 @@ void Graphics::EndFrame()
 void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue };
-
 	Context->ClearRenderTargetView(RenderTargetView, color);
 }
 
 void Graphics::ClearZBuffer()
 {
 	Context->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0u);
+}
+
+void Graphics::ClearRT(RTObject& t_RT)
+{
+	const float color[] = { 0.0f, 0.0f, 0.0f };
+	Context->ClearRenderTargetView(t_RT.ColorAttachment.rtv, color);
+	Context->ClearDepthStencilView(t_RT.DepthAttachment.dsv, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0u);
 }
 
 void Graphics::setRasterizationState(RasterizationState t_State)
@@ -337,7 +343,7 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	return to;
 }
 
-void Graphics::setRenderTarget(RTObject t_RT)
+void Graphics::setRenderTarget(RTObject& t_RT)
 {
 	Context->OMSetRenderTargets(1, &t_RT.ColorAttachment.rtv, t_RT.DepthAttachment.dsv);
 }
@@ -353,7 +359,7 @@ RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFo
 
 	// Color attachment creation
 	
-	D3D11_TEXTURE2D_DESC desc;
+	D3D11_TEXTURE2D_DESC desc{ 0 };
 	desc.Width = t_Width;
 	desc.Height = t_Height;
 	desc.MipLevels = 1;
@@ -370,7 +376,7 @@ RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFo
 	
 	GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &rt.ColorAttachment.tp));
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{ 0 };
 	srvDesc.Format = desc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
@@ -378,7 +384,7 @@ RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFo
 
 	GFX_CALL(Device->CreateShaderResourceView(rt.ColorAttachment.tp, &srvDesc, &rt.ColorAttachment.srv));
 
-	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{ 0 };
 	rtvDesc.Format = desc.Format;
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Texture2D.MipSlice= 0;
@@ -389,15 +395,16 @@ RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFo
 	{
 		// Depth attachment creation
 		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
 
 		GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &rt.DepthAttachment.tp));
 
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-		dsvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{ 0 };
+
+		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Flags = 0;
-	
+			
 		GFX_CALL(Device->CreateDepthStencilView(rt.DepthAttachment.tp, &dsvDesc, &rt.DepthAttachment.dsv));
 	}
 
@@ -732,3 +739,18 @@ void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint
 
 	Context->DrawIndexed(count/factor, offset, base);
 }
+
+void Graphics::draw(TopolgyType topology, uint32 count, uint32 base)
+{
+	switch (topology) {
+	  case TT_TRIANGLES:
+		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		  break;
+	  case TT_LINES:
+		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		  break;
+	}
+
+	Context->Draw(count, base);
+}
+	
