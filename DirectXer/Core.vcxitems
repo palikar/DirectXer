@@ -24,6 +24,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Main.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\GraphicsD3D11.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WinMain.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Materials.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Math.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Memory.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\GraphicsD3D11.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\IncludeWin.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp" />

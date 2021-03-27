@@ -3,6 +3,7 @@
 #include "Glm.hpp"
 #include "Memory.hpp"
 #include "GraphicsCommon.hpp"
+#include "Graphics.hpp"
 #include "Platform.hpp"
 
 #include <string_view>
@@ -50,7 +51,6 @@ public:
 
 };
 
-class Graphics;
 
 class ImageLibrary
 {
