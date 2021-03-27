@@ -29,6 +29,7 @@ void App::Init(HWND t_Window)
 	Graphics.InitRasterizationsStates();
 	Graphics.InitSamplers();
 	Graphics.InitBlending();
+	Graphics.InitDepthStencilStates();
 
 	Game.Application = this;
 	Game.Graphics = &Graphics;

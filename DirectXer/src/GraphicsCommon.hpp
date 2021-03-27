@@ -60,6 +60,7 @@ enum BlendingState : uint8
 enum DepthStencilState : uint8
 {
 	DSS_Normal = 0,
+	DSS_2DRendering,
 
 	DSS_Count,
 };

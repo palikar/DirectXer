@@ -18,6 +18,9 @@ static uint32 CAMERA;
 static uint32 POINTLIGHT;
 static uint32 SPOTLIGHT;
 
+static uint32 BGIMAGE;
+static uint32 SHIPIMAGE;
+
 void ExampleScenes::Init()
 {
 	CurrentScene = SCENE_SPACE_GAME;
@@ -88,11 +91,12 @@ void ExampleScenes::Init()
 
 	Memory::EstablishTempScope(Bytes(512));
 	ImageLibraryBuilder imagebuilder;
-	imagebuilder.Init(5);
+	imagebuilder.Init(10);
 	imagebuilder.PutImage("images/facebook.png");
 	imagebuilder.PutImage("images/instagram.png");
 	imagebuilder.PutImage("assets/sprites.png");
-	imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png");
+	BGIMAGE = imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png");
+	SHIPIMAGE = imagebuilder.PutImage("assets/PNG/Ship_Parts/Ship_Main_Icon.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
@@ -371,63 +375,32 @@ void ExampleScenes::ProcessPhongScene(float dt)
 
 void ExampleScenes::ProcessSpaceScene(float dt)
 {
-	Graphics->SetRenderTarget(uiRenderTarget);
-	Graphics->ClearRT(uiRenderTarget);
+	// @Note: UI
 
-	Renderer2D.BeginScene();
-	
-	Renderer2D.DrawQuad({10.f, 10.f}, {200.f, 200.f}, {1.0f, 0.0f, 0.0f, 1.0f});
-	Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f}); 
-	Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
-	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
-	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
-	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
+	// Graphics->SetRenderTarget(uiRenderTarget);
+	// Graphics->ClearRT(uiRenderTarget);
 
-	Renderer2D.DrawImage(3, {610.0f, 310.0f}, {64.0f, 64.0f});
-
-	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);
-	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, 1);
-
-	static uint32 spriteIndex = 0;
-	static float acc = 0;
-	acc += dt * 0.3f;
-	if (acc > 1.0f/24.0f)
-	{
-		spriteIndex = spriteIndex + 1 >= 7 ? 0 : ++spriteIndex;
-		acc = 0.0f;
-	}
-	SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
-	Renderer2D.EndScene();
+	// Renderer2D.BeginScene();
+	// Renderer2D.EndScene();
 
 	Graphics->ResetRenderTarget();
 
 
-	static float t = 0.0f;
-	t += 1.0f * dt;
-	t = t > 100.0f ? 0.0f : t;
-	ControlCameraFPS(camera, dt);
-
-	// @Note: Rendering begins here
+	// @Note: Main Scene
 
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
+	
 
-	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
-	SetupCamera(camera);
+	// @Note: Draw the background as the last thing so that the least amount of framgents can get processed
+	Graphics->SetDepthStencilState(DSS_2DRendering);
+	Renderer2D.BeginScene();
+	Renderer2D.DrawImage(BGIMAGE, {0.0f, 0.0f}, {Application->Width, Application->Height});
+	Renderer2D.EndScene();
 
-	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
-	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
-	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-
-	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
-	Graphics->BindTexture(0, texMat.EnvMap);
-	Graphics->BindTexture(1, texMat.BaseMap);
-	Graphics->BindTexture(2, texMat.AoMap); 
-
-	DrawFullscreenQuad(Graphics, uiRenderTarget.ColorAttachment, SC_QUAD_SIMPLE);
-
-	Graphics->BindPSConstantBuffers(&texMat.data, 1, 1);
+	Renderer2D.BeginScene();
+	Renderer2D.DrawImage(SHIPIMAGE, {300.0f, Application->Height - 100.0f}, {64.0f, 64.0f});
+	Renderer2D.EndScene();
 	
 	
 }

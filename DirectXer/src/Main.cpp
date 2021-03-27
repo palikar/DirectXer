@@ -65,13 +65,13 @@ App* InitMain(char** argv, int argc)
 // @Done: Depth Stencil State Setup
 // @Done: Render target support
 // @Done: Scissor test support
+// @Done: Debug: Print out the current feature level\API
+// @Done: Draw
 // @Todo: Debug marksers
 // @Todo: Timing queries
 // @Todo: DrawInstanced
-// @Todo: Draw
 // @Todo: Memory tracking for common objects
 // @Todo: Texture arrays
-// @Todo: Debug: Print out the current feature level\API
 // @Todo: Release the things that are not needed
 
 // @Done: Lines "geometry" + ability to use lines primiteves
@@ -100,9 +100,9 @@ App* InitMain(char** argv, int argc)
 // == Data management ==
 // @Done: Container for geometry info!
 // @Done: Color vertex type -- hence solid color material (ish)
+// @Done: Texture catalog but a good one, not holding textures in memory all the time
 // @Todo: Loading obj files
 // @Todo: Mouse picking
-// @Done: Texture catalog but a good one, not holding textures in memory all the time
 // @Todo: Tags for the textures -- for certain level, for certain material instance
 //     -- load all textures in a level
 //     -- get textures for some material instance
