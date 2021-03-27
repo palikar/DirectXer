@@ -84,7 +84,7 @@ struct TextureCatalog
 				DXERROR("Can't load texture {} at {}. Reason: {}", tex.Path, path, stbi_failure_reason());
 			}
 
-			tex.Handle = graphics.createTexture(width, height, PngFormat(channels), data, width*height*channels);
+			tex.Handle = graphics.CreateTexture(width, height, PngFormat(channels), data, width*height*channels);
 			tex.State = LS_LOADED;
 
 			Memory::ResetTempScope();
@@ -122,7 +122,7 @@ struct TextureCatalog
 
 		}
 
-		auto hand = graphics.createCubeTexture(width, height, PngFormat(channels), data);
+		auto hand = graphics.CreateCubeTexture(width, height, PngFormat(channels), data);
 		return hand;
 
 	}

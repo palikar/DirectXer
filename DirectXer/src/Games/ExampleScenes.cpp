@@ -51,23 +51,23 @@ void ExampleScenes::Init()
 
 	GPUGeometryDesc = builder.CreateBuffer(*Graphics);
 	DebugGeometry = GPUGeometryDesc.Description;
-	Graphics->setIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->setVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
 
 
 	// Create material
 	texMat.config = SC_DEBUG_TEX;
-	texMat.data = Graphics->createConstantBuffer(sizeof(TexturedMaterialData), &texMatData);
+	texMat.data = Graphics->CreateConstantBuffer(sizeof(TexturedMaterialData), &texMatData);
 	texMat.BaseMap = ROCKS_TEXTURE.Handle;
 	texMat.AoMap = ROCKS_AO_TEXTURE.Handle;
 	texMat.EnvMap = SkyboxTexture;
 
 	phongMat.config = SC_DEBUG_PHONG;
-	phongMat.data = Graphics->createConstantBuffer(sizeof(PhongMaterialData), &texMatData);
+	phongMat.data = Graphics->CreateConstantBuffer(sizeof(PhongMaterialData), &texMatData);
 
 
 	// Create lighing
-	Light.bufferId = Graphics->createConstantBuffer(sizeof(Lighting), &Light.lighting);
+	Light.bufferId = Graphics->CreateConstantBuffer(sizeof(Lighting), &Light.lighting);
 
 	Light.lighting.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
 	Light.lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
@@ -75,11 +75,11 @@ void ExampleScenes::Init()
 
 	Light.lighting.pointLights[0].Active = 1;
 
-	Graphics->updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
-	Graphics->setShaderConfiguration(SC_DEBUG_TEX);
-	Graphics->setViewport(0, 0, 800, 600);
-	Graphics->setRasterizationState(CurrentRastState);
+	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
+	Graphics->SetViewport(0, 0, 800, 600);
+	Graphics->SetRasterizationState(CurrentRastState);
 
 	camera.Pos = { 1.0f, 0.5f, 1.0f };
 	camera.lookAt({ 0.0f, 0.0f, 0.0f });
@@ -108,7 +108,7 @@ void ExampleScenes::Init()
 	SpriteSheets.PutSheet(2, { 640.0f, 470.0f }, { 8, 5 });
 
 
-	uiRenderTarget = Graphics->createRenderTarget((uint16)Application->Width, (uint16)Application->Height, TF_RGBA);
+	uiRenderTarget = Graphics->CreateRenderTarget((uint16)Application->Width, (uint16)Application->Height, TF_RGBA);
 
 }
 
@@ -123,7 +123,7 @@ void ExampleScenes::Update(float dt)
 	if (Input::gInput.IsKeyReleased(KeyCode::F1))
 	{
 		CurrentRastState = RasterizationState((CurrentRastState + 1) % RS_COUNT);
-		Graphics->setRasterizationState(CurrentRastState);
+		Graphics->SetRasterizationState(CurrentRastState);
 	}
 
 	if (Input::gInput.IsKeyReleased(KeyCode::Left))
@@ -155,11 +155,11 @@ void ExampleScenes::Update(float dt)
 void ExampleScenes::RenderSkyBox()
 {
 	// @Speed: The texture will be bount most of the time
-	Graphics->setShaderConfiguration(SC_DEBUG_SKY);
-	Graphics->bindTexture(0, SkyboxTexture);
+	Graphics->SetShaderConfiguration(SC_DEBUG_SKY);
+	Graphics->BindTexture(0, SkyboxTexture);
 	Graphics->VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
 	Graphics->VertexShaderCB.invModel = glm::inverse(Graphics->VertexShaderCB.model);
-	Graphics->updateCBs();
+	Graphics->UpdateCBs();
 	DebugGeometry.DrawGeometry(*Graphics, CUBE);
 
 }
@@ -174,14 +174,14 @@ void ExampleScenes::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, gl
 {
 	Graphics->VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
 	Graphics->VertexShaderCB.invModel = glm::inverse(Graphics->VertexShaderCB.model);
-	Graphics->updateCBs();
+	Graphics->UpdateCBs();
 	DebugGeometry.DrawGeometry(*Graphics, t_Id);
 }
 
 void ExampleScenes::RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform)
 {
 	Graphics->VertexShaderCB.model = t_Transform;
-	Graphics->updateCBs();
+	Graphics->UpdateCBs();
 	DebugGeometry.DrawGeometry(*Graphics, t_Id);
 }
 
@@ -201,39 +201,39 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
 	SetupCamera(camera);
 
-	Graphics->setShaderConfiguration(SC_DEBUG_COLOR);
-	Graphics->setIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->setVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
+	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 
-	Graphics->setShaderConfiguration(SC_DEBUG_TEX);
-	Graphics->bindTexture(0, texMat.EnvMap);
-	Graphics->bindTexture(1, texMat.BaseMap);
-	Graphics->bindTexture(2, texMat.AoMap);
+	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
+	Graphics->BindTexture(0, texMat.EnvMap);
+	Graphics->BindTexture(1, texMat.BaseMap);
+	Graphics->BindTexture(2, texMat.AoMap);
 
-	Graphics->bindPSConstantBuffers(&texMat.data, 1, 1);
+	Graphics->BindPSConstantBuffers(&texMat.data, 1, 1);
 
 	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 	texMatData.ColorIntensity = 0.5f * std::abs(std::sin(t*3));
 	texMatData.Reflectivity = 0.0f;
-	Graphics->updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	Graphics->UpdateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
 	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
 	texMatData.ColorIntensity = 0.15f;
-	Graphics->updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	Graphics->UpdateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
 	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
 	texMatData.ColorIntensity = 0.0;
 
 	texMatData.Reflectivity = 0.5f;
-	Graphics->updateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	Graphics->UpdateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 
 
-	Graphics->setShaderConfiguration(SC_DEBUG_SIMPLE_TEX);
-	Graphics->bindTexture(1, CHECKER_TEXTURE.Handle);
+	Graphics->SetShaderConfiguration(SC_DEBUG_SIMPLE_TEX);
+	Graphics->BindTexture(1, CHECKER_TEXTURE.Handle);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
 	RenderSkyBox();
@@ -274,7 +274,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	ControlCameraFPS(camera, dt);
 
 	bool lightChanged = false;
-	Graphics->bindPSConstantBuffers(&Light.bufferId, 1, 2);
+	Graphics->BindPSConstantBuffers(&Light.bufferId, 1, 2);
 	ImGui::Begin("Scene Setup");
 	if (ImGui::CollapsingHeader("Ligting"))
 	{
@@ -319,7 +319,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 
 	Light.lighting.pointLights[0].Position = {lightX, 0.5f, lightY, 0.0f};
 
-	Graphics->updateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
 	// @Note: Rendering begins here
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
@@ -328,25 +328,25 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/Application->Height, nearPlane, farPlane));
 	SetupCamera(camera);
 
-	Graphics->setIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->setVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
 
-	Graphics->setShaderConfiguration(SC_DEBUG_COLOR);
+	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 	RenderDebugGeometry(SPOTLIGHT, init_translate(2.0f *std::sin(t), 1.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f));
 
-	Graphics->setRasterizationState(RS_DEBUG);
+	Graphics->SetRasterizationState(RS_DEBUG);
 	RenderDebugGeometry(POINTLIGHT, init_translate(lightX, 0.5f, lightY), init_scale(1.0f, 1.0f, 1.0f));
-	Graphics->setRasterizationState(RS_NORMAL);
+	Graphics->SetRasterizationState(RS_NORMAL);
 
-	Graphics->setShaderConfiguration(SC_DEBUG_PHONG);
-	Graphics->bindPSConstantBuffers(&phongMat.data, 1, 3);
+	Graphics->SetShaderConfiguration(SC_DEBUG_PHONG);
+	Graphics->BindPSConstantBuffers(&phongMat.data, 1, 3);
 
 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
 	phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };
 	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
 	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
-	Graphics->updateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(5.0f, 1.0f, 5.0f));
 	
 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
@@ -354,7 +354,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
 	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 	phongMatData.SpecularChininess = 0.8f;
-	Graphics->updateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
 	RenderDebugGeometry(SPHERE, init_translate(-1.0f, 1.0, 3.0f), init_scale(0.20f, 0.20f, 0.20f));
 
 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
@@ -362,7 +362,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
 	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 	phongMatData.SpecularChininess = 1.3f;
-	Graphics->updateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
 	RenderDebugGeometry(SPHERE, init_translate(-1.0f, 1.0, -3.0f), init_scale(0.20f, 0.20f, 0.20f));
 
 	ImGui::End();
@@ -371,7 +371,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 
 void ExampleScenes::ProcessSpaceScene(float dt)
 {
-	Graphics->setRenderTarget(uiRenderTarget);
+	Graphics->SetRenderTarget(uiRenderTarget);
 	Graphics->ClearRT(uiRenderTarget);
 
 	Renderer2D.BeginScene();
@@ -399,7 +399,7 @@ void ExampleScenes::ProcessSpaceScene(float dt)
 	SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
 	Renderer2D.EndScene();
 
-	Graphics->resetRenderTarget();
+	Graphics->ResetRenderTarget();
 
 
 	static float t = 0.0f;
@@ -415,22 +415,19 @@ void ExampleScenes::ProcessSpaceScene(float dt)
 	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
 	SetupCamera(camera);
 
-	Graphics->setShaderConfiguration(SC_DEBUG_COLOR);
-	Graphics->setIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->setVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
+	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 
-	Graphics->setShaderConfiguration(SC_DEBUG_TEX);
-	Graphics->bindTexture(0, texMat.EnvMap);
-	Graphics->bindTexture(1, texMat.BaseMap);
-	Graphics->bindTexture(2, texMat.AoMap);
+	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
+	Graphics->BindTexture(0, texMat.EnvMap);
+	Graphics->BindTexture(1, texMat.BaseMap);
+	Graphics->BindTexture(2, texMat.AoMap); 
 
-	Graphics->bindTexture(1, uiRenderTarget.ColorAttachment);
-	Graphics->setShaderConfiguration(SC_DEBUG_QUAD);
-	Graphics->updateCBs();
-	Graphics->draw(TT_TRIANGLE_STRIP, 4, 0);
+	DrawFullscreenQuad(Graphics, uiRenderTarget.ColorAttachment, SC_QUAD_SIMPLE);
 
-	Graphics->bindPSConstantBuffers(&texMat.data, 1, 1);
+	Graphics->BindPSConstantBuffers(&texMat.data, 1, 1);
 	
 	
 }

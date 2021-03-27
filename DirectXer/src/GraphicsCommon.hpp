@@ -85,22 +85,24 @@ enum ShaderFile : uint8
 {
 	SF_DEBUG   = 0,
 	SF_2D      = 1,
+	SF_QUAD    = 2,
 
 	SF_COUNT
 };
 
 enum ShaderType : uint8
 {
-    ST_TEX        = 0,
-	ST_COLOR      = 1,
-	ST_SKY        = 2,
-	ST_TEX_SIMPLE = 3,
-	ST_PHONG      = 4,
-	
-
-	ST_RECT       = 5,
-	ST_CIRCLE     = 6,
-	ST_QUAD       = 7,
+    ST_TEX         = 0,
+	ST_COLOR       = 1,
+	ST_SKY         = 2,
+	ST_TEX_SIMPLE  = 3,
+	ST_PHONG       = 4,
+				   
+				   
+	ST_RECT        = 5,
+	ST_CIRCLE      = 6,
+				   
+	ST_SIMPLE_QUAD = 7,
 
 	ST_COUNT
 };
@@ -113,11 +115,12 @@ enum ShaderConfig
 	SC_DEBUG_SKY         = SF_DEBUG | (ST_SKY        << 8),
 	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG | (ST_TEX_SIMPLE << 8),
 	SC_DEBUG_PHONG       = SF_DEBUG | (ST_PHONG      << 8),
-	SC_DEBUG_QUAD        = SF_DEBUG | (ST_QUAD       << 8),
 
 	// 2D rendering
 	SC_2D_RECT           = SF_2D    | (ST_RECT      << 8),
 	SC_2D_CIRCLE         = SF_2D    | (ST_CIRCLE    << 8),
+	
+	SC_QUAD_SIMPLE       = SF_QUAD  | (ST_SIMPLE_QUAD << 8),
 	
 	SC_COUNT
 };

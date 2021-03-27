@@ -22,7 +22,7 @@ struct BufferDescriptor
 
 		const uint32 indexCount = Infos[t_Index].indexCount;
 		const auto topology = TopolgyType((Infos[t_Index].type & ~255) >> 8);
-		graphics.drawIndex(topology, indexCount, indexOffset, baseIndex);
+		graphics.DrawIndex(topology, indexCount, indexOffset, baseIndex);
 
 	}
 

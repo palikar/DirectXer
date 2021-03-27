@@ -39,7 +39,7 @@ ImageAtlas ImageLibrary::InitAtlas()
 	assert(Atlases.size() <= MaxAtlases);
 
 	ImageAtlas newAtlas;
-	newAtlas.TexHandle = Gfx->createTexture(AtlasSize, AtlasSize, TF_RGBA, nullptr, 0);
+	newAtlas.TexHandle = Gfx->CreateTexture(AtlasSize, AtlasSize, TF_RGBA, nullptr, 0);
 	Atlases.push_back(newAtlas);
 
 	// @Note: 8Kb Per atlas for tect packing; maybe we can bump this to 16KB for best rect packing results
@@ -90,7 +90,7 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 
 		if (width >= 1024 || height >= 1024)
 		{
-			auto texture = Gfx->createTexture(width, height, TF_RGBA, data, 0);
+			auto texture = Gfx->CreateTexture(width, height, TF_RGBA, data, 0);
 			Images.push_back({ texture, {0.0f, 0.0f}, {1.0f, 1.0f}, {width, height}});
 			continue;
 		}
@@ -100,7 +100,7 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 		rect.h = (stbrp_coord)height;
 
 		auto texture = Pack(rect);
-		Gfx->updateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
+		Gfx->UpdateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
 		Images.push_back({ texture, {(float)rect.x / AtlasSize, (float)rect.y / AtlasSize}, {(float)rect.w / AtlasSize, (float)rect.h / AtlasSize}, {AtlasSize, AtlasSize} });
 
 

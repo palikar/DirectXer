@@ -24,7 +24,7 @@ static const char* FeatureLevelToString(D3D_FEATURE_LEVEL level)
 	}
 }
 
-void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
+void Graphics::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
 {
 	DXGI_SWAP_CHAIN_DESC sd{ 0 };
 	sd.BufferDesc.Width = (uint32)t_Width;
@@ -62,7 +62,7 @@ void Graphics::initSwapChain(HWND hWnd, float t_Width, float t_Height)
 	DXLOG("[Graphics] Direct3D: {}", FeatureLevelToString(Device->GetFeatureLevel()));
 }
 
-void Graphics::initBackBuffer()
+void Graphics::InitBackBuffer()
 {
 
 	ID3D11Resource* pBackBuffer{ nullptr };
@@ -73,7 +73,7 @@ void Graphics::initBackBuffer()
 	pBackBuffer->Release();
 }
 
-void Graphics::initZBuffer(float width, float height)
+void Graphics::InitZBuffer(float width, float height)
 {
 	[[maybe_unused]]HRESULT hr;
 
@@ -110,7 +110,7 @@ void Graphics::initZBuffer(float width, float height)
 
 }
 
-void Graphics::initRasterizationsStates()
+void Graphics::InitRasterizationsStates()
 {
 	ID3D11RasterizerState* rastStateNormal;
 	ID3D11RasterizerState* rastStateDebug;
@@ -135,7 +135,7 @@ void Graphics::initRasterizationsStates()
 
 }
 
-void Graphics::initSamplers()
+void Graphics::InitSamplers()
 {
 	D3D11_SAMPLER_DESC desc;
 	desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -158,7 +158,7 @@ void Graphics::initSamplers()
 	Context->PSSetSamplers(0, 1, &state);
 }
 
-void Graphics::initBlending()
+void Graphics::InitBlending()
 {
 	D3D11_BLEND_DESC desc;
 
@@ -195,20 +195,20 @@ void Graphics::initBlending()
 
 }
 
-void Graphics::setBlendingState(BlendingState t_State)
+void Graphics::SetBlendingState(BlendingState t_State)
 {
 	Context->OMSetBlendState(BlendingStates[t_State], NULL, D3D11_COLOR_WRITE_ENABLE_ALL);
 }
 
-void Graphics::resizeBackBuffer(float width, float height)
+void Graphics::ResizeBackBuffer(float width, float height)
 {
 
 	RenderTargetView->Release();
 	Swap->ResizeBuffers(0, (uint32)width, (uint32)height, DXGI_FORMAT_UNKNOWN, 0);
-	initBackBuffer();
+	InitBackBuffer();
 }
 
-void Graphics::destroyZBuffer()
+void Graphics::DestroyZBuffer()
 {
 	DepthStencilView->Release();
 }
@@ -258,12 +258,12 @@ void Graphics::ClearRT(RTObject& t_RT)
 	Context->ClearDepthStencilView(t_RT.DepthAttachment.dsv, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0u);
 }
 
-void Graphics::setRasterizationState(RasterizationState t_State)
+void Graphics::SetRasterizationState(RasterizationState t_State)
 {
 	Context->RSSetState(RasterizationsStates[t_State]);
 }
 
-void Graphics::setScissor(Rectangle2D t_Rect)
+void Graphics::SetScissor(Rectangle2D t_Rect)
 {
 	D3D11_RECT sissorRect;
 	sissorRect.right= (int)(roundf(t_Rect.Position.x));
@@ -274,22 +274,22 @@ void Graphics::setScissor(Rectangle2D t_Rect)
 	Context->RSSetScissorRects(1, &sissorRect);
 }
 
-void Graphics::setDepthStencilState(DepthStencilState t_State, uint32 t_RefValue)
+void Graphics::SetDepthStencilState(DepthStencilState t_State, uint32 t_RefValue)
 {
 	Context->OMSetDepthStencilState(DepthStencilStates[t_State], t_RefValue);
 }
 
-void Graphics::bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
+void Graphics::BindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
 {
 	Context->PSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
 }
 
-void Graphics::bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
+void Graphics::BindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
 {
 	Context->VSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
 }
 
-void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch)
+void Graphics::UpdateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch)
 {
 	D3D11_BOX box;
 	box.left = (uint32)(rect.Position.x);
@@ -302,7 +302,7 @@ void Graphics::updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* 
 	Context->UpdateSubresource(t_Tex.tp, 0, &box, t_Data, (uint32)(rect.Size.x * t_Pitch), 0);
 }
 
-TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
+TextureObject Graphics::CreateTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
 {
 	TextureObject to;
 
@@ -343,17 +343,17 @@ TextureObject Graphics::createTexture(uint16 t_Width, uint16 t_Height, TextureFo
 	return to;
 }
 
-void Graphics::setRenderTarget(RTObject& t_RT)
+void Graphics::SetRenderTarget(RTObject& t_RT)
 {
 	Context->OMSetRenderTargets(1, &t_RT.ColorAttachment.rtv, t_RT.DepthAttachment.dsv);
 }
 
-void Graphics::resetRenderTarget()
+void Graphics::ResetRenderTarget()
 {
 	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
 }
 
-RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS)
+RTObject Graphics::CreateRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS)
 {
 	RTObject rt;
 
@@ -411,7 +411,7 @@ RTObject Graphics::createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFo
 	return rt;
 }
 
-TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6])
+TextureObject Graphics::CreateCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6])
 {
 
 	TextureObject to;
@@ -451,7 +451,7 @@ TextureObject Graphics::createCubeTexture(uint16 t_Width, uint16 t_Height, Textu
 
 }
 
-VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 dataSize,  bool dynamic)
+VBObject Graphics::CreateVertexBuffer(uint32 structSize, void* data, uint32 dataSize,  bool dynamic)
 {
 	ID3D11Buffer* pVertexBuffer;
 	D3D11_BUFFER_DESC vertexBufferDesc{ 0 };
@@ -478,7 +478,7 @@ VBObject Graphics::createVertexBuffer(uint32 structSize, void* data, uint32 data
 	return {structSize, pVertexBuffer};
 }
 
-IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize, bool dynamic)
+IBObject Graphics::CreateIndexBuffer(void* data, uint32 dataSize, bool dynamic)
 {
 	ID3D11Buffer* pIndexBuffer;
 	D3D11_BUFFER_DESC indexBufferDesc{ 0 };
@@ -504,7 +504,7 @@ IBObject Graphics::createIndexBuffer(void* data, uint32 dataSize, bool dynamic)
 	return {pIndexBuffer};
 }
 
-void Graphics::initResources()
+void Graphics::InitResources()
 {
 
 	[[maybe_unused]]HRESULT hr;
@@ -556,6 +556,23 @@ void Graphics::initResources()
 		Shaders[SF_2D] = shaderObject;
 	}
 
+	{
+		// Quad shader
+
+		ID3DBlob* pBlob;
+		ShaderObject shaderObject;
+		D3DReadFileToBlob(L"QuadPixelShader.cso", &pBlob);
+		GFX_CALL(Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.ps));
+
+		ID3D11VertexShader* pVertexShader{0};
+		D3DReadFileToBlob(L"QuadVertexShader.cso", &pBlob);
+		GFX_CALL(Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.vs));
+
+		shaderObject.il = nullptr;
+
+		Shaders[SF_QUAD] = shaderObject;
+	}
+
 	D3D11_BUFFER_DESC vertexShaderCBDesc{ 0 };
 	vertexShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
 	vertexShaderCBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -586,7 +603,7 @@ void Graphics::initResources()
 
 }
 
-void Graphics::initDepthStencilStates()
+void Graphics::InitDepthStencilStates()
 {
 	// Normal
 	
@@ -613,7 +630,7 @@ void Graphics::initDepthStencilStates()
 	GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_Normal]));	
 }
 
-CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
+CBObject Graphics::CreateConstantBuffer(uint32 t_Size, void* t_InitData)
 {
 
 	CBObject cb;
@@ -636,7 +653,7 @@ CBObject Graphics::createConstantBuffer(uint32 t_Size, void* t_InitData)
 
 }
 
-void Graphics::updateCBs()
+void Graphics::UpdateCBs()
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 
@@ -650,7 +667,7 @@ void Graphics::updateCBs()
 
 }
 
-void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
+void Graphics::UpdateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 
@@ -660,7 +677,7 @@ void Graphics::updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
 	Context->Unmap(t_CbObject.id, 0);
 }
 
-void Graphics::updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length)
+void Graphics::UpdateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 	[[maybe_unused]]HRESULT hr;
@@ -669,7 +686,7 @@ void Graphics::updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length
 	Context->Unmap(t_Buffer.id, 0);
 }
 
-void Graphics::updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length)
+void Graphics::UpdateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length)
 {
 	D3D11_MAPPED_SUBRESOURCE msr;
 	[[maybe_unused]]HRESULT hr;
@@ -678,12 +695,12 @@ void Graphics::updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length)
 	Context->Unmap(t_Buffer.id, 0);
 }
 
-void Graphics::bindTexture(uint32 t_Slot, TextureObject t_Texture)
+void Graphics::BindTexture(uint32 t_Slot, TextureObject t_Texture)
 {
 	Context->PSSetShaderResources(t_Slot, 1, &t_Texture.srv);
 }
 
-void Graphics::setViewport(float x, float y, float width, float height)
+void Graphics::SetViewport(float x, float y, float width, float height)
 {
 	D3D11_VIEWPORT vp;
 	vp.Width = width;
@@ -696,7 +713,7 @@ void Graphics::setViewport(float x, float y, float width, float height)
 	Context->RSSetViewports(1, &vp);
 }
 
-void Graphics::setShaderConfiguration(ShaderConfig t_Config)
+void Graphics::SetShaderConfiguration(ShaderConfig t_Config)
 {
 	uint8 shaderObjectIndex = 0xFF & t_Config;
 	uint8 shaderType = (0xFF00 & t_Config) >> 8;
@@ -711,17 +728,17 @@ void Graphics::setShaderConfiguration(ShaderConfig t_Config)
 	VertexShaderCB.shaderType = shaderType;
 }
 
-void Graphics::setIndexBuffer(IBObject t_buffer)
+void Graphics::SetIndexBuffer(IBObject t_buffer)
 {
 	Context->IASetIndexBuffer(t_buffer.id, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void Graphics::setVertexBuffer(VBObject t_buffer, uint32 offset)
+void Graphics::SetVertexBuffer(VBObject t_buffer, uint32 offset)
 {
 	Context->IASetVertexBuffers(0, 1, &t_buffer.id, &t_buffer.structSize, &offset);
 }
 
-void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
+void Graphics::DrawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
 {
 
 	// @Todo: Make this in a function of its own
@@ -740,7 +757,7 @@ void Graphics::drawIndex(TopolgyType topology, uint32 count, uint32 offset, uint
 	Context->DrawIndexed(count/factor, offset, base);
 }
 
-void Graphics::draw(TopolgyType topology, uint32 count, uint32 base)
+void Graphics::Draw(TopolgyType topology, uint32 count, uint32 base)
 {
 	switch (topology) {
 	  case TT_TRIANGLES:
@@ -757,3 +774,11 @@ void Graphics::draw(TopolgyType topology, uint32 count, uint32 base)
 	Context->Draw(count, base);
 }
 	
+
+void DrawFullscreenQuad(Graphics* Graphics, TextureObject texture, ShaderConfig type)
+{
+	Graphics->BindTexture(1, texture);
+	Graphics->SetShaderConfiguration(type);
+	Graphics->UpdateCBs();
+	Graphics->Draw(TT_TRIANGLE_STRIP, 4, 0);
+}

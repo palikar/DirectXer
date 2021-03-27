@@ -197,10 +197,6 @@ float4 main(PSIn input) : SV_Target
 
 	return float4(outgoingLight, 1.0f);
     }
-    else if(shaderType == 7) // Phong
-    {
-	return tex_1.Sample(samp, input.uv);
-    }
 
     return float4(1.0f, 0.0f, 0.5f, 1.0f);
 }

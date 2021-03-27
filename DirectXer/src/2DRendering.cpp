@@ -22,8 +22,8 @@ void Renderer2D::InitRenderer(Graphics* t_Graphics, Init2DParams t_Params)
 		
 	CurrentVertex = &Vertices[0];
 
-	vbo = Graph->createVertexBuffer(sizeof(Vertex2D), nullptr, (uint32)(sizeof(Vertex2D) * TotalVertices), true);
-	ibo = Graph->createIndexBuffer(nullptr, (uint32)(sizeof(uint32) * TotalVertices * 3), true);
+	vbo = Graph->CreateVertexBuffer(sizeof(Vertex2D), nullptr, (uint32)(sizeof(Vertex2D) * TotalVertices), true);
+	ibo = Graph->CreateIndexBuffer(nullptr, (uint32)(sizeof(uint32) * TotalVertices * 3), true);
 }
 
 void Renderer2D::BeginScene()
@@ -47,24 +47,24 @@ void Renderer2D::EndScene()
 	Graph->VertexShaderCB.projection = glm::transpose(glm::ortho(0.0f, Params.Width, Params.Height, 0.0f));
 	Graph->VertexShaderCB.model = glm::mat4(1.0f);
 
-	Graph->setShaderConfiguration(SC_2D_RECT);
+	Graph->SetShaderConfiguration(SC_2D_RECT);
 
-	Graph->setIndexBuffer(ibo);
-	Graph->setVertexBuffer(vbo);
+	Graph->SetIndexBuffer(ibo);
+	Graph->SetVertexBuffer(vbo);
 
-	Graph->updateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount * sizeof(Vertex2D));
-	Graph->updateIndexBuffer(ibo, Indices.data(), 3u * CurrentVertexCount * sizeof(uint32));
-	Graph->updateCBs();
+	Graph->UpdateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount * sizeof(Vertex2D));
+	Graph->UpdateIndexBuffer(ibo, Indices.data(), 3u * CurrentVertexCount * sizeof(uint32));
+	Graph->UpdateCBs();
 
-	Graph->setBlendingState(BS_AlphaBlending);
+	Graph->SetBlendingState(BS_AlphaBlending);
 
 	for (uint32 i = 0; i < CurrentTextureSlot; ++i)
 	{
-		Graph->bindTexture(i, TexSlots[i]);
+		Graph->BindTexture(i, TexSlots[i]);
 	}
 
 
-	Graph->drawIndex(TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
+	Graph->DrawIndex(TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
 
 }
 

@@ -41,7 +41,7 @@ void FontLibrary::Init(Graphics* t_Graphics)
 	
 void FontLibrary::InitNewAtlas()
 {
-	auto tex = Gfx->createTexture(AtlasSize, AtlasSize, TF_R, nullptr, 0);
+	auto tex = Gfx->CreateTexture(AtlasSize, AtlasSize, TF_R, nullptr, 0);
 	auto space = Memory::BulkGet<stbrp_node>(RectsCount);
 	stbrp_init_target(&RectContext, AtlasSize, AtlasSize, space,  RectsCount);
 	Atlases.push_back(tex);			
@@ -109,7 +109,7 @@ void FontLibrary::LoadTypeface(MemoryArena arena, float size, size_t index)
 		}
 
 		auto glyphAtlas = Atlases.back();
-		Gfx->updateTexture(glyphAtlas, { {rect.x + Padding, rect.y + Padding}, { bitmap.width, bitmap.rows}}, bitmap.buffer, 1);
+		Gfx->UpdateTexture(glyphAtlas, { {rect.x + Padding, rect.y + Padding}, { bitmap.width, bitmap.rows}}, bitmap.buffer, 1);
 
 		AtlasEntry entry;
 		entry.Pos = glm::vec2{rect.x + Padding, rect.y + Padding} / (float)AtlasSize;

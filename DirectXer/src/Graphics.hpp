@@ -93,56 +93,55 @@ class Graphics
 	using ShaderType = ShaderObject;
 	using RenderTargetType = RTObject;
 
-	void initSwapChain(HWND hWnd, float t_Width, float t_Height);
-	void initBackBuffer();
-	void initZBuffer(float width, float height);
-	void initResources();
-	void initRasterizationsStates();
-	void initSamplers();
-	void initBlending();
-	void initDepthStencilStates();
+	void InitSwapChain(HWND hWnd, float t_Width, float t_Height);
+	void InitBackBuffer();
+	void InitZBuffer(float width, float height);
+	void InitResources();
+	void InitRasterizationsStates();
+	void InitSamplers();
+	void InitBlending();
+	void InitDepthStencilStates();
 
-	void resizeBackBuffer(float width, float height);
+	void ResizeBackBuffer(float width, float height);
 
-	void bindTexture(uint32 t_Slot, TextureObject t_Texture);
+	void BindTexture(uint32 t_Slot, TextureObject t_Texture);
+	void BindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
+	void BindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
 
-	void bindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
-	void bindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
-
-	void setScissor(Rectangle2D t_Rect);
-	void setRasterizationState(RasterizationState t_State = RS_DEBUG);
-	void setDepthStencilState(DepthStencilState t_State = DSS_Normal, uint32 t_RefValue = 0);
-	void setVertexBuffer(VBObject t_buffer, uint32 offset = 0);
-	void setIndexBuffer(IBObject t_buffer);
-	void setViewport(float x, float y, float width, float height);
-	void setShaderConfiguration(ShaderConfig t_Confing);
-	void setBlendingState(BlendingState t_State);
-	void setRenderTarget(RTObject& t_RT);
-	void resetRenderTarget();
+	void SetScissor(Rectangle2D t_Rect);
+	void SetRasterizationState(RasterizationState t_State = RS_DEBUG);
+	void SetDepthStencilState(DepthStencilState t_State = DSS_Normal, uint32 t_RefValue = 0);
+	void SetVertexBuffer(VBObject t_buffer, uint32 offset = 0);
+	void SetIndexBuffer(IBObject t_buffer);
+	void SetViewport(float x, float y, float width, float height);
+	void SetShaderConfiguration(ShaderConfig t_Confing);
+	void SetBlendingState(BlendingState t_State);
+	void SetRenderTarget(RTObject& t_RT);
+	void ResetRenderTarget();
 
 
-	TextureObject createTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
-	TextureObject createCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
-	VBObject createVertexBuffer(uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
-	IBObject createIndexBuffer(void* data, uint32 dataSize, bool dynamic = false);
-	CBObject createConstantBuffer(uint32 t_Size, void* t_InitData);
-	RTObject createRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS = true);
+	TextureObject CreateTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
+	TextureObject CreateCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
+	VBObject CreateVertexBuffer(uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
+	IBObject CreateIndexBuffer(void* data, uint32 dataSize, bool dynamic = false);
+	CBObject CreateConstantBuffer(uint32 t_Size, void* t_InitData);
+	RTObject CreateRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS = true);
 
-	void updateCBs();
-	void updateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);
-	void updateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length);
-	void updateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length);
-	void updateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
+	void UpdateCBs();
+	void UpdateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);
+	void UpdateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length);
+	void UpdateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length);
+	void UpdateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
-	void drawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
-	void draw(TopolgyType topology, uint32 count, uint32 base);
+	void DrawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
+	void Draw(TopolgyType topology, uint32 count, uint32 base);
 
 	void ClearBuffer(float red, float green, float blue);
 	void ClearZBuffer();
 	void ClearRT(RTObject& t_RT);
 	void EndFrame();
 
-	void destroyZBuffer();
+	void DestroyZBuffer();
 	void Destroy();
 
   public:
@@ -175,11 +174,13 @@ class Graphics
 template<typename VertexType>
 VBObject vertexBufferFactory(Graphics& graphics, TempVector<VertexType>& t_VertexList)
 {
-	return graphics.createVertexBuffer(sizeof(VertexType), t_VertexList.data(), (uint32)(sizeof(VertexType) * t_VertexList.size()));
+	return graphics.CreateVertexBuffer(sizeof(VertexType), t_VertexList.data(), (uint32)(sizeof(VertexType) * t_VertexList.size()));
 }
 
 template<typename IndexType = uint32>
 IBObject indexBufferFactory(Graphics& graphics, TempVector<IndexType>& t_IndexList)
 {
-	return graphics.createIndexBuffer(t_IndexList.data(), (uint32)(sizeof(IndexType) * t_IndexList.size()));
+	return graphics.CreateIndexBuffer(t_IndexList.data(), (uint32)(sizeof(IndexType) * t_IndexList.size()));
 }
+
+void DrawFullscreenQuad(Graphics* Graphics, TextureObject texture, ShaderConfig type);
