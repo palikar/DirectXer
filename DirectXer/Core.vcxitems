@@ -18,7 +18,23 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\SpaceGame.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\ImageLibrary.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Input.cpp" />
@@ -28,6 +44,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WinMain.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\2DRendering.hpp" />
@@ -37,7 +54,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\FileUtils.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\FontLibrary.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GameDefinition.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\SpaceGame.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Geometry.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GeometryDebug.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GeometryUtils.hpp" />
@@ -55,6 +77,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\IncludeWin.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Resources.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\TextureCatalog.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Types.hpp" />

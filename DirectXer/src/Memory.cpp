@@ -20,8 +20,8 @@ static void* ArenaAllocation(MemoryArena& t_Arena, size_t t_Size)
 {
 	auto memory = t_Arena.Get<size_t>(t_Size + SIZE_BYTES);
 	*memory = t_Size;
-	t_Arena.Size += t_Size + SIZE_BYTES;
-	t_Arena.Current += t_Size + SIZE_BYTES;
+	//t_Arena.Size += t_Size + SIZE_BYTES;
+	//t_Arena.Current += t_Size + SIZE_BYTES;
 	
 	return memory + 1;
 }
@@ -93,7 +93,7 @@ void Memory::ResetTempMemory()
 
 void Memory::EstablishTempScope(size_t t_Size)
 {
-	g_TempScopes.PushScope(GetTempArena(t_Size));
+g_TempScopes.PushScope(GetTempArena(t_Size));
 }
 
 void Memory::EndTempScope()

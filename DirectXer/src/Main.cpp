@@ -1,6 +1,7 @@
 #include "Memory.hpp"
 #include "Resources.hpp"
 #include "App.hpp"
+#include <Random.hpp>
 
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
@@ -24,6 +25,7 @@ App* InitMain(char** argv, int argc)
 	gDxgiManager.Init();
 	Memory::InitMemoryState();
 	PlatformLayer::Init();
+	Random::Init();
 
 	App* application = Memory::BulkGet<App>();
 

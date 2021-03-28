@@ -55,6 +55,11 @@
       <Filter>PlatformWindows</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\SpaceGame.cpp">
+      <Filter>Games</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">
@@ -96,5 +101,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\GraphicsD3D11.hpp">
       <Filter>PlatformWindows</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\SpaceGame.hpp">
+      <Filter>Games</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
   </ItemGroup>
 </Project>

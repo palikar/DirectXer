@@ -33,6 +33,8 @@ void Renderer2D::BeginScene()
 	Indices.clear();
 	Vertices.clear();
 
+	Vertices.resize(TotalVertices);
+
 	CurrentTextureSlot = 0;
 	for (size_t i = 0; i < MaxTextureSlots; ++i)
 	{
@@ -64,7 +66,7 @@ void Renderer2D::EndScene()
 	}
 
 
-	Graph->DrawIndex(TT_TRIANGLES, 3u * CurrentVertexCount, 0, 0);
+	Graph->DrawIndex(TT_TRIANGLES, Indices.size(), 0, 0);
 
 }
 

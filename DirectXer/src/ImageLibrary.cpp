@@ -86,7 +86,9 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 		PlatformLayer::ReadFileIntoArena(queuedImage.Handle, queuedImage.FileSize, fileArena);
 
 		int width, height, channels;
-		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
+		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
+
+		assert(data);
 
 		if (width >= 1024 || height >= 1024)
 		{

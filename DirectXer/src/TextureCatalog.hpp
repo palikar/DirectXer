@@ -78,7 +78,7 @@ struct TextureCatalog
 			ReadWholeFile(path, fileArena);
 
 			int width, height, channels;
-			unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
+			unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
 			if (data == nullptr)
 			{
 				DXERROR("Can't load texture {} at {}. Reason: {}", tex.Path, path, stbi_failure_reason());
@@ -118,7 +118,7 @@ struct TextureCatalog
 
 			ReadWholeFile(path, fileArena);
 
-			data[i] = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 0);
+			data[i] = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
 
 		}
 

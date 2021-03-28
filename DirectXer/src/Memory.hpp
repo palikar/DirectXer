@@ -36,7 +36,7 @@ struct MemoryArena
 		assert(Size + len <= MaxSize);
 		Size += len;
 		Current += len;
-		return (T*)(Memory + Size);
+		return (T*)(Current - len);
 	}
 
 	void Reset()
@@ -197,6 +197,8 @@ using BulkVector = std::vector<T, BulkStdAllocator<T>>;
 using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
 using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
 
+using String = std::string_view;
+
 #else
 
 template<class T>
@@ -206,5 +208,7 @@ using TempString = std::string;
 template<class T>
 using BulkVector = std::vector<T>;
 using BulkString = std::string;
+
+using String = std::string_view;
 
 #endif

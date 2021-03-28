@@ -38,6 +38,10 @@ void* PlatformLayer::Allocate(size_t t_Size)
 PlatformLayer::FileHandle PlatformLayer::OpenFileForReading(const char* t_Path)
 {
 	FileHandle handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (handle == INVALID_HANDLE_VALUE)
+	{
+		DXERROR("Can't open file: {} ", t_Path);
+	}
 	return handle;
 }
 
