@@ -17,6 +17,8 @@ static uint32 EVIL_SHIP_2;
 static uint32 EVIL_SHIP_3;
 static uint32 SHIP_BULLET;
 static uint32 EXPLOSION;
+static uint32 STATUS_BAR;
+static uint32 HEALTH_BAR;
 
 static uint32 EXPLOSION_SPRITE;
 
@@ -62,7 +64,7 @@ void SpaceGame::Init()
 
 	Memory::EstablishTempScope(Kilobytes(2));
 	ImageLibraryBuilder imagebuilder;
-	imagebuilder.Init(10);
+	imagebuilder.Init(15);
 	BGIMAGE = imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png");
 	SHIPIMAGE = imagebuilder.PutImage("assets/PNG/Ship_Parts/Ship_Main_Icon.png");
 	EVIL_SHIP_1 = imagebuilder.PutImage("assets/evil_ship_1.png");
@@ -70,14 +72,16 @@ void SpaceGame::Init()
 	EVIL_SHIP_3 = imagebuilder.PutImage("assets/evil_ship_3.png");
 	SHIP_BULLET = imagebuilder.PutImage("assets/ship_bullet.png");
 	EXPLOSION = imagebuilder.PutImage("assets/explosion.png");
+	STATUS_BAR = imagebuilder.PutImage("assets/PNG/Main_UI/Stats_Bar.png");
+	HEALTH_BAR = imagebuilder.PutImage("assets/PNG/Main_UI/Health_Bar_Table.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
 	FontBuilder fontBuilder;
 	Memory::EstablishTempScope(Kilobytes(1));
 	fontBuilder.Init(2);
-	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans.ttf", 24);
-	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans-Bold.ttf", 24);
+	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans.ttf", 21);
+	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans-Bold.ttf", 21);
 	Renderer2D.FontLib.Build(fontBuilder);
 	Memory::EndTempScope();
 
@@ -278,12 +282,20 @@ void SpaceGame::Update(float dt)
 	}
 
 
-	// Renderer2D.EndScene();
-	// Renderer2D.BeginScene();
-	
 	Renderer2D.DrawImage(SHIPIMAGE, GameState->PlayerPosition, { 64.0f, 64.0f });
+	Renderer2D.EndScene();
 	
+	Renderer2D.BeginScene();
+	
+	Renderer2D.DrawImage(STATUS_BAR, {20.0f, 20.0f}, { Application->Width - 40.0f, 32.0f });
+	Renderer2D.DrawText("Wave: 0", {42.0f, 44.0f}, 1);
+	Renderer2D.DrawText("Score: 0", {260.0f, 44.0f}, 1);
+	Renderer2D.DrawText("Time: 0", {460.0f, 44.0f}, 1);
+	Renderer2D.DrawImage(HEALTH_BAR, {10.0f, Application->Height - 32.0f - 20.0f}, { Application->Width / 3.5f, 32.0f});
 	
 	Renderer2D.EndScene();
+	
+	
+	
 }
 
