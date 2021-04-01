@@ -37,7 +37,7 @@ void* PlatformLayer::Allocate(size_t t_Size)
 
 PlatformLayer::FileHandle PlatformLayer::OpenFileForReading(const char* t_Path)
 {
-	FileHandle handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	FileHandle handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (handle == INVALID_HANDLE_VALUE)
 	{
 		DXERROR("Can't open file: {} ", t_Path);
@@ -78,7 +78,6 @@ static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		auto wind = (WindowsWindow*)((LPCREATESTRUCTA)lParam)->lpCreateParams;
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)wind);
 		wind->InitAfterCreate(hWnd);
-		
 	}
 	else
 	{
@@ -134,8 +133,9 @@ void WindowsWindow::Init(WindowsSettings t_Settings)
 						nullptr, nullptr, GetModuleHandleA(NULL), this);
 	assert(hWnd);
 
-	ShowWindow(hWnd, SW_SHOWDEFAULT);
+	ShowWindow(hWnd, SW_SHOW);
 
+	Application->PostInit();
 }
 
 void WindowsWindow::InitAfterCreate(HWND t_hWnd)
@@ -153,6 +153,22 @@ void WindowsWindow::InitAfterCreate(HWND t_hWnd)
 	Application->Graphics.EndFrame();
 }
 
+void WindowsWindow::Resize(uint32 width, uint32 height)
+{
+	SetWindowPos(hWnd, HWND_NOTOPMOST, WindowRect.left, WindowRect.top,
+				 width, height,
+				 SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+	WindowRect.right = WindowRect.left + width;
+	WindowRect.bottom = WindowRect.top + height;
+	ShowWindow(hWnd, SW_NORMAL);
+
+	Application->Width = (float32)width;
+	Application->Height = (float32)height;
+	Application->Resize();
+	
+}
+	
 void WindowsWindow::ToggleFullscreen()
 {
 
@@ -260,7 +276,7 @@ void WindowsWindow::Deinit()
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	ImGui::DestroyContext(); 
 
 	gDxgiManager.Destroy();
 	Application->Destroy();

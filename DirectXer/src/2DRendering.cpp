@@ -66,7 +66,7 @@ void Renderer2D::EndScene()
 	}
 
 
-	Graph->DrawIndex(TT_TRIANGLES, Indices.size(), 0, 0);
+	Graph->DrawIndex(TT_TRIANGLES, (uint32)Indices.size(), 0u, 0u);
 
 }
 

@@ -36,6 +36,14 @@ void App::Init(HWND t_Window)
 	Game.Init();
 }
 
+void App::PostInit()
+{
+	// @Note: Windows is weird and it sends a resize mesage during the creation
+	// of the window; this method will be called after everything is initialized
+	// and no more spurious resize messages are expected to arrive
+	Game.PostInit();
+}
+
 void App::Resize()
 {
 	Graphics.ResizeBackBuffer(Width, Height);

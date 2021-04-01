@@ -46,7 +46,7 @@ ImageAtlas ImageLibrary::InitAtlas()
 	auto space = Memory::BulkGet<stbrp_node>(RectsCount);
 	stbrp_init_target(&Atlases.back().RectContext, AtlasSize, AtlasSize, space, RectsCount);
 
-	return newAtlas;
+	return Atlases.back();
 }
 
 TextureObject ImageLibrary::Pack(stbrp_rect& t_Rect)
@@ -60,7 +60,7 @@ TextureObject ImageLibrary::Pack(stbrp_rect& t_Rect)
 	stbrp_pack_rects(&newAtlas.RectContext, &t_Rect, 1);
 
 	assert(t_Rect.was_packed != 0);
-	return {};
+	return newAtlas.TexHandle;
 }
 
 void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)

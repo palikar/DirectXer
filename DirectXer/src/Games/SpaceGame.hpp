@@ -18,6 +18,7 @@ class SpaceGame
 {
 public:
 	void Init();
+	void PostInit();
 	void Update(float dt);
 	void Resize();
 
@@ -33,4 +34,5 @@ public:
 private:
 	void UpdateGameState(float dt);
 	void ControlPlayer(float dt);
+	void CleanUpDead();
 };

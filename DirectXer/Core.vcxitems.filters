@@ -60,6 +60,7 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\TextureCatalog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">

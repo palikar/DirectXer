@@ -94,7 +94,7 @@ struct Random
 
 	};
 
-	static float Uniform(float start, float end)
+	static float Uniform(float start = 0.0f, float end = 1.0f)
 	{
 		const std::uniform_real_distribution<float> uniformDistribution(start, end);
 		return uniformDistribution(RandomGenerator);

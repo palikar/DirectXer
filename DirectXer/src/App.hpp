@@ -25,6 +25,7 @@ public:
 	const static inline float farPlane = 1000.0f;
 
 	void Init(HWND t_Window);
+	void PostInit();
 	void Spin(float dt);
 	void Destroy();
 	void Resize();

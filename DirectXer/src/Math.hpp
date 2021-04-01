@@ -20,3 +20,14 @@ struct Rectangle2D
 	glm::vec2 Size;
 
 };
+
+inline bool IntersectRects(const Rectangle2D& rect1, const Rectangle2D& rect2)
+{
+	auto max1 = rect1.Position + rect1.Size;
+	auto max2 = rect2.Position + rect2.Size;
+
+	auto min1 = rect1.Position;
+	auto min2 = rect2.Position;
+
+	return !(max1.x < min2.x || min1.x > max2.x || max1.y < min2.y || min1.y > max2.y);
+}

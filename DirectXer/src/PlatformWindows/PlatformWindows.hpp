@@ -34,6 +34,7 @@ public:
 	void ToggleFullscreen();
 	int Run();
 	void Deinit();
+	void Resize(uint32 width, uint32 height);
 	void InitAfterCreate(HWND t_hWnd);
 	void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
