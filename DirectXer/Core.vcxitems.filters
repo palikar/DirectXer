@@ -106,5 +106,6 @@
       <Filter>Games</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Audio.hpp" />
   </ItemGroup>
 </Project>

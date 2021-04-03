@@ -132,6 +132,23 @@ struct Memory
 };
 
 template<typename T>
+inline T& ReadBlob(char* &current)
+{
+	auto res = (T*)current;
+	current += sizeof(T);
+	return *res;
+}
+
+template<typename T>
+inline T& ReadBlobAndMove(char* &current, size_t size)
+{
+	auto res = (T*)current;
+	current += size;
+	return *res;
+}
+
+
+template<typename T>
 class TempStdAllocator
 {
   public:

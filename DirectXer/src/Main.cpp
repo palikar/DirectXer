@@ -2,6 +2,8 @@
 #include "Resources.hpp"
 #include "App.hpp"
 #include <Random.hpp>
+#include <Logging.hpp>
+#include <Audio.hpp>
 
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
@@ -16,7 +18,6 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 	}
 }
 
-
 // @Note: This is not the true main funtion; this will be called from the platform
 // specific main function (WinMain or main)
 App* InitMain(char** argv, int argc)
@@ -26,9 +27,14 @@ App* InitMain(char** argv, int argc)
 	Memory::InitMemoryState();
 	PlatformLayer::Init();
 	Random::Init();
+	Audio::Init();
 
+	DXLOG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
 	App* application = Memory::BulkGet<App>();
 
+	// @Note: Ideally we won't this be we have some things in the games
+	// that have default values that will be set only if the "root object" is
+	// initialized
 	new(application) App();
 	
 	ParseCommandLineArguments(application->Arguments, argv, argc);

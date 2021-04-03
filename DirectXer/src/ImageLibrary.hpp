@@ -56,7 +56,6 @@ class ImageLibrary
 {
   public:
 	Graphics* Gfx;
-	MemoryArena fileArena;
 	BulkVector<Image> Images;
 	BulkVector<ImageAtlas> Atlases;
 

@@ -65,7 +65,7 @@ TextureObject ImageLibrary::Pack(stbrp_rect& t_Rect)
 
 void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 {
-	fileArena = Memory::GetTempArena(t_Builder.MaxFileSize + Megabytes(1));
+	MemoryArena fileArena = Memory::GetTempArena(t_Builder.MaxFileSize + Megabytes(1));
 	Memory::EstablishTempScope(Megabytes(64));
 	Defer { 
 		Memory::EndTempScope();

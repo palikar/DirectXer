@@ -10,6 +10,7 @@
 #include <2DRendering.hpp>
 #include <Memory.hpp>
 #include <Random.hpp>
+#include <Audio.hpp>
 
 
 class App;
@@ -28,6 +29,8 @@ public:
 	SpriteSheetHolder SpriteSheets;
 	Renderer2D Renderer2D;
 	RTObject uiRenderTarget;
+
+	AudioPlayer AudioEngine;
 
 	GameState* GameState;
 

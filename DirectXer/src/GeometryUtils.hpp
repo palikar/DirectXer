@@ -41,14 +41,6 @@ struct GPUGeometry
 	IBObject Ibo;	
 };
 
-template<typename T>
-static T& ReadBlob(char* &current)
-{
-	auto res = (T*)current;
-	current += sizeof(T);
-	return *res;
-}
- 
 static void SetColor(TempVector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
 {
 	for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)

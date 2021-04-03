@@ -102,6 +102,16 @@ void SpaceGame::Init()
 
 	SpriteSheets.Init(5, &Renderer2D);
 	EXPLOSION_SPRITE = SpriteSheets.PutSheet(EXPLOSION, { 960.0f, 384.0f }, { 5, 2 });
+
+	
+	AudioBuilder audioBuilder;
+	Memory::EstablishTempScope(Kilobytes(1));
+	audioBuilder.Init(5);
+	audioBuilder.PutWav("shoot.wav");
+	AudioEngine.Build(audioBuilder);
+	Memory::EndTempScope();
+
+	
 }
 
 void SpaceGame::PostInit()
@@ -148,6 +158,7 @@ void SpaceGame::ControlPlayer(float dt)
 	if (Input::gInput.IsKeyReleased(KeyCode::Space) || Input::gInput.IsJoystickButtonReleased(GAMEPAD_A))
 	{
 		GameState->Bulltets.push_back({GameState->PlayerPosition + glm::vec2{32.0f, -32.0f}});
+		AudioEngine.Play(0);
 	}
 }
 

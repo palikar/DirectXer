@@ -50,6 +50,7 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\2DRendering.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\App.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Audio.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Camera.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Config.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\FileUtils.hpp" />
