@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alcomplex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alfstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\almalloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\dynload.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\polyphase_resampler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\ringbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\strutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\threads.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\albit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\albyte.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alcomplex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\aldeque.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alfstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\almalloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alnumeric.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\aloptional.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alspan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\alstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\atomic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\dynload.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\intrusive_ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\math_defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\opthelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\polyphase_resampler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\pragmadefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\ringbuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\strutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\threads.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\vecmat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common\vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{DE1F0C48-2A20-374C-8562-7F0A5A5FB1E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{437DE18D-C109-3344-B6BD-B1E280571BAA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

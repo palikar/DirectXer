@@ -1,0 +1,425 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\auxeffectslot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\autowah.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\chorus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\compressor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\convolution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\dedicated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\distortion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\echo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\equalizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\fshifter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\modulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\null.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\pshifter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\reverb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\vmorpher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\extension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\listener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\bformatdec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\buffer_storage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effectslot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\autowah.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\chorus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\compressor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\convolution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\dedicated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\distortion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\echo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\equalizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\fshifter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\modulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\null.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\pshifter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\reverb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\vmorpher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\hrtf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\panning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\uiddefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\voice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\loopback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\null.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\winmm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\dsound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\wasapi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\wave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\ambdec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\bs2b.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\bsinc_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\cpu_caps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\devformat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\except.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\filters\biquad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\filters\nfc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\filters\splitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\fmt_traits.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\fpu_ctrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mastering.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\uhjfilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\mixer_c.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\mixer_sse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\mixer_sse2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\mixer_sse3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\mixer_sse41.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\auxeffectslot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\effects\effects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\listener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\al\source.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alcmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\alcontext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\async_event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\bformatdec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\buffer_storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\compat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effectslot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\effects\base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\front_stablizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\hrtf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\inprogext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\voice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\voice_change.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\loopback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\null.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\winmm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\dsound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\wasapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc\backends\wave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\hrtf_default.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\ambdec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\ambidefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\bs2b.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\bsinc_defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\bsinc_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\bufferline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\cpu_caps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\devformat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\except.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\filters\biquad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\filters\nfc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\filters\splitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\fmt_traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\fpu_ctrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mastering.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\uhjfilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\hrtfbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\core\mixer\hrtfdefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include\AL\al.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include\AL\alc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include\AL\alext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include\AL\efx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\CMakeFiles\a34f0b35bf2199e5e04e0a521ea77d20\hrtf_default.h.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\resources\openal32.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{FF0E1C3A-327A-3748-A7DE-A52A0259744A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{DE1F0C48-2A20-374C-8562-7F0A5A5FB1E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{437DE18D-C109-3344-B6BD-B1E280571BAA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

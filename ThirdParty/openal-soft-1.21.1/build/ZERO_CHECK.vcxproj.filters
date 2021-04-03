@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\CMakeFiles\fe36d73ecf08cad65defae610641bcc7\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{FF0E1C3A-327A-3748-A7DE-A52A0259744A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
