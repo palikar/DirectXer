@@ -160,6 +160,37 @@ enum class MouseCode : uint16_t
 
 };
 
+
+#define GAMEPAD_DPAD_UP 	   0x0001
+#define GAMEPAD_DPAD_DOWN 	   0x0002
+#define GAMEPAD_DPAD_LEFT 	   0x0004
+#define GAMEPAD_DPAD_RIGHT 	   0x0008
+#define GAMEPAD_START          0x0010
+#define GAMEPAD_BACK 	       0x0020
+
+#define GAMEPAD_LEFT_THUMB 	   0x0040
+#define GAMEPAD_RIGHT_THUMB    0x0080
+
+#define GAMEPAD_LEFT_SHOULDER  0x0100
+#define GAMEPAD_RIGHT_SHOULDER 0x0200
+
+#define GAMEPAD_A 	           0x1000
+#define GAMEPAD_B 	           0x2000
+#define GAMEPAD_X 	           0x4000
+#define GAMEPAD_Y              0x8000
+
+struct JoystickInput
+{
+	uint32 Buttons;
+	uint16 RightThumbX;
+	uint16 RightThumbY;
+	
+	int16 LeftThumbX;
+	int16 LeftThumbY;
+	uint8 LeftTrigger;
+	uint8 RightTrigger;
+};
+
 struct Input
 {
 	static Input gInput;
@@ -184,6 +215,9 @@ struct Input
 
 	glm::vec2 MouseScollOffset{0.0};
 	glm::vec2 MouseLastScollOffset{0.0};
+
+	JoystickInput PrevJoystickState{0};
+	JoystickInput CurrentJoystickState{0};
 
 	void InitInstance()
 	{
@@ -219,6 +253,14 @@ struct Input
 		}
 		
 		LastMousePosition = MousePosition;
+		
+		PrevJoystickState = CurrentJoystickState;
+		CurrentJoystickState = {0};
+	}
+
+	void UpdateJoystick(JoystickInput state)
+	{
+		CurrentJoystickState = state;
 	}
 
 	void UpdateKeyboardButtonPressed(uint16_t t_Key)
@@ -280,6 +322,36 @@ struct Input
 	bool IsKeyReleased(MouseCode t_Key)
 	{
 		return MouseReleasedKeys[(uint16_t)t_Key];
+	}
+
+	bool IsJoystickButtonPressed(uint16 t_Btn)
+	{
+		return CurrentJoystickState.Buttons & t_Btn;
+	}
+
+	bool IsJoystickButtonReleased(uint16 t_Btn)
+	{
+		return (PrevJoystickState.Buttons & t_Btn) && !(CurrentJoystickState.Buttons & t_Btn);
+	}
+	
+	glm::vec2 GetRightThumb()
+	{
+		return {(CurrentJoystickState.RightThumbX / (255.0f * 255.0f * 0.5f)), (CurrentJoystickState.RightThumbY / (255.0f * 255.0f * 0.5f))};
+	}
+
+	glm::vec2 GetLeftThumb()
+	{
+		return {(CurrentJoystickState.LeftThumbX / (255.0f * 255.0f * 0.5f)), (CurrentJoystickState.LeftThumbY / (255.0f * 255.0f * 0.5f))};
+	}
+	
+	float GetRightTrigger()
+	{
+		return CurrentJoystickState.LeftTrigger / (255.0f * 255.0f * 0.5f);
+	}
+	
+	float GetLeftTrigger()
+	{
+		return CurrentJoystickState.RightTrigger / (255.0f * 255.0f * 0.5f);
 	}
 
     static void Init();

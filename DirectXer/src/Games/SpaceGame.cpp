@@ -119,23 +119,25 @@ void SpaceGame::ControlPlayer(float dt)
 {
 	glm::vec2& pos = GameState->PlayerPosition;
 	const float playerSped = 350.0f;
+
+	auto lThumb = Input::gInput.GetLeftThumb();
 	
-	if (Input::gInput.IsKeyPressed(KeyCode::A))
+	if (Input::gInput.IsKeyPressed(KeyCode::A) || lThumb.x < 0.0f)
 	{
 		pos.x -= playerSped * dt;
 	}
 
-	if (Input::gInput.IsKeyPressed(KeyCode::D))
+	if (Input::gInput.IsKeyPressed(KeyCode::D) || lThumb.x > 0.0f)
 	{
 		pos.x += playerSped * dt;
 	}
 
-	if (Input::gInput.IsKeyPressed(KeyCode::W))
+	if (Input::gInput.IsKeyPressed(KeyCode::W) || lThumb.y > 0.0f)
 	{
 		pos.y -= playerSped * dt;
 	}
 
-	if (Input::gInput.IsKeyPressed(KeyCode::S))
+	if (Input::gInput.IsKeyPressed(KeyCode::S) || lThumb.y < 0.0f)
 	{
 		pos.y += playerSped * dt;
 	}
@@ -143,7 +145,7 @@ void SpaceGame::ControlPlayer(float dt)
 	pos.y = clamp(pos.y, Application->Height - 130.0f, Application->Height - 70.0f);
 	pos.x = clamp(pos.x, 2.0f,  Application->Width - 64.0f - 2.0f);
 
-	if (Input::gInput.IsKeyReleased(KeyCode::Space))
+	if (Input::gInput.IsKeyReleased(KeyCode::Space) || Input::gInput.IsJoystickButtonReleased(GAMEPAD_A))
 	{
 		GameState->Bulltets.push_back({GameState->PlayerPosition + glm::vec2{32.0f, -32.0f}});
 	}

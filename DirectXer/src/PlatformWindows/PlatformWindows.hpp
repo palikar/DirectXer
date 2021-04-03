@@ -1,5 +1,8 @@
 #pragma once
 
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
 #include "Types.hpp"
 #include "IncludeWin.hpp"
 #include "Memory.hpp"
@@ -37,7 +40,7 @@ public:
 	void Resize(uint32 width, uint32 height);
 	void InitAfterCreate(HWND t_hWnd);
 	void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
+	void UpdateJoyStickState();
 };
 
 struct WindowsPlatformLayer

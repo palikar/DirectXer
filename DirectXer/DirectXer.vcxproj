@@ -210,7 +210,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=0;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_HAS_EXCEPTIONS=0;DXER_EXAMPLE_SCENES=1</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Freetype\include;$(SolutionDir)Stb\include;$(SolutionDir)DXError\src;$(SolutionDir)IMGui\include;$(SolutionDir)Fmt\include;$(ProjectDir)src;$(ProjectDir)libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -238,7 +238,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_EXAMPLE_SCENES=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Freetype\include;$(SolutionDir)Stb\include;$(SolutionDir)DXError\src;$(SolutionDir)IMGui\include;$(SolutionDir)Fmt\include;$(ProjectDir)src;$(ProjectDir)libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
@@ -262,7 +262,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_EXAMPLE_SCENES=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Freetype\include;$(SolutionDir)Stb\include;$(SolutionDir)DXError\src;$(SolutionDir)IMGui\include;$(SolutionDir)Fmt\include;$(ProjectDir)src;$(ProjectDir)libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
@@ -278,24 +278,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DXError\DXError.vcxproj">
-      <Project>{48ffd535-c99e-43f8-b315-29f8f9d3723e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Fmt\Fmt.vcxproj">
-      <Project>{9281a33e-e029-4278-8752-ebc0cca25940}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Freetype\freetype.vcxproj">
-      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ImGui\ImGui.vcxproj">
-      <Project>{648f47b9-1348-4d49-ac41-9858961beda2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Stb\Stb.vcxproj">
-      <Project>{e9da2eb9-160a-4133-b4b5-109eb283280c}</Project>
-    </ProjectReference>
+    <None Include="DirectXer.args.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DirectXer.args.json" />
+    <ProjectReference Include="..\ThirdParty\DXError\DXError.vcxproj">
+      <Project>{48ffd535-c99e-43f8-b315-29f8f9d3723e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Fmt\Fmt.vcxproj">
+      <Project>{9281a33e-e029-4278-8752-ebc0cca25940}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Freetype\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\ImGui\ImGui.vcxproj">
+      <Project>{648f47b9-1348-4d49-ac41-9858961beda2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Stb\Stb.vcxproj">
+      <Project>{e9da2eb9-160a-4133-b4b5-109eb283280c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,6 +8,7 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <fmt/format.h>
+#include <Xinput.h>
 
 void PlatformLayer::Init()
 {
@@ -202,6 +203,24 @@ void WindowsWindow::ToggleFullscreen()
 	FullscreenMode = !FullscreenMode;
 }
 	
+
+void WindowsWindow::UpdateJoyStickState()
+{
+	XINPUT_STATE xState{ 0 };
+	XInputGetState(0, &xState);
+
+	JoystickInput newState;
+	newState.Buttons = xState.Gamepad.wButtons;
+	newState.LeftTrigger = xState.Gamepad.bLeftTrigger;
+	newState.RightTrigger = xState.Gamepad.bRightTrigger;
+	newState.LeftThumbX = xState.Gamepad.sThumbLX;
+	newState.LeftThumbY = xState.Gamepad.sThumbLY;
+	newState.RightThumbX = xState.Gamepad.sThumbRX;
+	newState.RightThumbY = xState.Gamepad.sThumbRY;
+		
+	Input::gInput.UpdateJoystick(newState);
+}
+
 int WindowsWindow::Run()
 {
 
@@ -214,7 +233,8 @@ int WindowsWindow::Run()
 	while (true)
 	{
 		Input::gInput.Update();
-			
+		UpdateJoyStickState();
+		
 		MSG msg;
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
