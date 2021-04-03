@@ -1,6 +1,8 @@
 #pragma once
 
 #define GLM_FORCE_SWIZZLE
+#define GLM_FORCE_SSE2
+#define GLM_FORCE_AVX
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
