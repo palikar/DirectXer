@@ -29,6 +29,7 @@ public:
 	void Init();
 	void Update(float dt);
 	void Resize();
+	void PostInit() {};
 	
 	void SetupCamera(Camera t_Camera);
 	void RenderSkyBox();

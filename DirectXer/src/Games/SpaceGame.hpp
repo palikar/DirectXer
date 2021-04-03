@@ -12,6 +12,8 @@
 #include <Random.hpp>
 #include <Audio.hpp>
 
+#include <SpaceAssets.hpp>
+
 class App;
 struct GameState;
 class SpaceGame

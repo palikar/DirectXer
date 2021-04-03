@@ -201,6 +201,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
+	Graphics->SetDepthStencilState(DSS_Normal);
 
 	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
 	SetupCamera(camera);
@@ -326,6 +327,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
 	// @Note: Rendering begins here
+	Graphics->SetDepthStencilState(DSS_Normal);
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
 

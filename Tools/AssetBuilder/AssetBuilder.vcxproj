@@ -26,13 +26,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ThirdParty\Fmt\Fmt.vcxproj">
+      <Project>{9281a33e-e029-4278-8752-ebc0cca25940}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ThirdParty\Stb\Stb.vcxproj">
+      <Project>{e9da2eb9-160a-4133-b4b5-109eb283280c}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssetBuilder.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{E8A1E208-E806-4908-97A5-BC4FB0B09C65}</ProjectGuid>
+    <ProjectGuid>{A8982FA0-0089-416D-9DD6-D9300B69D4A0}</ProjectGuid>
     <RootNamespace>DirectXer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>SpaceGame</ProjectName>
+    <ProjectName>AssetBuilder</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -77,9 +88,6 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-    <Import Project="Core.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -210,7 +218,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=0;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_HAS_EXCEPTIONS=0;DXER_SPACE_GAME=1</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(SolutionDir)\DirectXer\src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -221,7 +229,7 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>4194304</StackReserveSize>
@@ -238,13 +246,13 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_SPACE_GAME=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(SolutionDir)\DirectXer\src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -262,13 +270,13 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_EXAMPLE_SCENES=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)ResourceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(SolutionDir)\DirectXer\src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -277,29 +285,6 @@
       <HeapReserveSize>268435456</HeapReserveSize>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="SpaceGame.args.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\DXError\DXError.vcxproj">
-      <Project>{48ffd535-c99e-43f8-b315-29f8f9d3723e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\Fmt\Fmt.vcxproj">
-      <Project>{9281a33e-e029-4278-8752-ebc0cca25940}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\Freetype\freetype.vcxproj">
-      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\ImGui\ImGui.vcxproj">
-      <Project>{648f47b9-1348-4d49-ac41-9858961beda2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\openal-soft-1.21.1\build\OpenAL.vcxproj">
-      <Project>{f7a370ba-eed2-33dc-9759-a72287d42d6e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\Stb\Stb.vcxproj">
-      <Project>{e9da2eb9-160a-4133-b4b5-109eb283280c}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

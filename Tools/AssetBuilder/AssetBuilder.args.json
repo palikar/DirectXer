@@ -1,0 +1,10 @@
+{
+  "FileVersion": 2,
+  "Id": "a8982fa0-0089-416d-9dd6-d9300b69d4a0",
+  "Items": [
+    {
+      "Id": "4e9af367-5152-4b89-ac9d-570bb52da1bd",
+      "Command": "-r resources -h DirectXer/ResorceHeaders/SpaceAssets -o resources/SpaceAssets -i SpaceGame"
+    }
+  ]
+}
