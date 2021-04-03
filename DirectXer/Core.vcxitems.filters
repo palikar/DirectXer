@@ -61,6 +61,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TextureCatalog.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GeometryUtils.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Audio.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">

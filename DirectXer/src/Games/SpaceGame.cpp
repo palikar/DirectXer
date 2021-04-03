@@ -19,6 +19,7 @@ static uint32 SHIP_BULLET;
 static uint32 EXPLOSION;
 static uint32 STATUS_BAR;
 static uint32 HEALTH_BAR;
+static uint32 HEART;
 
 static uint32 EXPLOSION_SPRITE;
 
@@ -51,10 +52,12 @@ struct GameState
 	BulkVector<Enemy> Enemies;
 	BulkVector<Bullet> Bulltets;
 	BulkVector<Animation> Animations;
-	glm::vec2 PlayerPosition;
 	uint32 Score;
 	uint32 SpawndedEnemies;
+	glm::vec2 PlayerPosition;
 	float EnemySpwaner;
+	float Time;
+	uint16 Wave;
 	
 };
 
@@ -74,6 +77,7 @@ void SpaceGame::Init()
 	EXPLOSION = imagebuilder.PutImage("assets/explosion.png");
 	STATUS_BAR = imagebuilder.PutImage("assets/PNG/Main_UI/Stats_Bar.png");
 	HEALTH_BAR = imagebuilder.PutImage("assets/PNG/Main_UI/Health_Bar_Table.png");
+	HEART= imagebuilder.PutImage("assets/heart.png");
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
@@ -99,19 +103,20 @@ void SpaceGame::Init()
 	GameState->Bulltets.reserve(100);
 	GameState->EnemySpwaner = 0.0f;
 	GameState->SpawndedEnemies = 0;
+	GameState->Time = 0.0f;
+	GameState->Score = 0;
+	GameState->Wave = 1;
 
 	SpriteSheets.Init(5, &Renderer2D);
 	EXPLOSION_SPRITE = SpriteSheets.PutSheet(EXPLOSION, { 960.0f, 384.0f }, { 5, 2 });
-
 	
 	AudioBuilder audioBuilder;
 	Memory::EstablishTempScope(Kilobytes(1));
 	audioBuilder.Init(5);
 	audioBuilder.PutWav("shoot.wav");
+	audioBuilder.PutWav("explosion.wav");
 	AudioEngine.Build(audioBuilder);
 	Memory::EndTempScope();
-
-	
 }
 
 void SpaceGame::PostInit()
@@ -158,7 +163,7 @@ void SpaceGame::ControlPlayer(float dt)
 	if (Input::gInput.IsKeyReleased(KeyCode::Space) || Input::gInput.IsJoystickButtonReleased(GAMEPAD_A))
 	{
 		GameState->Bulltets.push_back({GameState->PlayerPosition + glm::vec2{32.0f, -32.0f}});
-		AudioEngine.Play(0);
+		AudioEngine.Play(0, 0.25f);
 	}
 }
 
@@ -179,6 +184,7 @@ void SpaceGame::CleanUpDead()
 void SpaceGame::UpdateGameState(float dt)
 {
 	CleanUpDead();
+	GameState->Time += dt;
 	
 	auto& bullets = GameState->Bulltets;
 	auto& enemies = GameState->Enemies;
@@ -211,6 +217,8 @@ void SpaceGame::UpdateGameState(float dt)
 				GameState->Animations.push_back(newAnimation);
 				enemy.Dead = true;
 				bullet.Position.y = -3.0f;
+				AudioEngine.Play(1, 0.5f);
+				GameState->Score += 1;
 				break;
 			}
 			
@@ -301,9 +309,11 @@ void SpaceGame::Update(float dt)
 	Renderer2D.BeginScene();
 	
 	Renderer2D.DrawImage(STATUS_BAR, {20.0f, 20.0f}, { Application->Width - 40.0f, 32.0f });
-	Renderer2D.DrawText("Wave: 0", {42.0f, 44.0f}, 1);
-	Renderer2D.DrawText("Score: 0", {260.0f, 44.0f}, 1);
-	Renderer2D.DrawText("Time: 0", {460.0f, 44.0f}, 1);
+
+	auto time = (int)roundf(GameState->Time);
+	Renderer2D.DrawText(Formater.Format("Wave: {}", GameState->Wave), {42.0f, 44.0f}, 1);
+	Renderer2D.DrawText(Formater.Format("Score: {}", GameState->Score), {260.0f, 44.0f}, 1);
+	Renderer2D.DrawText(Formater.Format("Time: {}:{}", time / 60, time % 60), {460.0f, 44.0f}, 1);
 	Renderer2D.DrawImage(HEALTH_BAR, {10.0f, Application->Height - 32.0f - 20.0f}, { Application->Width / 3.5f, 32.0f});
 	
 	Renderer2D.EndScene();

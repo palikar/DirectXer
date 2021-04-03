@@ -17,6 +17,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Audio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp">
@@ -35,6 +36,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GeometryUtils.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\ImageLibrary.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Input.cpp" />

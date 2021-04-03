@@ -12,7 +12,6 @@
 #include <Random.hpp>
 #include <Audio.hpp>
 
-
 class App;
 struct GameState;
 class SpaceGame
@@ -31,6 +30,8 @@ public:
 	RTObject uiRenderTarget;
 
 	AudioPlayer AudioEngine;
+
+	TempFormater Formater;
 
 	GameState* GameState;
 
