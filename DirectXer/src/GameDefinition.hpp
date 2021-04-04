@@ -10,4 +10,17 @@ using GameClass = ExampleScenes;
 #include "Games/SpaceGame.hpp"
 using GameClass = SpaceGame;
 
+#else
+struct DummyGame
+{
+	void Init(){}
+	void PostInit(){}
+	void Update(float){}
+	void Resize(){}
+
+	void* Graphics;
+	void* Application;
+};
+using GameClass = DummyGame;
+
 #endif

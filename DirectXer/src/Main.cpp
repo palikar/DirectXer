@@ -23,7 +23,6 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 App* InitMain(char** argv, int argc)
 {
 	Input::Init();
-	gDxgiManager.Init();
 	Memory::InitMemoryState();
 	PlatformLayer::Init();
 	Random::Init();

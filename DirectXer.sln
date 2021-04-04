@@ -52,11 +52,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetBuilder", "Tools\Asset
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TexturePacker", "Tools\TexturePacker\TexturePacker.vcxproj", "{16D5F330-9071-42E5-9ACF-F1D6C2636485}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinMain", "DirectXer\WinMain.vcxitems.vcxitems", "{981F05A7-FF2D-4AA5-A9CA-210E95ED1AF0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtlasViewer", "Tools\AtlasViewer\AtlasViewer.vcxproj", "{32D63685-09ED-459E-A8FF-95501679056A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		DirectXer\Core.vcxitems*{32d63685-09ed-459e-a8ff-95501679056a}*SharedItemsImports = 4
 		DirectXer\Core.vcxitems*{3a380954-cd7d-4508-876b-42df7c910d97}*SharedItemsImports = 9
+		DirectXer\WinMain.vcxitems.vcxitems*{981f05a7-ff2d-4aa5-a9ca-210e95ed1af0}*SharedItemsImports = 9
 		DirectXer\Core.vcxitems*{d39df77f-24b0-44cc-ab02-d6a8e5d0ecf1}*SharedItemsImports = 4
+		DirectXer\WinMain.vcxitems.vcxitems*{d39df77f-24b0-44cc-ab02-d6a8e5d0ecf1}*SharedItemsImports = 4
 		DirectXer\Core.vcxitems*{e8a1e208-e806-4908-97a5-bc4fb0b09c65}*SharedItemsImports = 4
+		DirectXer\WinMain.vcxitems.vcxitems*{e8a1e208-e806-4908-97a5-bc4fb0b09c65}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -378,6 +386,26 @@ Global
 		{16D5F330-9071-42E5-9ACF-F1D6C2636485}.RelWithDebInfo|x64.Build.0 = Release|x64
 		{16D5F330-9071-42E5-9ACF-F1D6C2636485}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
 		{16D5F330-9071-42E5-9ACF-F1D6C2636485}.RelWithDebInfo|x86.Build.0 = Release|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.Debug|x64.ActiveCfg = Debug|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.Debug|x64.Build.0 = Debug|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.Debug|x86.ActiveCfg = Debug|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.Debug|x86.Build.0 = Debug|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.MinSizeRel|x64.Build.0 = Debug|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.MinSizeRel|x86.ActiveCfg = Profile|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.MinSizeRel|x86.Build.0 = Profile|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.Profile|x64.ActiveCfg = Profile|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.Profile|x64.Build.0 = Profile|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.Profile|x86.ActiveCfg = Profile|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.Profile|x86.Build.0 = Profile|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.Release|x64.ActiveCfg = Release|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.Release|x64.Build.0 = Release|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.Release|x86.ActiveCfg = Release|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.Release|x86.Build.0 = Release|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.RelWithDebInfo|x64.ActiveCfg = Release|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.RelWithDebInfo|x64.Build.0 = Release|x64
+		{32D63685-09ED-459E-A8FF-95501679056A}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
+		{32D63685-09ED-459E-A8FF-95501679056A}.RelWithDebInfo|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -401,6 +429,7 @@ Global
 		{635B4EA0-B430-3373-9EED-0B1CDBA8AD8C} = {52C4F3BB-5890-4202-BB5C-446289A2DB2E}
 		{A8982FA0-0089-416D-9DD6-D9300B69D4A0} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
 		{16D5F330-9071-42E5-9ACF-F1D6C2636485} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
+		{32D63685-09ED-459E-A8FF-95501679056A} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6B8AD3D8-7C6D-400D-A86B-BEC34B5B7736}

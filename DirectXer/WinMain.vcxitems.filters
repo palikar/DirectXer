@@ -41,6 +41,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp">
       <Filter>PlatformWindows</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WinMain.cpp">
+      <Filter>PlatformWindows</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />

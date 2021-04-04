@@ -11,14 +11,6 @@
 #include "Resources.hpp"
 #include "FileUtils.hpp"
 
-inline TextureFormat PngFormat(int channels)
-{
-	if(channels == 1) return TF_A;
-	if(channels == 4) return TF_RGBA;
-
-	return TF_UNKNOWN;
-}
-
 enum LoadState
 {
 	LS_LOADED,

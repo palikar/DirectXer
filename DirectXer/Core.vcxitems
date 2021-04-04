@@ -45,7 +45,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\GraphicsD3D11.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WinMain.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TextureCatalog.cpp" />
   </ItemGroup>

@@ -135,3 +135,11 @@ inline void TransformVertex(ColorVertex& t_Vertex, glm::mat4 t_Mat)
 {
 	t_Vertex.pos = t_Mat * glm::vec4(t_Vertex.pos, 1.0f);
 }
+
+inline TextureFormat PngFormat(int channels)
+{
+	if(channels == 1) return TF_A;
+	if(channels == 4) return TF_RGBA;
+
+	return TF_UNKNOWN;
+}

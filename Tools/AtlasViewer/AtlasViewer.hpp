@@ -1,11 +1,19 @@
-#include "Platform.hpp"
-#include "Memory.hpp"
-#include "Resources.hpp"
-#include "App.hpp"
+#pragma once
 
-#include <shellapi.h>
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+#include <string>
+#include <cstdint>
+#include <fstream>
+#include <stb_image.h>
+#include <GraphicsCommon.hpp>
+#include <Types.hpp>
+#include <Utils.hpp>
+#include <Assets.hpp>
+#include <fmt/format.h>
+#include <filesystem>
 
-extern App* InitMain(char** argv, int argc);
 
 static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 {
@@ -78,32 +86,49 @@ static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdSHow)
+struct CommandLineArguments
 {
-	SetupConsole();
-	gDxgiManager.Init();
+	std::string Root{"resources"};
+	std::string Input{"input.dxa"};
+};
 
-	int argc;
-	char** argv;
-	argv = CommandLineToArgvA(GetCommandLine(), &argc);
+struct Context
+{
+	HWND hWnd;
+	CommandLineArguments Args;
+	bool FullscreenMode;
+	UINT WindowStyle;
+	RECT WindowRect;
+	Graphics Graphics;
+	TextureObject DummyTex;
+	uint16 currentTex{0};
+	std::vector<TextureObject> Texs;
+};
 
-	WindowsSettings settings{0};
-	settings.ClassName = "DirectXClass";
-	settings.WindowTitle = "DirectXer";
-	settings.InitialWidth = 1080;
-	settings.InitialHeight = 720;
-	settings.Fullscreen = 0;
+static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context* context);
 
-	WindowsWindow window;
-	window.Application = InitMain(argv, argc);
+static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (msg == WM_CREATE)
+	{
+		auto context = (Context*)((LPCREATESTRUCTA)lParam)->lpCreateParams;
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)context);
 
-	size_t InitialStackMemory{0};
-	InitialStackMemory += sizeof(WindowsWindow);
-	InitialStackMemory += sizeof(WindowsSettings);
-	InitialStackMemory += sizeof(int);
-	InitialStackMemory += sizeof(char**);
-	DXLOG("[INIT] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
+		context->Graphics.InitSwapChain(hWnd, 1080, 720);
+		context->Graphics.InitBackBuffer();
+		context->Graphics.InitZBuffer(1080, 720);
+		context->Graphics.InitResources();
+		context->Graphics.InitRasterizationsStates();
+		context->Graphics.InitSamplers();
+		context->Graphics.InitBlending();
+		context->Graphics.InitDepthStencilStates();
+	}
+	else
+	{
+		auto context = (Context*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		HandleMessage(hWnd, msg, wParam, lParam, context);
+	}
 	
-	window.Init(settings);
-	return window.Run();
+	return DefWindowProc(hWnd, msg, wParam, lParam);
+
 }

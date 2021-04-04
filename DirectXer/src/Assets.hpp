@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Types.hpp>
+#include <GraphicsCommon.hpp>
 
 enum Tag : uint16
 {

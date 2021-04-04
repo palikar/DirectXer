@@ -24,7 +24,7 @@ static inline ImageToPack ImagesToPack[] = {
 	{"assets/evil_ship_2.png", 64, 64},
 	{"assets/evil_ship_3.png", 64, 64},
 	{"assets/PNG/Ship_Parts/Ship_Main_Icon.png", 64, 64},
-	{"assets/ship_bullet.png", 32, 32},
+	{"assets/ship_bullet.png", 32, 64},
 	{"assets/explosion.png", 0, 0},
 	{"assets/PNG/Main_UI/Stats_Bar.png", 0, 0},
 	{"assets/heart.png", 32, 32},
@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
 				atlasEntry.Height = atlasHeight;
 				atlases.push_back(atlasEntry);
 				std::for_each(atlases.begin(), atlases.end(), [](auto& atlas){ atlas.Offset +=  sizeof(AtlasEntry); });
+				header.NumAtlases += 1;
 			}
 			
 			stbrp_pack_rects(&RectContexts[j], &rect, 1);
