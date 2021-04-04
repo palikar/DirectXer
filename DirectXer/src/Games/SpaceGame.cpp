@@ -7,6 +7,8 @@
 #include <Memory.hpp>
 
 #include "SpaceGame.hpp"
+#include <SpaceAssets.hpp>
+
 
 #include <imgui.h>
 

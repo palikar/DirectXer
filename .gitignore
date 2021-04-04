@@ -2,3 +2,8 @@ Build
 .vs
 *.user
 build.bat
+DirectXer/Shaders/*.hpp
+DirectXer/Shaders/*.cso
+resources/*.dxl
+resources/*.dxa
+resources/

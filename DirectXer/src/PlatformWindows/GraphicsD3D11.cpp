@@ -1,5 +1,13 @@
 #include "GraphicsD3D11.hpp"
 
+#include <2DVertexShader.hpp>
+#include <2DPixelShader.hpp>
+
+#include <PixelShader.hpp>
+#include <VertexShader.hpp>
+
+#include <QuadPixelShader.hpp>
+#include <QuadVertexShader.hpp>
 
 static DXGI_FORMAT TFToDXGI(TextureFormat format)
 {
@@ -511,39 +519,22 @@ void GraphicsD3D11::InitResources()
 
 	{
 		// Debug shader
-
-		ID3DBlob* pBlob;
-		ShaderObject shaderObject;
-		D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
-		GFX_CALL(Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.ps));
-
-		ID3D11VertexShader* pVertexShader{0};
-		D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
-		GFX_CALL(Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.vs));
-
 		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"Color", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"Texcoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
-		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &shaderObject.il));
-
+		
+		ShaderObject shaderObject;
+		GFX_CALL(Device->CreatePixelShader(g_PixelShader, Size(g_PixelShader), nullptr, &shaderObject.ps));
+		GFX_CALL(Device->CreateVertexShader(g_VertexShader, Size(g_VertexShader), nullptr, &shaderObject.vs));
+		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_VertexShader, Size(g_VertexShader), &shaderObject.il));
 		Shaders[SF_DEBUG] = shaderObject;
 	}
 
 	{
 		// 2D shader
-
-		ID3DBlob* pBlob;
-		ShaderObject shaderObject;
-		D3DReadFileToBlob(L"2DPixelShader.cso", &pBlob);
-		GFX_CALL(Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.ps));
-
-		ID3D11VertexShader* pVertexShader{0};
-		D3DReadFileToBlob(L"2DVertexShader.cso", &pBlob);
-		GFX_CALL(Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.vs));
-
 		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
 			{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"Texcoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -551,25 +542,21 @@ void GraphicsD3D11::InitResources()
 			{"Additional", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"Type", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
-		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &shaderObject.il));
-
+		
+		ShaderObject shaderObject;
+		GFX_CALL(Device->CreatePixelShader(g_2DPixelShader, Size(g_2DPixelShader), nullptr, &shaderObject.ps));
+		GFX_CALL(Device->CreateVertexShader(g_2DVertexShader, Size(g_2DVertexShader), nullptr, &shaderObject.vs));
+		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_2DVertexShader, Size(g_2DVertexShader), &shaderObject.il));
 		Shaders[SF_2D] = shaderObject;
 	}
 
 	{
 		// Quad shader
-
-		ID3DBlob* pBlob;
+		
 		ShaderObject shaderObject;
-		D3DReadFileToBlob(L"QuadPixelShader.cso", &pBlob);
-		GFX_CALL(Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.ps));
-
-		ID3D11VertexShader* pVertexShader{0};
-		D3DReadFileToBlob(L"QuadVertexShader.cso", &pBlob);
-		GFX_CALL(Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &shaderObject.vs));
-
+		GFX_CALL(Device->CreatePixelShader(g_QuadPixelShader, Size(g_QuadPixelShader), nullptr, &shaderObject.ps));
+		GFX_CALL(Device->CreateVertexShader(g_QuadVertexShader, Size(g_QuadVertexShader), nullptr, &shaderObject.vs));
 		shaderObject.il = nullptr;
-
 		Shaders[SF_QUAD] = shaderObject;
 	}
 

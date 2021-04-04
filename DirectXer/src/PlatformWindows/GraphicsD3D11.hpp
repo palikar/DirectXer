@@ -3,6 +3,7 @@
 #include <Logging.hpp>
 #include <Memory.hpp>
 #include <Math.hpp>
+#include <Utils.hpp>
 
 #include <d3d11.h>
 #include <wrl.h>
