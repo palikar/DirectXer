@@ -49,3 +49,30 @@ struct FontHeader
 {
 	uint32 FontSize;
 };
+
+
+
+struct AtlasFileHeader
+{
+	uint16 NumAtlases;
+	uint16 NumImages;
+};
+
+struct AtlasEntry
+{
+	int Width;
+	int Height;
+	TextureFormat Format;
+	int Offset;
+};
+
+struct ImageEntry
+{
+	int Atlas;
+	float Y;
+	float X;
+	float Width;
+	float Height;
+	float AtlasWidth;
+	float AtlasHeight;
+};

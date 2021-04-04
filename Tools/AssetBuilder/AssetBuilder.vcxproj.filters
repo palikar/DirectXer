@@ -2,5 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="AssetBuilder.cpp" />
+    <ClCompile Include="AssetLoaders.cpp" />
+    <ClCompile Include="AssetBuilderStbi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetBuilder.hpp" />
   </ItemGroup>
 </Project>
