@@ -13,13 +13,14 @@ enum AssetType : uint16
 	Type_Image,
 	Type_Font,
 	Type_Wav,
+	Type_Atlas,
 };
 
 struct AssetEntry
 {
 	uint64 Offset;
 	uint64 Size;
-	uint16 Type;
+	AssetType Type;
 	uint16 Tag;
 };
 
@@ -28,6 +29,7 @@ struct AssetColletionHeader
 	uint32 ImagesCount;
 	uint32 WavCount;
 	uint32 FontsCount;	
+	uint32 AtlasesCount;
 	uint32 VersionSpec;	
 };
 
@@ -69,6 +71,7 @@ struct AtlasEntry
 
 struct ImageEntry
 {
+	char Id[64];
 	int Atlas;
 	float Y;
 	float X;
@@ -76,4 +79,5 @@ struct ImageEntry
 	float Height;
 	float AtlasWidth;
 	float AtlasHeight;
+	
 };

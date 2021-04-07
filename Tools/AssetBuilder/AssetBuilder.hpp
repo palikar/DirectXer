@@ -52,3 +52,5 @@ struct AssetToLoad
 size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes);
 size_t LoadWav(AssetToLoad asset, std::vector<unsigned char>& bytes);
 size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes);
+size_t LoadAtlas(AssetToLoad asset, std::vector<unsigned char>& bytes,
+				 std::vector<std::string>& headerDefines, AssetColletionHeader& header);

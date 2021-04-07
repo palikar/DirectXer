@@ -21,6 +21,7 @@
 #include <Utils.hpp>
 #include <Assets.hpp>
 #include <FileUtils.hpp>
+#include <Platform.hpp>
 
 #include "AtlasViewer.hpp"
 #include "DummyTexture.hpp"
@@ -45,14 +46,16 @@ static void DumpImages(char* memory, uint16 count)
 	for (size_t i = 0; i < count; ++i)
 	{
 		auto image = (ImageEntry*)(memory + sizeof(ImageEntry) * i);
-		fmt::print("Image [{}] is in atlas [{}] and has size of	 [{}x{}]\n", i, image->Atlas,
-				   (int)roundf(image->AtlasWidth * image->X), (int)roundf(image->AtlasHeight * image->Y));
+		fmt::print("Image [{}]\tis in atlas [{}] and has size of [{}x{}]\n", image->Id, image->Atlas,
+				   (int)roundf(image->AtlasWidth * image->Width), (int)roundf(image->AtlasHeight * image->Height));
 
 	}
 }
 
 static void LoadAtlas(Context& context, const char* path)
 {
+	if (!PlatformLayer::IsValidPath(path)) return;
+	
 	auto Graphics = &context.Graphics;
 	MemoryArena fileArena = Memory::GetTempArena(Megabytes(128));
 	Defer {

@@ -9,6 +9,7 @@
 -Build
 -Release
 -Debug
+-ThirdParty
 
 -.vs
 -*vcxitems*
@@ -23,3 +24,5 @@
 -*.lib*
 -*.obj*
 -*.pdb*
+
+

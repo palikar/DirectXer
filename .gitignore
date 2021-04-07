@@ -7,3 +7,4 @@ DirectXer/Shaders/*.cso
 resources/*.dxl
 resources/*.dxa
 resources/
+ThirdParty/

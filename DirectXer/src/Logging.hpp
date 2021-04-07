@@ -116,7 +116,6 @@ class DxgiInfoManager
 
 	}
 	
-  private:
 	unsigned long long next = 0u;
 	struct IDXGIInfoQueue* pDxgiInfoQueue = nullptr;
 };

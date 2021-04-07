@@ -6,17 +6,6 @@
 
 #include <imgui.h>
 
-
-static uint32 CUBE;
-static uint32 PLANE;
-static uint32 LINES;
-static uint32 CYLINDER;
-static uint32 SPHERE;
-static uint32 AXIS;
-static uint32 CAMERA;
-static uint32 POINTLIGHT;
-static uint32 SPOTLIGHT;
-
 void App::Init(HWND t_Window)
 {
 	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
@@ -52,14 +41,4 @@ void App::Resize()
 	Graphics.SetViewport(0, 0, Width, Height);
 	
 	Game.Resize();
-}
-
-void App::Destroy()
-{
-	Graphics.Destroy();
-}
-
-void App::Spin(float dt)
-{
-	Game.Update(dt);
 }

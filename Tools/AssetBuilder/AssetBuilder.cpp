@@ -17,21 +17,16 @@
 static AssetToLoad AssetsToLoad[] = {
 
 	{Type_Image, Tag_Level, "assets/PNG/Main_Menu/BG.png", "I_BG"},
-	{Type_Image, Tag_Level, "assets/PNG/Ship_Parts/Ship_Main_Icon.png", "I_SHIP"},
-	{Type_Image, Tag_Level, "assets/evil_ship_1.png", "I_ENEMY_1"},
-	{Type_Image, Tag_Level, "assets/evil_ship_2.png", "I_ENEMY_2"},
-	{Type_Image, Tag_Level, "assets/evil_ship_3.png", "I_ENEMY_3"},
-	{Type_Image, Tag_Level, "assets/ship_bullet.png", "i_BULLET"},
-	{Type_Image, Tag_Level, "assets/explosion.png", "i_EXPLODE"},
 	{Type_Image, Tag_Level, "assets/PNG/Main_UI/Stats_Bar.png", "I_STATS"},
-	{Type_Image, Tag_Level, "assets/PNG/Main_UI/Health_Bar_Table.png", "i_HEALTH"},
-	{Type_Image, Tag_Level, "assets/heart.png", "I_HEART"},
 
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans.ttf", "F_DroidSans", {24, 20}},
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans-Bold.ttf", "F_DroidSansBold", {24, 20}},
 	
 	{Type_Wav, Tag_Level,  "shoot.wav", "A_SHOOT"},
 	{Type_Wav, Tag_Level,  "explosion.wav", "A_EXPLODE"},
+
+	// @Note: The image IDs are in the atlas itself
+	{Type_Atlas, Tag_Level, "SpaceGameAtlases.datlas", "<not used>"},
 };
 
 struct CommandLineArguments
@@ -85,34 +80,40 @@ int main(int argc, char *argv[])
 		auto& asset = AssetsToLoad[i];
 		asset.Path = fmt::format("{}/{}", arguments.Root, asset.Path);
 		size_t size = 0;
-		
-		if(asset.Type == Type_Image)
+
+		switch (asset.Type)
 		{
-			headerDefines.push_back(fmt::format("#define {}\t{}", asset.Id, header.ImagesCount));
-			header.ImagesCount += 1;
-			size = LoadImage(asset, data);
-			if(size > 1024*1024)
-			{
-				std::cout << fmt::format("{} -> Packing image [{:.3} MB] [{}]\n", asset.Id, size/(1024.0f*1024.0f), asset.Path); 
-			}
-			else
-			{
-				std::cout << fmt::format("{} -> Packing image [{:.3} KB] [{}]\n", asset.Id, size/1024.0f, asset.Path); 
-			}
-		}
-		else if(asset.Type == Type_Font)
-		{
-			headerDefines.push_back(fmt::format("#define {}\t{}", asset.Id, header.FontsCount));
-			header.FontsCount += 1;
-			size = LoadFont(asset, data);
-			std::cout << fmt::format("{} -> Packing font [{:.3} KB] [{}]\n", asset.Id, size/1024.0f, asset.Path);
-		}
-		else if(asset.Type == Type_Wav)
-		{
-			headerDefines.push_back(fmt::format("#define {}\t{}", asset.Id, header.WavCount));
-			header.WavCount += 1;
-			size = LoadWav(asset, data);
-			std::cout << fmt::format("{} -> Packing WAV [{:.3} KB] [{}]\n", asset.Id, size/1024.0f, asset.Path);
+		  case Type_Image: 
+		  {
+			  headerDefines.push_back(fmt::format("#define {}\t{}", asset.Id, header.ImagesCount));
+			  header.ImagesCount += 1;
+			  size = LoadImage(asset, data);
+			  std::cout << fmt::format("{} -> Packing image [{:.3} {}] [{}]\n", asset.Id, size/(1024.0f*1024.0f), size > 1024*1024 ? "MB" : "KB", asset.Path);
+			  break;
+		  }
+		  case Type_Font: 
+		  {
+			  headerDefines.push_back(fmt::format("#define {}_\t{}", asset.Id, header.FontsCount));
+			  header.FontsCount += 1;
+			  size = LoadFont(asset, data);
+			  std::cout << fmt::format("{} -> Packing font [{:.3} KB] [{}]\n", asset.Id, size/1024.0f, asset.Path);
+			  break;
+		  }
+		  case Type_Wav: 
+		  {
+			  headerDefines.push_back(fmt::format("#define {}\t{}", asset.Id, header.WavCount));
+			  header.WavCount += 1;
+			  size = LoadWav(asset, data);
+			  std::cout << fmt::format("{} -> Packing WAV [{:.3} KB] [{}]\n", asset.Id, size/1024.0f, asset.Path);
+			  break;
+		  }
+		  case Type_Atlas: 
+		  {
+			  header.AtlasesCount += 1;
+			  size = LoadAtlas(asset, data, headerDefines, header);
+			  std::cout << fmt::format("----- -> Packing Atlas [{:.3} KB] [{}]\n", size/1024.0f, asset.Path);
+			  break;
+		  }
 		}
 		
 		AssetEntry entry{ 0 };
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
 	auto size = sizeof(AssetColletionHeader) + entries.size() * sizeof(AssetEntry) + data.size();
 	std::cout << fmt::format("Creating file [{:.3} MB] [{}.dx1]\n",size/(1024.0f*1024.0f), arguments.Output);
 
-	std::string assetFileName = fmt::format("{}.dx1", arguments.Output); 
+	std::string assetFileName = fmt::format("{}.dbundle", arguments.Output); 
 	std::ofstream outfile(assetFileName, std::ios::out | std::ios::binary);
 
 	outfile.write((char*)&header, sizeof(AssetColletionHeader));

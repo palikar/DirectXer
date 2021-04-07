@@ -4,7 +4,7 @@
   "Items": [
     {
       "Id": "68c9499f-ca2f-46d5-bcd2-d4fd5ba3b8e6",
-      "Command": "-r ./resources -i SpaceGameAtlases.dxa"
+      "Command": "-r ./resources -i SpaceGameAtlases.datlas"
     }
   ]
 }

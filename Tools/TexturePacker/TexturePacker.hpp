@@ -26,6 +26,7 @@ struct ImageToPack
 	std::string Path;
 	int Width;
 	int Height;
+	const char* Id;
 };
 
 inline static void PutPixels(std::vector<unsigned char>& atlasBytes, stbrp_rect rect, unsigned char* data, size_t atlasSize)

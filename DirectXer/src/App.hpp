@@ -20,14 +20,8 @@ struct CommandLineSettings
 class App
 {
 public:
-	const static inline float pov =  65.0f;
-	const static inline float nearPlane = 0.0001f;
-	const static inline float farPlane = 1000.0f;
-
 	void Init(HWND t_Window);
 	void PostInit();
-	void Spin(float dt);
-	void Destroy();
 	void Resize();
 
 	// @Note: Application Data -- used by the "application" for

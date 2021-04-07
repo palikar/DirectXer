@@ -10,33 +10,35 @@
 #include <fmt/format.h>
 #include <Xinput.h>
 
-void PlatformLayer::Init()
+#include <Shlwapi.h>
+
+void WindowsPlatformLayer::Init()
 {
 	StdOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	ErrOutHandle = GetStdHandle(STD_ERROR_HANDLE);
 }
 
-void PlatformLayer::SetOuputColor(ConsoleForeground color)
+void WindowsPlatformLayer::SetOuputColor(ConsoleForeground color)
 {
 	SetConsoleTextAttribute(StdOutHandle, (WORD)color);
 }
 		
-void PlatformLayer::WriteStdOut(const char* data, size_t len)
+void WindowsPlatformLayer::WriteStdOut(const char* data, size_t len)
 {
 	WriteFile(StdOutHandle, data, (DWORD)len, NULL, NULL);
 }
 
-void PlatformLayer::WriteErrOut(const char* data, size_t len)
+void WindowsPlatformLayer::WriteErrOut(const char* data, size_t len)
 {
 	WriteFile(ErrOutHandle, data, (DWORD)len, NULL, NULL);
 }
 	
-void* PlatformLayer::Allocate(size_t t_Size)
+void* WindowsPlatformLayer::Allocate(size_t t_Size)
 {
 	return VirtualAlloc(NULL, t_Size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 }
 
-PlatformLayer::FileHandle PlatformLayer::OpenFileForReading(const char* t_Path)
+WindowsPlatformLayer::FileHandle WindowsPlatformLayer::OpenFileForReading(const char* t_Path)
 {
 	FileHandle handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (handle == INVALID_HANDLE_VALUE)
@@ -46,13 +48,18 @@ PlatformLayer::FileHandle PlatformLayer::OpenFileForReading(const char* t_Path)
 	return handle;
 }
 
-size_t PlatformLayer::FileSize(FileHandle handle)
+size_t WindowsPlatformLayer::FileSize(FileHandle handle)
 {
 	DWORD fileSize = GetFileSize(handle, NULL);
 	return fileSize;
 }
 
-void PlatformLayer::ReadFileIntoArena(FileHandle handle, size_t size, MemoryArena& t_Arena)
+bool WindowsPlatformLayer::IsValidPath(const char* path)
+{
+	return PathFileExists(path);
+}
+
+void WindowsPlatformLayer::ReadFileIntoArena(FileHandle handle, size_t size, MemoryArena& t_Arena)
 {
 	DWORD readBytes;
 	ReadFile(handle, t_Arena.Memory + t_Arena.Size, (DWORD)size, &readBytes, NULL);
@@ -60,7 +67,7 @@ void PlatformLayer::ReadFileIntoArena(FileHandle handle, size_t size, MemoryAren
 	t_Arena.Size += readBytes;
 }
 
-void PlatformLayer::CloseFile(FileHandle handle)
+void WindowsPlatformLayer::CloseFile(FileHandle handle)
 {
 	// @Todo: Probably queue this in some vector and close them in one go
 	// at some point
@@ -201,8 +208,7 @@ void WindowsWindow::ToggleFullscreen()
 	}
 	
 	FullscreenMode = !FullscreenMode;
-}
-	
+}	
 
 void WindowsWindow::UpdateJoyStickState()
 {
@@ -240,7 +246,7 @@ int WindowsWindow::Run()
 		{
 			if (msg.message == WM_QUIT)
 			{
-				Deinit();
+				if(CleanDestroy) Deinit();
 				return (int)msg.wParam;
 			}
 			TranslateMessage(&msg);
@@ -260,7 +266,7 @@ int WindowsWindow::Run()
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			Application->Spin((float)clockToMilliseconds(dt) / 1000.0f);
+			Application->Game.Update((float)clockToMilliseconds(dt) / 1000.0f);
 
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); 
@@ -293,13 +299,12 @@ int WindowsWindow::Run()
 
 void WindowsWindow::Deinit()
 {
-
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext(); 
 
 	gDxgiManager.Destroy();
-	Application->Destroy();
+	Application->Graphics.Destroy();
 	UnregisterClass("DirectXer Window", GetModuleHandleA(NULL));
 	FreeConsole();
 	DestroyWindow(hWnd);
@@ -417,11 +422,9 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 void SetupConsole()
 {
-
 	AllocConsole();
 
 	FILE* fDummy;
-	freopen_s(&fDummy, "CONIN$", "r", stdin);
 	freopen_s(&fDummy, "CONOUT$", "w", stderr);
 	freopen_s(&fDummy, "CONOUT$", "w", stdout);
 

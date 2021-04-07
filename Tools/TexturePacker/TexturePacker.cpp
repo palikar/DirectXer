@@ -20,14 +20,14 @@
 
 static inline ImageToPack ImagesToPack[] = {
 
-	{"assets/evil_ship_1.png", 64, 64},
-	{"assets/evil_ship_2.png", 64, 64},
-	{"assets/evil_ship_3.png", 64, 64},
-	{"assets/PNG/Ship_Parts/Ship_Main_Icon.png", 64, 64},
-	{"assets/ship_bullet.png", 32, 64},
-	{"assets/explosion.png", 0, 0},
-	{"assets/PNG/Main_UI/Stats_Bar.png", 0, 0},
-	{"assets/heart.png", 32, 32},
+	{"assets/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
+	{"assets/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
+	{"assets/evil_ship_3.png", 64, 64, "I_EVIL_SHIP_3"},
+	{"assets/PNG/Ship_Parts/Ship_Main_Icon.png", 64, 64, "I_MAIN_SHIP"},
+	{"assets/ship_bullet.png", 32, 64, "I_BULLET"},
+	{"assets/explosion.png", 0, 0, "I_EXPLOSION"},
+	{"assets/heart.png", 32, 32, "I_HEART"},
+	{"assets/PNG/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
 };
 
 struct CommandLineArguments
@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
 		rect.w = (stbrp_coord)width;
 		rect.h = (stbrp_coord)height;
 		ImageEntry image;
+		strcpy_s(image.Id, entry.Id);
 				
 		for (size_t j = 0; j < maxAtlases; ++j)
 		{
@@ -163,7 +164,7 @@ int main(int argc, char *argv[])
 	}
 
 	
-	std::string atlasFileName = fmt::format("{}.dxa", arguments.Output); 
+	std::string atlasFileName = fmt::format("{}.datlas", arguments.Output); 
 	std::ofstream outfile(atlasFileName, std::ios::out | std::ios::binary);
 	if (!outfile.is_open())
 	{

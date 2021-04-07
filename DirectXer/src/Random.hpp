@@ -25,8 +25,7 @@ class splitmix
     result_type operator()();
 
     void discard(unsigned long long n);
-
-  private:
+	
     uint64_t m_seed;
 };
 
@@ -51,8 +50,7 @@ class xorshift
 
     void discard(unsigned long long n);
 
-  private:
-    uint64_t m_seed;
+	uint64_t m_seed;
 };
 
 bool operator==(xorshift const &lhs, xorshift const &rhs);
@@ -76,7 +74,6 @@ class pcg
 
     void discard(unsigned long long n);
 	
-  private:
     uint64_t m_state;
     uint64_t m_inc;
 };

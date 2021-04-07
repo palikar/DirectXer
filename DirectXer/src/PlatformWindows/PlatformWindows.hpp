@@ -80,5 +80,6 @@ struct WindowsPlatformLayer
 	static size_t FileSize(FileHandle handle);
 	static void ReadFileIntoArena(FileHandle handle, size_t size, MemoryArena& t_Arena);
 	static void CloseFile(FileHandle handle);
+	static bool IsValidPath(const char* data);
 	
 };

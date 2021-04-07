@@ -1,6 +1,5 @@
 #include "AssetBuilder.hpp"
 
-
 struct  WavHeader
 {
 	/* RIFF Chunk Descriptor */
@@ -32,7 +31,7 @@ static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 	infile.read((char*)&v[0], static_cast<std::streamsize>(size));
 
 	return v;
-}
+ }
 
 // @Note: These functions hould produce some data based on the given asset
 // to load; the data should be *appended* to the end of the bytes vector and
@@ -107,4 +106,22 @@ size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes)
 	}
 
 	return data.size() + sizeof(FontHeader);
+}
+
+size_t LoadAtlas(AssetToLoad asset, std::vector<unsigned char>& bytes,
+				 std::vector<std::string>& headerDefines, AssetColletionHeader& header)
+{
+	const auto atlasData = LoadFile(asset.Path);
+
+	const AtlasFileHeader* atlasHeader = (AtlasFileHeader*) atlasData.data();
+	const size_t offset = sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * atlasHeader->NumAtlases;
+
+	for (size_t i = 0; i < atlasHeader->NumImages; ++i)
+	{
+		const ImageEntry* image = (ImageEntry*)(atlasData.data() + i * sizeof(ImageEntry) + offset);
+		headerDefines.push_back(fmt::format("#define {}\t{}", image->Id, (i+1) << 16 | header.AtlasesCount));
+	}
+	
+
+	return atlasData.size();
 }
