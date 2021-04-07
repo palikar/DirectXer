@@ -1,5 +1,8 @@
 #include <stdlib.h>
 
+//@Note : The sbi setup expects these functions to be difined by when linking
+// against the binary
+
 void* TempAlloc(size_t size)
 {
 	return malloc(size);

@@ -35,39 +35,62 @@ static void Update(Context& context)
 	Graphics->ResetRenderTarget();
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
-	
+
 	DrawFullscreenQuad(Graphics, context.DummyTex, SC_QUAD_SIMPLE);
 	DrawFullscreenQuad(Graphics, context.Texs[context.currentTex], SC_QUAD_SIMPLE);
+}
+
+static void DumpImages(char* memory, uint16 count)
+{
+	for (size_t i = 0; i < count; ++i)
+	{
+		auto image = (ImageEntry*)(memory + sizeof(ImageEntry) * i);
+		fmt::print("Image [{}] is in atlas [{}] and has size of	 [{}x{}]\n", i, image->Atlas,
+				   (int)roundf(image->AtlasWidth * image->X), (int)roundf(image->AtlasHeight * image->Y));
+
+	}
+}
+
+static void LoadAtlas(Context& context, const char* path)
+{
+	auto Graphics = &context.Graphics;
+	MemoryArena fileArena = Memory::GetTempArena(Megabytes(128));
+	Defer {
+		Memory::DestoryTempArena(fileArena);
+	};
+	ReadWholeFile(path, fileArena);
+	auto header = (AtlasFileHeader*)(fileArena.Memory);
+	fmt::print("Opening an atlas file with [{}] images and [{}] atlases\n", header->NumImages, header->NumAtlases);
+
+	context.Texs.resize(header->NumAtlases);
+	for (size_t i = 0; i < header->NumAtlases; ++i)
+	{
+		auto atlas = (AtlasEntry*)(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * i);
+		fmt::print("Atlas [{}] has size [{}x{}]\n", i, atlas->Width, atlas->Height);
+		context.Texs[i] = Graphics->CreateTexture(atlas->Width, atlas->Height, atlas->Format, fileArena.Memory + atlas->Offset, 0);
+	}
+
+	DumpImages(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * header->NumAtlases, header->NumImages);
 }
 
 static void Init(Context& context)
 {
 	Memory::InitMemoryState();
 	auto Graphics = &context.Graphics;
-	auto path = fmt::format("{}/{}", context.Args.Root, context.Args.Input);
 
-	MemoryArena fileArena = Memory::GetTempArena(Megabytes(128));
 	Memory::EstablishTempScope(Megabytes(16));
 	Defer {
 		Memory::EndTempScope();
-		Memory::DestoryTempArena(fileArena);
 	};
 	int width, height, channels;
 	unsigned char* data = stbi_load_from_memory(DUMMYTEXTURE_PNG, DUMMYTEXTURE_PNG_LEN, &width, &height, &channels, 4);
 	context.DummyTex = Graphics->CreateTexture(width, height, PngFormat(channels), data, width*height*channels);
 
-	ReadWholeFile(path.c_str(), fileArena);
-	auto header = (AtlasFileHeader*)(fileArena.Memory);	
-	context.Texs.resize(header->NumAtlases);
-	for (size_t i = 0; i < header->NumAtlases; ++i) 
-	{
-		auto atlas = (AtlasEntry*)(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * i);
-		context.Texs[i] = Graphics->CreateTexture(atlas->Width, atlas->Height, atlas->Format, fileArena.Memory + atlas->Offset, 0);
-	}
-
+	auto resolvedPath = fmt::format("{}/{}", context.Args.Root, context.Args.Input);
+	LoadAtlas(context, resolvedPath.c_str());
 }
 
-void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context* context)
+void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& context)
 {
 	switch (msg)
 	{
@@ -80,16 +103,31 @@ void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context* c
 	  case WM_SYSKEYUP:
 	  {
 		  auto param = static_cast<uint16_t>(wParam);
+		  // @Note: Change the current atlas with the arrow keys
 		  if ( param == 37) {
-			  context->currentTex = (context->currentTex - 1) % context->Texs.size();
-
+			  context.currentTex = (context.currentTex - 1) % context.Texs.size();
 		  } else if ( param == 39) {
-			  context->currentTex = (context->currentTex + 1) % context->Texs.size();
+			  context.currentTex = (context.currentTex + 1) % context.Texs.size();
 		  }
-		  
 		  break;
 	  }
-	  
+	  case WM_DROPFILES:
+	  {
+		  HDROP dropHandle = (HDROP)wParam;
+		  auto numberOfDroppedFiles = DragQueryFileA(dropHandle, 0xFFFFFFFF, nullptr, 0);
+		  if (numberOfDroppedFiles > 1) break;
+		  auto droppedFilepathSize = DragQueryFileA(dropHandle, 0, nullptr, 0);
+		  std::string droppedFilepath;
+		  droppedFilepath.resize(droppedFilepathSize);
+		  auto bytesCopied = DragQueryFileA(dropHandle, 0, &droppedFilepath[0], droppedFilepathSize + 1);
+		  // @Note: this does not work for some reason with full path; the probelm seems to be the Win32 function
+		  // CreateFile but I don't really case right now
+		  // LoadAtlas(context, droppedFilepath.c_str());
+		  DragFinish(dropHandle);
+		  break;
+
+	  }
+
 	}
 }
 
@@ -145,6 +183,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 							 context.WindowRect.bottom - context.WindowRect.top,
 							 nullptr, nullptr, GetModuleHandleA(NULL), &context);
 
+	DragAcceptFiles(hWnd, TRUE);
 	ShowWindow(hWnd, SW_SHOW);
 
 	Init(context);

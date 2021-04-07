@@ -34,6 +34,11 @@ static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 	return v;
 }
 
+// @Note: These functions hould produce some data based on the given asset
+// to load; the data should be *appended* to the end of the bytes vector and
+// the amount of new data should be returned; the appended data can contain
+// (and probably should) some sort of header discribing the asset which's data
+// should come after the header
 
 size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes)
 {

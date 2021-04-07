@@ -105,7 +105,7 @@ struct Context
 	std::vector<TextureObject> Texs;
 };
 
-static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context* context);
+static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& context);
 
 static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -126,7 +126,7 @@ static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	else
 	{
 		auto context = (Context*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		HandleMessage(hWnd, msg, wParam, lParam, context);
+		HandleMessage(hWnd, msg, wParam, lParam, *context);
 	}
 	
 	return DefWindowProc(hWnd, msg, wParam, lParam);
