@@ -152,3 +152,16 @@ void AudioPlayer::Play(uint32 t_Id, float t_Gain)
 	alSourcef(source, AL_GAIN, t_Gain);
 	alSourcePlay(source);
 }
+
+void AudioPlayer::CreateMemoryWav(WavAssetHeader& header, void* data)
+{
+	unsigned int bufferid;
+	unsigned int sourceid;
+
+	alGenBuffers(1, &bufferid);
+	alBufferData(bufferid, header.Format, data, header.Size, header.SampleRate);
+	alGenSources(1, &sourceid);
+	alSourcei(sourceid, AL_BUFFER, bufferid);
+
+	AudioEntries.push_back({bufferid, sourceid});
+}

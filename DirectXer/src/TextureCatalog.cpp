@@ -37,15 +37,15 @@ void TextureCatalog::LoadTextures(Graphics graphics)
 			DXERROR("Can't load texture {} at {}. Reason: {}", tex.Path, path, stbi_failure_reason());
 		}
 
-		tex.Handle = graphics.CreateTexture(width, height, PngFormat(channels), data, width*height*channels);
+		tex.Handle = NextTextureId();
+		graphics.CreateTexture(tex.Handle, {(uint16)width, (uint16)height, TF_RGBA}, data);
 		tex.State = LS_LOADED;
 
 		Memory::ResetTempScope();
 	}
-
 }
 
-TextureObject TextureCatalog::LoadCube(Graphics graphics, const char* name[6])
+TextureId TextureCatalog::LoadCube(Graphics graphics, const char* name[6])
 {
 	// @Note: We'll use this for loading the contents of the file
 	MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));
@@ -53,8 +53,6 @@ TextureObject TextureCatalog::LoadCube(Graphics graphics, const char* name[6])
 	// @Note: This will be used for the STB allocations
 	Memory::EstablishTempScope(Megabytes(128));
 	Defer { Memory::ResetTempMemory(); };
-
-
 
 	int width, height, channels;
 	// @Todo: Use temporary memory here
@@ -75,7 +73,8 @@ TextureObject TextureCatalog::LoadCube(Graphics graphics, const char* name[6])
 
 	}
 
-	auto hand = graphics.CreateCubeTexture(width, height, PngFormat(channels), data);
-	return hand;
+	const auto texId = NextTextureId();
+	graphics.CreateCubeTexture(texId, {(uint16)width, (uint16)height, TF_RGBA}, data);
+	return texId;
 
 }

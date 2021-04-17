@@ -9,6 +9,16 @@
 #include <AL/alext.h>
 #include <AL/alext.h>
 
+using WavId = uint32;
+	
+struct WavDescription
+{
+	uint32 Size;
+	uint32 SampleRate;
+	uint32 Format;
+	uint16 Channels;
+	uint16 Bps;
+};
 
 struct Audio
 {
@@ -42,21 +52,7 @@ class AudioPlayer
 	};
 
 	BulkVector<AudioEntry> AudioEntries;
-
 	void Build(AudioBuilder& t_Builder);
-
-	void CreateMemoryWav(WavAssetHeader& header, void* data)
-	{
-		unsigned int bufferid;
-		unsigned int sourceid;
-
-		alGenBuffers(1, &bufferid);
-		alBufferData(bufferid, header.Format, data, header.Size, header.SampleRate);
-		alGenSources(1, &sourceid);
-		alSourcei(sourceid, AL_BUFFER, bufferid);
-
-		AudioEntries.push_back({bufferid, sourceid});
-	}
-	
+	void CreateMemoryWav(WavAssetHeader& header, void* data);
 	void Play(uint32 t_Id, float t_Gain);
 };

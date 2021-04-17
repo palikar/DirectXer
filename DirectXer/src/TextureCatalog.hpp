@@ -21,7 +21,7 @@ struct TextureLoadEntry
 {
 	std::string_view Path;
 	LoadState State{LS_INVALID};
-	TextureObject Handle{0};
+	TextureId Handle{0};
 };
 
 inline TextureLoadEntry g_Textures[]
@@ -43,5 +43,5 @@ struct TextureCatalog
 {
 	void LoadTextures(Graphics graphics);
 
-	TextureObject LoadCube(Graphics graphics, const char* name[6]);
+	TextureId LoadCube(Graphics graphics, const char* name[6]);
 };

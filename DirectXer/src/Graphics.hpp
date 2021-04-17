@@ -7,8 +7,6 @@ using Graphics = GraphicsD3D11;
 
 #endif
 
-
-
 template<typename VertexType>
 VBObject vertexBufferFactory(Graphics& graphics, TempVector<VertexType>& t_VertexList)
 {
@@ -22,3 +20,5 @@ IBObject indexBufferFactory(Graphics& graphics, TempVector<IndexType>& t_IndexLi
 }
 
 void DrawFullscreenQuad(Graphics* Graphics, TextureObject texture, ShaderConfig type);
+
+TextureId NextTextureId();

@@ -11,9 +11,9 @@ struct TexturedMaterial
 {
 	ShaderConfig config;
 	CBObject data;
-	TextureObject BaseMap;
-	TextureObject AoMap;
-	TextureObject EnvMap;
+	TextureId BaseMap;
+	TextureId AoMap;
+	TextureId EnvMap;
 };
 
 struct TexturedMaterialData

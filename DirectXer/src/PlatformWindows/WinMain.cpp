@@ -102,7 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	InitialStackMemory += sizeof(WindowsSettings);
 	InitialStackMemory += sizeof(int);
 	InitialStackMemory += sizeof(char**);
-	DXLOG("[INIT] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
+	DXLOG("[Init] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
 	
 	window.Init(settings);
 	return window.Run();

@@ -15,6 +15,7 @@ enum AssetType : uint16
 	Type_Font,
 	Type_Wav,
 	Type_Atlas,
+	Type_Texture,
 };
 
 struct AssetEntry
@@ -27,6 +28,7 @@ struct AssetEntry
 
 struct AssetColletionHeader
 {
+	// uint32 AssetsCount;
 	uint32 ImagesCount;
 	uint32 WavCount;
 	uint32 FontsCount;	
@@ -104,3 +106,31 @@ struct AssetStore
 };
 
 
+
+
+// struct ImageEntry
+// {
+// 	Image Image;
+// 	ImageId Id;
+// };
+
+// struct TextureLoadEntry
+// {
+// 	TextureDescription Desc;
+// 	TextureId Id;
+// 	size_t DataOffset;
+// };
+
+// struct WavLoadEntry
+// {
+// 	WavDescription Desc;
+// 	WavId Id;
+// 	size_t DataOffset;
+// };
+
+// struct FontLoadEntry
+// {
+// 	FontDescription Desc;
+// 	FontId Id;
+// 	size_t DataOffset;
+// }

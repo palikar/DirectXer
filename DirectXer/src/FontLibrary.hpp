@@ -16,6 +16,13 @@ inline float ToFloat(FT_Pos fixed)
 	return (float)fixed / 64.0f;
 }
 
+using FontId = uint32;
+
+struct FontDescription
+{
+	float FontSize;
+};
+
 struct FontBuilder
 {
 	struct FontLoadEntry
@@ -50,14 +57,14 @@ public:
 	{
 		glm::vec2 Pos;
 		glm::vec2 Size;
-		TextureObject TexHandle;
+		TextureId TexHandle;
 		glm::vec2 GlyphSize;
 		glm::vec2 Advance;		
 	};
 
 	FT_Library FTLibrary;
 	Graphics* Gfx;
-	BulkVector<TextureObject> Atlases;
+	BulkVector<TextureId> Atlases;
 	stbrp_context RectContext;
 	BulkVector<AtlasEntry> AtlasGlyphEntries;
 	Map<char, size_t> CharMap;

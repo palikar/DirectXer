@@ -12,6 +12,8 @@ void AssetStore::LoadAssetFile(String path, AssetBuilder& context)
 		Memory::DestoryTempArena(fileArena);
 	};
 
+	DXLOG("[Init] Loading asset file: {}", path);
+
 	ReadWholeFile(path.data(), fileArena);
 	auto current = fileArena.Memory;
 

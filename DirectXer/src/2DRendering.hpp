@@ -33,7 +33,7 @@ class Renderer2D
 	VBObject vbo;
 	IBObject ibo;
 
-	TextureObject TexSlots[MaxTextureSlots];
+	TextureId TexSlots[MaxTextureSlots];
 	uint8 CurrentTextureSlot;
 
 	Graphics* Graph;
@@ -47,7 +47,7 @@ class Renderer2D
 	void BeginScene();
 	void EndScene();
 
-	uint8 AttachTexture(TextureObject t_Tex);
+	uint8 AttachTexture(TextureId t_Tex);
 
 	void DrawQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
 	void DrawCirlce(glm::vec2 pos, float radius, glm::vec4 color);

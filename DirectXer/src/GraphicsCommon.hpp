@@ -126,6 +126,32 @@ enum ShaderConfig
 	SC_COUNT
 };
 
+struct TextureDescription
+{
+	uint16 Width;
+	uint16 Height;
+	TextureFormat Format;
+};
+
+struct RenderTargetDescription
+{
+	uint16 Width;
+	uint16 Height;
+	TextureFormat Format;
+	bool NeedsDepthStencil;
+};
+
+using TextureId = uint16;
+using VertexBufferId = uint16;
+using IndexBufferId = uint16;
+using ConstantBufferId = uint16;
+
+struct RTObject
+{
+	TextureId Color;
+	TextureId DepthStencil;
+};
+
 inline void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)
 {
 	t_Vertex.pos = t_Mat * glm::vec4(t_Vertex.pos, 1.0f);

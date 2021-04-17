@@ -11,7 +11,7 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 	{
 		if (strcmp(argv[i], "--resources") == 0)
 		{
-			DXLOG("[INIT] Argument: {} -> {}", argv[i], argv[i + 1]);
+			DXLOG("[Init] Argument: {} -> {}", argv[i], argv[i + 1]);
 			t_Settings.ResourcesPath = argv[i + 1];
 			++i;
 		}		

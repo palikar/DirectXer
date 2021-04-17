@@ -62,18 +62,7 @@ struct TextureObject
 	ID3D11Texture2D* tp{nullptr};
 	ID3D11ShaderResourceView* srv{nullptr};
 	ID3D11RenderTargetView* rtv{nullptr};
-};
-
-struct DepthStencilTextureObject
-{
-	ID3D11Texture2D* tp{nullptr};
-	ID3D11DepthStencilView* dsv;
-};
-
-struct RTObject
-{
-	TextureObject ColorAttachment;
-	DepthStencilTextureObject DepthAttachment;
+	ID3D11DepthStencilView* dsv{nullptr};
 };
 
 struct ShaderObject
@@ -92,7 +81,6 @@ class GraphicsD3D11
 	using ConstantBufferType = CBObject;
 	using TextureType = TextureObject;
 	using ShaderType = ShaderObject;
-	using RenderTargetType = RTObject;
 
 	void InitSwapChain(HWND hWnd, float t_Width, float t_Height);
 	void InitBackBuffer();
@@ -105,9 +93,9 @@ class GraphicsD3D11
 
 	void ResizeBackBuffer(float width, float height);
 
-	void BindTexture(uint32 t_Slot, TextureObject t_Texture);
-	void BindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
-	void BindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot);
+	void BindTexture(uint32 t_Slot, TextureId t_Id);
+	void BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
+	void BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
 
 	void SetScissor(Rectangle2D t_Rect);
 	void SetRasterizationState(RasterizationState t_State = RS_DEBUG);
@@ -120,19 +108,20 @@ class GraphicsD3D11
 	void SetRenderTarget(RTObject& t_RT);
 	void ResetRenderTarget();
 
-
-	TextureObject CreateTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length);
-	TextureObject CreateCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6]);
+	bool CreateTexture(TextureId id, TextureDescription description, const void* t_Data);
+	bool CreateDSTexture(TextureId id, TextureDescription description);
+	bool CreateRenderTexture(TextureId t_Id, RenderTargetDescription description);
+	bool CreateCubeTexture(TextureId id, TextureDescription description, void* t_Data[6]);
+	
 	VBObject CreateVertexBuffer(uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
 	IBObject CreateIndexBuffer(void* data, uint32 dataSize, bool dynamic = false);
-	CBObject CreateConstantBuffer(uint32 t_Size, void* t_InitData);
-	RTObject CreateRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS = true);
+	bool CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData);
 
 	void UpdateCBs();
-	void UpdateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data);
+	void UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data);
 	void UpdateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length);
 	void UpdateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length);
-	void UpdateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
+	void UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
 	void DrawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
 	void Draw(TopolgyType topology, uint32 count, uint32 base);
@@ -169,6 +158,11 @@ class GraphicsD3D11
 	ID3D11DepthStencilState* DepthStencilStates[DSS_Count];
 
 	ShaderObject Shaders[SF_COUNT];
+
+	Map<TextureId, TextureObject> Textures;
+	Map<VertexBufferId, VBObject> VertexBuffers;
+	Map<IndexBufferId, IBObject> IndexBuffers;
+	Map<ConstantBufferId, CBObject> ConstantBuffers;
 
 };
 

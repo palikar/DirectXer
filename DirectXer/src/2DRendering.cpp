@@ -70,11 +70,11 @@ void Renderer2D::EndScene()
 
 }
 
-uint8 Renderer2D::AttachTexture(TextureObject t_Tex)
+uint8 Renderer2D::AttachTexture(TextureId t_Tex)
 {
 	for (uint8 i = 0; i < MaxTextureSlots; ++i)
 	{
-		if(TexSlots[i].srv == t_Tex.srv) return i;
+		if(TexSlots[i] == t_Tex) return i;
 	}
 			
 	if (CurrentTextureSlot >= MaxTextureSlots)
@@ -323,26 +323,26 @@ void Renderer2D::DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::v
 		
 	CurrentVertex->pos = pos;
 	CurrentVertex->type = type;
-	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize;
-	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageAtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageAtlasSize;
 	++CurrentVertex;
 
 	CurrentVertex->pos = glm::vec2{pos.x + size.x, pos.y};
 	CurrentVertex->type = type;
-	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize + subSize.x / ImageLibrary::AtlasSize;
-	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageAtlasSize + subSize.x / ImageAtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageAtlasSize;
 	++CurrentVertex;
 
 	CurrentVertex->pos = glm::vec2{pos.x, pos.y + size.y};
 	CurrentVertex->type = type;
-	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize;
-	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize + subSize.y/ ImageLibrary::AtlasSize;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageAtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageAtlasSize + subSize.y/ ImageAtlasSize;
 	++CurrentVertex;
 
 	CurrentVertex->pos = pos + size;
 	CurrentVertex->type = type;
-	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageLibrary::AtlasSize + subSize.x / ImageLibrary::AtlasSize;
-	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageLibrary::AtlasSize + subSize.y / ImageLibrary::AtlasSize;
+	CurrentVertex->additional.x = screenImage.ScreenPos.x + subPos.x / ImageAtlasSize + subSize.x / ImageAtlasSize;
+	CurrentVertex->additional.y = screenImage.ScreenPos.y + subPos.y / ImageAtlasSize + subSize.y / ImageAtlasSize;
 	++CurrentVertex;
 
 

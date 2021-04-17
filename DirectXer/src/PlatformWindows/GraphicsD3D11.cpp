@@ -261,9 +261,12 @@ void GraphicsD3D11::ClearZBuffer()
 
 void GraphicsD3D11::ClearRT(RTObject& t_RT)
 {
+	auto rtv = Textures.at(t_RT.Color).rtv;
+	auto dsv = Textures.at(t_RT.DepthStencil).dsv;
+	
 	const float color[] = { 0.0f, 0.0f, 0.0f };
-	Context->ClearRenderTargetView(t_RT.ColorAttachment.rtv, color);
-	Context->ClearDepthStencilView(t_RT.DepthAttachment.dsv, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0u);
+	Context->ClearRenderTargetView(rtv, color);
+	Context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0u);
 }
 
 void GraphicsD3D11::SetRasterizationState(RasterizationState t_State)
@@ -287,17 +290,17 @@ void GraphicsD3D11::SetDepthStencilState(DepthStencilState t_State, uint32 t_Ref
 	Context->OMSetDepthStencilState(DepthStencilStates[t_State], t_RefValue);
 }
 
-void GraphicsD3D11::BindPSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
+void GraphicsD3D11::BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot)
 {
-	Context->PSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
+	Context->PSSetConstantBuffers(t_Slot, 1, &ConstantBuffers.at(t_Id)->id);
 }
 
-void GraphicsD3D11::BindVSConstantBuffers(CBObject* t_Buffers, uint16 t_Count, uint16 t_StartSlot)
+void GraphicsD3D11::BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot)
 {
-	Context->VSSetConstantBuffers(t_StartSlot, t_Count, &t_Buffers->id);
+	Context->VSSetConstantBuffers(t_Slot, 1, &ConstantBuffers.at(t_Id)->id);
 }
 
-void GraphicsD3D11::UpdateTexture(TextureObject t_Tex, Rectangle2D rect, const void* t_Data, int t_Pitch)
+void GraphicsD3D11::UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch)
 {
 	D3D11_BOX box;
 	box.left = (uint32)(rect.Position.x);
@@ -307,19 +310,19 @@ void GraphicsD3D11::UpdateTexture(TextureObject t_Tex, Rectangle2D rect, const v
 	box.front = 0;
 	box.back = 1;
 
-	Context->UpdateSubresource(t_Tex.tp, 0, &box, t_Data, (uint32)(rect.Size.x * t_Pitch), 0);
+	Context->UpdateSubresource(Textures.at(t_Id).tp, 0, &box, t_Data, (uint32)(rect.Size.x * t_Pitch), 0);
 }
 
-TextureObject GraphicsD3D11::CreateTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, const void* t_Data, uint64 t_Length)
+bool GraphicsD3D11::CreateTexture(TextureId id, TextureDescription description, const void* t_Data)
 {
 	TextureObject to;
 
 	D3D11_TEXTURE2D_DESC desc;
-	desc.Width = t_Width;
-	desc.Height = t_Height;
+	desc.Width = description.Width;
+	desc.Height = description.Height;
 	desc.MipLevels = 1;
 	desc.ArraySize = 1;
-	desc.Format = TFToDXGI(t_Format);
+	desc.Format = TFToDXGI( description.Format);
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
@@ -332,7 +335,7 @@ TextureObject GraphicsD3D11::CreateTexture(uint16 t_Width, uint16 t_Height, Text
 	{
 		D3D11_SUBRESOURCE_DATA data;
 		data.pSysMem = t_Data;
-		data.SysMemPitch = t_Width*4;
+		data.SysMemPitch = description.Width*4;
 		GFX_CALL(Device->CreateTexture2D(&desc, &data, &to.tp));
 	}
 	else
@@ -348,12 +351,49 @@ TextureObject GraphicsD3D11::CreateTexture(uint16 t_Width, uint16 t_Height, Text
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	return to;
+	Textures.insert({id, to});
+	
+	return true;
+}
+
+bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description)
+{
+	TextureObject to;
+
+	D3D11_TEXTURE2D_DESC desc{ 0 };
+	desc.Width = description.Width ;
+	desc.Height = description.Height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT ;
+	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;	
+
+	[[maybe_unused]] HRESULT hr;
+	GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &to.tp));
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{ 0 };
+
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = 0;
+			
+	GFX_CALL(Device->CreateDepthStencilView(to.tp, &dsvDesc, &to.dsv));
+
+	Textures.insert({id, to});
+	
+	return true;
 }
 
 void GraphicsD3D11::SetRenderTarget(RTObject& t_RT)
 {
-	Context->OMSetRenderTargets(1, &t_RT.ColorAttachment.rtv, t_RT.DepthAttachment.dsv);
+	auto rtv = Textures.at(t_RT.Color).rtv;
+	auto dsv = Textures.at(t_RT.DepthStencil).dsv;
+	Context->OMSetRenderTargets(1, &rtv, dsv);
 }
 
 void GraphicsD3D11::ResetRenderTarget()
@@ -361,18 +401,16 @@ void GraphicsD3D11::ResetRenderTarget()
 	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
 }
 
-RTObject GraphicsD3D11::CreateRenderTarget(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, bool needsDS)
+bool GraphicsD3D11::CreateRenderTexture(TextureId t_Id, RenderTargetDescription description)
 {
-	RTObject rt;
+	TextureObject to;
 
-	// Color attachment creation
-	
 	D3D11_TEXTURE2D_DESC desc{ 0 };
-	desc.Width = t_Width;
-	desc.Height = t_Height;
+	desc.Width = description.Width;
+	desc.Height = description.Height;
 	desc.MipLevels = 1;
 	desc.ArraySize = 1;
-	desc.Format = TFToDXGI(t_Format);
+	desc.Format = TFToDXGI(description.Format);
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT ;
@@ -380,9 +418,9 @@ RTObject GraphicsD3D11::CreateRenderTarget(uint16 t_Width, uint16 t_Height, Text
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
-	[[maybe_unused]]HRESULT hr;
+	[[maybe_unused]] HRESULT hr;
 	
-	GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &rt.ColorAttachment.tp));
+	GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &to.tp));
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{ 0 };
 	srvDesc.Format = desc.Format;
@@ -390,46 +428,28 @@ RTObject GraphicsD3D11::CreateRenderTarget(uint16 t_Width, uint16 t_Height, Text
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
 
-	GFX_CALL(Device->CreateShaderResourceView(rt.ColorAttachment.tp, &srvDesc, &rt.ColorAttachment.srv));
+	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
 	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{ 0 };
 	rtvDesc.Format = desc.Format;
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Texture2D.MipSlice= 0;
 
-	GFX_CALL(Device->CreateRenderTargetView(rt.ColorAttachment.tp, &rtvDesc, &rt.ColorAttachment.rtv));
-
-	if (needsDS)
-	{
-		// Depth attachment creation
-		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-
-		GFX_CALL(Device->CreateTexture2D(&desc, nullptr, &rt.DepthAttachment.tp));
-
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{ 0 };
-
-		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		dsvDesc.Flags = 0;
-			
-		GFX_CALL(Device->CreateDepthStencilView(rt.DepthAttachment.tp, &dsvDesc, &rt.DepthAttachment.dsv));
-	}
-
-	return rt;
+	GFX_CALL(Device->CreateRenderTargetView(to.tp, &rtvDesc, &to.rtv));
+	
+	return true;
 }
 
-TextureObject GraphicsD3D11::CreateCubeTexture(uint16 t_Width, uint16 t_Height, TextureFormat t_Format, void* t_Data[6])
+bool GraphicsD3D11::CreateCubeTexture(TextureId id, TextureDescription description, void* t_Data[6])
 {
-
 	TextureObject to;
 
 	D3D11_TEXTURE2D_DESC desc;
-	desc.Width = t_Width;
-	desc.Height = t_Height;
+	desc.Width = description.Width;
+	desc.Height = description.Height;
 	desc.MipLevels = 1;
 	desc.ArraySize = 6;
-	desc.Format = TFToDXGI(t_Format);
+	desc.Format = TFToDXGI(description.Format);
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
@@ -441,7 +461,7 @@ TextureObject GraphicsD3D11::CreateCubeTexture(uint16 t_Width, uint16 t_Height, 
 	for (size_t i = 0; i < 6; ++i)
 	{
 		data[i].pSysMem = t_Data[i];
-		data[i].SysMemPitch = t_Width*4;
+		data[i].SysMemPitch = description.Width *4;
 	}
 
 	[[maybe_unused]]HRESULT hr;
@@ -455,7 +475,9 @@ TextureObject GraphicsD3D11::CreateCubeTexture(uint16 t_Width, uint16 t_Height, 
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	return to;
+	Textures.insert({id, to });
+
+	return true;
 
 }
 
@@ -647,9 +669,8 @@ void GraphicsD3D11::InitDepthStencilStates()
 	}
 }
 
-CBObject GraphicsD3D11::CreateConstantBuffer(uint32 t_Size, void* t_InitData)
+bool GraphicsD3D11::CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData)
 {
-
 	CBObject cb;
 
 	D3D11_BUFFER_DESC desc{ 0 };
@@ -660,14 +681,11 @@ CBObject GraphicsD3D11::CreateConstantBuffer(uint32 t_Size, void* t_InitData)
 	desc.ByteWidth = t_Size;
 	desc.StructureByteStride = 0;
 
-	// D3D11_SUBRESOURCE_DATA data{0};
-	// data.pSysMem = &PixelShaderCB;
-
 	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
-	return cb;
-
+	ConstantBuffers.insert({id, cb});
+	return true;
 }
 
 void GraphicsD3D11::UpdateCBs()
@@ -684,14 +702,15 @@ void GraphicsD3D11::UpdateCBs()
 
 }
 
-void GraphicsD3D11::UpdateCBs(CBObject& t_CbObject, uint32 t_Length, void* t_Data)
+void GraphicsD3D11::UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data)
 {
-	D3D11_MAPPED_SUBRESOURCE msr;
+	auto id = ConstantBuffers.at(t_Id);
 
+	D3D11_MAPPED_SUBRESOURCE msr;
 	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(Context->Map(t_CbObject.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
+	GFX_CALL(Context->Map(id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, t_Data, t_Length);
-	Context->Unmap(t_CbObject.id, 0);
+	Context->Unmap(id, 0);
 }
 
 void GraphicsD3D11::UpdateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length)
@@ -712,9 +731,9 @@ void GraphicsD3D11::UpdateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Le
 	Context->Unmap(t_Buffer.id, 0);
 }
 
-void GraphicsD3D11::BindTexture(uint32 t_Slot, TextureObject t_Texture)
+void GraphicsD3D11::BindTexture(uint32 t_Slot, TextureId t_Id)
 {
-	Context->PSSetShaderResources(t_Slot, 1, &t_Texture.srv);
+	Context->PSSetShaderResources(t_Slot, 1, &Textures.at(t_Id).srv);
 }
 
 void GraphicsD3D11::SetViewport(float x, float y, float width, float height)

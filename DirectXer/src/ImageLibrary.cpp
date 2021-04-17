@@ -25,7 +25,6 @@ void ImageLibraryBuilder::PutImage(std::string_view t_Path, uint32 t_Id)
 	MaxFileSize = MaxFileSize < newImage.FileSize ? newImage.FileSize  : MaxFileSize;
 }
 
-
 void ImageLibrary::Init(Graphics* Gfx)
 {
 	this->Gfx = Gfx;
@@ -39,17 +38,18 @@ ImageAtlas ImageLibrary::InitAtlas()
 	assert(Atlases.size() <= MaxAtlases);
 
 	ImageAtlas newAtlas;
-	newAtlas.TexHandle = Gfx->CreateTexture(AtlasSize, AtlasSize, TF_RGBA, nullptr, 0);
+	newAtlas.TexHandle = NextTextureId();
+	Gfx->CreateTexture(newAtlas.TexHandle, {ImageAtlasSize, ImageAtlasSize, TF_RGBA}, nullptr);
 	Atlases.push_back(newAtlas);
 
 	// @Note: 8Kb Per atlas for tect packing; maybe we can bump this to 16KB for best rect packing results
 	auto space = Memory::BulkGet<stbrp_node>(RectsCount);
-	stbrp_init_target(&Atlases.back().RectContext, AtlasSize, AtlasSize, space, RectsCount);
+	stbrp_init_target(&Atlases.back().RectContext, ImageAtlasSize, ImageAtlasSize, space, RectsCount);
 
 	return Atlases.back();
 }
 
-TextureObject ImageLibrary::Pack(stbrp_rect& t_Rect)
+TextureId ImageLibrary::Pack(stbrp_rect& t_Rect)
 {
 	for (auto& atlas: Atlases)
 	{
@@ -73,7 +73,7 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 		Memory::DestoryTempArena(fileArena);
 	};
 
-	Images.reserve(t_Builder.QueuedImages.size() + t_Builder.MemoryImages.size());
+	Images.reserve(t_Builder.QueuedImages.size());
 	
 	stbi_set_flip_vertically_on_load(0);
 
@@ -88,49 +88,41 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 
 		int width, height, channels;
 		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
-
-		assert(data);
-
-		if (width >= 1024 || height >= 1024)
-		{
-			auto texture = Gfx->CreateTexture(width, height, TF_RGBA, data, 0);
-			Images.insert({queuedImage.Id, Image{ texture, {0.0f, 0.0f}, {1.0f, 1.0f}, {width, height}}});
-			continue;
-		}
 		
-		stbrp_rect rect;
-		rect.w = (stbrp_coord)width;
-		rect.h = (stbrp_coord)height;
-
-		auto texture = Pack(rect);
-		Gfx->UpdateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
-		Images.insert({queuedImage.Id, Image{ texture, {(float)rect.x / AtlasSize, (float)rect.y / AtlasSize}, {(float)rect.w / AtlasSize, (float)rect.h / AtlasSize}, {AtlasSize, AtlasSize} }});
-
-
+		CreateMemoryImage({queuedImage.Id, (uint16)width, (uint16)height, TF_RGBA}, data);
 	}
-
-	for (auto& memoryImage : t_Builder.MemoryImages)
-	{
-		assert(memoryImage.Data);
-
-		if (memoryImage.Image.Width >= 1024 || memoryImage.Image.Height >= 1024)
-		{
-			auto texture = Gfx->CreateTexture(memoryImage.Image.Width, memoryImage.Image.Height, memoryImage.Image.Format, memoryImage.Data, 0);
-			Images.insert({ memoryImage.Image.Id, Image{ texture, {0.0f, 0.0f}, {1.0f, 1.0f}, {memoryImage.Image.Width, memoryImage.Image.Height}}});
-			continue;
-		}
-		
-		stbrp_rect rect;
-		rect.w = (stbrp_coord)memoryImage.Image.Width;
-		rect.h = (stbrp_coord)memoryImage.Image.Height;
-
-		auto texture = Pack(rect);
-		Gfx->UpdateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, memoryImage.Data);
-		Images.insert({ memoryImage.Image.Id, Image{ texture, {(float)rect.x / AtlasSize, (float)rect.y / AtlasSize}, {(float)rect.w / AtlasSize, (float)rect.h / AtlasSize}, {AtlasSize, AtlasSize} }});
-	}
+	
 }
 
-Image ImageLibrary::GetImage(uint32 t_id)
+void ImageLibrary::CreateMemoryImage(ImageHeader header, void* data)
 {
-	return Images[t_id];
+	assert(data);
+
+	if (header.Width >= MaxWidthForPacking|| header.Height >= MaxHeightForPacking)
+	{
+		const auto texId = NextTextureId();
+		Gfx->CreateTexture(texId, { (uint16)header.Width, (uint16)header.Height, header.Format }, data);
+		Images.insert({ ImageId{header.Id}, Image{ texId, {0.0f, 0.0f}, {1.0f, 1.0f}, {header.Width, header.Height}} });
+		return;
+	}
+		
+	stbrp_rect rect;
+	rect.w = (stbrp_coord)header.Width;
+	rect.h = (stbrp_coord)header.Height;
+
+	auto texture = Pack(rect);
+	Gfx->UpdateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
+	Images.insert({ ImageId{header.Id}, Image{ texture, {(float)rect.x / ImageAtlasSize, (float)rect.y / ImageAtlasSize}, {(float)rect.w / ImageAtlasSize, (float)rect.h / ImageAtlasSize}, {ImageAtlasSize, ImageAtlasSize} }});
+	
+}
+	
+void ImageLibrary::CreateStaticAtlas(AtlasEntry entry, void* data)
+{
+	ImageAtlas newAtlas;
+	newAtlas.TexHandle = NextTextureId();
+	newAtlas.RectContext = {0};
+
+	Gfx->CreateTexture(newAtlas.TexHandle, {(uint16)entry.Width, (uint16)entry.Height, entry.Format}, data);
+	
+	Atlases.push_back(newAtlas);
 }
