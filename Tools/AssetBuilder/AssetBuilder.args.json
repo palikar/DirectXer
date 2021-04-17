@@ -3,8 +3,20 @@
   "Id": "a8982fa0-0089-416d-9dd6-d9300b69d4a0",
   "Items": [
     {
+      "Id": "76a1857a-7c77-4e66-8274-fe77cc990b56",
+      "Command": "-i SpaceGame"
+    },
+    {
+      "Id": "4d75821d-758a-4465-be01-31cdbce4df55",
+      "Command": "-o resources/SpaceAssets "
+    },
+    {
+      "Id": "e788e0be-f373-4065-83ab-487d65507c09",
+      "Command": "-h DirectXer/ResorceHeaders/SpaceAssets "
+    },
+    {
       "Id": "4e9af367-5152-4b89-ac9d-570bb52da1bd",
-      "Command": "-r resources -h DirectXer/ResorceHeaders/SpaceAssets -o resources/SpaceAssets -i SpaceGame"
+      "Command": "-r resources"
     }
   ]
 }

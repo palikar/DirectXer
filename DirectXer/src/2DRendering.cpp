@@ -218,7 +218,6 @@ void Renderer2D::DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size)
 		BeginScene();
 	}
 		
-	assert(t_Id < ImageLib.Images.size());
 	const auto& screenImage = ImageLib.Images[t_Id];
 
 	auto slot = AttachTexture(screenImage.TexHandle);
@@ -317,7 +316,6 @@ void Renderer2D::DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::v
 		BeginScene();
 	}
 		
-	assert(t_Id < ImageLib.Images.size());
 	const auto& screenImage = ImageLib.Images[t_Id];
 
 	auto slot = AttachTexture(screenImage.TexHandle);

@@ -28,7 +28,6 @@ public:
 	
 	SpriteSheetHolder SpriteSheets;
 	Renderer2D Renderer2D;
-	RTObject uiRenderTarget;
 
 	AudioPlayer AudioEngine;
 

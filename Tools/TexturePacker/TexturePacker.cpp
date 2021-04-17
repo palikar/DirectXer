@@ -30,14 +30,6 @@ static inline ImageToPack ImagesToPack[] = {
 	{"assets/PNG/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
 };
 
-struct CommandLineArguments
-{
-	std::string Root{"resources"};
-	std::string Output{"output"};
-	uint16 Size{1024};
-	uint16 MaxAtlases{20};
-};
-
 static void ParseCommandLineArguments(int argc, char *argv[], CommandLineArguments& arguments)
 {
 	for (size_t i = 0; i < argc; ++i)
@@ -116,7 +108,8 @@ int main(int argc, char *argv[])
 		rect.w = (stbrp_coord)width;
 		rect.h = (stbrp_coord)height;
 		ImageEntry image;
-		strcpy_s(image.Id, entry.Id);
+		strcpy_s(image.Name, entry.Id);
+		image.Id = 0;
 				
 		for (size_t j = 0; j < maxAtlases; ++j)
 		{
@@ -137,7 +130,7 @@ int main(int argc, char *argv[])
 			}
 			
 			stbrp_pack_rects(&RectContexts[j], &rect, 1);
-			image.Atlas = (uint16)j;
+			image.Atlas = (uint32)j;
 			if (rect.was_packed != 0) break;
 		}
 
@@ -162,7 +155,6 @@ int main(int argc, char *argv[])
 		
 		stbi_image_free(data);
 	}
-
 	
 	std::string atlasFileName = fmt::format("{}.datlas", arguments.Output); 
 	std::ofstream outfile(atlasFileName, std::ios::out | std::ios::binary);

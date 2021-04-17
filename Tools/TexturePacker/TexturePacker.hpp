@@ -44,3 +44,11 @@ inline static void PutPixels(std::vector<unsigned char>& atlasBytes, stbrp_rect 
 	}
 	
 }
+
+struct CommandLineArguments
+{
+	std::string Root{"resources"};
+	std::string Output{"output"};
+	uint16 Size{1024};
+	uint16 MaxAtlases{20};
+};

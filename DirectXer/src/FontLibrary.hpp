@@ -60,12 +60,12 @@ public:
 	BulkVector<TextureObject> Atlases;
 	stbrp_context RectContext;
 	BulkVector<AtlasEntry> AtlasGlyphEntries;
-	robin_hood::unordered_map<char, size_t> CharMap;
+	Map<char, size_t> CharMap;
 
 	void Init(Graphics* t_Graphics);
 	void InitNewAtlas();
 	void Build(FontBuilder t_Builder);
-	void LoadTypeface(MemoryArena t_Arena, float t_Size, size_t t_Index);
+	void LoadTypeface(void* data, size_t dataSize, float size, size_t id);
 	AtlasEntry GetEntry(size_t t_TypeFace, char t_Ch);
 	
 };

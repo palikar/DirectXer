@@ -61,19 +61,19 @@ void FontLibrary::Build(FontBuilder t_Builder)
 	for (auto entry : t_Builder.LoadEntries)
 	{
 		PlatformLayer::ReadFileIntoArena(entry.Handle, entry.FileSize, fileArena);
-		LoadTypeface(fileArena, entry.Size, faceIndex++);
+		LoadTypeface(fileArena.Memory, fileArena.Size, entry.Size, faceIndex++);
 		fileArena.Reset();
 	}		
 }
 	
-void FontLibrary::LoadTypeface(MemoryArena arena, float size, size_t index)
+void FontLibrary::LoadTypeface(void* data, size_t dataSize, float size, size_t id)
 {
 	FT_Face face;
 
 	FT_Open_Args openArgs;
 	openArgs.flags = FT_OPEN_MEMORY;
-	openArgs.memory_base = (uint8*)arena.Memory;
-	openArgs.memory_size = (FT_Long)arena.Size;
+	openArgs.memory_base = (uint8*)data;
+	openArgs.memory_size = (FT_Long)dataSize;
 		
 	FT_Error res;
 	res = FT_Open_Face(FTLibrary, &openArgs, 0, &face);
@@ -120,7 +120,7 @@ void FontLibrary::LoadTypeface(MemoryArena arena, float size, size_t index)
 			
 		entry.TexHandle = glyphAtlas;
 
-		AtlasGlyphEntries[index*Characters.size() + qcharIndex++] = entry;
+		AtlasGlyphEntries[id*Characters.size() + qcharIndex++] = entry;
 	}
 
 	FT_Done_Face(face);		

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Memory.hpp"
-#include "Resources.hpp"
-#include "Fileutils.hpp"
+#include <Memory.hpp>
+#include <Resources.hpp>
+#include <Fileutils.hpp>
+#include <Assets.hpp>
 
 #include <AL/al.h>
+#include <AL/alext.h>
 #include <AL/alext.h>
 
 
@@ -29,8 +31,10 @@ struct AudioBuilder
 	uint32 PutWav(std::string_view t_Path);
 };
 
-struct AudioPlayer
+class AudioPlayer
 {
+  public:
+	
 	struct AudioEntry
 	{
 		unsigned Buffer;
@@ -40,5 +44,19 @@ struct AudioPlayer
 	BulkVector<AudioEntry> AudioEntries;
 
 	void Build(AudioBuilder& t_Builder);
+
+	void CreateMemoryWav(WavAssetHeader& header, void* data)
+	{
+		unsigned int bufferid;
+		unsigned int sourceid;
+
+		alGenBuffers(1, &bufferid);
+		alBufferData(bufferid, header.Format, data, header.Size, header.SampleRate);
+		alGenSources(1, &sourceid);
+		alSourcei(sourceid, AL_BUFFER, bufferid);
+
+		AudioEntries.push_back({bufferid, sourceid});
+	}
+	
 	void Play(uint32 t_Id, float t_Gain);
 };

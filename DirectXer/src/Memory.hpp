@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <string>
+#include <robin_hood.h>
 
 #include <assert.h>
 
@@ -215,6 +216,9 @@ using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAlloca
 using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
 
 using String = std::string_view;
+
+template<class Key, class Value>
+using Map = robin_hood::unordered_map<Key, Value>;
 
 #else
 

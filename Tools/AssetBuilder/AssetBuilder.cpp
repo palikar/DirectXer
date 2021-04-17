@@ -32,7 +32,7 @@ static AssetToLoad AssetsToLoad[] = {
 struct CommandLineArguments
 {
 	std::string Root{""};
-	std::string Output{"output"};
+	std::string Output{"output"}; 
 	std::string Header{"output"};
 	std::string Id{"Asset"};
 	size_t MaxSize{128};
@@ -86,16 +86,16 @@ int main(int argc, char *argv[])
 		  case Type_Image: 
 		  {
 			  headerDefines.push_back(fmt::format("#define {}\t{}", asset.Id, header.ImagesCount));
+			  size = LoadImage(asset, data, header.ImagesCount);
 			  header.ImagesCount += 1;
-			  size = LoadImage(asset, data);
 			  std::cout << fmt::format("{} -> Packing image [{:.3} {}] [{}]\n", asset.Id, size/(1024.0f*1024.0f), size > 1024*1024 ? "MB" : "KB", asset.Path);
 			  break;
 		  }
 		  case Type_Font: 
 		  {
-			  headerDefines.push_back(fmt::format("#define {}_\t{}", asset.Id, header.FontsCount));
+			  headerDefines.push_back(fmt::format("#define {}_{} \t {}", asset.Id, asset.data.unsigned1, header.FontsCount));
+			  size = LoadFont(asset, data, header.FontsCount);
 			  header.FontsCount += 1;
-			  size = LoadFont(asset, data);
 			  std::cout << fmt::format("{} -> Packing font [{:.3} KB] [{}]\n", asset.Id, size/1024.0f, asset.Path);
 			  break;
 		  }

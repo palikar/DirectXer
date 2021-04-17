@@ -2,6 +2,7 @@
 
 #include <Types.hpp>
 #include <GraphicsCommon.hpp>
+#include <Memory.hpp>
 
 enum Tag : uint16
 {
@@ -35,6 +36,7 @@ struct AssetColletionHeader
 
 struct ImageHeader
 {
+	uint32 Id;
 	uint16 Width;
 	uint16 Height;
 	TextureFormat Format;
@@ -44,6 +46,7 @@ struct WavAssetHeader
 {
 	uint32 Size;
 	uint32 SampleRate;
+	uint32 Format;
 	uint16 Channels;
 	uint16 Bps;
 };
@@ -51,6 +54,8 @@ struct WavAssetHeader
 struct FontHeader
 {
 	uint32 FontSize;
+	uint32 Id;
+	uint32 DataSize;
 };
 
 
@@ -71,13 +76,31 @@ struct AtlasEntry
 
 struct ImageEntry
 {
-	char Id[64];
-	int Atlas;
+	char Name[64];
+	uint32 Id;
+	uint32 Atlas;
 	float Y;
 	float X;
 	float Width;
 	float Height;
 	float AtlasWidth;
 	float AtlasHeight;
-	
 };
+
+class ImageLibrary;
+class AudioPlayer;
+class FontLibrary;
+
+struct AssetBuilder
+{
+	ImageLibrary* ImageLib;
+	FontLibrary* FontLib;
+	AudioPlayer* WavLib;
+};
+
+struct AssetStore
+{
+	static void LoadAssetFile(String path, AssetBuilder& builders);
+};
+
+

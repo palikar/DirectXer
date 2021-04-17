@@ -20,6 +20,16 @@ struct  WavHeader
 	uint32_t        Subchunk2Size;  // Sampled data length
 };
 
+// @Note: Taken from the al.h header of OpenAL
+/** Unsigned 8-bit mono buffer format. */
+#define AL_FORMAT_MONO8                          0x1100
+/** Signed 16-bit mono buffer format. */
+#define AL_FORMAT_MONO16                         0x1101
+/** Unsigned 8-bit stereo buffer format. */
+#define AL_FORMAT_STEREO8                        0x1102
+/** Signed 16-bit stereo buffer format. */
+#define AL_FORMAT_STEREO16                       0x1103
+
 static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 {
     std::ifstream infile(t_filename.c_str(), std::ios::in | std::ios::ate | std::ios::binary);
@@ -39,7 +49,7 @@ static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 // (and probably should) some sort of header discribing the asset which's data
 // should come after the header
 
-size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes)
+size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id)
 {
 	int width, height, channels;
 	unsigned char* data = stbi_load(asset.Path.c_str(), &width, &height, &channels, 4);
@@ -48,6 +58,7 @@ size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes)
 	header.Width = width;
 	header.Height = height;
 	header.Format = TF_RGBA;
+	header.Id = id;
 
 	for (size_t i = 0; i < sizeof(ImageHeader); ++i)
 	{
@@ -74,6 +85,26 @@ size_t LoadWav(AssetToLoad asset, std::vector<unsigned char>& bytes)
 	header.SampleRate = wavHeader->SamplesPerSec;
 	header.Channels = wavHeader->NumOfChan;
 	header.Bps = wavHeader->BitsPerSample;
+	if (header.Channels == 1)
+	{
+		if (header.Bps == 8)
+		{
+			header.Format = AL_FORMAT_MONO8;
+		}
+		else {
+			header.Format = AL_FORMAT_MONO16;
+		}
+	}
+	else
+	{
+		if (header.Bps == 8)
+		{
+			header.Format = AL_FORMAT_STEREO8;
+		}
+		else {
+			header.Format = AL_FORMAT_STEREO16;
+		}
+	}
 
 	for (size_t i = 0; i < sizeof(WavHeader); ++i)
 	{
@@ -88,12 +119,14 @@ size_t LoadWav(AssetToLoad asset, std::vector<unsigned char>& bytes)
 	return wavHeader->Subchunk2Size + sizeof(WavHeader);
 }
 
-size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes)
+size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id)
 {
 	auto data = LoadFile(asset.Path);
 	
 	FontHeader header{0};
 	header.FontSize = 24;
+	header.Id = id;
+	header.DataSize = (uint32)data.size();
 	
 	for (size_t i = 0; i < sizeof(FontHeader); ++i)
 	{
@@ -118,10 +151,15 @@ size_t LoadAtlas(AssetToLoad asset, std::vector<unsigned char>& bytes,
 
 	for (size_t i = 0; i < atlasHeader->NumImages; ++i)
 	{
-		const ImageEntry* image = (ImageEntry*)(atlasData.data() + i * sizeof(ImageEntry) + offset);
-		headerDefines.push_back(fmt::format("#define {}\t{}", image->Id, (i+1) << 16 | header.AtlasesCount));
+		ImageEntry* image = (ImageEntry*)(atlasData.data() + i * sizeof(ImageEntry) + offset);
+		headerDefines.push_back(fmt::format("#define {}\t{}", image->Name, header.AtlasesCount << 16 | i));
+		image->Id = (uint32)(header.AtlasesCount << 16 | i);
 	}
-	
+
+	for (auto b : atlasData)
+	{
+		bytes.push_back(b);
+	}
 
 	return atlasData.size();
 }

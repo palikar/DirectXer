@@ -49,8 +49,8 @@ struct AssetToLoad
 	ExtraData data{0};
 };
 
-size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes);
+size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id);
 size_t LoadWav(AssetToLoad asset, std::vector<unsigned char>& bytes);
-size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes);
+size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id);
 size_t LoadAtlas(AssetToLoad asset, std::vector<unsigned char>& bytes,
 				 std::vector<std::string>& headerDefines, AssetColletionHeader& header);

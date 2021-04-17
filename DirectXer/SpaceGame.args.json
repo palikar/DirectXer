@@ -3,8 +3,8 @@
   "Id": "e8a1e208-e806-4908-97a5-bc4fb0b09c65",
   "Items": [
     {
-      "Id": "db3ebc32-763e-4f72-b45c-1772244711f0",
-      "Command": "--resources  ../../../resources"
+      "Id": "4d164e44-adbf-4bcb-8cbd-06f0efaefede",
+      "Command": "--resources resources"
     }
   ]
 }

@@ -95,60 +95,60 @@ uint32 AudioBuilder::PutWav(std::string_view t_Path)
 
 void AudioPlayer::Build(AudioBuilder& t_Builder)
 {
-		MemoryArena fileArena = Memory::GetTempArena(t_Builder.MaxFileSize + Megabytes(1));
-		Memory::EstablishTempScope(Megabytes(64));
+	MemoryArena fileArena = Memory::GetTempArena(t_Builder.MaxFileSize + Megabytes(1));
+	Memory::EstablishTempScope(Megabytes(64));
+	Defer {
+		Memory::EndTempScope();
+		Memory::DestoryTempArena(fileArena);
+	};
+
+	for (auto& entry : t_Builder.QueuedWavs)
+	{
 		Defer {
-			Memory::EndTempScope();
-			Memory::DestoryTempArena(fileArena);
+			fileArena.Reset();
+			Memory::ResetTempScope();
 		};
 
-		for (auto& entry : t_Builder.QueuedWavs)
+		PlatformLayer::ReadFileIntoArena(entry.Handle, entry.FileSize, fileArena);
+
+		int channel, sampleRate, bps, size;
+		auto data = LoadWAV(fileArena.Memory, channel, sampleRate, bps, size);
+
+		unsigned int bufferid, format;
+		alGenBuffers(1, &bufferid);
+		if (channel == 1)
 		{
-			Defer {
-				fileArena.Reset();
-				Memory::ResetTempScope();
-			};
-
-			PlatformLayer::ReadFileIntoArena(entry.Handle, entry.FileSize, fileArena);
-
-			int channel, sampleRate, bps, size;
-			auto data = LoadWAV(fileArena.Memory, channel, sampleRate, bps, size);
-
-			unsigned int bufferid, format;
-			alGenBuffers(1, &bufferid);
-			if (channel == 1)
+			if (bps == 8)
 			{
-				if (bps == 8)
-				{
-					format = AL_FORMAT_MONO8;
-				}
-				else {
-					format = AL_FORMAT_MONO16;
-				}
+				format = AL_FORMAT_MONO8;
 			}
-			else
-			{
-				if (bps == 8)
-				{
-					format = AL_FORMAT_STEREO8;
-				}
-				else {
-					format = AL_FORMAT_STEREO16;
-				}
+			else {
+				format = AL_FORMAT_MONO16;
 			}
-			alBufferData(bufferid, format, data, size, sampleRate);
-			unsigned int sourceid;
-			alGenSources(1, &sourceid);
-			alSourcei(sourceid, AL_BUFFER, bufferid);
-
-			AudioEntries.push_back({bufferid, sourceid});
-
 		}
+		else
+		{
+			if (bps == 8)
+			{
+				format = AL_FORMAT_STEREO8;
+			}
+			else {
+				format = AL_FORMAT_STEREO16;
+			}
+		}
+		alBufferData(bufferid, format, data, size, sampleRate);
+		unsigned int sourceid;
+		alGenSources(1, &sourceid);
+		alSourcei(sourceid, AL_BUFFER, bufferid);
+
+		AudioEntries.push_back({bufferid, sourceid});
+
 	}
+}
 
 void AudioPlayer::Play(uint32 t_Id, float t_Gain)
 {
-		const auto source =  AudioEntries[t_Id].Source;
-		alSourcef(source, AL_GAIN, t_Gain);
-		alSourcePlay(source);
-	}
+	const auto source =  AudioEntries[t_Id].Source;
+	alSourcef(source, AL_GAIN, t_Gain);
+	alSourcePlay(source);
+}

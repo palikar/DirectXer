@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Glm.hpp"
-#include "Memory.hpp"
-#include "GraphicsCommon.hpp"
-#include "Graphics.hpp"
-#include "Platform.hpp"
+#include <Glm.hpp>
+#include <Memory.hpp>
+#include <GraphicsCommon.hpp>
+#include <Graphics.hpp>
+#include <Platform.hpp>
+#include <Assets.hpp>
 
 #include <string_view>
 #include <stb_rect_pack.h>
@@ -32,7 +33,7 @@ struct ImageAtlas
 	stbrp_context RectContext;
 };
 
-class ImageLibraryBuilder
+struct ImageLibraryBuilder
 {
 public:
 
@@ -41,22 +42,28 @@ public:
 		std::string_view Path;
 		PlatformLayer::FileHandle Handle;
 		size_t FileSize;
+		uint32 Id;
+	};
+
+	struct MemoryImage
+	{
+		ImageHeader Image;
+		void* Data;
 	};
 
 	TempVector<QueuedImage> QueuedImages;
+	TempVector<MemoryImage> MemoryImages;
 	size_t MaxFileSize;
 
 	void Init(uint16 t_ImageCount);
-	uint32 PutImage(std::string_view t_Path);
-
+	void PutImage(std::string_view t_Path, uint32 t_Id);
 };
-
 
 class ImageLibrary
 {
   public:
 	Graphics* Gfx;
-	BulkVector<Image> Images;
+	Map<uint32, Image> Images;
 	BulkVector<ImageAtlas> Atlases;
 
 	const static inline uint16 RectsCount = 1024u / 2u;
@@ -68,5 +75,34 @@ class ImageLibrary
 	TextureObject Pack(stbrp_rect& t_Rect);
 	void Build(ImageLibraryBuilder& t_Builder);
 	Image GetImage(uint32 t_id);
+
+	void CreateMemoryImage(ImageHeader header, void* data)
+	{
+		assert(data);
+
+		if (header.Width >= 1024 || header.Height >= 1024)
+		{
+			auto texture = Gfx->CreateTexture(header.Width, header.Height, header.Format, data, 0);
+			Images.insert({ header.Id, Image{ texture, {0.0f, 0.0f}, {1.0f, 1.0f}, {header.Width, header.Height}}});
+			return;
+		}
+		
+		stbrp_rect rect;
+		rect.w = (stbrp_coord)header.Width;
+		rect.h = (stbrp_coord)header.Height;
+
+		auto texture = Pack(rect);
+		Gfx->UpdateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
+		Images.insert({ header.Id, Image{ texture, {(float)rect.x / AtlasSize, (float)rect.y / AtlasSize}, {(float)rect.w / AtlasSize, (float)rect.h / AtlasSize}, {AtlasSize, AtlasSize} }});
+	
+	}
+	
+	void CreateStaticAtlas(AtlasEntry entry, void* data)
+	{
+		ImageAtlas newAtlas;
+		newAtlas.TexHandle = Gfx->CreateTexture(entry.Width, entry.Height, entry.Format, data, 0);
+		newAtlas.RectContext = {0};
+		Atlases.push_back(newAtlas);
+	}
 	
 };

@@ -3,8 +3,8 @@
   "Id": "32d63685-09ed-459e-a8ff-95501679056a",
   "Items": [
     {
-      "Id": "68c9499f-ca2f-46d5-bcd2-d4fd5ba3b8e6",
-      "Command": "-r ./resources -i SpaceGameAtlases.datlas"
+      "Id": "f8704a5e-464b-48f2-bc54-f43e94875c87",
+      "Command": "-i SpaceGameAtlases.datlas"
     }
   ]
 }
