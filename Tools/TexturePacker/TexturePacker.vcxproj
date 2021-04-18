@@ -35,11 +35,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TexturePacker.cpp" />
-    <ClCompile Include="TexturePackerStbi.cpp" />
+    <ClCompile Include="src\TexturePacker.cpp" />
+    <ClCompile Include="src\TexturePackerStbi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TexturePacker.hpp" />
+    <ClInclude Include="src\TexturePacker.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

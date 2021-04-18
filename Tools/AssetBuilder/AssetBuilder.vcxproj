@@ -35,12 +35,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AssetBuilder.cpp" />
-    <ClCompile Include="AssetBuilderStbi.cpp" />
-    <ClCompile Include="AssetLoaders.cpp" />
+    <ClCompile Include="src\AssetBuilder.cpp" />
+    <ClCompile Include="src\AssetBuilderStbi.cpp" />
+    <ClCompile Include="src\AssetLoaders.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AssetBuilder.hpp" />
+    <ClInclude Include="src\AssetBuilder.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

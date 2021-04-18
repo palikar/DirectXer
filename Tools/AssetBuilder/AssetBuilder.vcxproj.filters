@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="AssetBuilder.cpp" />
-    <ClCompile Include="AssetLoaders.cpp" />
-    <ClCompile Include="AssetBuilderStbi.cpp" />
+    <ClCompile Include="src\AssetBuilder.cpp" />
+    <ClCompile Include="src\AssetBuilderStbi.cpp" />
+    <ClCompile Include="src\AssetLoaders.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AssetBuilder.hpp" />
+    <ClInclude Include="src\AssetBuilder.hpp" />
   </ItemGroup>
 </Project>

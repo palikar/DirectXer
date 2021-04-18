@@ -47,11 +47,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AtlasViewer.cpp" />
+    <ClCompile Include="src\AtlasViewer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AtlasViewer.hpp" />
-    <ClInclude Include="DummyTexture.hpp" />
+    <ClInclude Include="src\AtlasViewer.hpp" />
+    <ClInclude Include="src\DummyTexture.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
