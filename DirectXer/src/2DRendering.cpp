@@ -22,8 +22,10 @@ void Renderer2D::InitRenderer(Graphics* t_Graphics, Init2DParams t_Params)
 		
 	CurrentVertex = &Vertices[0];
 
-	vbo = Graph->CreateVertexBuffer(sizeof(Vertex2D), nullptr, (uint32)(sizeof(Vertex2D) * TotalVertices), true);
-	ibo = Graph->CreateIndexBuffer(nullptr, (uint32)(sizeof(uint32) * TotalVertices * 3), true);
+	vbo = NextVertexBufferId();
+	Graph->CreateVertexBuffer(vbo, sizeof(Vertex2D), nullptr, (uint32)(sizeof(Vertex2D) * TotalVertices), true);
+	ibo = NextIndexBufferId();
+	Graph->CreateIndexBuffer(ibo , nullptr, (uint32)(sizeof(uint32) * TotalVertices * 3), true);
 }
 
 void Renderer2D::BeginScene()

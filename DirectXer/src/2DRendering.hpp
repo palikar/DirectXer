@@ -30,8 +30,8 @@ class Renderer2D
 	inline static const size_t TotalVertices = 2000;
 	inline static const uint8 MaxTextureSlots = 3;
 
-	VBObject vbo;
-	IBObject ibo;
+	VertexBufferId vbo;
+	IndexBufferId ibo;
 
 	TextureId TexSlots[MaxTextureSlots];
 	uint8 CurrentTextureSlot;

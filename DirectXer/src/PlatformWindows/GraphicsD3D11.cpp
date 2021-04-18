@@ -292,12 +292,12 @@ void GraphicsD3D11::SetDepthStencilState(DepthStencilState t_State, uint32 t_Ref
 
 void GraphicsD3D11::BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot)
 {
-	Context->PSSetConstantBuffers(t_Slot, 1, &ConstantBuffers.at(t_Id)->id);
+	Context->PSSetConstantBuffers(t_Slot, 1, &ConstantBuffers.at(t_Id).id);
 }
 
 void GraphicsD3D11::BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot)
 {
-	Context->VSSetConstantBuffers(t_Slot, 1, &ConstantBuffers.at(t_Id)->id);
+	Context->VSSetConstantBuffers(t_Slot, 1, &ConstantBuffers.at(t_Id).id);
 }
 
 void GraphicsD3D11::UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch)
@@ -351,7 +351,7 @@ bool GraphicsD3D11::CreateTexture(TextureId id, TextureDescription description, 
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	Textures.insert({id, to});
+	assert(Textures.insert({id, to}).second);
 	
 	return true;
 }
@@ -384,7 +384,7 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 			
 	GFX_CALL(Device->CreateDepthStencilView(to.tp, &dsvDesc, &to.dsv));
 
-	Textures.insert({id, to});
+	assert(Textures.insert({id, to}).second);
 	
 	return true;
 }
@@ -475,13 +475,13 @@ bool GraphicsD3D11::CreateCubeTexture(TextureId id, TextureDescription descripti
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	Textures.insert({id, to });
+	assert(Textures.insert({id, to }).second);
 
 	return true;
 
 }
 
-VBObject GraphicsD3D11::CreateVertexBuffer(uint32 structSize, void* data, uint32 dataSize,  bool dynamic)
+bool GraphicsD3D11::CreateVertexBuffer(VertexBufferId id, uint32 structSize, void* data, uint32 dataSize, bool dynamic)
 {
 	ID3D11Buffer* pVertexBuffer;
 	D3D11_BUFFER_DESC vertexBufferDesc{ 0 };
@@ -504,11 +504,12 @@ VBObject GraphicsD3D11::CreateVertexBuffer(uint32 structSize, void* data, uint32
 		GFX_CALL(Device->CreateBuffer(&vertexBufferDesc, nullptr, &pVertexBuffer));
 	}
 
+	assert(VertexBuffers.insert({id, VBObject{structSize, pVertexBuffer}}).second);
 
-	return {structSize, pVertexBuffer};
+	return true;
 }
 
-IBObject GraphicsD3D11::CreateIndexBuffer(void* data, uint32 dataSize, bool dynamic)
+bool GraphicsD3D11::CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataSize, bool dynamic)
 {
 	ID3D11Buffer* pIndexBuffer;
 	D3D11_BUFFER_DESC indexBufferDesc{ 0 };
@@ -531,7 +532,9 @@ IBObject GraphicsD3D11::CreateIndexBuffer(void* data, uint32 dataSize, bool dyna
 		GFX_CALL(Device->CreateBuffer(&indexBufferDesc, nullptr, &pIndexBuffer));
 	}
 
-	return {pIndexBuffer};
+	assert(IndexBuffers.insert({ id, IBObject{pIndexBuffer } }).second);
+	
+	return true;
 }
 
 void GraphicsD3D11::InitResources()
@@ -684,7 +687,7 @@ bool GraphicsD3D11::CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, voi
 	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
-	ConstantBuffers.insert({id, cb});
+	assert(ConstantBuffers.insert({id, cb}).second);
 	return true;
 }
 
@@ -704,7 +707,7 @@ void GraphicsD3D11::UpdateCBs()
 
 void GraphicsD3D11::UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data)
 {
-	auto id = ConstantBuffers.at(t_Id);
+	auto id = ConstantBuffers.at(t_Id).id;
 
 	D3D11_MAPPED_SUBRESOURCE msr;
 	[[maybe_unused]]HRESULT hr;
@@ -713,22 +716,25 @@ void GraphicsD3D11::UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_D
 	Context->Unmap(id, 0);
 }
 
-void GraphicsD3D11::UpdateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length)
+void GraphicsD3D11::UpdateVertexBuffer(VertexBufferId t_Id, void* data, uint64 t_Length)
 {
+	auto id = VertexBuffers.at(t_Id).id;
+	
 	D3D11_MAPPED_SUBRESOURCE msr;
 	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(Context->Map(t_Buffer.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
+	GFX_CALL(Context->Map(id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, data, t_Length);
-	Context->Unmap(t_Buffer.id, 0);
+	Context->Unmap(id, 0);
 }
 
-void GraphicsD3D11::UpdateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length)
+void GraphicsD3D11::UpdateIndexBuffer(IndexBufferId t_Id, void* data, uint64 t_Length)
 {
+	auto id = IndexBuffers.at(t_Id).id;
 	D3D11_MAPPED_SUBRESOURCE msr;
 	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(Context->Map(t_Buffer.id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
+	GFX_CALL(Context->Map(id, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr));
 	memcpy(msr.pData, data, t_Length);
-	Context->Unmap(t_Buffer.id, 0);
+	Context->Unmap(id, 0);
 }
 
 void GraphicsD3D11::BindTexture(uint32 t_Slot, TextureId t_Id)
@@ -764,14 +770,15 @@ void GraphicsD3D11::SetShaderConfiguration(ShaderConfig t_Config)
 	VertexShaderCB.shaderType = shaderType;
 }
 
-void GraphicsD3D11::SetIndexBuffer(IBObject t_buffer)
+void GraphicsD3D11::SetIndexBuffer(IndexBufferId id)
 {
-	Context->IASetIndexBuffer(t_buffer.id, DXGI_FORMAT_R32_UINT, 0);
+	Context->IASetIndexBuffer(IndexBuffers.at(id).id, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void GraphicsD3D11::SetVertexBuffer(VBObject t_buffer, uint32 offset)
+void GraphicsD3D11::SetVertexBuffer(VertexBufferId t_Id, uint32 offset)
 {
-	Context->IASetVertexBuffers(0, 1, &t_buffer.id, &t_buffer.structSize, &offset);
+	const auto& buffer = VertexBuffers.at(t_Id);
+	Context->IASetVertexBuffers(0, 1, &buffer.id, &buffer.structSize, &offset);
 }
 
 void GraphicsD3D11::DrawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)

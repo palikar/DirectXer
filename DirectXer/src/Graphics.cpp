@@ -15,3 +15,24 @@ TextureId NextTextureId()
 	++next;
 	return next;
 }
+
+ConstantBufferId NextConstantBufferId()
+{	
+	static ConstantBufferId next = 0;
+	++next;
+	return next;
+}
+
+IndexBufferId NextIndexBufferId()
+{
+	static IndexBufferId next = 0;
+	++next;
+	return next;
+}
+
+VertexBufferId NextVertexBufferId()
+{
+	static IndexBufferId next = 0;
+	++next;
+	return next;
+}

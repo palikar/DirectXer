@@ -277,8 +277,8 @@ GPUGeometry BufferBuilder::CreateBuffer(Graphics graphics)
 		geometryType = ReadBlob<GeometryType>(current);
 	}
 		
-	auto vb = vertexBufferFactory<ColorVertex>(graphics, Vertices);
-	auto ib = indexBufferFactory(graphics, Indices);
+	auto vb = vertexBufferFactory<ColorVertex>(NextIndexBufferId(), graphics, Vertices);
+	auto ib = indexBufferFactory(NextIndexBufferId(), graphics, Indices);
 
 	Memory::ResetTempScope();
 

@@ -16,8 +16,8 @@ struct BufferDescriptor
 struct GPUGeometry
 {
 	BufferDescriptor Description;
-	VBObject Vbo;
-	IBObject Ibo;	
+	VertexBufferId Vbo;
+	IndexBufferId Ibo;	
 };
 
 struct BufferBuilder

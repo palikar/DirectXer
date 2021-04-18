@@ -96,12 +96,12 @@ class GraphicsD3D11
 	void BindTexture(uint32 t_Slot, TextureId t_Id);
 	void BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
 	void BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
+	void SetVertexBuffer(VertexBufferId t_Id, uint32 offset = 0);
+	void SetIndexBuffer(IndexBufferId id);
 
 	void SetScissor(Rectangle2D t_Rect);
 	void SetRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void SetDepthStencilState(DepthStencilState t_State = DSS_Normal, uint32 t_RefValue = 0);
-	void SetVertexBuffer(VBObject t_buffer, uint32 offset = 0);
-	void SetIndexBuffer(IBObject t_buffer);
 	void SetViewport(float x, float y, float width, float height);
 	void SetShaderConfiguration(ShaderConfig t_Confing);
 	void SetBlendingState(BlendingState t_State);
@@ -113,14 +113,14 @@ class GraphicsD3D11
 	bool CreateRenderTexture(TextureId t_Id, RenderTargetDescription description);
 	bool CreateCubeTexture(TextureId id, TextureDescription description, void* t_Data[6]);
 	
-	VBObject CreateVertexBuffer(uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
-	IBObject CreateIndexBuffer(void* data, uint32 dataSize, bool dynamic = false);
+	bool CreateVertexBuffer(VertexBufferId id, uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
+	bool CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataSize, bool dynamic = false);
 	bool CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData);
 
 	void UpdateCBs();
 	void UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data);
-	void UpdateVertexBuffer(VBObject t_Buffer, void* data, uint64 t_Length);
-	void UpdateIndexBuffer(IBObject t_Buffer, void* data, uint64 t_Length);
+	void UpdateVertexBuffer(VertexBufferId t_Id, void* data, uint64 t_Length);
+	void UpdateIndexBuffer(IndexBufferId t_Id, void* data, uint64 t_Length);
 	void UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
 	void DrawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
