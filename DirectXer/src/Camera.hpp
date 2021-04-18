@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Glm.hpp"
-#include "Input.hpp"
+#include <Glm.hpp>
+#include <Input.hpp>
 
 struct Camera
 {

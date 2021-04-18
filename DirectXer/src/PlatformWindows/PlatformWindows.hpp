@@ -3,9 +3,10 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#include "Types.hpp"
+#include <Types.hpp>
+#include <Utils.hpp>
+
 #include "IncludeWin.hpp"
-#include "Memory.hpp"
 
 void SetupConsole();
 	
@@ -17,10 +18,10 @@ struct WindowsSettings
 	uint32 InitialWidth;
 	uint32 InitialHeight;
 	bool Fullscreen;
-
 };
 
 class App;
+struct MemoryArena;
 class WindowsWindow
 {
 public:

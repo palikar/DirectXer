@@ -1,6 +1,6 @@
-#include "Memory.hpp"
-#include "Resources.hpp"
-#include "App.hpp"
+#include <Memory.hpp>
+#include <Resources.hpp>
+#include <App.hpp>
 #include <Random.hpp>
 #include <Logging.hpp>
 #include <Audio.hpp>

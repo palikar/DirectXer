@@ -1,16 +1,15 @@
 #pragma once
 
-#include "Geometry.hpp"
-#include "Graphics.hpp"
-#include "Camera.hpp"
-#include "TextureCatalog.hpp"
-#include "GeometryUtils.hpp"
-#include "Materials.hpp"
-#include "Lighting.hpp"
-#include "2DRendering.hpp"
-#include "Memory.hpp"
-#include "GameDefinition.hpp"
-
+#include <Geometry.hpp>
+#include <Graphics.hpp>
+#include <Camera.hpp>
+#include <TextureCatalog.hpp>
+#include <GeometryUtils.hpp>
+#include <Materials.hpp>
+#include <Lighting.hpp>
+#include <2DRendering.hpp>
+#include <Memory.hpp>
+#include <GameDefinition.hpp>
 
 struct CommandLineSettings
 {

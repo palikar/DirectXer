@@ -1,9 +1,8 @@
 #pragma once
 
-#include "GraphicsCommon.hpp"
-#include "Graphics.hpp"
-#include "Glm.hpp"
-
+#include <GraphicsCommon.hpp>
+#include <Graphics.hpp>
+#include <Glm.hpp>
 
 struct PointLight
 {

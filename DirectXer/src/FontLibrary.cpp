@@ -78,7 +78,7 @@ void FontLibrary::LoadTypeface(void* data, size_t dataSize, float size, size_t i
 		
 	FT_Error res;
 	res = FT_Open_Face(FTLibrary, &openArgs, 0, &face);
-	assert(res == 0);
+	Assert(res == 0, "Can't open font face: {}", id);
 
 	uint16 qcharIndex{0};
 	for (const auto ch : Characters)
@@ -86,13 +86,13 @@ void FontLibrary::LoadTypeface(void* data, size_t dataSize, float size, size_t i
 		auto glyph_index = FT_Get_Char_Index( face, (unsigned long)ch );
 
 		res = FT_Set_Pixel_Sizes(face, 0, FT_UInt(size));
-		assert(res == 0);
+		Assert(res == 0, "Can't set pixel size for typeface");
 			
 		res = FT_Load_Glyph(face, glyph_index, FT_LOAD_NO_HINTING | FT_LOAD_NO_BITMAP);
-		assert(res == 0);
+		Assert(res == 0, "Can't load glyph: {}", glyph_index);
 			
 		res = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-		assert(res == 0);
+		Assert(res == 0, "Can't render glyph: {}", glyph_index);
 
 		const auto& bitmap = face->glyph->bitmap;
 		const auto width = bitmap.width + Padding;

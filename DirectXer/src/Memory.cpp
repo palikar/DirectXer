@@ -1,5 +1,5 @@
-#include "Memory.hpp"
-#include "Platform.hpp"
+#include <Memory.hpp>
+#include <Platform.hpp>
 
 
 const size_t Memory::TempMemoryRequired = Megabytes(256);
@@ -10,6 +10,28 @@ MemoryState Memory::g_Memory{0};
 TempScopesHolder Memory::g_TempScopes{0};
 
 static const inline size_t SIZE_BYTES = sizeof(size_t);
+
+void* MemoryArena::GetMemory(size_t len)
+{
+	Assert(Size + len <= MaxSize, "Can't get this much data from this memory arena");
+	Size += len;
+	Current += len;
+	return (void*)(Current - len);
+}
+
+void MemoryArena::Put(const void* data, size_t len)
+{
+	Assert(Size + len <= MaxSize, "Can't put this much data into this memory arena");
+	memcpy(Memory + Size, data, len);
+	Current += len;
+	Size += len;
+}
+
+void MemoryArena::Reset()
+{
+	Size = 0;
+	Current = Memory;
+}
 
 static bool ArenaHasPlace(MemoryArena& t_Arena, size_t t_Size)
 {
@@ -58,7 +80,7 @@ void Memory::InitMemoryState()
 
 MemoryArena Memory::GetTempArena(size_t t_Size)
 {
-	assert(EnoughTempMemory(t_Size));
+	Assert(EnoughTempMemory(t_Size), "There is not enough space in this memory arena");
 
 	MemoryArena arena;
 	arena.MaxSize = t_Size;
@@ -74,7 +96,8 @@ MemoryArena Memory::GetTempArena(size_t t_Size)
 
 void Memory::DestoryTempArena(MemoryArena& t_Arena)
 {
-	assert(t_Arena.Memory == (Memory::g_Memory.TempMemoryCurrent - t_Arena.MaxSize));
+	Assert(t_Arena.Memory == (Memory::g_Memory.TempMemoryCurrent - t_Arena.MaxSize),
+		   "Trying to destory temporary memory arena out of order. There is something wrong with the code");
 
 	Memory::g_Memory.TempMemoryCurrent -= t_Arena.MaxSize;
 	Memory::g_Memory.TempMemorySize -= t_Arena.MaxSize;	
@@ -109,14 +132,14 @@ void Memory::ResetTempScope()
 void* Memory::TempAlloc(size_t t_Size)
 {
 	auto& arena = g_TempScopes.GetCurrentArena();
-	assert(arena.Memory);
+	Assert(arena.Memory, "Currently there is not temporary memory scope");
 
 	if(ArenaHasPlace(arena, t_Size))
 	{
 		return ArenaAllocation(arena, t_Size);
 	}
 
-	assert(false);
+	Assert(arena.Memory, "The current temporary scope has not enough space.");
 	return nullptr;
 }
 
@@ -146,7 +169,7 @@ void Memory::TempDealloc(void*)
 
 void* Memory::BulkGet(size_t t_Size)
 {
-	assert(EnoughBulkMemory(t_Size));
+	Assert(EnoughBulkMemory(t_Size), "Not enough bulk memory");
 	auto res = g_Memory.BulkMemoryCurrent;
 
 	g_Memory.BulkMemoryCurrent += t_Size;

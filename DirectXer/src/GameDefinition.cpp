@@ -4,10 +4,10 @@
 
 #if defined(DXER_EXAMPLE_SCENES)
 
-#include "Games/ExampleScenes.cpp"
+#include <Games/ExampleScenes.cpp>
 
 #elif defined(DXER_SPACE_GAME)
 
-#include "Games/SpaceGame.cpp"
+#include <Games/SpaceGame.cpp>
 
 #endif

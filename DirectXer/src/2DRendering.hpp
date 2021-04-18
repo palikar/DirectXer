@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Types.hpp"
-#include "Glm.hpp"
-#include "GraphicsCommon.hpp"
-#include "Graphics.hpp"
-#include "ImageLibrary.hpp"
-#include "FontLibrary.hpp"
-#include "Resources.hpp"
-
+#include <Types.hpp>
+#include <Glm.hpp>
+#include <GraphicsCommon.hpp>
+#include <Graphics.hpp>
+#include <ImageLibrary.hpp>
+#include <FontLibrary.hpp>
+#include <Resources.hpp>
 
 struct Init2DParams
 {
@@ -54,7 +53,7 @@ class Renderer2D
 	void DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size);
 	void DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color, float radius);
 	void DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::vec2 subPos, glm::vec2 subSize);
-	void DrawText(std::string_view text, glm::vec2 pos, uint8 typeface);
+	void DrawText(String text, glm::vec2 pos, uint8 typeface);
 };
 
 // Pusing transform matrices

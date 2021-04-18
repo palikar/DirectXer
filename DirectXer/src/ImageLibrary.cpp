@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Graphics.hpp"
-#include "Resources.hpp"
-#include "ImageLibrary.hpp"
+#include <Graphics.hpp>
+#include <Resources.hpp>
+#include <ImageLibrary.hpp>
 
 #include <stb_image.h>
 
@@ -35,7 +35,7 @@ void ImageLibrary::Init(Graphics* Gfx)
 
 ImageAtlas ImageLibrary::InitAtlas()
 {
-	assert(Atlases.size() <= MaxAtlases);
+	Assert(Atlases.size() <= MaxAtlases, "Too many image atlases. Try increasing the maximum atlases number");
 
 	ImageAtlas newAtlas;
 	newAtlas.TexHandle = NextTextureId();
@@ -60,7 +60,7 @@ TextureId ImageLibrary::Pack(stbrp_rect& t_Rect)
 	auto newAtlas = InitAtlas();
 	stbrp_pack_rects(&newAtlas.RectContext, &t_Rect, 1);
 
-	assert(t_Rect.was_packed != 0);
+	Assert(t_Rect.was_packed != 0, "Can't pack image in a fresh atlas");
 	return newAtlas.TexHandle;
 }
 
@@ -96,7 +96,7 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 
 void ImageLibrary::CreateMemoryImage(ImageHeader header, void* data)
 {
-	assert(data);
+	Assert(data, "This image does not have memory data");
 
 	if (header.Width >= MaxWidthForPacking|| header.Height >= MaxHeightForPacking)
 	{

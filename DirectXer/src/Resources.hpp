@@ -1,16 +1,14 @@
 #pragma once 
 
-#include "Types.hpp"
-#include "Memory.hpp"
-
-#include <string_view>
+#include <Types.hpp>
+#include <Memory.hpp>
 
 #include <fmt/format.h>
 
 struct Resources
 {
 	inline static fmt::basic_memory_buffer<char, 512> FormatBuffer{};
-	inline static std::string_view ResourcesRoot{""};
+	inline static String ResourcesRoot{""};
 
 	static void Init(std::string_view Root)
 	{

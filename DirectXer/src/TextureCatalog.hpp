@@ -1,15 +1,14 @@
 #pragma once
 
+#include <Graphics.hpp>
+#include <Memory.hpp>
+#include <Utils.hpp>
+#include <Platform.hpp>
+#include <Resources.hpp>
+#include <FileUtils.hpp>
+
 #include <stb_image.h>
 #include <fmt/format.h>
-#include <string>
-
-#include "Graphics.hpp"
-#include "Memory.hpp"
-#include "Utils.hpp"
-#include "Platform.hpp"
-#include "Resources.hpp"
-#include "FileUtils.hpp"
 
 enum LoadState
 {
@@ -19,7 +18,7 @@ enum LoadState
 
 struct TextureLoadEntry
 {
-	std::string_view Path;
+	String Path;
 	LoadState State{LS_INVALID};
 	TextureId Handle{0};
 };

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include "Glm.hpp"
-#include "Types.hpp"
+#include <Glm.hpp>
+#include <Types.hpp>
+#include <Logging.hpp>
 
 enum class KeyCode : uint16_t
 {
@@ -285,7 +286,7 @@ struct Input
 
 	void UpdateMouseButtonPressed(uint32 t_Bnt)
 	{
-		assert(t_Bnt < 10);
+		Assert(t_Bnt < 10, "No such mout botton. There are only 10 mouse buttons.");
 		
 		MousePressedKeys[t_Bnt] = true;
 		MouseReleasedKeys[t_Bnt] = false;
@@ -293,7 +294,7 @@ struct Input
 	
 	void UpdateMouseButtonReleased(uint32 t_Bnt)
 	{
-		assert(t_Bnt < 10);
+		Assert(t_Bnt < 10, "No such mout botton. There are only 10 mouse buttons.");
 		MousePressedKeys[t_Bnt] = false;
 		MouseReleasedKeys[t_Bnt] = true;
 	}

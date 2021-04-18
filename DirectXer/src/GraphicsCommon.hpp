@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.hpp"
-#include "Glm.hpp"
+#include <Types.hpp>
+#include <Glm.hpp>
 
 struct PSConstantBuffer
 {

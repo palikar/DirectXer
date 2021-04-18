@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Types.hpp"
-#include "Memory.hpp"
-#include "Platform.hpp"
+#include <Types.hpp>
+#include <Platform.hpp>
 
 #include <fmt/format.h>
 #include <fmt/color.h>
@@ -125,18 +124,23 @@ inline DxgiInfoManager gDxgiManager;
 
 #ifdef _DEBUG
 
+#define DXWARNING(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__)
 #define DXERROR(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); assert(false)
 #define DXLOG(MSG, ...) gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
 #define DXPRINT(MSG, ...) gLogger.Print(MSG, __VA_ARGS__)
 
+#define Assert(VALUE, MSG, ...) do { if (!(VALUE)) { gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); assert(false); } } while(false)
 
 #define DXLOGHRESULT(hr) gLogger.LogHResult(__FILE__, __LINE__, hr)
 
 #else
 
+#define DXWARNING(MSG, ...)
 #define DXERROR(MSG, ...)
 #define DXLOG(MSG, ...)  gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
 #define DXPRINT(MSG, ...)
+
+#define Assert(VALUE, MSG, ...)
 
 #endif 
 

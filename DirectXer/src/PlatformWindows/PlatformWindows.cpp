@@ -64,7 +64,7 @@ void WindowsPlatformLayer::ReadFileIntoArena(FileHandle handle, size_t size, Mem
 {
 	DWORD readBytes;
 	ReadFile(handle, t_Arena.Memory + t_Arena.Size, (DWORD)size, &readBytes, NULL);
-	assert(readBytes <= t_Arena.MaxSize - t_Arena.Size);
+	Assert(readBytes <= t_Arena.MaxSize - t_Arena.Size, "Can't read the whole file into the given arena.");
 	t_Arena.Size += readBytes;
 }
 
@@ -131,7 +131,7 @@ void WindowsWindow::Init(WindowsSettings t_Settings)
 	WindowRect.top = 100;
 	WindowRect.bottom = Settings.InitialHeight + WindowRect.top;
 
-	assert(AdjustWindowRect(&WindowRect, WindowStyle, FALSE) != 0);
+	Assert(AdjustWindowRect(&WindowRect, WindowStyle, FALSE) != 0, "Can't adjust the window's rectangle");
 		
 	Application->Width = (float32)Settings.InitialWidth;
 	Application->Height = (float32)Settings.InitialHeight;
@@ -140,7 +140,7 @@ void WindowsWindow::Init(WindowsSettings t_Settings)
 						CW_USEDEFAULT, CW_USEDEFAULT, WindowRect.right - WindowRect.left,
 						WindowRect.bottom - WindowRect.top,
 						nullptr, nullptr, GetModuleHandleA(NULL), this);
-	assert(hWnd);
+	Assert(hWnd, "Can't open window");
 
 	ShowWindow(hWnd, SW_SHOW);
 

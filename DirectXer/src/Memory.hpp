@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Utils.hpp"
-#include "Types.hpp"
-#include "Config.hpp"
+#include <Utils.hpp>
+#include <Types.hpp>
+#include <Config.hpp>
+#include <Logging.hpp>
 
 #include <vector>
 #include <string>
 #include <robin_hood.h>
-
-#include <assert.h>
 
 struct MemoryArena
 {
@@ -17,14 +16,10 @@ struct MemoryArena
 	size_t MaxSize;
 	size_t Size;
 
-	void Put(const void* data, size_t len)
-	{
-		assert(Size + len <= MaxSize);
-		memcpy(Memory + Size, data, len);
-		Current += len;
-		Size += len;
-	}
-
+	void Put(const void* data, size_t len);
+	void* GetMemory(size_t len);
+	void Reset();
+	
 	template<typename T>
 	void Put(const T& value)
 	{
@@ -34,18 +29,8 @@ struct MemoryArena
 	template<typename T = void>
 	T* Get(size_t len)
 	{
-		assert(Size + len <= MaxSize);
-		Size += len;
-		Current += len;
-		return (T*)(Current - len);
+		return (T*)GetMemory(len);
 	}
-
-	void Reset()
-	{
-		Size = 0;
-		Current = Memory;
-	}
-
 };
 
 struct MemoryState
@@ -76,7 +61,7 @@ struct TempScopesHolder
 	
 	inline void PushScope(MemoryArena t_Arena)
 	{
-		assert(CurrentScope < MaxTempScopes);
+		Assert(CurrentScope < MaxTempScopes, "Too many temporary memory scopes: {}", MaxTempScopes);
 		Scopes[CurrentScope++] = t_Arena;
 	}
 
@@ -269,7 +254,7 @@ struct SimdFlatMap
 			}
 		}
 		
-		assert(false);
+		Assert(false, "Can't find element in has table.");
 		return current->second;
 	}
 

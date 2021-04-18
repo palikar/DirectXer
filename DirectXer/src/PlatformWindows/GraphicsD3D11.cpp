@@ -20,7 +20,7 @@ static DXGI_FORMAT TFToDXGI(TextureFormat format)
 	  case TF_R: return DXGI_FORMAT_R8_UNORM;
 	}
 
-	assert(false);
+	Assert(false, "Usage of unknows texture format.");
 	return DXGI_FORMAT_UNKNOWN;
 }
 
@@ -121,7 +121,7 @@ void GraphicsD3D11::InitZBuffer(float width, float height)
 	GFX_CALL(Device->CreateDepthStencilView(depthStencil, &descDSV, &DepthStencilView));
 
 	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
-	assert(DepthStencilView);
+	Assert(DepthStencilView, "Can't create the depth stencil view for the backbuffer");
 
 }
 
@@ -241,16 +241,16 @@ void GraphicsD3D11::Destroy()
 
 void GraphicsD3D11::EndFrame()
 {
-	[[maybe_unused]]HRESULT hr;
+	HRESULT hr;
 	if( FAILED( hr = Swap->Present( 1u,0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
-			assert(false);
+			Assert(false, "Lost the rendering device. This is bad and we have to crash");
 		}
 		else
 		{
-			assert(false);
+			DXWARNING("[Graphics] Can't present frame but we'll not crash here");
 		}
 	}
 }
@@ -358,7 +358,7 @@ bool GraphicsD3D11::CreateTexture(TextureId id, TextureDescription description, 
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	assert(Textures.insert({id, to}).second);
+	Assert(Textures.insert({id, to}).second, "Usage of non-existaned texture");
 	
 	return true;
 }
@@ -391,7 +391,7 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 			
 	GFX_CALL(Device->CreateDepthStencilView(to.tp, &dsvDesc, &to.dsv));
 
-	assert(Textures.insert({id, to}).second);
+	Assert(Textures.insert({id, to}).second, "Usage of non-existaned texture");
 	
 	return true;
 }
@@ -482,7 +482,7 @@ bool GraphicsD3D11::CreateCubeTexture(TextureId id, TextureDescription descripti
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	assert(Textures.insert({id, to }).second);
+	Assert(Textures.insert({id, to }).second, "Usage of non-existaned texture");
 
 	return true;
 
@@ -511,7 +511,7 @@ bool GraphicsD3D11::CreateVertexBuffer(VertexBufferId id, uint32 structSize, voi
 		GFX_CALL(Device->CreateBuffer(&vertexBufferDesc, nullptr, &pVertexBuffer));
 	}
 
-	assert(VertexBuffers.insert({id, VBObject{structSize, pVertexBuffer}}).second);
+	Assert(VertexBuffers.insert({id, VBObject{structSize, pVertexBuffer}}).second, "Usage of non-existaned vertex buffer");
 
 	return true;
 }
@@ -539,7 +539,7 @@ bool GraphicsD3D11::CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataS
 		GFX_CALL(Device->CreateBuffer(&indexBufferDesc, nullptr, &pIndexBuffer));
 	}
 
-	assert(IndexBuffers.insert({ id, IBObject{pIndexBuffer } }).second);
+	Assert(IndexBuffers.insert({ id, IBObject{pIndexBuffer } }).second, "Usage of non-existaned index buffer");
 	
 	return true;
 }
@@ -694,7 +694,7 @@ bool GraphicsD3D11::CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, voi
 	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
-	assert(ConstantBuffers.insert({id, cb}).second);
+	Assert(ConstantBuffers.insert({id, cb}).second, "Usage of non-existaned constant buffer");
 	return true;
 }
 

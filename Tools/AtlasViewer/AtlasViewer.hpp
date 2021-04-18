@@ -19,25 +19,20 @@ static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 {
 	int retval;
 	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
-	assert(SUCCEEDED(retval));
-
 
 	LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
-	assert(lpWideCharStr != NULL);
-		
-
 	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
+	
 	if (!SUCCEEDED(retval))
 	{
 		free(lpWideCharStr);
 		return NULL;
 	}
-
+	
 	int numArgs;
 	LPWSTR* args;
 	args = CommandLineToArgvW(lpWideCharStr, &numArgs);
 	free(lpWideCharStr);
-	assert(args != NULL);
 
 	int storage = numArgs * sizeof(LPSTR);
 	for (int i = 0; i < numArgs; ++i)
@@ -63,8 +58,7 @@ static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 	int bufLen = storage - numArgs * sizeof(LPSTR);
 	LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
 	for (int i = 0; i < numArgs; ++i)
-	{
-		assert(bufLen > 0);
+	{		
 		BOOL lpUsedDefaultChar = FALSE;
 		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
 		if (!SUCCEEDED(retval))

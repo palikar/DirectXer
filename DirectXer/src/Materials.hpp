@@ -1,11 +1,8 @@
 #pragma once
 
-#include "Graphics.hpp"
-#include "GraphicsCommon.hpp"
-#include "Glm.hpp"
-
-#include <type_traits>
-
+#include <Graphics.hpp>
+#include <GraphicsCommon.hpp>
+#include <Glm.hpp>
 
 struct TexturedMaterial
 {
