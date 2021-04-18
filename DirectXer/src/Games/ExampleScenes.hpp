@@ -50,7 +50,7 @@ public:
 	BufferDescriptor DebugGeometry;
 	Camera camera;
 	RasterizationState CurrentRastState;
-	TextureObject SkyboxTexture;
+	TextureId SkyboxTexture;
 	LightSetup Light;
 	GPUGeometry GPUGeometryDesc;
 	Renderer2D Renderer2D;

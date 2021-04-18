@@ -119,7 +119,7 @@ struct Memory
 	static void* TempRealloc(void* mem, size_t len);
 	static void TempDealloc(void*);
 
-    //  @Note: Reset the current temp global temp scope arena
+    //  @Note: Reset the Current temp global temp scope arena
 	// to its initial state 
 	static void ResetTempScope();
 
@@ -133,18 +133,18 @@ struct Memory
 };
 
 template<typename T>
-inline T& ReadBlob(char* &current)
+inline T& ReadBlob(char* &Current)
 {
-	auto res = (T*)current;
-	current += sizeof(T);
+	auto res = (T*)Current;
+	Current += sizeof(T);
 	return *res;
 }
 
 template<typename T>
-inline T& ReadBlobAndMove(char* &current, size_t size)
+inline T& ReadBlobAndMove(char* &Current, size_t size)
 {
-	auto res = (T*)current;
-	current += size;
+	auto res = (T*)Current;
+	Current += size;
 	return *res;
 }
 
@@ -157,7 +157,7 @@ class TempStdAllocator
 	TempStdAllocator(){};
 	
 	TempStdAllocator(const TempStdAllocator&){};
-	
+
 	typedef T value_type;
 	typedef size_t size_type;
 	typedef std::ptrdiff_t difference_type;
@@ -173,8 +173,7 @@ class TempStdAllocator
 		return Memory::TempDealloc(p);
 	}
 
-	inline bool operator==(TempStdAllocator const&) const { return true; }
-		
+	inline bool operator==(TempStdAllocator const&) const { return true; }		
 };
 
 template<typename T>
@@ -185,7 +184,6 @@ class BulkStdAllocator
 	BulkStdAllocator(){};
 	
 	BulkStdAllocator(const BulkStdAllocator&){};
-
 	
 	typedef T value_type;
 	typedef size_t size_type;
@@ -199,8 +197,7 @@ class BulkStdAllocator
 	
 	void deallocate(T*, size_type){}
 
-	inline bool operator==(BulkStdAllocator const&) const { return true; }
-		
+	inline bool operator==(BulkStdAllocator const&) const { return true; }		
 };
 
 #if USE_CUSTOM_ALLOCATORS
@@ -233,3 +230,93 @@ using BulkString = std::string;
 using String = std::string_view;
 
 #endif
+
+template<class Key, class Value>
+struct SimdFlatMap
+{
+	using Node = std::pair<uint32, Value>;
+	BulkVector<Node> Nodes;
+
+	void reserve(size_t size)
+	{
+		Nodes.reserve(size);
+	}
+	
+	std::pair<bool, bool> insert(Node node)
+	{
+		Nodes.push_back(node);
+		return { true, true };
+	}
+
+	Value& at(uint32 id)
+	{
+		auto current = Nodes.data();
+		
+		__m128i value = _mm_set1_epi32((int)id);
+		
+		for (size_t i = 0; i < Nodes.size(); i += 4, ++current)
+		{
+			__m128i keys = _mm_set_epi32((int)current[3].first, (int)current[2].first, (int)current[1].first, (int)current[0].first);
+			__m128i result = _mm_cmpeq_epi32(keys, value);
+			int mask_i = _mm_movemask_epi8(result);
+			unsigned long mask = (unsigned long) _mm_movemask_epi8(result);
+			unsigned long index;
+			_BitScanForward(&index, mask);
+
+			if(mask)
+			{
+				return current[index >> 2].second;
+			}
+		}
+		
+		assert(false);
+		return current->second;
+	}
+
+	Value& operator[](uint32 id)
+	{
+		auto current = Nodes.data();
+		__m128i value = _mm_set1_epi32((int)id);
+		
+		for (size_t i = 0; i < Nodes.size(); i += 4, ++current)
+		{
+			__m128i keys = _mm_set_epi32((int)current[3].first, (int)current[2].first, (int)current[1].first, (int)current[0].first);
+			__m128i result = _mm_cmpeq_epi32(keys, value);
+			int mask_i = _mm_movemask_epi8(result);
+			unsigned long mask = (unsigned long) _mm_movemask_epi8(result);
+			unsigned long index;
+			_BitScanForward(&index, mask);
+
+			if(mask)
+			{
+				return current[index >> 2].second;
+			}
+		}
+		
+		Nodes.push_back({id, Value{}});
+		return Nodes.back().second;
+	}
+
+	auto begin()
+	{
+		return Nodes.begin();
+	}
+
+	auto end()
+	{
+		return Nodes.end();
+	}
+	
+	const auto begin() const
+	{
+		return Nodes.begin();
+	}
+
+	const auto end() const
+	{
+		return Nodes.end();
+	}			
+};
+
+template<class Key, class Value>
+using GPUResourceMap = SimdFlatMap<Key, Value>;

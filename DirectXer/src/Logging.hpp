@@ -125,7 +125,7 @@ inline DxgiInfoManager gDxgiManager;
 
 #ifdef _DEBUG
 
-#define DXERROR(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__)
+#define DXERROR(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); assert(false)
 #define DXLOG(MSG, ...) gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
 #define DXPRINT(MSG, ...) gLogger.Print(MSG, __VA_ARGS__)
 

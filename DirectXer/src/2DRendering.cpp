@@ -53,8 +53,8 @@ void Renderer2D::EndScene()
 
 	Graph->SetShaderConfiguration(SC_2D_RECT);
 
-	Graph->SetIndexBuffer(ibo);
-	Graph->SetVertexBuffer(vbo);
+	Graph->BindIndexBuffer(ibo);
+	Graph->BindVertexBuffer(vbo);
 
 	Graph->UpdateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount * sizeof(Vertex2D));
 	Graph->UpdateIndexBuffer(ibo, Indices.data(), 3u * CurrentVertexCount * sizeof(uint32));

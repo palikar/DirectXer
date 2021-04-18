@@ -1,8 +1,13 @@
 #pragma once
 
-#include "Glm.hpp"
-#include "GraphicsCommon.hpp"
+#include <Glm.hpp>
+#include <GraphicsCommon.hpp>
 
+#include <cmath>
+#include <utility>
+#include <algorithm>
+
+inline constexpr float PI = 3.14159265358979323846f;
 
 template<typename T>
 static void TransformVertices(glm::mat4 t_Mat, T* t_Vertices, size_t t_Count)

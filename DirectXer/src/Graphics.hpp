@@ -21,7 +21,7 @@ IndexBufferId indexBufferFactory(IndexBufferId id, Graphics& graphics, TempVecto
 	return id;
 }
 
-void DrawFullscreenQuad(Graphics* Graphics, TextureObject texture, ShaderConfig type);
+void DrawFullscreenQuad(Graphics* Graphics, TextureId texture, ShaderConfig type);
 
 TextureId NextTextureId();
 ConstantBufferId NextConstantBufferId();

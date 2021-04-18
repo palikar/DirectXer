@@ -38,6 +38,12 @@ App* InitMain(char** argv, int argc)
 	
 	ParseCommandLineArguments(application->Arguments, argv, argc);
 
+	if (application->Arguments.ResourcesPath.empty())
+	{
+		DXERROR("[INIT] The resource path fiven is empty. Please provide a sensible one.");
+		assert(false);
+	}
+
 	Resources::Init(application->Arguments.ResourcesPath);
 	return application;
 }

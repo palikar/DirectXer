@@ -100,9 +100,9 @@ struct Context
 	UINT WindowStyle;
 	RECT WindowRect;
 	Graphics Graphics;
-	TextureObject DummyTex;
+	TextureId DummyTex;
 	uint16 currentTex{0};
-	std::vector<TextureObject> Texs;
+	std::vector<TextureId> Texs;
 };
 
 static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& context);

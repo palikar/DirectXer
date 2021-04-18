@@ -90,14 +90,14 @@ class GraphicsD3D11
 	void InitSamplers();
 	void InitBlending();
 	void InitDepthStencilStates();
-
+	
 	void ResizeBackBuffer(float width, float height);
 
 	void BindTexture(uint32 t_Slot, TextureId t_Id);
 	void BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
 	void BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
-	void SetVertexBuffer(VertexBufferId t_Id, uint32 offset = 0);
-	void SetIndexBuffer(IndexBufferId id);
+	void BindVertexBuffer(VertexBufferId t_Id, uint32 offset = 0);
+	void BindIndexBuffer(IndexBufferId id);
 
 	void SetScissor(Rectangle2D t_Rect);
 	void SetRasterizationState(RasterizationState t_State = RS_DEBUG);
@@ -135,9 +135,6 @@ class GraphicsD3D11
 	void Destroy();
 
   public:
-	// @Note: We should probably have a maximum of 8 pointers here (1 cahce line)
-	// not sure which data has to be inlined though; what is that we use most commonly
-	// together?
 	ID3D11Device* Device{ nullptr };
 	IDXGISwapChain* Swap{ nullptr };
 	ID3D11DeviceContext* Context{ nullptr };
@@ -146,23 +143,23 @@ class GraphicsD3D11
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };
 	ID3D11DepthStencilView* DepthStencilView{ nullptr };
 
+	// @Note: Pipeline state objects
 	ID3D11RasterizerState* RasterizationsStates[RS_COUNT];
 	ID3D11BlendState* BlendingStates[BS_Count];
+	ID3D11DepthStencilState* DepthStencilStates[DSS_Count];
+	ShaderObject Shaders[SF_COUNT];
 
+	// @Note: These are the primary VS and PX constant buffers; these are the
+	// first constant buffers in each shader
+	ID3D11Buffer* PixelShaderCBId{nullptr};
+	ID3D11Buffer* VertexShaderCBId{nullptr};
 	PSConstantBuffer PixelShaderCB;
 	VSConstantBuffer VertexShaderCB;
 
-	ID3D11Buffer* PixelShaderCBId{nullptr};
-	ID3D11Buffer* VertexShaderCBId{nullptr};
-
-	ID3D11DepthStencilState* DepthStencilStates[DSS_Count];
-
-	ShaderObject Shaders[SF_COUNT];
-
-	Map<TextureId, TextureObject> Textures;
-	Map<VertexBufferId, VBObject> VertexBuffers;
-	Map<IndexBufferId, IBObject> IndexBuffers;
-	Map<ConstantBufferId, CBObject> ConstantBuffers;
-
+	// @Note: GPU resources
+	GPUResourceMap<TextureId, TextureObject> Textures;
+	GPUResourceMap<VertexBufferId, VBObject> VertexBuffers;
+	GPUResourceMap<IndexBufferId, IBObject> IndexBuffers;
+	GPUResourceMap<ConstantBufferId, CBObject> ConstantBuffers;
 };
 

@@ -169,7 +169,7 @@ uint32 BufferBuilder::InitSpotLightHelper()
 	return GeometryBuffer.PutGeometry(lightInfo);
 }
 	
-GPUGeometry BufferBuilder::CreateBuffer(Graphics graphics)
+GPUGeometry BufferBuilder::CreateBuffer(Graphics& graphics)
 {
 	Memory::EstablishTempScope(Megabytes(4));
 
@@ -277,7 +277,7 @@ GPUGeometry BufferBuilder::CreateBuffer(Graphics graphics)
 		geometryType = ReadBlob<GeometryType>(current);
 	}
 		
-	auto vb = vertexBufferFactory<ColorVertex>(NextIndexBufferId(), graphics, Vertices);
+	auto vb = vertexBufferFactory<ColorVertex>(NextVertexBufferId(), graphics, Vertices);
 	auto ib = indexBufferFactory(NextIndexBufferId(), graphics, Indices);
 
 	Memory::ResetTempScope();

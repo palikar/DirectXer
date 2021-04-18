@@ -17,7 +17,7 @@ TextureId NextTextureId()
 }
 
 ConstantBufferId NextConstantBufferId()
-{	
+{
 	static ConstantBufferId next = 0;
 	++next;
 	return next;

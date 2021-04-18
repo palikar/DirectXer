@@ -1,5 +1,7 @@
 #include "GraphicsD3D11.hpp"
 
+#include <Config.hpp>
+
 #include <2DVertexShader.hpp>
 #include <2DPixelShader.hpp>
 
@@ -34,6 +36,11 @@ static const char* FeatureLevelToString(D3D_FEATURE_LEVEL level)
 
 void GraphicsD3D11::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
 {
+	Textures.reserve(Config::InitialMaxTextures);
+	VertexBuffers.reserve(Config::InitialMaxVertexBuffers);
+	IndexBuffers.reserve(Config::InitialMaxIndexBuffers);
+	ConstantBuffers.reserve(Config::InitialMaxConstantBuffers);
+
 	DXGI_SWAP_CHAIN_DESC sd{ 0 };
 	sd.BufferDesc.Width = (uint32)t_Width;
 	sd.BufferDesc.Height = (uint32)t_Height;
@@ -770,12 +777,12 @@ void GraphicsD3D11::SetShaderConfiguration(ShaderConfig t_Config)
 	VertexShaderCB.shaderType = shaderType;
 }
 
-void GraphicsD3D11::SetIndexBuffer(IndexBufferId id)
+void GraphicsD3D11::BindIndexBuffer(IndexBufferId id)
 {
 	Context->IASetIndexBuffer(IndexBuffers.at(id).id, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void GraphicsD3D11::SetVertexBuffer(VertexBufferId t_Id, uint32 offset)
+void GraphicsD3D11::BindVertexBuffer(VertexBufferId t_Id, uint32 offset)
 {
 	const auto& buffer = VertexBuffers.at(t_Id);
 	Context->IASetVertexBuffers(0, 1, &buffer.id, &buffer.structSize, &offset);

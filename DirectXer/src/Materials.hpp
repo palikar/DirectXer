@@ -10,7 +10,7 @@
 struct TexturedMaterial
 {
 	ShaderConfig config;
-	CBObject data;
+	ConstantBufferId data;
 	TextureId BaseMap;
 	TextureId AoMap;
 	TextureId EnvMap;
@@ -28,7 +28,7 @@ struct TexturedMaterialData
 struct PhongMaterial
 {
 	ShaderConfig config;
-	CBObject data;
+	ConstantBufferId data;
 };
 
 struct PhongMaterialData

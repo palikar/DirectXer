@@ -3,7 +3,7 @@
 #include <stb_image.h>
 
 
-void TextureCatalog::LoadTextures(Graphics graphics)
+void TextureCatalog::LoadTextures(Graphics& graphics)
 {
 	// @Note: We'll use this for loading the contents of the file
 	MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));
@@ -45,7 +45,7 @@ void TextureCatalog::LoadTextures(Graphics graphics)
 	}
 }
 
-TextureId TextureCatalog::LoadCube(Graphics graphics, const char* name[6])
+TextureId TextureCatalog::LoadCube(Graphics& graphics, const char* name[6])
 {
 	// @Note: We'll use this for loading the contents of the file
 	MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));

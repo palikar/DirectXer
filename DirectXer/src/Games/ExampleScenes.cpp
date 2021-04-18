@@ -18,8 +18,8 @@ static uint32 CAMERA;
 static uint32 POINTLIGHT;
 static uint32 SPOTLIGHT;
 
-static uint32 BGIMAGE;
-static uint32 SHIPIMAGE;
+static uint32 BGIMAGE = 3;
+static uint32 SHIPIMAGE = 4;
 
 void ExampleScenes::Init()
 {
@@ -54,23 +54,26 @@ void ExampleScenes::Init()
 
 	GPUGeometryDesc = builder.CreateBuffer(*Graphics);
 	DebugGeometry = GPUGeometryDesc.Description;
-	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
 
 
 	// Create material
 	texMat.config = SC_DEBUG_TEX;
-	texMat.data = Graphics->CreateConstantBuffer(sizeof(TexturedMaterialData), &texMatData);
+	texMat.data = NextConstantBufferId();
+	Graphics->CreateConstantBuffer(texMat.data, sizeof(TexturedMaterialData), &texMatData);
 	texMat.BaseMap = ROCKS_TEXTURE.Handle;
 	texMat.AoMap = ROCKS_AO_TEXTURE.Handle;
 	texMat.EnvMap = SkyboxTexture;
 
 	phongMat.config = SC_DEBUG_PHONG;
-	phongMat.data = Graphics->CreateConstantBuffer(sizeof(PhongMaterialData), &texMatData);
+	phongMat.data = NextConstantBufferId();
+	Graphics->CreateConstantBuffer(phongMat.data, sizeof(PhongMaterialData), &texMatData);
 
 
 	// Create lighing
-	Light.bufferId = Graphics->CreateConstantBuffer(sizeof(Lighting), &Light.lighting);
+	Light.bufferId = NextConstantBufferId();
+	Graphics->CreateConstantBuffer(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
 	Light.lighting.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
 	Light.lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
@@ -92,11 +95,11 @@ void ExampleScenes::Init()
 	Memory::EstablishTempScope(Bytes(512));
 	ImageLibraryBuilder imagebuilder;
 	imagebuilder.Init(10);
-	imagebuilder.PutImage("images/facebook.png");
-	imagebuilder.PutImage("images/instagram.png");
-	imagebuilder.PutImage("assets/sprites.png");
-	BGIMAGE = imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png");
-	SHIPIMAGE = imagebuilder.PutImage("assets/PNG/Ship_Parts/Ship_Main_Icon.png");
+	imagebuilder.PutImage("images/facebook.png", 0);
+	imagebuilder.PutImage("images/instagram.png", 1);
+	imagebuilder.PutImage("assets/sprites.png", 2);
+	imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png", 3);
+	imagebuilder.PutImage("assets/PNG/Ship_Parts/Ship_Main_Icon.png", 4);
 	Renderer2D.ImageLib.Build(imagebuilder);
 	Memory::EndTempScope();
 
@@ -112,7 +115,11 @@ void ExampleScenes::Init()
 	SpriteSheets.PutSheet(2, { 640.0f, 470.0f }, { 8, 5 });
 
 
-	uiRenderTarget = Graphics->CreateRenderTarget((uint16)Application->Width, (uint16)Application->Height, TF_RGBA);
+	uiRenderTarget.Color = NextTextureId();
+	uiRenderTarget.DepthStencil = NextTextureId();
+
+	Graphics->CreateRenderTexture(uiRenderTarget.Color, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
+	Graphics->CreateDSTexture(uiRenderTarget.DepthStencil, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
 
 }
 
@@ -132,7 +139,7 @@ void ExampleScenes::Update(float dt)
 
 	if (Input::gInput.IsKeyReleased(KeyCode::Left))
 	{
-		CurrentScene = Scene(std::abs(CurrentScene - 1) % SCENE_COUNT);
+		CurrentScene = Scene(CurrentScene - 1 < 0 ? SCENE_COUNT - 1 : CurrentScene - 1);
 	}
 
 	if (Input::gInput.IsKeyReleased(KeyCode::Right))
@@ -207,8 +214,8 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	SetupCamera(camera);
 
 	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
-	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
 
 	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
@@ -216,7 +223,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->BindTexture(1, texMat.BaseMap);
 	Graphics->BindTexture(2, texMat.AoMap);
 
-	Graphics->BindPSConstantBuffers(&texMat.data, 1, 1);
+	Graphics->BindPSConstantBuffers(texMat.data, 1);
 
 	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 	texMatData.ColorIntensity = 0.5f * std::abs(std::sin(t*3));
@@ -279,7 +286,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	ControlCameraFPS(camera, dt);
 
 	bool lightChanged = false;
-	Graphics->BindPSConstantBuffers(&Light.bufferId, 1, 2);
+	Graphics->BindPSConstantBuffers(Light.bufferId, 2);
 	ImGui::Begin("Scene Setup");
 	if (ImGui::CollapsingHeader("Ligting"))
 	{
@@ -334,8 +341,8 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/Application->Height, nearPlane, farPlane));
 	SetupCamera(camera);
 
-	Graphics->SetIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->SetVertexBuffer(GPUGeometryDesc.Vbo);
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
 
 	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
@@ -346,7 +353,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	Graphics->SetRasterizationState(RS_NORMAL);
 
 	Graphics->SetShaderConfiguration(SC_DEBUG_PHONG);
-	Graphics->BindPSConstantBuffers(&phongMat.data, 1, 3);
+	Graphics->BindPSConstantBuffers(phongMat.data, 3);
 
 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
 	phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };

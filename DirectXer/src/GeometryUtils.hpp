@@ -40,6 +40,6 @@ struct BufferBuilder
 	uint32 InitPointLightHelper();
 	uint32 InitSpotLightHelper();
 	
-	GPUGeometry CreateBuffer(Graphics graphics);
+	GPUGeometry CreateBuffer(Graphics& graphics);
 
 };

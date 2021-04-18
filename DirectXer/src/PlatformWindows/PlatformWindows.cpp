@@ -11,6 +11,7 @@
 #include <Xinput.h>
 
 #include <Shlwapi.h>
+#include <time.h>
 
 void WindowsPlatformLayer::Init()
 {

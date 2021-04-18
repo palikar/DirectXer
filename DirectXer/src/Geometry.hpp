@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Types.hpp"
-#include "Glm.hpp"
-#include "GraphicsCommon.hpp"
-#include "Memory.hpp"
+#include <Types.hpp>
+#include <GraphicsCommon.hpp>
+#include <Memory.hpp>
+#include <Math.hpp>
 
-#include <vector>
 #include <cmath>
-
-inline constexpr float PI = 3.14159265358979323846f;
+#include <utility>
+#include <algorithm>
 
 enum GeometryType : uint16
 {
@@ -430,7 +429,6 @@ inline int PlaneGeometryData(const PlaneGeometry& t_PlaneInfo, ColorVertex* t_Ve
 
 inline GeometryInfo SphereGeometryInfo(const SphereGeometry& t_SphereInfo)
 {
-
 	const float width_segments  = std::max(3.0f, std::floor(t_SphereInfo.width_segments));
 	const float height_segments = std::max(2.0f, std::floor(t_SphereInfo.height_segments));
 	const float theta_end = std::min(t_SphereInfo.theta_start + t_SphereInfo.theta_length, PI);

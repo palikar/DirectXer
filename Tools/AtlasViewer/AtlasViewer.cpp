@@ -70,7 +70,8 @@ static void LoadAtlas(Context& context, const char* path)
 	{
 		auto atlas = (AtlasEntry*)(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * i);
 		fmt::print("Atlas [{}] has size [{}x{}]\n", i, atlas->Width, atlas->Height);
-		context.Texs[i] = Graphics->CreateTexture({(uint16)atlas->Width, (uint16)atlas->Height, atlas->Format}, fileArena.Memory + atlas->Offset);
+		context.Texs[i] = NextIndexBufferId();
+		Graphics->CreateTexture(context.Texs[i], {(uint16)atlas->Width, (uint16)atlas->Height, atlas->Format}, fileArena.Memory + atlas->Offset);
 	}
 
 	DumpImages(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * header->NumAtlases, header->NumImages);
@@ -87,7 +88,8 @@ static void Init(Context& context)
 	};
 	int width, height, channels;
 	unsigned char* data = stbi_load_from_memory(DUMMYTEXTURE_PNG, DUMMYTEXTURE_PNG_LEN, &width, &height, &channels, 4);
-	context.DummyTex = Graphics->CreateTexture({(uint16)width, (uint16)height, PngFormat(channels)}, data);
+	context.DummyTex = NextTextureId();
+	Graphics->CreateTexture(context.DummyTex, {(uint16)width, (uint16)height, PngFormat(channels)}, data);
 
 	auto resolvedPath = fmt::format("{}/{}", context.Args.Root, context.Args.Input);
 	LoadAtlas(context, resolvedPath.c_str());
