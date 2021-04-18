@@ -234,7 +234,7 @@ using String = std::string_view;
 template<class Key, class Value>
 struct SimdFlatMap
 {
-	using Node = std::pair<uint32, Value>;
+	using Node = std::pair<uint16, Value>;
 	BulkVector<Node> Nodes;
 
 	void reserve(size_t size)
@@ -252,49 +252,25 @@ struct SimdFlatMap
 	{
 		auto current = Nodes.data();
 		
-		__m128i value = _mm_set1_epi32((int)id);
+		__m128i value = _mm_set1_epi16(id);
 		
-		for (size_t i = 0; i < Nodes.size(); i += 4, ++current)
+		for (size_t i = 0; i < Nodes.size(); i += 8, ++current)
 		{
-			__m128i keys = _mm_set_epi32((int)current[3].first, (int)current[2].first, (int)current[1].first, (int)current[0].first);
-			__m128i result = _mm_cmpeq_epi32(keys, value);
-			int mask_i = _mm_movemask_epi8(result);
+			__m128i keys = _mm_set_epi16(current[7].first, current[6].first, current[5].first, current[4].first,
+										 current[3].first, current[2].first, current[1].first, current[0].first);
+			__m128i result = _mm_cmpeq_epi16(keys, value);
 			unsigned long mask = (unsigned long) _mm_movemask_epi8(result);
 			unsigned long index;
 			_BitScanForward(&index, mask);
 
 			if(mask)
 			{
-				return current[index >> 2].second;
+				return current[index >> 1].second;
 			}
 		}
 		
 		assert(false);
 		return current->second;
-	}
-
-	Value& operator[](uint32 id)
-	{
-		auto current = Nodes.data();
-		__m128i value = _mm_set1_epi32((int)id);
-		
-		for (size_t i = 0; i < Nodes.size(); i += 4, ++current)
-		{
-			__m128i keys = _mm_set_epi32((int)current[3].first, (int)current[2].first, (int)current[1].first, (int)current[0].first);
-			__m128i result = _mm_cmpeq_epi32(keys, value);
-			int mask_i = _mm_movemask_epi8(result);
-			unsigned long mask = (unsigned long) _mm_movemask_epi8(result);
-			unsigned long index;
-			_BitScanForward(&index, mask);
-
-			if(mask)
-			{
-				return current[index >> 2].second;
-			}
-		}
-		
-		Nodes.push_back({id, Value{}});
-		return Nodes.back().second;
 	}
 
 	auto begin()
