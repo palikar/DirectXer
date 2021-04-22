@@ -136,7 +136,7 @@ void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& c
 	}
 }
 
-static void ParseCommandLineArguments(int argc, char *argv[], CommandLineArguments& arguments)
+static void ParseCommandLineArguments(int argc, char *argv[], AtlasViewer::CommandLineArguments& arguments)
 {
 	for (size_t i = 0; i < argc; ++i)
 	{

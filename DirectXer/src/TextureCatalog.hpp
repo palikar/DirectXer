@@ -41,6 +41,6 @@ inline TextureLoadEntry g_Textures[]
 struct TextureCatalog
 {
 	void LoadTextures(Graphics& graphics);
-
+	
 	TextureId LoadCube(Graphics& graphics, const char* name[6]);
 };

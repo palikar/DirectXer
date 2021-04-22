@@ -43,123 +43,73 @@ static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 	return v;
  }
 
-// @Note: These functions hould produce some data based on the given asset
-// to load; the data should be *appended* to the end of the bytes vector and
-// the amount of new data should be returned; the appended data can contain
-// (and probably should) some sort of header discribing the asset which's data
-// should come after the header
-
-size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id)
+void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	int width, height, channels;
 	unsigned char* data = stbi_load(asset.Path.c_str(), &width, &height, &channels, 4);
 
-	ImageHeader header{ 0 };
-	header.Width = width;
-	header.Height = height;
-	header.Format = TF_RGBA;
-	header.Id = id;
+	ImageLoadEntry imageEntry{ 0 };
+	imageEntry.Desc.Width = width;
+	imageEntry.Desc.Height = height;
+	imageEntry.Desc.Format = TF_RGBA;
+	imageEntry.Id = NewAssetName(context, Type_Image, asset.Id);
 
-	for (size_t i = 0; i < sizeof(ImageHeader); ++i)
-	{
-		bytes.push_back(*((char*)&header + i));
-	}
+	blob.PutData(data, width * height * channels);
+
+	context.LoadImages.push_back(imageEntry);
 	
-	for (size_t i = 0; i < width*height*channels; ++i)
-	{
-		bytes.push_back(data[i]);
-	}
-
 	stbi_image_free(data);
-
-	return width * height * channels + sizeof(ImageHeader);
 }
 
-size_t LoadWav(AssetToLoad asset, std::vector<unsigned char>& bytes)
+void LoadWav(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	auto data = LoadFile(asset.Path);
 	WavHeader* wavHeader = (WavHeader*)(data.data());
 
-	WavAssetHeader header;
-	header.Size = wavHeader->Subchunk2Size;
-	header.SampleRate = wavHeader->SamplesPerSec;
-	header.Channels = wavHeader->NumOfChan;
-	header.Bps = wavHeader->BitsPerSample;
-	if (header.Channels == 1)
+	WavLoadEntry wavEntry;
+	wavEntry.Desc.Size = wavHeader->Subchunk2Size;
+	wavEntry.Desc.SampleRate = wavHeader->SamplesPerSec;
+	wavEntry.Desc.Channels = wavHeader->NumOfChan;
+	wavEntry.Desc.Bps = wavHeader->BitsPerSample;
+	wavEntry.Id = NewAssetName(context, Type_Wav, asset.Id);
+
+	if (wavEntry.Desc.Channels == 1)
 	{
-		if (header.Bps == 8)
+		if (wavEntry.Desc.Bps == 8)
 		{
-			header.Format = AL_FORMAT_MONO8;
+			wavEntry.Desc.Format = AL_FORMAT_MONO8;
 		}
-		else {
-			header.Format = AL_FORMAT_MONO16;
+		else
+		{
+			wavEntry.Desc.Format = AL_FORMAT_MONO16;
 		}
 	}
 	else
 	{
-		if (header.Bps == 8)
+		if (wavEntry.Desc.Bps == 8)
 		{
-			header.Format = AL_FORMAT_STEREO8;
+			wavEntry.Desc.Format = AL_FORMAT_STEREO8;
 		}
-		else {
-			header.Format = AL_FORMAT_STEREO16;
+		else
+		{
+			wavEntry.Desc.Format = AL_FORMAT_STEREO16;
 		}
 	}
-
-	for (size_t i = 0; i < sizeof(WavHeader); ++i)
-	{
-		bytes.push_back(*((char*)&header + i));
-	}
-		
-	for (size_t i = 0; i < wavHeader->Subchunk2Size; ++i)
-	{
-		bytes.push_back(data[sizeof(WavHeader) + i]);
-	}
-
-	return wavHeader->Subchunk2Size + sizeof(WavHeader);
+	
+	wavEntry.DataOffset = blob.PutData(data, sizeof(WavHeader));	
+	context.LoadWavs.push_back(wavEntry);
 }
 
-size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id)
+void LoadFont(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	auto data = LoadFile(asset.Path);
 	
-	FontHeader header{0};
-	header.FontSize = 24;
-	header.Id = id;
-	header.DataSize = (uint32)data.size();
+	FontLoadEntry fontEntry{0};
+	fontEntry.Desc.FontSize = 24;
+	fontEntry.Id = NewAssetName(context, Type_Font, fmt::format("{}_{}", asset.Id, asset.data.unsigned1).c_str());
 	
-	for (size_t i = 0; i < sizeof(FontHeader); ++i)
-	{
-		bytes.push_back(*((char*)&header + i));
-	}
-		
-	for (size_t i = 0; i < data.size(); ++i)
-	{
-		bytes.push_back(data[i]);
-	}
+	fontEntry.DataSize = (uint32)data.size();
+	fontEntry.DataOffset = blob.PutData(data);
 
-	return data.size() + sizeof(FontHeader);
-}
-
-size_t LoadAtlas(AssetToLoad asset, std::vector<unsigned char>& bytes,
-				 std::vector<std::string>& headerDefines, AssetColletionHeader& header)
-{
-	const auto atlasData = LoadFile(asset.Path);
-
-	const AtlasFileHeader* atlasHeader = (AtlasFileHeader*) atlasData.data();
-	const size_t offset = sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * atlasHeader->NumAtlases;
-
-	for (size_t i = 0; i < atlasHeader->NumImages; ++i)
-	{
-		ImageEntry* image = (ImageEntry*)(atlasData.data() + i * sizeof(ImageEntry) + offset);
-		headerDefines.push_back(fmt::format("#define {}\t{}", image->Name, header.AtlasesCount << 16 | i));
-		image->Id = (uint32)(header.AtlasesCount << 16 | i);
-	}
-
-	for (auto b : atlasData)
-	{
-		bytes.push_back(b);
-	}
-
-	return atlasData.size();
+	context.LoadFonts.push_back(fontEntry);
 }

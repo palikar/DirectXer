@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
 #include <unordered_map>
 #include <vector>
 #include <string>
@@ -13,14 +14,6 @@
 #include <Assets.hpp>
 #include <fmt/format.h>
 #include <filesystem>
-
-
-template<class T, size_t N>
-constexpr size_t size(T (&)[N])
-{
-	return N;
-}
-
 
 //@Note: as we don't have different structs for the different types of entries
 // (and we probably should at some point), each entry can have some extra information
@@ -36,6 +29,14 @@ struct ExtraData
 	float float2;
 };
 
+enum AssetType : uint16
+{
+	Type_Image,
+	Type_Font,
+	Type_Wav,
+	Type_Texture,
+};
+
 struct AssetToLoad
 {
 	AssetType Type;
@@ -49,8 +50,96 @@ struct AssetToLoad
 	ExtraData data{0};
 };
 
-size_t LoadImage(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id);
-size_t LoadWav(AssetToLoad asset, std::vector<unsigned char>& bytes);
-size_t LoadFont(AssetToLoad asset, std::vector<unsigned char>& bytes, uint32 id);
-size_t LoadAtlas(AssetToLoad asset, std::vector<unsigned char>& bytes,
-				 std::vector<std::string>& headerDefines, AssetColletionHeader& header);
+struct AssetBuilder
+{
+	struct CommandLineArguments
+	{
+		std::string Root{""};
+		std::string Output{"output"}; 
+		std::string Header{"output"};
+		std::string Id{"Asset"};
+		size_t MaxSize{128};
+	};
+
+};
+
+struct AssetDefine
+{
+	std::string Name;
+	uint32 Id;
+	AssetType Type;
+};
+
+struct AssetBundlerContext
+{
+	AssetColletionHeader Header;
+	std::vector<AssetDefine> Defines;
+	
+	// @Note: Those textures will be created through the Graphics
+	std::vector<TextureLoadEntry> TexturesToCreate;
+
+	// @Note: Those images and atlases are purely meta data which 
+	// will be inserte into the ImageLibrary's images map; the textures will
+	// be created with the "TexturesToCreate" entries
+	std::vector<ImageEntry> Images;
+	std::vector<AtlasEntry> Atlases;
+	
+	// @Note: These entries have some actual byte data that will be used
+	// to create the corresponding object
+	std::vector<ImageLoadEntry> LoadImages;
+	std::vector<WavLoadEntry> LoadWavs;
+	std::vector<FontLoadEntry> LoadFonts;
+
+	// @Note: The byte data of everything above
+	std::vector<unsigned char> Data;
+};
+
+struct AssetDataBlob
+{
+	std::vector<unsigned char> Data;
+	uint64 CurrentOffset{ 0 };
+
+	// @Note: Will keep track of the last inserted size; used for debugging
+	// and logging porposes
+	uint64 lastSize;
+
+	uint64 PutData(std::vector<unsigned char>& newData, size_t offset = 0)
+	{
+		auto res = CurrentOffset;
+		CurrentOffset += newData.size() - offset;
+		lastSize = newData.size() - offset;
+		Data.insert(Data.end(), newData.begin() + offset, newData.end());
+		return res;
+	}
+
+	uint64 PutData(unsigned char* newData, size_t size)
+	{
+		auto res = CurrentOffset;
+		CurrentOffset += size;
+		lastSize = size;
+		for (size_t i = 0; i < size; ++i)
+		{
+			Data.push_back(newData[i]);
+		}
+		return res;
+	}
+};
+
+void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
+void LoadWav(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
+void LoadFont(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
+
+inline uint32 NewAssetName(AssetBundlerContext& context, AssetType type, const char* name, uint32 id = 0) 
+{
+	static uint32 next = 0;
+	uint32 nextId = (id == 0 ?  ++next : id);
+	context.Defines.push_back({ name, nextId, type });
+	return next;
+}
+
+inline TextureId NextTextureAssetId()
+{
+	static TextureId next = 0;
+	++next;
+	return 1 << 15 | next;
+}

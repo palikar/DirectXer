@@ -80,16 +80,19 @@ static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 
 }
 
-struct CommandLineArguments
+struct AtlasViewer
 {
-	std::string Root{"resources"};
-	std::string Input{"input.dxa"};
-};
+	struct CommandLineArguments
+	{
+		std::string Root{"resources"};
+		std::string Input{"input.dxa"};
+	};
 
+};
 struct Context
 {
 	HWND hWnd;
-	CommandLineArguments Args;
+	AtlasViewer::CommandLineArguments Args;
 	bool FullscreenMode;
 	UINT WindowStyle;
 	RECT WindowRect;

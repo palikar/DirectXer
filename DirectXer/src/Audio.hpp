@@ -3,7 +3,6 @@
 #include <Memory.hpp>
 #include <Resources.hpp>
 #include <Fileutils.hpp>
-#include <Assets.hpp>
 
 #include <AL/al.h>
 #include <AL/alext.h>
@@ -53,6 +52,6 @@ class AudioPlayer
 
 	BulkVector<AudioEntry> AudioEntries;
 	void Build(AudioBuilder& t_Builder);
-	void CreateMemoryWav(WavAssetHeader& header, void* data);
+	void CreateMemoryWav(WavDescription& header, void* data);
 	void Play(uint32 t_Id, float t_Gain);
 };

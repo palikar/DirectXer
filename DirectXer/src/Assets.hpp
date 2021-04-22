@@ -3,27 +3,13 @@
 #include <Types.hpp>
 #include <GraphicsCommon.hpp>
 #include <Memory.hpp>
+#include <ImageLibrary.hpp>
+#include <Audio.hpp>
+#include <FontLibrary.hpp>
 
 enum Tag : uint16
 {
 	Tag_Level
-};
-
-enum AssetType : uint16
-{
-	Type_Image,
-	Type_Font,
-	Type_Wav,
-	Type_Atlas,
-	Type_Texture,
-};
-
-struct AssetEntry
-{
-	uint64 Offset;
-	uint64 Size;
-	AssetType Type;
-	uint16 Tag;
 };
 
 struct AssetColletionHeader
@@ -36,31 +22,44 @@ struct AssetColletionHeader
 	uint32 VersionSpec;	
 };
 
-struct ImageHeader
+struct TextureLoadEntry
 {
-	uint32 Id;
-	uint16 Width;
-	uint16 Height;
-	TextureFormat Format;
+	TextureDescription Desc;
+	TextureId Id;
+	size_t DataOffset;
 };
 
-struct WavAssetHeader
+// @Note: Will be put directly into the images map of the ImageLibrary
+struct ImageEntry
 {
-	uint32 Size;
-	uint32 SampleRate;
-	uint32 Format;
-	uint16 Channels;
-	uint16 Bps;
+	Image Image;
+	ImageId Id;
 };
 
-struct FontHeader
+// @Note: Will be used to create image from memory
+struct ImageLoadEntry
 {
-	uint32 FontSize;
-	uint32 Id;
-	uint32 DataSize;
+	ImageDescription Desc;
+	ImageId Id;
+	size_t DataOffset;
 };
 
+// @Note: Will be used to create WAV from memory
+struct WavLoadEntry
+{
+	WavDescription Desc;
+	WavId Id;
+	size_t DataOffset;
+};
 
+// @Note: Will be used to create font from memory
+struct FontLoadEntry
+{
+	FontDescription Desc;
+	FontId Id;
+	size_t DataOffset;
+	size_t DataSize;
+};
 
 struct AtlasFileHeader
 {
@@ -68,15 +67,7 @@ struct AtlasFileHeader
 	uint16 NumImages;
 };
 
-struct AtlasEntry
-{
-	int Width;
-	int Height;
-	TextureFormat Format;
-	int Offset;
-};
-
-struct ImageEntry
+struct AtlasImage
 {
 	char Name[64];
 	uint32 Id;
@@ -89,11 +80,21 @@ struct ImageEntry
 	float AtlasHeight;
 };
 
+struct AtlasEntry
+{
+	int Width;
+	int Height;
+	TextureFormat Format;
+	int Offset;
+};
+
+
+
 class ImageLibrary;
 class AudioPlayer;
 class FontLibrary;
 
-struct AssetBuilder
+struct AssetBuildingContext
 {
 	ImageLibrary* ImageLib;
 	FontLibrary* FontLib;
@@ -102,35 +103,5 @@ struct AssetBuilder
 
 struct AssetStore
 {
-	static void LoadAssetFile(String path, AssetBuilder& builders);
+	static void LoadAssetFile(String path, AssetBuildingContext& builders);
 };
-
-
-
-
-// struct ImageEntry
-// {
-// 	Image Image;
-// 	ImageId Id;
-// };
-
-// struct TextureLoadEntry
-// {
-// 	TextureDescription Desc;
-// 	TextureId Id;
-// 	size_t DataOffset;
-// };
-
-// struct WavLoadEntry
-// {
-// 	WavDescription Desc;
-// 	WavId Id;
-// 	size_t DataOffset;
-// };
-
-// struct FontLoadEntry
-// {
-// 	FontDescription Desc;
-// 	FontId Id;
-// 	size_t DataOffset;
-// }

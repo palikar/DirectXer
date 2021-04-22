@@ -6,7 +6,6 @@
 #include <GraphicsCommon.hpp>
 #include <Graphics.hpp>
 #include <Platform.hpp>
-#include <Assets.hpp>
 
 #include <stb_rect_pack.h>
 
@@ -14,6 +13,13 @@ struct ImageDescription
 {
 	uint16 Width;
 	uint16 Height;
+	TextureFormat Format;
+};
+
+struct AtlasDescription
+{
+	int Width;
+	int Height;
 	TextureFormat Format;
 };
 
@@ -64,7 +70,7 @@ class ImageLibrary
 	void Build(ImageLibraryBuilder& t_Builder);
 	
 	ImageAtlas InitAtlas();
-	void CreateMemoryImage(ImageHeader header, void* data);
-	void CreateStaticAtlas(AtlasEntry entry, void* data);
+	void CreateMemoryImage(ImageId id, ImageDescription desc, void* data);
+	void CreateStaticAtlas(AtlasDescription desc, void* data);
 	
 };

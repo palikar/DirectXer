@@ -5,7 +5,7 @@
 #include <Audio.hpp>
 #include <FontLibrary.hpp>
 
-void AssetStore::LoadAssetFile(String path, AssetBuilder& context)
+void AssetStore::LoadAssetFile(String path, AssetBuildingContext& context)
 {
 	MemoryArena fileArena = Memory::GetTempArena(Megabytes(64));
 	Defer { 

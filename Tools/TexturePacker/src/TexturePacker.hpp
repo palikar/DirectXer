@@ -29,26 +29,24 @@ struct ImageToPack
 	const char* Id;
 };
 
-inline static void PutPixels(std::vector<unsigned char>& atlasBytes, stbrp_rect rect, unsigned char* data, size_t atlasSize)
+struct TexturePacker
 {
-
-	for (size_t i = 0; i < rect.h; ++i)
+	struct CommandLineArguments
 	{
-		for (size_t j = 0; j < rect.w; ++j)
-		{
-			atlasBytes[((i + rect.y) * atlasSize + (j + rect.x))*4 + 0] = data[(i*rect.w + j)*4 + 0];
-			atlasBytes[((i + rect.y) * atlasSize + (j + rect.x))*4 + 1] = data[(i*rect.w + j)*4 + 1];
-			atlasBytes[((i + rect.y) * atlasSize + (j + rect.x))*4 + 2] = data[(i*rect.w + j)*4 + 2];
-			atlasBytes[((i + rect.y) * atlasSize + (j + rect.x))*4 + 3] = data[(i*rect.w + j)*4 + 3];
-		}
-	}
+		std::string Root{"resources"};
+		std::string Output{"output"};
+		uint16 Size{1024};
+		uint16 MaxAtlases{20};
+	};
 	
-}
-
-struct CommandLineArguments
-{
-	std::string Root{"resources"};
-	std::string Output{"output"};
-	uint16 Size{1024};
-	uint16 MaxAtlases{20};
 };
+
+struct TexturePackerOutput
+{
+	AtlasFileHeader Header;
+	std::vector<AtlasImage> Images;
+	std::vector<AtlasEntry> Atlases;
+	std::vector<std::vector<unsigned char>> AtlasesBytes;
+};
+
+TexturePackerOutput PackTextures(TexturePacker::CommandLineArguments arguments, ImageToPack* imagesToPack, size_t imagesCount);

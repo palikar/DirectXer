@@ -12,7 +12,7 @@
     },
     {
       "Id": "e788e0be-f373-4065-83ab-487d65507c09",
-      "Command": "-h DirectXer/ResorceHeaders/SpaceAssets "
+      "Command": "-h DirectXer/ResorceHeaders/SpaceAssets.hpp"
     },
     {
       "Id": "4e9af367-5152-4b89-ac9d-570bb52da1bd",
