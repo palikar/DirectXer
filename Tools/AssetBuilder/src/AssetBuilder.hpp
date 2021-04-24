@@ -82,7 +82,7 @@ struct AssetBundlerContext
 	// will be inserte into the ImageLibrary's images map; the textures will
 	// be created with the "TexturesToCreate" entries
 	std::vector<ImageEntry> Images;
-	std::vector<AtlasEntry> Atlases;
+	std::vector<ImageAtlas> Atlases;
 	
 	// @Note: These entries have some actual byte data that will be used
 	// to create the corresponding object
@@ -128,6 +128,7 @@ struct AssetDataBlob
 void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 void LoadWav(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 void LoadFont(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
+void LoadTexture(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 
 inline uint32 NewAssetName(AssetBundlerContext& context, AssetType type, const char* name, uint32 id = 0) 
 {

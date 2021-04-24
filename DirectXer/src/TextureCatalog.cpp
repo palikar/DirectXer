@@ -16,7 +16,7 @@ void TextureCatalog::LoadTextures(Graphics& graphics)
 	};
 
 
-	const auto texturesCount = sizeof(g_Textures) / sizeof(TextureLoadEntry);
+	const auto texturesCount = sizeof(g_Textures) / sizeof(TextureLoadEntry_);
 
 	stbi_set_flip_vertically_on_load(1);
 	for (size_t i = 0; i < texturesCount; ++i)

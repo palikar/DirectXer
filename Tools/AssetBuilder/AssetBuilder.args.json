@@ -4,7 +4,7 @@
   "Items": [
     {
       "Id": "76a1857a-7c77-4e66-8274-fe77cc990b56",
-      "Command": "-i SpaceGame"
+      "Command": "-i SpaceGameAssetFile"
     },
     {
       "Id": "4d75821d-758a-4465-be01-31cdbce4df55",

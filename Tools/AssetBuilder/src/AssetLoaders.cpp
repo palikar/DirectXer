@@ -53,8 +53,7 @@ void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& b
 	imageEntry.Desc.Height = height;
 	imageEntry.Desc.Format = TF_RGBA;
 	imageEntry.Id = NewAssetName(context, Type_Image, asset.Id);
-
-	blob.PutData(data, width * height * channels);
+	imageEntry.DataOffset = blob.PutData(data, width * height * channels);
 
 	context.LoadImages.push_back(imageEntry);
 	
@@ -112,4 +111,23 @@ void LoadFont(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 	fontEntry.DataOffset = blob.PutData(data);
 
 	context.LoadFonts.push_back(fontEntry);
+}
+
+void LoadTexture(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	int width, height, channels;
+	unsigned char* data = stbi_load(asset.Path.c_str(), &width, &height, &channels, 4);
+
+	TextureLoadEntry texEntry;
+	texEntry.Id = NextTextureAssetId();
+	texEntry.Desc.Width = width;
+	texEntry.Desc.Height = height;
+	texEntry.Desc.Format = TF_RGBA;
+	texEntry.DataOffset = blob.PutData(data, width*height*channels);
+		
+	context.TexturesToCreate.push_back(texEntry);
+	
+	NewAssetName(context, Type_Texture, asset.Id, texEntry.Id);
+
+	stbi_image_free(data);
 }

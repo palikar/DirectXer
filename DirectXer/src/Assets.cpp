@@ -2,84 +2,69 @@
 #include <FileUtils.hpp>
 
 #include <ImageLibrary.hpp>
+#include <Graphics.hpp>
 #include <Audio.hpp>
 #include <FontLibrary.hpp>
 
-void AssetStore::LoadAssetFile(String path, AssetBuildingContext& context)
+// @Note: I hope this gets inlined; is is there because I am lazy at typing
+template<typename T>
+static void* GetData(MemoryArena& fileArena, T& entry)
 {
-	MemoryArena fileArena = Memory::GetTempArena(Megabytes(64));
+	return fileArena.Memory + entry.DataOffset;
+}
+
+void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
+{
+	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
 	Defer { 
 		Memory::DestoryTempArena(fileArena);
 	};
 
-	DXLOG("[Init] Loading asset file: {}", path);
+	DXLOG("[Init] Loading asset file: {}", file.Path);
 
-	ReadWholeFile(path.data(), fileArena);
+	ReadWholeFile(file.Path, fileArena);
 	auto current = fileArena.Memory;
 
 	auto header = ReadBlob<AssetColletionHeader>(current);
 
-	context.ImageLib->Images.reserve(header.ImagesCount);
-	context.WavLib->AudioEntries.reserve(header.WavCount);
-	// @Note: This *has* to be resize because we put straight into the array later
-	context.FontLib->AtlasGlyphEntries.resize(header.FontsCount * FontLibrary::Characters.size());
-	
+	context.ImageLib->Images.reserve(header.LoadImagesCount + header.ImagesCount);
+	context.WavLib->AudioEntries.reserve(header.LoadWavsCount);
+	context.FontLib->AtlasGlyphEntries.resize(header.LoadFontsCount * FontLibrary::Characters.size());
 
-	const auto assetsCount = header.ImagesCount + header.WavCount + header.FontsCount + header.AtlasesCount;
-
-	for (uint32 i = 0; i < assetsCount; ++i)
+	for (uint32 i = 0; i < header.TexturesCount; ++i)
 	{
-		auto assetEntry = ReadBlob<AssetEntry>(current);
-		switch (assetEntry.Type)
-		{
-		  case Type_Image:
-		  {
-			  ImageHeader imageHeader = *((ImageHeader*)(fileArena.Memory + assetEntry.Offset));
-			  void* data = (fileArena.Memory + assetEntry.Offset + sizeof(ImageHeader));
-			  context.ImageLib->CreateMemoryImage(imageHeader, data);
-			  break;
-		  }
-
-		  case Type_Atlas:
-		  {
-			  AtlasFileHeader* atlasHeader = ((AtlasFileHeader*)(fileArena.Memory + assetEntry.Offset));	
-
-			  auto baseAtlasIndex = context.ImageLib->Atlases.size();
-			  for (uint16 j = 0; j < atlasHeader->NumAtlases; ++j)
-			  {
-				  AtlasEntry* atlas = (AtlasEntry*)((char*)atlasHeader + sizeof(AtlasFileHeader) + j * sizeof(AtlasEntry));
-				  context.ImageLib->CreateStaticAtlas(*atlas, ((char*)atlasHeader + atlas->Offset));
-			  }
-
-			  for (uint16 j = 0; j < atlasHeader->NumImages; ++j)
-			  {
-				  ImageEntry* image = (ImageEntry*)((char*)atlasHeader + sizeof(AtlasFileHeader) + j * sizeof(ImageEntry) + atlasHeader->NumAtlases * sizeof(AtlasEntry));
-
-				  Image newImage;
-				  newImage.ScreenPos = {image->X, image->Y};
-				  newImage.ScreenSize = {image->Width, image->Height};
-				  newImage.AtlasSize = {image->AtlasWidth, image->AtlasHeight};
-				  newImage.TexHandle = context.ImageLib->Atlases[(size_t)(image->Atlas + baseAtlasIndex)].TexHandle;
-				  context.ImageLib->Images.insert({image->Id, newImage });
-			  }
-			  
-			  break;
-		  }
-
-		  case Type_Wav:
-		  {
-			  WavAssetHeader* wavHeader = ((WavAssetHeader*)(fileArena.Memory + assetEntry.Offset));
-			  context.WavLib->CreateMemoryWav(*wavHeader, (char*)wavHeader + sizeof(WavAssetHeader));
-			  break;
-		  }
-
-		  case Type_Font:
-		  {
-			  FontHeader* fontHeader = ((FontHeader*)(fileArena.Memory + assetEntry.Offset));			
-			  context.FontLib->LoadTypeface(((char*)fontHeader + sizeof(FontHeader)), fontHeader->DataSize, (float)fontHeader->FontSize, fontHeader->Id);
-			  break;
-		  }
-		  
-		}
+		const TextureLoadEntry& textureEntry = ReadBlob<TextureLoadEntry>(current);
+		context.Graphics->CreateTexture(textureEntry.Id, textureEntry.Desc, GetData(fileArena, textureEntry));
 	}
+
+	for (uint32 i = 0; i < header.ImagesCount; ++i)
+	{
+		const ImageEntry& entry = ReadBlob<ImageEntry>(current);
+		context.ImageLib->Images.insert({ entry.Id, entry.Image });
+	}
+
+	for (uint32 i = 0; i < header.AtlasesCount; ++i)
+	{
+		const ImageAtlas& entry = ReadBlob<ImageAtlas>(current);
+		context.ImageLib->Atlases.push_back(entry);
+	}
+	
+	for (uint32 i = 0; i < header.LoadImagesCount; ++i)
+	{
+		const ImageLoadEntry& entry = ReadBlob<ImageLoadEntry>(current);
+		context.ImageLib->CreateMemoryImage(entry.Id, entry.Desc, GetData(fileArena, entry));
+	}
+
+	for (uint32 i = 0; i < header.LoadWavsCount; ++i)
+	{
+		const WavLoadEntry& entry = ReadBlob<WavLoadEntry>(current);
+		context.WavLib->CreateMemoryWav(entry.Id, entry.Desc, GetData(fileArena, entry));
+	}
+
+	for (uint32 i = 0; i < header.LoadWavsCount; ++i)
+	{
+		FontLoadEntry& entry = ReadBlob<FontLoadEntry>(current);
+		context.FontLib->CreateMemoryTypeface(entry.Id, entry.Desc, GetData(fileArena, entry), entry.DataSize);
+	}
+	
 }

@@ -14,11 +14,15 @@ enum Tag : uint16
 
 struct AssetColletionHeader
 {
-	// uint32 AssetsCount;
+	uint32 TexturesCount;
+
 	uint32 ImagesCount;
-	uint32 WavCount;
-	uint32 FontsCount;	
 	uint32 AtlasesCount;
+
+	uint32 LoadImagesCount;
+	uint32 LoadWavsCount;
+	uint32 LoadFontsCount;
+	
 	uint32 VersionSpec;	
 };
 
@@ -67,28 +71,6 @@ struct AtlasFileHeader
 	uint16 NumImages;
 };
 
-struct AtlasImage
-{
-	char Name[64];
-	uint32 Id;
-	uint32 Atlas;
-	float Y;
-	float X;
-	float Width;
-	float Height;
-	float AtlasWidth;
-	float AtlasHeight;
-};
-
-struct AtlasEntry
-{
-	int Width;
-	int Height;
-	TextureFormat Format;
-	int Offset;
-};
-
-
 
 class ImageLibrary;
 class AudioPlayer;
@@ -99,9 +81,17 @@ struct AssetBuildingContext
 	ImageLibrary* ImageLib;
 	FontLibrary* FontLib;
 	AudioPlayer* WavLib;
+
+	Graphics* Graphics;
+};
+
+struct AssetFile
+{
+	const char* Path;
+	size_t Size;
 };
 
 struct AssetStore
 {
-	static void LoadAssetFile(String path, AssetBuildingContext& builders);
+	static void LoadAssetFile(AssetFile file, AssetBuildingContext& builders);
 };

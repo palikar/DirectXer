@@ -53,7 +53,7 @@ class Renderer2D
 	void DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size);
 	void DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color, float radius);
 	void DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::vec2 subPos, glm::vec2 subSize);
-	void DrawText(String text, glm::vec2 pos, uint8 typeface);
+	void DrawText(std::string_view text, glm::vec2 pos, FontId typeface);
 };
 
 // Pusing transform matrices

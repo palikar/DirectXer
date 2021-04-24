@@ -31,6 +31,7 @@ struct FontBuilder
 		float Size;
 		PlatformLayer::FileHandle Handle;
 		size_t FileSize;
+		FontId Id;
 	};
 	
 	TempVector<FontLoadEntry> LoadEntries;
@@ -51,6 +52,7 @@ public:
 		"qwertzuiopasdfghjklyxcvbnm"
 		"QWERTZUIOPASDFGHJKLYXCVBNM"
 		"1234567890"
+		" "
 		"°!\"§$%&/(){}[]=?`´'><|,.-;:_#+*~öäüÖÄÜ";
 
 	struct AtlasEntry
@@ -68,11 +70,15 @@ public:
 	stbrp_context RectContext;
 	BulkVector<AtlasEntry> AtlasGlyphEntries;
 	Map<char, size_t> CharMap;
+	Map<FontId, size_t> IdMap;
 
 	void Init(Graphics* t_Graphics);
 	void InitNewAtlas();
 	void Build(FontBuilder t_Builder);
 	void LoadTypeface(void* data, size_t dataSize, float size, size_t id);
-	AtlasEntry GetEntry(size_t t_TypeFace, char t_Ch);
+
+	void CreateMemoryTypeface(FontId id, FontDescription desc, void* data, size_t size);
 	
+	AtlasEntry GetEntry(FontId typeFace, char ch);
+	void GetEntries(FontId id, const char* text, size_t size, TempVector<AtlasEntry>& vec);
 };

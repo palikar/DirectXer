@@ -141,27 +141,27 @@ void AudioPlayer::Build(AudioBuilder& t_Builder)
 		alGenSources(1, &sourceid);
 		alSourcei(sourceid, AL_BUFFER, bufferid);
 
-		AudioEntries.push_back({bufferid, sourceid});
+		AudioEntries.insert({entry.Id, AudioEntry{bufferid, sourceid}});
 
 	}
 }
 
-void AudioPlayer::Play(uint32 t_Id, float t_Gain)
+void AudioPlayer::Play(WavId t_Id, float t_Gain)
 {
 	const auto source =  AudioEntries[t_Id].Source;
 	alSourcef(source, AL_GAIN, t_Gain);
 	alSourcePlay(source);
 }
 
-void AudioPlayer::CreateMemoryWav(WavAssetHeader& header, void* data)
+void AudioPlayer::CreateMemoryWav(WavId id, const WavDescription& desc, void* data)
 {
 	unsigned int bufferid;
 	unsigned int sourceid;
 
 	alGenBuffers(1, &bufferid);
-	alBufferData(bufferid, header.Format, data, header.Size, header.SampleRate);
+	alBufferData(bufferid, desc.Format, data, desc.Size, desc.SampleRate);
 	alGenSources(1, &sourceid);
 	alSourcei(sourceid, AL_BUFFER, bufferid);
 
-	AudioEntries.push_back({bufferid, sourceid});
+	AudioEntries.insert({id, AudioEntry{bufferid, sourceid}});
 }

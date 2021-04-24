@@ -15,7 +15,6 @@ inline void ReadWholeFile(const char* t_Path, MemoryArena& t_Arena)
 	Assert(fileSize < t_Arena.MaxSize, "Can't read the whole file into the given arena: {}", t_Path);
 	
 	PlatformLayer::ReadFileIntoArena(handle, fileSize, t_Arena);
-	t_Arena.Size += fileSize;
 
 	PlatformLayer::CloseFile(handle);
 }

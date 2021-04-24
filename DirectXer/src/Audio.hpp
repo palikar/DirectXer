@@ -31,6 +31,7 @@ struct AudioBuilder
 		String Path;
 		PlatformLayer::FileHandle Handle;
 		size_t FileSize;
+		WavId Id;
 	};
 
 	TempVector<QueuedWav> QueuedWavs;
@@ -50,8 +51,8 @@ class AudioPlayer
 		unsigned Source;
 	};
 
-	BulkVector<AudioEntry> AudioEntries;
+	Map<WavId, AudioEntry> AudioEntries;
 	void Build(AudioBuilder& t_Builder);
-	void CreateMemoryWav(WavDescription& header, void* data);
+	void CreateMemoryWav(WavId id, const WavDescription& desc, void* data);
 	void Play(uint32 t_Id, float t_Gain);
 };

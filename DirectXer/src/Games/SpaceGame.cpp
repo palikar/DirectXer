@@ -62,10 +62,11 @@ void SpaceGame::Init()
 		FontBuilder fontBuilder;
 		AudioBuilder audioBuilder;
 
-		Memory::EstablishTempScope(Megabytes(2));
-		AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine};
+		Memory::EstablishTempScope(Megabytes(4));
+		AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine, Graphics};
 
-		AssetStore::LoadAssetFile(SpaceGameAssetFilePath, masterBuilder);
+		AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
+		
 		Memory::EndTempScope();
 	}
 

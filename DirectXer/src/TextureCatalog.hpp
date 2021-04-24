@@ -16,14 +16,14 @@ enum LoadState
 	LS_INVALID
 };
 
-struct TextureLoadEntry
+struct TextureLoadEntry_
 {
 	String Path;
 	LoadState State{LS_INVALID};
 	TextureId Handle{0};
 };
 
-inline TextureLoadEntry g_Textures[]
+inline TextureLoadEntry_ g_Textures[]
 {
 	{"checker.png"},
 	{"rocks_color.png"},

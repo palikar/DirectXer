@@ -71,6 +71,5 @@ class ImageLibrary
 	
 	ImageAtlas InitAtlas();
 	void CreateMemoryImage(ImageId id, ImageDescription desc, void* data);
-	void CreateStaticAtlas(AtlasDescription desc, void* data);
 	
 };

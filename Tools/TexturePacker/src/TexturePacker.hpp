@@ -41,6 +41,29 @@ struct TexturePacker
 	
 };
 
+struct AtlasImage
+{
+	char Name[64];
+	uint32 Id;
+	uint32 Atlas;
+	float Y;
+	float X;
+	float Width;
+	float Height;
+	float AtlasWidth;
+	float AtlasHeight;
+};
+
+struct AtlasEntry
+{
+	int Width;
+	int Height;
+	TextureFormat Format;
+	int Offset;
+	TextureId Id;
+};
+
+
 struct TexturePackerOutput
 {
 	AtlasFileHeader Header;

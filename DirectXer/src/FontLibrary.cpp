@@ -58,11 +58,13 @@ void FontLibrary::Build(FontBuilder t_Builder)
 	AtlasGlyphEntries.reserve(t_Builder.LoadEntries.size() * Characters.size());
 	AtlasGlyphEntries.resize(t_Builder.LoadEntries.size() * Characters.size());
 		
-	size_t faceIndex{ 0 };
 	for (auto entry : t_Builder.LoadEntries)
 	{
 		PlatformLayer::ReadFileIntoArena(entry.Handle, entry.FileSize, fileArena);
-		LoadTypeface(fileArena.Memory, fileArena.Size, entry.Size, faceIndex++);
+
+		LoadTypeface(fileArena.Memory, fileArena.Size, entry.Size, IdMap.size());
+		IdMap.insert({entry.Id, IdMap.size()});
+
 		fileArena.Reset();
 	}		
 }
@@ -101,25 +103,30 @@ void FontLibrary::LoadTypeface(void* data, size_t dataSize, float size, size_t i
 		stbrp_rect rect;
 		rect.w = (stbrp_coord)width;
 		rect.h = (stbrp_coord)height;
-		stbrp_pack_rects(&RectContext, &rect, 1);
-
-		if(rect.was_packed == 0)
-		{
-			InitNewAtlas();
-			stbrp_pack_rects(&RectContext, &rect, 1);
-		}
-
-		const auto glyphAtlas = Atlases.back();
-		Gfx->UpdateTexture(glyphAtlas, { {rect.x + Padding, rect.y + Padding}, { bitmap.width, bitmap.rows}}, bitmap.buffer, 1);
 
 		AtlasEntry entry;
-		entry.Pos = glm::vec2{rect.x + Padding, rect.y + Padding} / (float)AtlasSize;
-		entry.Size = glm::vec2{ bitmap.width, bitmap.rows} / (float)AtlasSize;
-		entry.GlyphSize = glm::vec2{float(-face->glyph->bitmap_left), float(face->glyph->bitmap_top)};
+		entry.TexHandle = 0;
+
+		if (width != 0 && height != 0)
+		{
+			stbrp_pack_rects(&RectContext, &rect, 1);
+			if(rect.was_packed == 0)
+			{
+				InitNewAtlas();
+				stbrp_pack_rects(&RectContext, &rect, 1);
+			}
+			
+			const auto glyphAtlas = Atlases.back();
+			Gfx->UpdateTexture(glyphAtlas, { {rect.x + Padding, rect.y + Padding}, { bitmap.width, bitmap.rows}}, bitmap.buffer, 1);
+		
+			entry.Pos = glm::vec2{rect.x + Padding, rect.y + Padding} / (float)AtlasSize;
+			entry.Size = glm::vec2{ bitmap.width, bitmap.rows} / (float)AtlasSize;
+			entry.GlyphSize = glm::vec2{float(-face->glyph->bitmap_left), float(face->glyph->bitmap_top)};
+
+			entry.TexHandle = glyphAtlas;
+		}
 
 		entry.Advance = glm::vec2(ToFloat(face->glyph->advance.x), ToFloat(face->glyph->advance.y));
-			
-		entry.TexHandle = glyphAtlas;
 
 		AtlasGlyphEntries[id*Characters.size() + qcharIndex++] = entry;
 	}
@@ -127,7 +134,24 @@ void FontLibrary::LoadTypeface(void* data, size_t dataSize, float size, size_t i
 	FT_Done_Face(face);		
 }
 
-FontLibrary::AtlasEntry FontLibrary::GetEntry(size_t typeFace, char ch)
+void FontLibrary::CreateMemoryTypeface(FontId id, FontDescription desc, void* data, size_t size)
 {
-	return AtlasGlyphEntries[typeFace*Characters.size() + CharMap[ch]];
+	LoadTypeface(data, size, desc.FontSize, IdMap.size());
+	IdMap.insert({id, IdMap.size()});
+
+}
+
+FontLibrary::AtlasEntry FontLibrary::GetEntry(FontId typeFace, char ch)
+{
+	return AtlasGlyphEntries[IdMap.at(typeFace)*Characters.size() + CharMap[ch]];
+}
+
+void FontLibrary::GetEntries(FontId id, const char* text, size_t size, TempVector<AtlasEntry>& vec)
+{
+	size_t typeFace = IdMap.at(id) * Characters.size();
+	for (size_t i = 0; i < size; ++i)
+	{
+		vec.push_back(AtlasGlyphEntries[typeFace + CharMap.at(text[i])]);
+	}
+
 }

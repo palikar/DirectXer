@@ -89,40 +89,30 @@ void ImageLibrary::Build(ImageLibraryBuilder& t_Builder)
 		int width, height, channels;
 		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
 		
-		CreateMemoryImage({queuedImage.Id, (uint16)width, (uint16)height, TF_RGBA}, data);
+		CreateMemoryImage(queuedImage.Id, {(uint16)width, (uint16)height, TF_RGBA}, data);
 	}
 	
 }
 
-void ImageLibrary::CreateMemoryImage(ImageHeader header, void* data)
+void ImageLibrary::CreateMemoryImage(ImageId id, ImageDescription desc, void* data)
 {
 	Assert(data, "This image does not have memory data");
 
-	if (header.Width >= MaxWidthForPacking|| header.Height >= MaxHeightForPacking)
+	if (desc.Width >= MaxWidthForPacking|| desc.Height >= MaxHeightForPacking)
 	{
 		const auto texId = NextTextureId();
-		Gfx->CreateTexture(texId, { (uint16)header.Width, (uint16)header.Height, header.Format }, data);
-		Images.insert({ ImageId{header.Id}, Image{ texId, {0.0f, 0.0f}, {1.0f, 1.0f}, {header.Width, header.Height}} });
+		Gfx->CreateTexture(texId, { (uint16)desc.Width, (uint16)desc.Height, desc.Format }, data);
+		Images.insert({ ImageId{id}, Image{ texId, {0.0f, 0.0f}, {1.0f, 1.0f}, {desc.Width, desc.Height}} });
 		return;
 	}
 		
 	stbrp_rect rect;
-	rect.w = (stbrp_coord)header.Width;
-	rect.h = (stbrp_coord)header.Height;
+	rect.w = (stbrp_coord)desc.Width;
+	rect.h = (stbrp_coord)desc.Height;
 
 	auto texture = Pack(rect);
 	Gfx->UpdateTexture(texture, { {rect.x, rect.y}, { rect.w, rect.h }}, data);
-	Images.insert({ ImageId{header.Id}, Image{ texture, {(float)rect.x / ImageAtlasSize, (float)rect.y / ImageAtlasSize}, {(float)rect.w / ImageAtlasSize, (float)rect.h / ImageAtlasSize}, {ImageAtlasSize, ImageAtlasSize} }});
+	Images.insert({ ImageId{id}, Image{ texture, {(float)rect.x / ImageAtlasSize, (float)rect.y / ImageAtlasSize}, {(float)rect.w / ImageAtlasSize, (float)rect.h / ImageAtlasSize}, {ImageAtlasSize, ImageAtlasSize} }});
 	
 }
 	
-void ImageLibrary::CreateStaticAtlas(AtlasEntry entry, void* data)
-{
-	ImageAtlas newAtlas;
-	newAtlas.TexHandle = NextTextureId();
-	newAtlas.RectContext = {0};
-
-	Gfx->CreateTexture(newAtlas.TexHandle, {(uint16)entry.Width, (uint16)entry.Height, entry.Format}, data);
-	
-	Atlases.push_back(newAtlas);
-}

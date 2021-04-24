@@ -257,7 +257,7 @@ void Renderer2D::DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size)
 		
 }
 
-void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, uint8 typeface)
+void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, FontId typeface)
 {
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
@@ -265,15 +265,20 @@ void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, uint8 typeface)
 		BeginScene();
 	}
 
-	glm::vec2 currentPen{0.0f, 0.0f};
-	for (const auto ch : text)
-	{
-		auto entry = FontLib.GetEntry(typeface, ch);
+	Memory::EstablishTempScope(Kilobytes(5));
+	Defer { Memory::EndTempScope(); };
+	TempVector<FontLibrary::AtlasEntry> entries;
 
+	FontLib.GetEntries(typeface, text.data(), text.size(), entries);
+		
+	glm::vec2 currentPen{0.0f, 0.0f};
+	for (const auto& entry : entries)
+	{
 		auto rect = pos + currentPen - entry.GlyphSize;
-		auto screenSize = glm::vec2{ (entry.Size.x) * FontLibrary::AtlasSize, (entry.Size.y) * FontLibrary::AtlasSize};
 		currentPen += entry.Advance;
-		if (ch == ' ') continue;
+		if (entry.TexHandle == 0) continue;
+
+		auto screenSize = glm::vec2{ (entry.Size.x) * FontLibrary::AtlasSize, (entry.Size.y) * FontLibrary::AtlasSize};
 
 		auto slot = AttachTexture(entry.TexHandle);
 		uint32 type = (slot << 8) | (5 << 0);
