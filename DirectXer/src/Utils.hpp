@@ -59,3 +59,14 @@ constexpr size_t Size(T (&)[N])
 {
 	return N;
 }
+
+
+#ifdef _DEBUG
+
+#define DX_DEBUG_COD(STATEMENT) STATEMENT
+
+#else
+
+#define DX_DEBUG_COD(STATEMENT)
+
+#endif

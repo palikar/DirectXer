@@ -39,6 +39,13 @@ void* WindowsPlatformLayer::Allocate(size_t t_Size)
 	return VirtualAlloc(NULL, t_Size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 }
 
+uint64 WindowsPlatformLayer::Clock()
+{
+	ULONGLONG lpInterruptTimePrecise;
+	QueryInterruptTimePrecise(&lpInterruptTimePrecise);
+	return lpInterruptTimePrecise;
+}
+
 WindowsPlatformLayer::FileHandle WindowsPlatformLayer::OpenFileForReading(const char* t_Path)
 {
 	FileHandle handle = CreateFile(t_Path, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);

@@ -5,6 +5,7 @@
 #include <Graphics.hpp>
 #include <Audio.hpp>
 #include <FontLibrary.hpp>
+#include <Timing.hpp>
 
 // @Note: I hope this gets inlined; is is there because I am lazy at typing
 template<typename T>
@@ -20,6 +21,7 @@ static void* GetData(MemoryArena& fileArena, size_t offset)
 
 void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 {
+	TimedBlock block("[TIMING] Asset loading: {} ms\n");
 	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
 	Defer { 
 		Memory::DestoryTempArena(fileArena);
