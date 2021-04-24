@@ -56,19 +56,10 @@ void SpaceGame::Init()
 {
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
 
-
-	{
-		ImageLibraryBuilder imagebuilder;
-		FontBuilder fontBuilder;
-		AudioBuilder audioBuilder;
-
-		Memory::EstablishTempScope(Megabytes(4));
-		AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine, Graphics};
-
-		AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
-		
-		Memory::EndTempScope();
-	}
+	Memory::EstablishTempScope(Megabytes(4));
+	AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine, Graphics};
+	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
+	Memory::EndTempScope();	
 
 	const uint32 maxSpritesCount = 10;
 	SpriteSheets.Init(maxSpritesCount, &Renderer2D);

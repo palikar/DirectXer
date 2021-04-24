@@ -261,8 +261,9 @@ int WindowsWindow::Run()
 
 		if (!Minimized)
 		{
+			
 			clock_t beginFrame = clock();
-		
+			
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
@@ -273,18 +274,17 @@ int WindowsWindow::Run()
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); 
 
 			Application->Graphics.EndFrame();
-
 			clock_t endFrame = clock();
 
 			dt = endFrame - beginFrame;
-			deltaTime += endFrame - beginFrame;
+			deltaTime += dt;
 			frames++;
 
 			if( clockToMilliseconds(deltaTime)>1000.0)
 			{
 				frameRate = (double)frames * 0.5 +  frameRate * 0.5;
 				deltaTime -= CLOCKS_PER_SEC;
-				averageFrameTimeMilliseconds  = 1000.0/(frameRate == 0 ? 0.001 : frameRate);
+				averageFrameTimeMilliseconds = 1000.0 / (frameRate == 0 ? 0.001 : frameRate);
 
 				DXLOG("[SYS] Frame time: {:.2} ms; FPS: {} ", averageFrameTimeMilliseconds, frames);
 			

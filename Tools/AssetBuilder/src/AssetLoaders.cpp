@@ -131,3 +131,37 @@ void LoadTexture(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob&
 
 	stbi_image_free(data);
 }
+
+void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	std::string paths[] = {
+		fmt::format("{}/left.png", asset.Path.c_str()),
+		fmt::format("{}/right.png", asset.Path.c_str()),
+		fmt::format("{}/up.png", asset.Path.c_str()),
+		fmt::format("{}/down.png", asset.Path.c_str()),
+		fmt::format("{}/front.png", asset.Path.c_str()),
+		fmt::format("{}/back.png", asset.Path.c_str()),
+	};
+
+	SkyboxLoadEntry skybox;
+	skybox.Id = NextTextureAssetId();
+
+	NewAssetName(context, Type_Texture, asset.Id, skybox.Id);
+	
+	for (size_t i = 0; i < 6; ++i)
+	{
+		stbi_set_flip_vertically_on_load(1);
+		int width, height, channels;
+		unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channels, 4);
+
+		skybox.Desc.Width = width;
+		skybox.Desc.Height = height;
+		skybox.Desc.Format = TF_RGBA;
+		skybox.DataOffset[i] = blob.PutData(data, width*height*channels);
+
+		stbi_image_free(data);
+	}
+
+	context.Skyboxes.push_back(skybox);
+
+}

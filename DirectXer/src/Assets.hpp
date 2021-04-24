@@ -18,6 +18,7 @@ struct AssetColletionHeader
 
 	uint32 ImagesCount;
 	uint32 AtlasesCount;
+	uint32 SkyboxesCount;
 
 	uint32 LoadImagesCount;
 	uint32 LoadWavsCount;
@@ -31,6 +32,13 @@ struct TextureLoadEntry
 	TextureDescription Desc;
 	TextureId Id;
 	size_t DataOffset;
+};
+
+struct SkyboxLoadEntry
+{
+	TextureDescription Desc;
+	TextureId Id;
+	size_t DataOffset[6];
 };
 
 // @Note: Will be put directly into the images map of the ImageLibrary

@@ -3,8 +3,10 @@
 #include <Logging.hpp>
 #include <Math.hpp>
 #include <App.hpp>
+#include <Assets.hpp>
 
 #include "ExampleScenes.hpp"
+#include <SpaceAssets.hpp>
 
 #include <imgui.h>
 
@@ -23,20 +25,15 @@ static uint32 SHIPIMAGE = 4;
 
 void ExampleScenes::Init()
 {
-	CurrentScene = SCENE_SPACE_GAME;
+	CurrentScene = SCENE_FIRST;
 	CurrentRastState = RS_NORMAL;
 
-	Textures.LoadTextures(*Graphics);
+	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
 
-	const char* cube_fils[] = {
-		"sky/left.png",
-		"sky/right.png",
-		"sky/down.png",
-		"sky/up.png",
-		"sky/front.png",
-		"sky/back.png",
-	};
-	SkyboxTexture = Textures.LoadCube(*Graphics, cube_fils);
+	Memory::EstablishTempScope(Megabytes(4));
+	AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine, Graphics};
+	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
+	Memory::EndTempScope();	
 
 
 	// @Todo: This should use some sort of arena storage to do its thing
@@ -62,9 +59,9 @@ void ExampleScenes::Init()
 	texMat.config = SC_DEBUG_TEX;
 	texMat.data = NextConstantBufferId();
 	Graphics->CreateConstantBuffer(texMat.data, sizeof(TexturedMaterialData), &texMatData);
-	texMat.BaseMap = ROCKS_TEXTURE.Handle;
-	texMat.AoMap = ROCKS_AO_TEXTURE.Handle;
-	texMat.EnvMap = SkyboxTexture;
+	texMat.BaseMap = T_ROCKS_COLOR;
+	texMat.AoMap = T_ROCKS_AO;
+	texMat.EnvMap = ST_SKY;
 
 	phongMat.config = SC_DEBUG_PHONG;
 	phongMat.data = NextConstantBufferId();
@@ -90,30 +87,8 @@ void ExampleScenes::Init()
 	camera.Pos = { 1.0f, 0.5f, 1.0f };
 	camera.lookAt({ 0.0f, 0.0f, 0.0f });
 
-	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
-
-	Memory::EstablishTempScope(Bytes(512));
-	ImageLibraryBuilder imagebuilder;
-	imagebuilder.Init(10);
-	imagebuilder.PutImage("images/facebook.png", 0);
-	imagebuilder.PutImage("images/instagram.png", 1);
-	imagebuilder.PutImage("assets/sprites.png", 2);
-	imagebuilder.PutImage("assets/PNG/Main_Menu/BG.png", 3);
-	imagebuilder.PutImage("assets/PNG/Ship_Parts/Ship_Main_Icon.png", 4);
-	Renderer2D.ImageLib.Build(imagebuilder);
-	Memory::EndTempScope();
-
-	FontBuilder fontBuilder;
-	Memory::EstablishTempScope(Kilobytes(1));
-	fontBuilder.Init(2);
-	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans.ttf", 24);
-	fontBuilder.PutTypeface("fonts/DroidSans/DroidSans-Bold.ttf", 24);
-	Renderer2D.FontLib.Build(fontBuilder);
-	Memory::EndTempScope();
-
 	SpriteSheets.Init(5, &Renderer2D);
-	SpriteSheets.PutSheet(2, { 640.0f, 470.0f }, { 8, 5 });
-
+	SpriteSheets.PutSheet(I_SHOOT, { 640.0f, 470.0f }, { 8, 5 });
 
 	uiRenderTarget.Color = NextTextureId();
 	uiRenderTarget.DepthStencil = NextTextureId();
@@ -167,7 +142,7 @@ void ExampleScenes::RenderSkyBox()
 {
 	// @Speed: The texture will be bount most of the time
 	Graphics->SetShaderConfiguration(SC_DEBUG_SKY);
-	Graphics->BindTexture(0, SkyboxTexture);
+	Graphics->BindTexture(0, T_SKY);
 	Graphics->VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
 	Graphics->VertexShaderCB.invModel = glm::inverse(Graphics->VertexShaderCB.model);
 	Graphics->UpdateCBs();
@@ -245,7 +220,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 
 	Graphics->SetShaderConfiguration(SC_DEBUG_SIMPLE_TEX);
-	Graphics->BindTexture(1, CHECKER_TEXTURE.Handle);
+	Graphics->BindTexture(1, T_CHECKER);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
 	RenderSkyBox();
@@ -260,10 +235,10 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
 	Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
 
-	Renderer2D.DrawImage(3, {610.0f, 310.0f}, {64.0f, 64.0f});
+	Renderer2D.DrawImage(I_INSTAGRAM, {610.0f, 310.0f}, {64.0f, 64.0f});
 
-	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, 0);
-	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, 1);
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, F_DroidSansBold_24);
+	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, F_DroidSans_24);
 
 	static uint32 spriteIndex = 0;
 	static float acc = 0;
@@ -274,6 +249,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 		acc = 0.0f;
 	}
 	SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
+
 	Renderer2D.EndScene();
 
 }

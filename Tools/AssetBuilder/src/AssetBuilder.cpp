@@ -15,13 +15,26 @@
 #include <TexturePacker.hpp>
 #include "AssetBuilder.hpp"
 
+/*
+  @Note: Checklist for adding as new asset type
+
+  1. Add the new type to the AssetType enum
+  2. Create a new load structure that will be read by the loading code
+  3. Adjust the base offset calculation
+  4. Apply the base offset to the entries of the new structure
+  5. Create new counter variable and its handling
+  6. Create a new loader
+
+*/
 
 static AssetToLoad AssetsToLoad[] = {
+	{Type_Skybox, Tag_Level, "sky", "T_SKY"},
+
 	{Type_Texture, Tag_Level, "checker.png", "T_CHECKER"},
 	{Type_Texture, Tag_Level, "rocks_color.png", "T_ROCKS_COLOR"},
 	{Type_Texture, Tag_Level, "floor_color.png", "T_FLOOR_COLOR"},
 	{Type_Texture, Tag_Level, "rocks_ao.png", "T_ROCKS_AO"},
-	{Type_Texture, Tag_Level, "rocks_normal.png", "T_ROCKS_NORMAL"},
+	{Type_Texture, Tag_Level, "rocks_normal.png", "T_ROCKS_NORMAL"},	
 
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans.ttf", "F_DroidSans", {24, 20}},
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans-Bold.ttf", "F_DroidSansBold", {24, 20}},
@@ -32,7 +45,7 @@ static AssetToLoad AssetsToLoad[] = {
 
 // @Note: The images here will be packed into atlases and those will be put in the asset bundle file.
 static inline ImageToPack IagesForPacking[] = {
-
+		
 	{"assets/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
 	{"assets/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
 	{"assets/evil_ship_3.png", 64, 64, "I_EVIL_SHIP_3"},
@@ -43,6 +56,9 @@ static inline ImageToPack IagesForPacking[] = {
 	{"assets/PNG/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
 	{"assets/PNG/Main_Menu/BG.png", 0, 0, "I_BG"},
 	{"assets/PNG/Main_UI/Stats_Bar.png", 0, 0, "I_STATS"},
+	{"assets/sprites.png", 0, 0, "I_SHOOT"},
+	{"images/facebook.png", 0, 0, "I_FACEBOOK"},
+	{"images/instagram.png", 0, 0, "I_INSTAGRAM"},
 };
 
 static void ParseCommandLineArguments(int argc, char *argv[], AssetBuilder::CommandLineArguments& arguments)
@@ -73,6 +89,8 @@ static size_t CalculateBaseOffset(AssetBundlerContext& context)
 	offset += sizeof(ImageEntry) * context.Images.size();
 	offset += sizeof(ImageAtlas) * context.Atlases.size();
 	
+	offset += sizeof(SkyboxLoadEntry) * context.Skyboxes.size();
+
 	offset += sizeof(ImageLoadEntry) * context.LoadImages.size();
 	offset += sizeof(WavLoadEntry) * context.LoadWavs.size();
 	offset += sizeof(FontLoadEntry) * context.LoadFonts.size();
@@ -100,6 +118,16 @@ static void ApplyBaseOffset(AssetBundlerContext& context, size_t offset)
 	for (auto& entry : context.LoadFonts) 
 	{
 		entry.DataOffset += offset; 
+	}
+
+	for (auto& entry : context.Skyboxes) 
+	{
+		entry.DataOffset[0] += offset; 
+		entry.DataOffset[1] += offset; 
+		entry.DataOffset[2] += offset; 
+		entry.DataOffset[3] += offset; 
+		entry.DataOffset[4] += offset; 
+		entry.DataOffset[5] += offset; 
 	}
 
 }
@@ -215,6 +243,12 @@ int main(int argc, char *argv[])
 			  std::cout << fmt::format("{} \t->\t Bundling Texture [{:.3} MB] [{}]\n", asset.Id, dataBlob.lastSize/(1024.0f*1024.0f), asset.Path);
 			  break;
 		  }
+		  case Type_Skybox: 
+		  {
+			  LoadSkybox(asset, context, dataBlob);
+			  std::cout << fmt::format("{} \t->\t Bundling Skybox [{:.3} MB] [{}]\n", asset.Id, (4*dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
+			  break;
+		  }
 		}
 	}
 
@@ -224,6 +258,7 @@ int main(int argc, char *argv[])
 	context.Header.LoadImagesCount = (uint32)context.LoadImages.size();
  	context.Header.LoadWavsCount = (uint32)context.LoadWavs.size();
  	context.Header.LoadFontsCount  = (uint32)context.LoadFonts.size();
+	context.Header.SkyboxesCount  = (uint32)context.Skyboxes.size();
 	
 	fmt::print("----------Done building assets----------\n");
 	fmt::print("Textures: \t[{}]\n", context.Header.TexturesCount);
@@ -232,6 +267,7 @@ int main(int argc, char *argv[])
 	fmt::print("LoadImages: \t[{}]\n", context.Header.LoadImagesCount);
 	fmt::print("LoadWavs: \t[{}]\n", context.Header.LoadWavsCount);
 	fmt::print("LoadFonts: \t[{}]\n", context.Header.LoadFontsCount);
+	fmt::print("Skyboxes: \t[{}]\n", context.Header.SkyboxesCount);
 
 	
 	// @Note: The offsets in the context are relative to the beginning of the DataBlob;
@@ -269,6 +305,8 @@ int main(int argc, char *argv[])
 	  |----------------------------------------|
 	  |---------------Fonts--------------------| -- struct FontsLoadEntry
 	  |----------------------------------------|
+	  |---------------Skyboxes-----------------| -- struct SkyboxLoadEntry
+	  |----------------------------------------|
 	  |----------------DATA--------------------| -- unsigned char[]
 
 	*/
@@ -290,6 +328,8 @@ int main(int argc, char *argv[])
 	outfile.write((char*)context.LoadImages.data(), sizeof(ImageLoadEntry)*context.LoadImages.size());
 	outfile.write((char*)context.LoadWavs.data(), sizeof(WavLoadEntry)*context.LoadWavs.size());
 	outfile.write((char*)context.LoadFonts.data(), sizeof(FontLoadEntry)*context.LoadFonts.size());
+
+	outfile.write((char*)context.Skyboxes.data(), sizeof(SkyboxLoadEntry)*context.Skyboxes.size());
 
 	outfile.write((char*)dataBlob.Data.data(), sizeof(char) * dataBlob.Data.size());
 	

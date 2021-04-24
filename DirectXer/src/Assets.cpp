@@ -13,6 +13,11 @@ static void* GetData(MemoryArena& fileArena, T& entry)
 	return fileArena.Memory + entry.DataOffset;
 }
 
+static void* GetData(MemoryArena& fileArena, size_t offset)
+{
+	return fileArena.Memory + offset;
+}
+
 void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 {
 	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
@@ -33,8 +38,8 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 
 	for (uint32 i = 0; i < header.TexturesCount; ++i)
 	{
-		const TextureLoadEntry& textureEntry = ReadBlob<TextureLoadEntry>(current);
-		context.Graphics->CreateTexture(textureEntry.Id, textureEntry.Desc, GetData(fileArena, textureEntry));
+		const TextureLoadEntry& entry = ReadBlob<TextureLoadEntry>(current);
+		context.Graphics->CreateTexture(entry.Id, entry.Desc, GetData(fileArena, entry));
 	}
 
 	for (uint32 i = 0; i < header.ImagesCount; ++i)
@@ -61,10 +66,25 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		context.WavLib->CreateMemoryWav(entry.Id, entry.Desc, GetData(fileArena, entry));
 	}
 
-	for (uint32 i = 0; i < header.LoadWavsCount; ++i)
+	for (uint32 i = 0; i < header.LoadFontsCount; ++i)
 	{
 		FontLoadEntry& entry = ReadBlob<FontLoadEntry>(current);
 		context.FontLib->CreateMemoryTypeface(entry.Id, entry.Desc, GetData(fileArena, entry), entry.DataSize);
+	}
+
+	for (uint32 i = 0; i < header.SkyboxesCount; ++i)
+	{
+		SkyboxLoadEntry& entry = ReadBlob<SkyboxLoadEntry>(current);
+
+		void* datas[] = {
+			GetData(fileArena, entry.DataOffset[0]), 
+			GetData(fileArena, entry.DataOffset[1]), 
+			GetData(fileArena, entry.DataOffset[2]), 
+			GetData(fileArena, entry.DataOffset[3]), 
+			GetData(fileArena, entry.DataOffset[4]), 
+			GetData(fileArena, entry.DataOffset[5]), 
+		};
+		context.Graphics->CreateCubeTexture(entry.Id, entry.Desc, datas);
 	}
 	
 }

@@ -9,6 +9,7 @@
 #include <Lighting.hpp>
 #include <2DRendering.hpp>
 #include <Memory.hpp>
+#include <Audio.hpp>
 
 enum Scene
 {
@@ -50,13 +51,14 @@ public:
 	BufferDescriptor DebugGeometry;
 	Camera camera;
 	RasterizationState CurrentRastState;
-	TextureId SkyboxTexture;
 	LightSetup Light;
 	GPUGeometry GPUGeometryDesc;
 	Renderer2D Renderer2D;
 	SpriteSheetHolder SpriteSheets;
 	Scene CurrentScene;
 	TextureCatalog Textures;
+
+	AudioPlayer AudioEngine;
 
 
 	RTObject uiRenderTarget;

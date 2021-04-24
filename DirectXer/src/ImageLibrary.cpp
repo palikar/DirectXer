@@ -30,7 +30,6 @@ void ImageLibrary::Init(Graphics* Gfx)
 	this->Gfx = Gfx;
 	InitAtlas();
 	Atlases.reserve(MaxAtlases);
-	Images.reserve(64);
 }
 
 ImageAtlas ImageLibrary::InitAtlas()

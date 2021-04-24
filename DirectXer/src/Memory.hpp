@@ -180,7 +180,10 @@ class BulkStdAllocator
 		return (T*)Memory::BulkGet(sizeof(T) * t_Size);
 	}
 	
-	void deallocate(T*, size_type){}
+	void deallocate(T*, size_type)
+	{
+		//Assert(false, "Something using BulkStorage is trying to deallocate. This is not good.");
+	}
 
 	inline bool operator==(BulkStdAllocator const&) const { return true; }		
 };
@@ -239,7 +242,7 @@ struct SimdFlatMap
 		
 		__m128i value = _mm_set1_epi16(id);
 		
-		for (size_t i = 0; i < Nodes.size(); i += 8, ++current)
+		for (size_t i = 0; i < Nodes.size(); i += 8, current += 8)
 		{
 			__m128i keys = _mm_set_epi16(current[7].first, current[6].first, current[5].first, current[4].first,
 										 current[3].first, current[2].first, current[1].first, current[0].first);

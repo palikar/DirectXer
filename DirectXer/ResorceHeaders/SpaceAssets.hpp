@@ -14,15 +14,19 @@
 #define I_HEALTH              8
 #define I_BG                  9
 #define I_STATS              10
-#define T_CHECKER         32772
-#define T_ROCKS_COLOR     32773
-#define T_FLOOR_COLOR     32774
-#define T_ROCKS_AO        32775
-#define T_ROCKS_NORMAL    32776
-#define F_DroidSans_24       11
-#define F_DroidSansBold_24   12
-#define A_SHOOT              13
-#define A_EXPLODE            14
+#define I_SHOOT              11
+#define I_FACEBOOK           12
+#define I_INSTAGRAM          13
+#define T_SKY             32772
+#define T_CHECKER         32773
+#define T_ROCKS_COLOR     32774
+#define T_FLOOR_COLOR     32775
+#define T_ROCKS_AO        32776
+#define T_ROCKS_NORMAL    32777
+#define F_DroidSans_24       14
+#define F_DroidSansBold_24   15
+#define A_SHOOT              16
+#define A_EXPLODE            17
 
 
 static inline const char* ImagesNames[] = {
@@ -36,6 +40,9 @@ static inline const char* ImagesNames[] = {
 	"I_HEALTH",
 	"I_BG",
 	"I_STATS",
+	"I_SHOOT",
+	"I_FACEBOOK",
+	"I_INSTAGRAM",
 };
 
 static inline uint32 ImagesIds[] = {
@@ -49,6 +56,9 @@ static inline uint32 ImagesIds[] = {
 	8,
 	9,
 	10,
+	11,
+	12,
+	13,
 };
 
 /* ------------------------------  */
@@ -59,8 +69,8 @@ static inline const char* WavsNames[] = {
 };
 
 static inline uint32 WavsIds[] = {
-	13,
-	14,
+	16,
+	17,
 };
 
 /* ------------------------------  */
@@ -71,14 +81,14 @@ static inline const char* FontsNames[] = {
 };
 
 static inline uint32 FontsIds[] = {
-	11,
-	12,
+	14,
+	15,
 };
 
 /* ------------------------------  */
 
 static inline AssetFile AssetFiles[] = {
-	{ "resources/SpaceAssets.dbundle", 88914776 },
+	{ "resources/SpaceAssets.dbundle", 114080764 },
 };
 
 static inline size_t SpaceGameAssetFile = 0;

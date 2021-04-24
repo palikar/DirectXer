@@ -32,12 +32,6 @@ inline TextureLoadEntry_ g_Textures[]
 	{"rocks_normal.png"},
 };
 
-#define CHECKER_TEXTURE g_Textures[0]
-#define ROCKS_TEXTURE g_Textures[1]
-#define FLOOR_TEXTURE g_Textures[2]
-#define ROCKS_AO_TEXTURE g_Textures[3]
-#define ROCKS_NORMAL_TEXTURE g_Textures[4]
-
 struct TextureCatalog
 {
 	void LoadTextures(Graphics& graphics);

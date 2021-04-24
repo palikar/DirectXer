@@ -9,7 +9,7 @@ struct BufferDescriptor
 {
 	BulkVector<GeometryInfo> Infos;
 
-	void DrawGeometry(Graphics graphics, uint32 t_Index);
+	void DrawGeometry(Graphics& graphics, uint32 t_Index);
 	uint32 PutGeometry(GeometryInfo t_Info);
 };
 

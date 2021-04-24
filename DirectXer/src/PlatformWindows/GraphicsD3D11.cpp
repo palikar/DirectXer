@@ -242,7 +242,7 @@ void GraphicsD3D11::Destroy()
 void GraphicsD3D11::EndFrame()
 {
 	HRESULT hr;
-	if( FAILED( hr = Swap->Present( 1u,0u ) ) )
+	if( FAILED( hr = Swap->Present( 1u, 0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
@@ -358,7 +358,8 @@ bool GraphicsD3D11::CreateTexture(TextureId id, TextureDescription description, 
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	Assert(Textures.insert({id, to}).second, "Usage of non-existaned texture");
+	[[maybe_unused]] bool res = Textures.insert({ id, to }).second;
+	Assert(res, "Usage of non-existaned texture");
 	
 	return true;
 }
@@ -391,7 +392,8 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 			
 	GFX_CALL(Device->CreateDepthStencilView(to.tp, &dsvDesc, &to.dsv));
 
-	Assert(Textures.insert({id, to}).second, "Usage of non-existaned texture");
+	[[maybe_unused]]bool res = Textures.insert({id, to}).second;
+	Assert(res, "Usage of non-existaned texture");
 	
 	return true;
 }
@@ -482,7 +484,8 @@ bool GraphicsD3D11::CreateCubeTexture(TextureId id, TextureDescription descripti
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
 
-	Assert(Textures.insert({id, to }).second, "Usage of non-existaned texture");
+	[[maybe_unused]]bool res = Textures.insert({id, to }).second;
+	Assert(res, "Usage of non-existaned texture");
 
 	return true;
 
@@ -511,7 +514,8 @@ bool GraphicsD3D11::CreateVertexBuffer(VertexBufferId id, uint32 structSize, voi
 		GFX_CALL(Device->CreateBuffer(&vertexBufferDesc, nullptr, &pVertexBuffer));
 	}
 
-	Assert(VertexBuffers.insert({id, VBObject{structSize, pVertexBuffer}}).second, "Usage of non-existaned vertex buffer");
+	[[maybe_unused]]bool res = VertexBuffers.insert({id, VBObject{structSize, pVertexBuffer}}).second;
+	Assert(res, "Usage of non-existaned vertex buffer");
 
 	return true;
 }
@@ -539,7 +543,8 @@ bool GraphicsD3D11::CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataS
 		GFX_CALL(Device->CreateBuffer(&indexBufferDesc, nullptr, &pIndexBuffer));
 	}
 
-	Assert(IndexBuffers.insert({ id, IBObject{pIndexBuffer } }).second, "Usage of non-existaned index buffer");
+	[[maybe_unused]]bool res = IndexBuffers.insert({ id, IBObject{pIndexBuffer } }).second;
+	Assert(res, "Usage of non-existaned index buffer");
 	
 	return true;
 }
@@ -694,7 +699,8 @@ bool GraphicsD3D11::CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, voi
 	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
 
-	Assert(ConstantBuffers.insert({id, cb}).second, "Usage of non-existaned constant buffer");
+	[[maybe_unused]]bool res = ConstantBuffers.insert({id, cb}).second;
+	Assert(res, "Usage of non-existaned constant buffer");
 	return true;
 }
 

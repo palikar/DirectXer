@@ -2,7 +2,7 @@
 
 #include "GeometryUtils.hpp"
 
-void BufferDescriptor::DrawGeometry(Graphics graphics, uint32 t_Index)
+void BufferDescriptor::DrawGeometry(Graphics& graphics, uint32 t_Index)
 {
 	uint32 indexOffset = 0;
 	uint32 baseIndex = 0;
