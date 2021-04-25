@@ -3,14 +3,16 @@
 #include <Input.hpp>
 #include <Logging.hpp>
 #include <Math.hpp>
+#include <Timing.hpp>
 
 #include <imgui.h>
 
 void App::Init(HWND t_Window)
 {
-	DXLOG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
+	DXDEBUGCODE(DxTimedBlock("[Timing] Application initialization: {} ms\n"));
+	
+	DXDEBUG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
 
-	// @Todo: Refactor this into functions
 	Graphics.InitSwapChain(t_Window, Width, Height);
 	Graphics.InitBackBuffer();
 	Graphics.InitZBuffer(Width, Height);

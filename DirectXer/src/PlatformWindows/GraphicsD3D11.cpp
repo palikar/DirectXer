@@ -74,7 +74,7 @@ void GraphicsD3D11::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
 	GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, initFlags,featureLevels,
 										   2, D3D11_SDK_VERSION, &sd, &Swap, &Device, nullptr, &Context));
 
-	DXLOG("[Graphics] Direct3D: {}", FeatureLevelToString(Device->GetFeatureLevel()));
+	DXDEBUG("[Graphics] Direct3D: {}", FeatureLevelToString(Device->GetFeatureLevel()));
 }
 
 void GraphicsD3D11::InitBackBuffer()

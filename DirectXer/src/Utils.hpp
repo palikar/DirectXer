@@ -63,10 +63,10 @@ constexpr size_t Size(T (&)[N])
 
 #ifdef _DEBUG
 
-#define DX_DEBUG_COD(STATEMENT) STATEMENT
+#define DXDEBUGCODE(STATEMENT) STATEMENT
 
 #else
 
-#define DX_DEBUG_COD(STATEMENT)
+#define DXDEBUGCODE(STATEMENT)
 
 #endif

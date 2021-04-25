@@ -21,13 +21,13 @@ static void* GetData(MemoryArena& fileArena, size_t offset)
 
 void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 {
-	TimedBlock block("[TIMING] Asset loading: {} ms\n");
+	DXDEBUGCODE(DxTimedBlock("[Timing] Asset loading: {} ms\n"));
 	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
 	Defer { 
 		Memory::DestoryTempArena(fileArena);
 	};
 
-	DXLOG("[Init] Loading asset file: {}", file.Path);
+	DXDEBUG("[Init] Loading asset file: {}", file.Path);
 
 	ReadWholeFile(file.Path, fileArena);
 	auto current = fileArena.Memory;

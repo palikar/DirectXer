@@ -6,6 +6,7 @@
 #include <App.hpp>
 #include <Memory.hpp>
 #include <Assets.hpp>
+#include <Timing.hpp>
 
 #include "SpaceGame.hpp"
 #include <SpaceAssets.hpp>
@@ -265,7 +266,6 @@ void SpaceGame::Update(float dt)
 	Renderer2D.EndScene();
 	
 	Renderer2D.BeginScene();
-	
 	Renderer2D.DrawImage(I_STATS, {20.0f, 20.0f}, { Application->Width - 40.0f, 32.0f });
 
 	auto time = (int)roundf(GameState->Time);

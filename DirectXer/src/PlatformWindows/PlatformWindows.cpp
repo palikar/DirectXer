@@ -316,7 +316,6 @@ void WindowsWindow::Deinit()
 	UnregisterClass("DirectXer Window", GetModuleHandleA(NULL));
 	FreeConsole();
 	DestroyWindow(hWnd);
-
 }
 
 void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -333,14 +332,14 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		  if(wParam == SIZE_MINIMIZED)
 		  {
 			  Minimized = true;
-			  DXLOG("[EVENT] Minimizing");
+			  DXDEBUG("[Event] Minimizing");
 			  break;
 		  }
 
 		  if(wParam == SIZE_MAXIMIZED || wParam == SIZE_RESTORED)
 		  {
 			  Minimized = false;
-			  DXLOG("[EVENT] Maximizing");
+			  DXDEBUG("[Event] Maximizing");
 		  }
 
 		  uint32 width = LOWORD(lParam);
@@ -352,7 +351,7 @@ void WindowsWindow::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		  Application->Height = (float32)height;
 		  Application->Resize();
 			  
-		  DXLOG("[EVENT] Resizing: {}x{}", width, height);
+		  DXDEBUG("[Event] Resizing: {}x{}", width, height);
 	  }
 
 	  case WM_KILLFOCUS:

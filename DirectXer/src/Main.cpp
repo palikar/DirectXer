@@ -11,7 +11,7 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 	{
 		if (strcmp(argv[i], "--resources") == 0)
 		{
-			DXLOG("[Init] Argument: {} -> {}", argv[i], argv[i + 1]);
+			DXDEBUG("[Init] Argument: {} -> {}", argv[i], argv[i + 1]);
 			t_Settings.ResourcesPath = argv[i + 1];
 			++i;
 		}		
@@ -28,7 +28,7 @@ App* InitMain(char** argv, int argc)
 	Random::Init();
 	Audio::Init();
 
-	DXLOG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
+	DXDEBUG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
 	App* application = Memory::BulkGet<App>();
 
 	// @Note: Ideally we won't this be we have some things in the games

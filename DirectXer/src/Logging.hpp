@@ -125,8 +125,9 @@ inline DxgiInfoManager gDxgiManager;
 #ifdef _DEBUG
 
 #define DXWARNING(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__)
-#define DXERROR(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); assert(false)
+#define DXERROR(MSG, ...) gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); int* p = nullptr; *p = 4
 #define DXLOG(MSG, ...) gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
+#define DXDEBUG(MSG, ...) gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
 #define DXPRINT(MSG, ...) gLogger.Print(MSG, __VA_ARGS__)
 
 #define Assert(VALUE, MSG, ...) do { if (!(VALUE)) { gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); int* p = nullptr; *p = 4; } } while(false)
@@ -138,6 +139,7 @@ inline DxgiInfoManager gDxgiManager;
 #define DXWARNING(MSG, ...)
 #define DXERROR(MSG, ...)
 #define DXLOG(MSG, ...)  gLogger.PrintLog(__FILE__, __LINE__, MSG, __VA_ARGS__)
+#define DXDEBUG(MSG, ...)
 #define DXPRINT(MSG, ...)
 
 #define Assert(VALUE, MSG, ...)

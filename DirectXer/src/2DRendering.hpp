@@ -40,7 +40,6 @@ class Renderer2D
 
   public:
 
-
 	void InitRenderer(Graphics* t_Graphics, Init2DParams t_Params);
 
 	void BeginScene();
