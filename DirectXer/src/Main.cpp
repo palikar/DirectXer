@@ -5,6 +5,8 @@
 #include <Logging.hpp>
 #include <Audio.hpp>
 
+#include <optick.h>
+
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
 	for (size_t i = 1; i < argc; ++i)
@@ -22,6 +24,8 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 // specific main function (WinMain or main)
 App* InitMain(char** argv, int argc)
 {
+	OPTICK_THREAD("MainThread");
+
 	Input::Init();
 	Memory::InitMemoryState();
 	PlatformLayer::Init();

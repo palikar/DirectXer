@@ -1,8 +1,7 @@
-#include "PlatformWindows.hpp"
-#include "App.hpp"
-#include "Input.hpp"
-#include "Glm.hpp"
-#include "Logging.hpp"
+#include <App.hpp>
+#include <Input.hpp>
+#include <Glm.hpp>
+#include <Logging.hpp>
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>
@@ -10,8 +9,12 @@
 #include <fmt/format.h>
 #include <Xinput.h>
 
+#include <optick.h>
+
 #include <Shlwapi.h>
 #include <time.h>
+
+#include "PlatformWindows.hpp"
 
 void WindowsPlatformLayer::Init()
 {
@@ -268,7 +271,7 @@ int WindowsWindow::Run()
 
 		if (!Minimized)
 		{
-			
+			OPTICK_FRAME("MainThread");
 			clock_t beginFrame = clock();
 			
 			ImGui_ImplDX11_NewFrame();
@@ -313,6 +316,8 @@ void WindowsWindow::Deinit()
 
 	gDxgiManager.Destroy();
 	Application->Graphics.Destroy();
+	OPTICK_SHUTDOWN();
+	
 	UnregisterClass("DirectXer Window", GetModuleHandleA(NULL));
 	FreeConsole();
 	DestroyWindow(hWnd);

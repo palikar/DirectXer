@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="src\optick.config.h" />
+    <ClInclude Include="src\optick.h" />
+    <ClInclude Include="src\optick_capi.h" />
+    <ClInclude Include="src\optick_common.h" />
+    <ClInclude Include="src\optick_core.freebsd.h" />
+    <ClInclude Include="src\optick_core.h" />
+    <ClInclude Include="src\optick_core.linux.h" />
+    <ClInclude Include="src\optick_core.macos.h" />
+    <ClInclude Include="src\optick_core.platform.h" />
+    <ClInclude Include="src\optick_core.win.h" />
+    <ClInclude Include="src\optick_gpu.h" />
+    <ClInclude Include="src\optick_memory.h" />
+    <ClInclude Include="src\optick_message.h" />
+    <ClInclude Include="src\optick_miniz.h" />
+    <ClInclude Include="src\optick_serialization.h" />
+    <ClInclude Include="src\optick_server.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\optick_capi.cpp" />
+    <ClCompile Include="src\optick_core.cpp" />
+    <ClCompile Include="src\optick_gpu.cpp" />
+    <ClCompile Include="src\optick_message.cpp" />
+    <ClCompile Include="src\optick_miniz.cpp" />
+    <ClCompile Include="src\optick_serialization.cpp" />
+    <ClCompile Include="src\optick_server.cpp" />
+  </ItemGroup>
+</Project>

@@ -7,6 +7,8 @@
 #include <FontLibrary.hpp>
 #include <Timing.hpp>
 
+#include <optick.h>
+
 // @Note: I hope this gets inlined; is is there because I am lazy at typing
 template<typename T>
 static void* GetData(MemoryArena& fileArena, T& entry)
@@ -21,6 +23,7 @@ static void* GetData(MemoryArena& fileArena, size_t offset)
 
 void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 {
+	OPTICK_EVENT();
 	DXDEBUGCODE(DxTimedBlock("[Timing] Asset loading: {} ms\n"));
 	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
 	Defer { 

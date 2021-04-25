@@ -1,7 +1,9 @@
-#include "Platform.hpp"
-#include "Memory.hpp"
-#include "Resources.hpp"
-#include "App.hpp"
+#include <Platform.hpp>
+#include <Memory.hpp>
+#include <Resources.hpp>
+#include <App.hpp>
+
+#include <optick.h>
 
 #include <shellapi.h>
 
@@ -94,6 +96,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	settings.InitialHeight = 720;
 	settings.Fullscreen = 0;
 
+	OPTICK_APP("DirectXer"); 
+	
 	WindowsWindow window;
 	window.Application = InitMain(argv, argc);
 
@@ -103,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	InitialStackMemory += sizeof(int);
 	InitialStackMemory += sizeof(char**);
 	DXDEBUG("[Init] Initial Stack Memory: {:.3} kB ", InitialStackMemory/1024.0f);
-	
+
 	window.Init(settings);
 	return window.Run();
 }

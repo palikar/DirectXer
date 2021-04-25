@@ -8,6 +8,8 @@
 #include <Assets.hpp>
 #include <Timing.hpp>
 
+#include <optick.h>
+
 #include "SpaceGame.hpp"
 #include <SpaceAssets.hpp>
 
@@ -143,6 +145,8 @@ void SpaceGame::CleanUpDead()
 
 void SpaceGame::UpdateGameState(float dt)
 {
+	OPTICK_EVENT();
+	
 	CleanUpDead();
 	GameState->Time += dt;
 	
@@ -227,12 +231,10 @@ void SpaceGame::UpdateGameState(float dt)
 
 }
 
-void SpaceGame::Update(float dt)
+void SpaceGame::Render(float dt)
 {
-
-	UpdateGameState(dt);
-	// @Note: Main Scene
-
+	OPTICK_EVENT();
+		
 	Graphics->SetDepthStencilState(DSS_2DRendering);
 	Graphics->SetBlendingState(BS_PremultipliedAlpha);
 	
@@ -275,8 +277,13 @@ void SpaceGame::Update(float dt)
 	Renderer2D.DrawImage(I_HEALTH, {10.0f, Application->Height - 32.0f - 20.0f}, { Application->Width / 3.5f, 32.0f});
 	
 	Renderer2D.EndScene();
-	
-	
-	
+}
+
+void SpaceGame::Update(float dt)
+{
+	OPTICK_EVENT();
+	UpdateGameState(dt);
+	// @Note: Main Scene
+	Render(dt);
 }
 

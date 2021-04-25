@@ -211,7 +211,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_ITERATOR_DEBUG_LEVEL=0;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_HAS_EXCEPTIONS=0;DXER_SPACE_GAME=1</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Optik\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -239,7 +239,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_SPACE_GAME=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Optik\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
@@ -263,7 +263,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_EXAMPLE_SCENES=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Optik\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
@@ -296,6 +296,9 @@
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\openal-soft-1.21.1\build\OpenAL.vcxproj">
       <Project>{f7a370ba-eed2-33dc-9759-a72287d42d6e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Optik\Optik.vcxproj">
+      <Project>{84ed5066-b3a1-46fa-8945-efc477a708e4}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\Stb\Stb.vcxproj">
       <Project>{e9da2eb9-160a-4133-b4b5-109eb283280c}</Project>

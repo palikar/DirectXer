@@ -37,6 +37,7 @@ public:
 
 	// @Note: These will be used only by the concreate game
 	void UpdateGameState(float dt);
+	void Render(float dt);
 	void ControlPlayer(float dt);
 	void CleanUpDead();
 };
