@@ -60,23 +60,14 @@ constexpr size_t Size(T (&)[N])
 	return N;
 }
 
-
 #ifdef _DEBUG
-
-#define DXDEBUGCODE(STATEMENT) STATEMENT
-
+#define DxDebugCode(STATEMENT) STATEMENT
 #else
-
-#define DXDEBUGCODE(STATEMENT)
-
+#define DxDebugCode(STATEMENT)
 #endif
 
-#ifdef _DEBUG
-
+#ifdef DX_PROFILE_BUILD
 #define DxProfileCode(STATEMENT) STATEMENT
-
 #else
-
-#define DXProfileCode(STATEMENT)
-
+#define DxProfileCode(STATEMENT)
 #endif

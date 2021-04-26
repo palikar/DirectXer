@@ -9,7 +9,7 @@
 
 void App::Init(HWND t_Window)
 {
-	DXDEBUGCODE(DxTimedBlock("[Timing] Application initialization: {} ms\n"));
+	DxProfileCode(DxTimedBlock("[Timing] Application initialization: {} ms\n"));
 	
 	DXDEBUG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
 

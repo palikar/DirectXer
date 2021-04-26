@@ -57,6 +57,7 @@ struct GameState
 
 void SpaceGame::Init()
 {
+	DxProfileCode(DxTimedBlock("[Timing] Game initialization: {} ms\n"));
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
 
 	Memory::EstablishTempScope(Megabytes(4));

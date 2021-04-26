@@ -8,6 +8,7 @@
 #include <Types.hpp>
 #include <Logging.hpp>
 #include <Utils.hpp>
+#include <Config.hpp>
 
 #ifdef DX_PROFILE_BUILD
 #define USE_OPTICK (1)
@@ -37,6 +38,28 @@ struct TimedBlock
 	}
 };
 
+struct CycleCountedBlock
+{
+	const char* FormatString;
+	const char* Tag;
+	uint64 Cycles;
+	
+	CycleCountedBlock(const char* formatString, const char* tag)
+	{
+		FormatString = formatString;
+		Tag = tag;
+		Cycles = __rdtsc();
+	}
+	
+	~CycleCountedBlock()
+	{
+		auto elapsedCycles = __rdtsc() - Cycles;
+		if (!Config::EnableCycleCounters) return;
+		fmt::print(FormatString, elapsedCycles, Tag);
+	}
+};
+
 }
 
 #define DxTimedBlock(MSG) detail::TimedBlock ANONYMOUS_VARIABLE(__timedBlock)(MSG)
+#define DxCycleBlock(MSG, TAG) detail::CycleCountedBlock ANONYMOUS_VARIABLE(__cycleBlock)(MSG, TAG)

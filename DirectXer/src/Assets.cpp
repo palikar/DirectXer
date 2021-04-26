@@ -21,7 +21,7 @@ static void* GetData(MemoryArena& fileArena, size_t offset)
 
 void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 {
-	DXDEBUGCODE(DxTimedBlock("[Timing] Asset loading: {} ms\n"));
+	DxProfileCode(DxTimedBlock("[Timing] Asset loading: {} ms\n"));
 	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
 	Defer { 
 		Memory::DestoryTempArena(fileArena);

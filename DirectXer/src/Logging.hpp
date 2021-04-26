@@ -9,6 +9,7 @@
 #include <cassert>
 #include <dxerr.h>
 #include <dxgidebug.h>
+#include <type_traits>
 
 #pragma comment(lib, "dxguid.lib")
 

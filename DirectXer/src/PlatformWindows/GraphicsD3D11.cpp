@@ -400,7 +400,7 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 
 void GraphicsD3D11::SetRenderTarget(RTObject& t_RT)
 {
-	auto rtv = Textures.at(t_RT.Color).rtv;
+	ID3D11RenderTargetView* rtv = Textures.at(t_RT.Color).rtv;
 	auto dsv = Textures.at(t_RT.DepthStencil).dsv;
 	Context->OMSetRenderTargets(1, &rtv, dsv);
 }

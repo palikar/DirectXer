@@ -4,6 +4,7 @@
 #include <Memory.hpp>
 #include <Math.hpp>
 #include <Utils.hpp>
+#include <Containers.hpp>
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -157,9 +158,9 @@ class GraphicsD3D11
 	VSConstantBuffer VertexShaderCB;
 
 	// @Note: GPU resources
-	GPUResourceMap<TextureId, TextureObject> Textures;
-	GPUResourceMap<VertexBufferId, VBObject> VertexBuffers;
-	GPUResourceMap<IndexBufferId, IBObject> IndexBuffers;
-	GPUResourceMap<ConstantBufferId, CBObject> ConstantBuffers;
+	GPUResourceMap<TextureId, TextureObject, GPURes_Texture> Textures;
+	GPUResourceMap<VertexBufferId, VBObject, GPURes_VertexBuffer> VertexBuffers;
+	GPUResourceMap<IndexBufferId, IBObject, GPURes_IndexBuffer> IndexBuffers;
+	GPUResourceMap<ConstantBufferId, CBObject, GPURes_ConstantBuffer> ConstantBuffers;
 };
 
