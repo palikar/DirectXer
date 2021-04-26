@@ -260,7 +260,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_EXAMPLE_SCENES=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_HAS_EXCEPTIONS=0;DXER_SPACE_GAME=1;DX_PROFILE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\Freetype\include;$(SolutionDir)ThirdParty\Stb\include;$(SolutionDir)ThirdParty\DXError\src;$(SolutionDir)ThirdParty\IMGui\include;$(SolutionDir)ThirdParty\Fmt\include;$(ProjectDir)Shaders;$(ProjectDir)ResorceHeaders;$(ProjectDir)src;$(SolutionDir)ThirdParty\RobinHood;$(SolutionDir)ThirdParty\openal-soft-1.21.1\include;$(SolutionDir)ThirdParty\Optik\include;$(SolutionDir)ThirdParty\Glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -273,7 +273,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>4194304</StackReserveSize>
       <HeapReserveSize>268435456</HeapReserveSize>
     </Link>

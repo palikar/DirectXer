@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IncludeWin.hpp"
-#include "Types.hpp"
+#include <Types.hpp>
 
 #include <unordered_map>
 

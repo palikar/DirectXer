@@ -70,3 +70,13 @@ constexpr size_t Size(T (&)[N])
 #define DXDEBUGCODE(STATEMENT)
 
 #endif
+
+#ifdef _DEBUG
+
+#define DxProfileCode(STATEMENT) STATEMENT
+
+#else
+
+#define DXProfileCode(STATEMENT)
+
+#endif

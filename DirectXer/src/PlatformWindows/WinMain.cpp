@@ -3,7 +3,7 @@
 #include <Resources.hpp>
 #include <App.hpp>
 
-#include <optick.h>
+#include <Timing.hpp>
 
 #include <shellapi.h>
 
@@ -95,8 +95,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	settings.InitialWidth = 1080;
 	settings.InitialHeight = 720;
 	settings.Fullscreen = 0;
-
-	OPTICK_APP("DirectXer"); 
 	
 	WindowsWindow window;
 	window.Application = InitMain(argv, argc);

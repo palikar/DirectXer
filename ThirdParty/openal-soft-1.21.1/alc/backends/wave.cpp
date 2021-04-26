@@ -150,6 +150,8 @@ int WaveBackend::mixerProc()
             mDevice->renderSamples(mBuffer.data(), mDevice->UpdateSize, frameStep);
             done += mDevice->UpdateSize;
 
+#pragma warning(push)
+#pragma warning(disable:4127)
             if_constexpr(al::endian::native != al::endian::little)
             {
                 const uint bytesize{mDevice->bytesFromFmt()};
@@ -176,6 +178,7 @@ int WaveBackend::mixerProc()
                     }
                 }
             }
+#pragma warning(pop)
 
             const size_t fs{fwrite(mBuffer.data(), frameSize, mDevice->UpdateSize, mFile)};
             if(fs < mDevice->UpdateSize || ferror(mFile))

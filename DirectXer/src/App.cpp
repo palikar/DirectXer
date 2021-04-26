@@ -25,7 +25,25 @@ void App::Init(HWND t_Window)
 	Game.Application = this;
 	Game.Graphics = &Graphics;
 	Game.Init();
+
+	OptickCaptureQueued = false;
+	OptickCaptureActive = false;
+
+	
+	OPTICK_APP("DirectXer");
+	{
+		OPTICK_THREAD("MainThread");
+		OPTICK_FRAME("MainThread");
+	}
 }
+
+void App::NewFrame()
+{
+	OPTICK_FRAME("MainThread");
+}
+	
+void App::Update()
+{}
 
 void App::PostInit()
 {

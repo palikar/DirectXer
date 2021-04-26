@@ -9,6 +9,14 @@
 #include <Logging.hpp>
 #include <Utils.hpp>
 
+#ifdef DX_PROFILE_BUILD
+#define USE_OPTICK (1)
+#else
+#define USE_OPTICK (0)
+#endif
+
+#include <optick.h>
+
 namespace detail
 {
 struct TimedBlock

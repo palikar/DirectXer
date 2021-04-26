@@ -8,7 +8,7 @@
 #include <Assets.hpp>
 #include <Timing.hpp>
 
-#include <optick.h>
+#include <Timing.hpp>
 
 #include "SpaceGame.hpp"
 #include <SpaceAssets.hpp>

@@ -4,8 +4,7 @@
 #include <Random.hpp>
 #include <Logging.hpp>
 #include <Audio.hpp>
-
-#include <optick.h>
+#include <Timing.hpp>
 
 static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** argv, int argc)
 {
@@ -24,8 +23,8 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 // specific main function (WinMain or main)
 App* InitMain(char** argv, int argc)
 {
-	OPTICK_THREAD("MainThread");
-
+	OPTICK_EVENT();
+	
 	Input::Init();
 	Memory::InitMemoryState();
 	PlatformLayer::Init();

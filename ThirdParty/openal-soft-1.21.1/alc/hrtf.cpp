@@ -55,6 +55,8 @@
 #include "opthelpers.h"
 #include "polyphase_resampler.h"
 
+#pragma warning(push)
+#pragma warning(disable:4127)
 
 namespace {
 
@@ -1471,3 +1473,5 @@ void HrtfStore::release()
         LoadedHrtfs.erase(iter, LoadedHrtfs.end());
     }
 }
+
+#pragma warning(pop)

@@ -22,7 +22,9 @@ public:
 	void Init(HWND t_Window);
 	void PostInit();
 	void Resize();
-
+	void Update();
+	void NewFrame();
+		
 	// @Note: Application Data -- used by the "application" for
 	// application management stuff
 	float32 Width;
@@ -41,4 +43,7 @@ public:
 	// @Note: Depending on how the project was build, this will
 	// be a different "game"
 	GameClass Game;
+
+	bool OptickCaptureQueued;
+	bool OptickCaptureActive;
 };

@@ -2,14 +2,13 @@
 #include <Input.hpp>
 #include <Glm.hpp>
 #include <Logging.hpp>
+#include <Timing.hpp>
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <fmt/format.h>
 #include <Xinput.h>
-
-#include <optick.h>
 
 #include <Shlwapi.h>
 #include <time.h>
@@ -271,13 +270,13 @@ int WindowsWindow::Run()
 
 		if (!Minimized)
 		{
-			OPTICK_FRAME("MainThread");
 			clock_t beginFrame = clock();
 			
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
+			Application->Update();
 			Application->Game.Update((float)clockToMilliseconds(dt) / 1000.0f);
 
 			ImGui::Render();
