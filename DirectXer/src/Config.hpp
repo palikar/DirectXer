@@ -25,6 +25,6 @@ struct Config
 	const static inline uint16 InitialMaxIndexBuffers = 32u;
 	const static inline uint16 InitialMaxConstantBuffers = 32u;
 
-	const static inline bool EnableCycleCounters = true;
+	const static inline bool EnableCycleCounters = false;
 };
 

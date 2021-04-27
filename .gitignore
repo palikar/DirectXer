@@ -1,6 +1,9 @@
-Build
-.vs
+ Build
+
+*.vs
 *.user
+*.opt
+
 build.bat
 DirectXer/Shaders/*.hpp
 DirectXer/Shaders/*.cso
