@@ -22,8 +22,7 @@ public:
 	void Init(HWND t_Window);
 	void PostInit();
 	void Resize();
-	void Update();
-	void NewFrame();
+	void Update(float dt);
 		
 	// @Note: Application Data -- used by the "application" for
 	// application management stuff
@@ -44,6 +43,5 @@ public:
 	// be a different "game"
 	GameClass Game;
 
-	bool OptickCaptureQueued;
-	bool OptickCaptureActive;
+	float Timer;
 };

@@ -21,7 +21,7 @@ static void* GetData(MemoryArena& fileArena, size_t offset)
 
 void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 {
-	DxProfileCode(DxTimedBlock("[Timing] Asset loading: {} ms\n"));
+	DxProfileCode(DxTimedBlock(Phase_Init, "Asset loading"));
 	MemoryArena fileArena = Memory::GetTempArena(file.Size + Kilobytes(1));
 	Defer { 
 		Memory::DestoryTempArena(fileArena);
@@ -37,13 +37,13 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 	context.ImageLib->Images.reserve(header.LoadImagesCount + header.ImagesCount);
 	context.WavLib->AudioEntries.reserve(header.LoadWavsCount);
 	context.FontLib->AtlasGlyphEntries.resize(header.LoadFontsCount * FontLibrary::Characters.size());
-
+	
 	for (uint32 i = 0; i < header.TexturesCount; ++i)
 	{
 		const TextureLoadEntry& entry = ReadBlob<TextureLoadEntry>(current);
 		context.Graphics->CreateTexture(entry.Id, entry.Desc, GetData(fileArena, entry));
 	}
-
+	
 	for (uint32 i = 0; i < header.ImagesCount; ++i)
 	{
 		const ImageEntry& entry = ReadBlob<ImageEntry>(current);
@@ -60,20 +60,20 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 	{
 		const ImageLoadEntry& entry = ReadBlob<ImageLoadEntry>(current);
 		context.ImageLib->CreateMemoryImage(entry.Id, entry.Desc, GetData(fileArena, entry));
-	}
-
+	}	
+	
 	for (uint32 i = 0; i < header.LoadWavsCount; ++i)
 	{
 		const WavLoadEntry& entry = ReadBlob<WavLoadEntry>(current);
 		context.WavLib->CreateMemoryWav(entry.Id, entry.Desc, GetData(fileArena, entry));
-	}
+	}	
 
 	for (uint32 i = 0; i < header.LoadFontsCount; ++i)
 	{
 		FontLoadEntry& entry = ReadBlob<FontLoadEntry>(current);
 		context.FontLib->CreateMemoryTypeface(entry.Id, entry.Desc, GetData(fileArena, entry), entry.DataSize);
 	}
-
+		
 	for (uint32 i = 0; i < header.SkyboxesCount; ++i)
 	{
 		SkyboxLoadEntry& entry = ReadBlob<SkyboxLoadEntry>(current);
@@ -88,5 +88,7 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		};
 		context.Graphics->CreateCubeTexture(entry.Id, entry.Desc, datas);
 	}
+	
+	
 	
 }

@@ -3,51 +3,102 @@
 #include <fmt/format.h>
 #include <fmt/color.h>
 
-#include <Platform.hpp>
-#include <Memory.hpp>
 #include <Types.hpp>
-#include <Logging.hpp>
 #include <Utils.hpp>
 #include <Config.hpp>
-
-#ifdef DX_PROFILE_BUILD
-#define USE_OPTICK (1)
-#else
-#define USE_OPTICK (0)
-#endif
+#include <Tags.hpp>
+#include <Memory.hpp>
+#include <GraphicsCommon.hpp>
 
 #include <optick.h>
 
+struct Telemetry
+{
+	struct CycleCountedEntry
+	{
+		uint64 AvgCycles{ 0 };
+		uint64 EntriesCount{ 0 };
+	};
+
+	struct TimedBlockEntry
+	{
+		const char* Msg;
+		uint64 Time;
+	};
+
+	struct MemoryState
+	{
+		uint64 CurrentMemory;
+	};
+
+	static inline Map<uint64, CycleCountedEntry> CycleCounters{};
+	static inline Map<uint64, TimedBlockEntry> BlockTimers{};
+	static inline MemoryState MemoryStates[Tags_Count]{0};
+
+	static void NewCycleCounterEntry(SystemTag sysTag, CycleCounterTag counterTag, uint64 cycles)
+	{
+		auto& entry = CycleCounters[(uint64)sysTag << 32 | (uint64)counterTag];
+		entry.EntriesCount += 1;
+		entry.AvgCycles += cycles;
+		entry.AvgCycles /= entry.EntriesCount > 1 ? 2 : 1;
+	}
+
+	static void NewTimedBlockEntry(SystemTag sysTag, const char* msg, uint64 time)
+	{
+		BlockTimers[(uint64)jenkins_hash(msg) << 32 | sysTag] = TimedBlockEntry{msg, time};
+	}
+
+
+	static void AddMemory(SystemTag sysTag, uint64 memory)
+	{
+		MemoryStates[sysTag].CurrentMemory += memory;
+	}
+
+	static void RemoveMemory(SystemTag sysTag, uint64 memory)
+	{
+		MemoryStates[sysTag].CurrentMemory -= memory;
+	}
+
+	static void Init()
+	{
+		CycleCounters.reserve(32);
+		BlockTimers.reserve(32);
+	}
+};
+
 namespace detail
 {
+
 struct TimedBlock
 {
-	const char* FormatString;
+	SystemTag SysTag;
+	const char* Msg;
 	uint64 Time;
 	
-	TimedBlock(const char* formatString)
+	TimedBlock(SystemTag sysTag, const char* msg)
 	{
-		FormatString = formatString;
+		SysTag = sysTag;
+		Msg = msg;
 		Time = PlatformLayer::Clock();
 	}
 	
 	~TimedBlock()
 	{
 		auto elapsedTime = PlatformLayer::Clock() - Time;
-		fmt::print(FormatString, elapsedTime/10000);
+		Telemetry::NewTimedBlockEntry(SysTag, Msg, elapsedTime/10000);
 	}
 };
 
 struct CycleCountedBlock
 {
-	const char* FormatString;
-	const char* Tag;
+	SystemTag SysTag;
+	CycleCounterTag CounterTag;
 	uint64 Cycles;
 	
-	CycleCountedBlock(const char* formatString, const char* tag)
+	CycleCountedBlock(SystemTag sysTag, CycleCounterTag counterTag)
 	{
-		FormatString = formatString;
-		Tag = tag;
+		SysTag = sysTag;
+		CounterTag = counterTag;
 		Cycles = __rdtsc();
 	}
 	
@@ -55,11 +106,12 @@ struct CycleCountedBlock
 	{
 		auto elapsedCycles = __rdtsc() - Cycles;
 		if (!Config::EnableCycleCounters) return;
-		fmt::print(FormatString, elapsedCycles, Tag);
-	}
+		Telemetry::NewCycleCounterEntry(SysTag, CounterTag, elapsedCycles);
+	}	
 };
 
 }
 
-#define DxTimedBlock(MSG) detail::TimedBlock ANONYMOUS_VARIABLE(__timedBlock)(MSG)
-#define DxCycleBlock(MSG, TAG) detail::CycleCountedBlock ANONYMOUS_VARIABLE(__cycleBlock)(MSG, TAG)
+#define DxTimedBlock(SYS, MSG) detail::TimedBlock ANONYMOUS_VARIABLE(__timedBlock)(SYS, MSG)
+#define DxCycleBlock(SYS, COUNTER) detail::CycleCountedBlock ANONYMOUS_VARIABLE(__cycleBlock)(SYS, COUNTER)
+

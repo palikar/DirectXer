@@ -98,6 +98,7 @@ void ImGui_ImplDX11_RenderDrawData(ImDrawData* draw_data)
 {
     // Avoid rendering when minimized
     if (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f)
+
         return;
 
     ID3D11DeviceContext* ctx = g_pd3dDeviceContext;

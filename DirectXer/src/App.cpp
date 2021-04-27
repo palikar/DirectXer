@@ -9,7 +9,7 @@
 
 void App::Init(HWND t_Window)
 {
-	DxProfileCode(DxTimedBlock("[Timing] Application initialization: {} ms\n"));
+	DxProfileCode(DxTimedBlock(Phase_Init, "Application initialization"));
 	
 	DXDEBUG("[RES] Resouces path: {}", Arguments.ResourcesPath.data());
 
@@ -26,9 +26,7 @@ void App::Init(HWND t_Window)
 	Game.Graphics = &Graphics;
 	Game.Init();
 
-	OptickCaptureQueued = false;
-	OptickCaptureActive = false;
-
+	Timer = 0.0f;
 	
 	OPTICK_APP("DirectXer");
 	{
@@ -36,14 +34,66 @@ void App::Init(HWND t_Window)
 		OPTICK_FRAME("MainThread");
 	}
 }
-
-void App::NewFrame()
+	
+void App::Update(float dt)
 {
 	OPTICK_FRAME("MainThread");
-}
+
+	TempFormater formater;
+
+	ImGui::Begin("App");
 	
-void App::Update()
-{}
+	if (ImGui::CollapsingHeader("Telemetry"))
+	{
+		
+		if (ImGui::TreeNode("Cycle Counters"))
+		{
+			for (const auto& [id, entry] : Telemetry::CycleCounters)
+			{
+				const uint32 counter = uint32(id & 0xFFFFFFFF);
+				const uint32 sys = uint32((id & (uint64)(0xFFFFFFFF) << 32) >> 32);
+
+				String text{formater.Format("[{}][{}] : {} Avrg. Cycles",
+						gCycleCounterTagNames[counter], gSystemTagNames[sys], entry.AvgCycles)};
+
+				ImGui::BulletText(text.data());
+			}
+			
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Timed Blocks"))
+		{
+			for (const auto& [id, entry] : Telemetry::BlockTimers)
+			{
+				const uint32 tag = uint32(id & 0xFFFFFFFF);
+				String text{formater.Format("[{}] [{}] : {} ms", gSystemTagNames[tag], entry.Msg, entry.Time)};
+				ImGui::BulletText(text.data());
+			}
+			
+			ImGui::TreePop();
+		}
+
+		
+		if (ImGui::TreeNode("Memory Tacking"))
+		{
+			for (size_t i = 0; i < Tags_Count; ++i)
+			{
+				auto& entry = Telemetry::MemoryStates[i];
+				if (entry.CurrentMemory == 0) continue;
+				
+				float mem = entry.CurrentMemory > 1024*1024 ? entry.CurrentMemory / (1024.0f*1024.0f) : entry.CurrentMemory / 1024.0f;
+				const char* unit = entry.CurrentMemory > 1024*1024 ? "MBs" : "KBs";
+				String text{formater.Format("[{}] : {:.2f} {}", gSystemTagNames[i], mem, unit)};
+				ImGui::BulletText(text.data());
+			}
+			
+			ImGui::TreePop();
+		}
+	}
+	
+	ImGui::End();
+}
 
 void App::PostInit()
 {

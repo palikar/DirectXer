@@ -8,6 +8,12 @@ static inline const bool DebugBuild = true;
 static inline const bool DebugBuild = false;
 #endif
 
+#ifdef DX_PROFILE_BUILD
+#define USE_OPTICK (0)
+#else
+#define USE_OPTICK (0)
+#endif
+
 // @Most of the time we probably don't need to release resources; enable this
 // only to check if there are some memory leaks
 static inline const bool CleanDestroy = false;
@@ -25,6 +31,6 @@ struct Config
 	const static inline uint16 InitialMaxIndexBuffers = 32u;
 	const static inline uint16 InitialMaxConstantBuffers = 32u;
 
-	const static inline bool EnableCycleCounters = false;
+	const static inline bool EnableCycleCounters = true;
 };
 

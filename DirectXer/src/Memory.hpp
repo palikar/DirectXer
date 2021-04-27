@@ -4,7 +4,6 @@
 #include <Types.hpp>
 #include <Config.hpp>
 #include <Logging.hpp>
-#include <Timing.hpp>
 #include <GraphicsCommon.hpp>
 
 #include <vector>
@@ -187,7 +186,7 @@ class BulkStdAllocator
 		//Assert(false, "Something using BulkStorage is trying to deallocate. This is not good.");
 	}
 
-	inline bool operator==(BulkStdAllocator const&) const { return true; }		
+	inline bool operator==(BulkStdAllocator const&) const { return true; }
 };
 
 #if USE_CUSTOM_ALLOCATORS
@@ -218,5 +217,8 @@ using BulkVector = std::vector<T>;
 using BulkString = std::string;
 
 using String = std::string_view;
+
+template<class Key, class Value>
+using Map = robin_hood::unordered_map<Key, Value>;
 
 #endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Types.hpp>
+
 #include <fmt/format.h>
 #include <fmt/color.h>
 
@@ -60,6 +62,25 @@ constexpr size_t Size(T (&)[N])
 	return N;
 }
 
+inline uint32 jenkins_hash(const char* begin)
+{
+
+    uint32 hash = 0;
+
+    while (*begin)
+    {
+        hash += *(begin++);
+        hash += hash << 10;
+        hash ^= hash >> 6;
+    }
+
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+
+    return hash;
+}
+
 #ifdef _DEBUG
 #define DxDebugCode(STATEMENT) STATEMENT
 #else
@@ -69,5 +90,11 @@ constexpr size_t Size(T (&)[N])
 #ifdef DX_PROFILE_BUILD
 #define DxProfileCode(STATEMENT) STATEMENT
 #else
-#define DxProfileCode(STATEMENT)
+#define DxProfileCode(STATEMENT) STATEMENT
+#endif
+
+#if defined(DX_PROFILE_BUILD) || defined(_DEBUG)
+#define DxNonReleseCode(STATEMENT) STATEMENT
+#else
+#define DxNonReleseCode(STATEMENT)
 #endif

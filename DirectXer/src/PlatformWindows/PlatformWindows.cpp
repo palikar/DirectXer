@@ -163,10 +163,12 @@ void WindowsWindow::InitAfterCreate(HWND t_hWnd)
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplWin32_Init(t_hWnd);
 	ImGui_ImplDX11_Init(Application->Graphics.Device, Application->Graphics.Context);
+	
 
 	Application->Graphics.EndFrame();
 }
@@ -271,13 +273,14 @@ int WindowsWindow::Run()
 		if (!Minimized)
 		{
 			clock_t beginFrame = clock();
-			
+
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			Application->Update();
-			Application->Game.Update((float)clockToMilliseconds(dt) / 1000.0f);
+			const float delta= (float)clockToMilliseconds(dt) / 1000.0f;
+			Application->Update(delta);
+			Application->Game.Update(delta);
 
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); 

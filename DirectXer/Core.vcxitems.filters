@@ -107,5 +107,7 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Audio.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Tags.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Timing.hpp" />
   </ItemGroup>
 </Project>

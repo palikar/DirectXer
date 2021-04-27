@@ -26,15 +26,15 @@
     <RemoteDebuggerCommandArguments>--resources resources</RemoteDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerWorkingDirectory>$(Solutiondir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>--resources resources</LocalDebuggerCommandArguments>
     <RemoteDebuggerCommandArguments>--resources resources</RemoteDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
-    <LocalDebuggerWorkingDirectory>$(Outdir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>--resources  ../../../resources</LocalDebuggerCommandArguments>
-    <RemoteDebuggerCommandArguments>--resources  ../../../resources</RemoteDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--resources resources</LocalDebuggerCommandArguments>
+    <RemoteDebuggerCommandArguments>--resources resources</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

@@ -182,6 +182,7 @@ void GraphicsD3D11::InitBlending()
 
 	// alpha blending
 	{
+		desc.RenderTarget[0].BlendEnable = TRUE;
 		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -196,6 +197,7 @@ void GraphicsD3D11::InitBlending()
 
 	// premultiplied alpha
 	{
+		desc.RenderTarget[0].BlendEnable = TRUE;
 		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -217,7 +219,6 @@ void GraphicsD3D11::SetBlendingState(BlendingState t_State)
 
 void GraphicsD3D11::ResizeBackBuffer(float width, float height)
 {
-
 	RenderTargetView->Release();
 	Swap->ResizeBuffers(0, (uint32)width, (uint32)height, DXGI_FORMAT_UNKNOWN, 0);
 	InitBackBuffer();
@@ -360,6 +361,7 @@ bool GraphicsD3D11::CreateTexture(TextureId id, TextureDescription description, 
 
 	[[maybe_unused]] bool res = Textures.insert({ id, to }).second;
 	Assert(res, "Usage of non-existaned texture");
+	Telemetry::AddMemory(GPURes_Texture, BytesPerPixel(description.Format) * description.Width * description.Height);
 	
 	return true;
 }
@@ -394,6 +396,7 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 
 	[[maybe_unused]]bool res = Textures.insert({id, to}).second;
 	Assert(res, "Usage of non-existaned texture");
+	Telemetry::AddMemory(GPURes_Texture, BytesPerPixel(description.Format) * description.Width * description.Height);
 	
 	return true;
 }
@@ -445,6 +448,7 @@ bool GraphicsD3D11::CreateRenderTexture(TextureId t_Id, RenderTargetDescription 
 	rtvDesc.Texture2D.MipSlice= 0;
 
 	GFX_CALL(Device->CreateRenderTargetView(to.tp, &rtvDesc, &to.rtv));
+	Telemetry::AddMemory(GPURes_Texture, BytesPerPixel(description.Format) * description.Width * description.Height);
 	
 	return true;
 }
@@ -483,9 +487,10 @@ bool GraphicsD3D11::CreateCubeTexture(TextureId id, TextureDescription descripti
 	srvDesc.Texture2D.MipLevels = 1;
 
 	GFX_CALL(Device->CreateShaderResourceView(to.tp, &srvDesc, &to.srv));
-
+	
 	[[maybe_unused]]bool res = Textures.insert({id, to }).second;
 	Assert(res, "Usage of non-existaned texture");
+	Telemetry::AddMemory(GPURes_Texture, BytesPerPixel(description.Format) * description.Width * description.Height * 6);
 
 	return true;
 
@@ -516,6 +521,7 @@ bool GraphicsD3D11::CreateVertexBuffer(VertexBufferId id, uint32 structSize, voi
 
 	[[maybe_unused]]bool res = VertexBuffers.insert({id, VBObject{structSize, pVertexBuffer}}).second;
 	Assert(res, "Usage of non-existaned vertex buffer");
+	Telemetry::AddMemory(GPURes_VertexBuffer, dataSize);
 
 	return true;
 }
@@ -545,6 +551,7 @@ bool GraphicsD3D11::CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataS
 
 	[[maybe_unused]]bool res = IndexBuffers.insert({ id, IBObject{pIndexBuffer } }).second;
 	Assert(res, "Usage of non-existaned index buffer");
+	Telemetry::AddMemory(GPURes_IndexBuffer, dataSize);
 	
 	return true;
 }
@@ -701,6 +708,7 @@ bool GraphicsD3D11::CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, voi
 
 	[[maybe_unused]]bool res = ConstantBuffers.insert({id, cb}).second;
 	Assert(res, "Usage of non-existaned constant buffer");
+	Telemetry::AddMemory(GPURes_ConstantBuffer, t_Size);
 	return true;
 }
 

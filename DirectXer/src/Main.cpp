@@ -30,6 +30,7 @@ App* InitMain(char** argv, int argc)
 	PlatformLayer::Init();
 	Random::Init();
 	Audio::Init();
+	Telemetry::Init();
 
 	DXDEBUG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
 	App* application = Memory::BulkGet<App>();
@@ -154,6 +155,11 @@ App* InitMain(char** argv, int argc)
 // @Notes
 // @Note: In a scene, some things are dynamic, and some things are static
 
+// == Telemtry ==
+// @Todo GPU memory tracking
+// @Todo GPU timing tracking
+// @Todo Bulk Memory tracking
+// @Todo Allocation tracking
 
 
 

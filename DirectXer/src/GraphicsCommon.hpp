@@ -169,3 +169,17 @@ inline TextureFormat PngFormat(int channels)
 
 	return TF_UNKNOWN;
 }
+
+inline uint8 BytesPerPixel(TextureFormat format)
+{
+	switch (format)
+	{
+	  case TF_RGBA: return 4;
+	  case TF_A: return 1;
+	  case TF_R: return 1;
+	}
+	
+	return 0;
+}
+
+	

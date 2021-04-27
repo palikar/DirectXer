@@ -83,7 +83,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Resources.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Tags.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\TextureCatalog.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Timing.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Types.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Utils.hpp" />
   </ItemGroup>
