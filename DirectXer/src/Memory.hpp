@@ -5,6 +5,7 @@
 #include <Config.hpp>
 #include <Logging.hpp>
 #include <GraphicsCommon.hpp>
+#include <Tags.hpp>
 
 #include <vector>
 #include <string>
@@ -80,12 +81,13 @@ struct Memory
 	static MemoryState g_Memory;
 	static TempScopesHolder g_TempScopes;
 
+	static void* BulkGet(size_t t_Size, SystemTag Tag = Tag_Unknown);
 	static void* BulkGet(size_t t_Size);
 
 	template<typename T>
-	static T* BulkGet(size_t t_Size = 1)
+	static T* BulkGetType(size_t t_Size  = 1, SystemTag Tag = Tag_Unknown)
 	{
-		return (T*)BulkGet(t_Size*sizeof(T));
+		return (T*)BulkGet(t_Size*sizeof(T), Tag);
 	}
 
 	// @Note: Get some storage in arena form, use it and then
@@ -134,7 +136,6 @@ inline T& ReadBlobAndMove(char* &Current, size_t size)
 	return *res;
 }
 
-
 template<typename T>
 class TempStdAllocator
 {
@@ -178,7 +179,7 @@ class BulkStdAllocator
 
 	T* allocate(size_type t_Size)
 	{
-		return (T*)Memory::BulkGet(sizeof(T) * t_Size);
+		return (T*)Memory::BulkGet(sizeof(T) * t_Size, Tag_Unknown);
 	}
 	
 	void deallocate(T*, size_type)
@@ -189,36 +190,3 @@ class BulkStdAllocator
 	inline bool operator==(BulkStdAllocator const&) const { return true; }
 };
 
-#if USE_CUSTOM_ALLOCATORS
-
-template<class T>
-using TempVector = std::vector<T, TempStdAllocator<T>>;
-using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
-using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
-
-template<class T>
-using BulkVector = std::vector<T, BulkStdAllocator<T>>;
-using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
-using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
-
-using String = std::string_view;
-
-template<class Key, class Value>
-using Map = robin_hood::unordered_map<Key, Value>;
-
-#else
-
-template<class T>
-using TempVector = std::vector<T>;
-using TempString = std::string;
-
-template<class T>
-using BulkVector = std::vector<T>;
-using BulkString = std::string;
-
-using String = std::string_view;
-
-template<class Key, class Value>
-using Map = robin_hood::unordered_map<Key, Value>;
-
-#endif

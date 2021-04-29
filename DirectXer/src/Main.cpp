@@ -33,7 +33,7 @@ App* InitMain(char** argv, int argc)
 	Telemetry::Init();
 
 	DXDEBUG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
-	App* application = Memory::BulkGet<App>();
+	App* application = Memory::BulkGetType<App>();
 
 	// @Note: Ideally we won't this be we have some things in the games
 	// that have default values that will be set only if the "root object" is
@@ -84,11 +84,13 @@ App* InitMain(char** argv, int argc)
 // @Done: Scissor test support
 // @Done: Debug: Print out the current feature level\API
 // @Done: Draw
+// @Done: Memory tracking for common objects
+
 // @Todo: Debug marksers
 // @Todo: Timing queries
 // @Todo: DrawInstanced
-// @Todo: Memory tracking for common objects
 // @Todo: Texture arrays
+// @Todo: Destroying objects
 // @Todo: Release the things that are not needed
 
 // @Done: Lines "geometry" + ability to use lines primiteves
@@ -139,6 +141,7 @@ App* InitMain(char** argv, int argc)
 // @Done: FPS independence
 // @Done: Windows Abstraction Layer
 // @Done: Handle Minimization
+// @Done: Image merger -- take sevaral pngs, put them in a sprite sheet
 // @Todo: Some job\task system for basic multithreading support
 //    -- maybe this is only useful for loading resources
 //    -- Defer certain things "for later"
@@ -149,17 +152,20 @@ App* InitMain(char** argv, int argc)
 //the memory consumption in Debug
 // @Todo: Input Abstraction -- left, right, actionXXX, axis x/y
 // @Todo: 2D Collision detection with something like GJK Algorithm
-// @Todo: Image merger -- take sevaral pngs, put them in a sprite sheet
 // @Todo: Inter image based animator setup
 
-// @Notes
-// @Note: In a scene, some things are dynamic, and some things are static
-
 // == Telemtry ==
+// @Todo Current Temporary and Bulk
 // @Todo GPU memory tracking
 // @Todo GPU timing tracking
 // @Todo Bulk Memory tracking
 // @Todo Allocation tracking
+// @Todo Tagged bulk allocation
+// @Todo Temorary memory tracking(?)
+
+// == Memory ==
+// @Todo Tracking support for the map
+// @Todo Allocating general arenas in BulkStorage
 
 
 

@@ -10,6 +10,7 @@
 #include <2DRendering.hpp>
 #include <Memory.hpp>
 #include <Audio.hpp>
+#include <Containers.hpp>
 
 enum Scene
 {

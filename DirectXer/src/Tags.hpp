@@ -12,6 +12,11 @@ enum SystemTag : uint32
 	Phase_Init			  = 4,
 	Phase_Update		  = 5,
 
+	Memory_Bulk  		  = 6,
+	Memory_GameState  	  = 7,
+
+
+	Tag_Unknown,
 	Tags_Count,
 };
 
@@ -24,6 +29,11 @@ static inline const char* gSystemTagNames[] =
 
 	"Init",
 	"Update",
+
+	"Bulk Memory",
+	"GameState Memory",
+
+	"Unknow",
 };
 
 enum CycleCounterTag : uint32

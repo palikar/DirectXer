@@ -109,5 +109,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Audio.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Tags.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Timing.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsContainers.hpp" />
   </ItemGroup>
 </Project>

@@ -69,7 +69,7 @@ void SpaceGame::Init()
 	SpriteSheets.Init(maxSpritesCount, &Renderer2D);
 	EXPLOSION_SPRITE = SpriteSheets.PutSheet(I_EXPLOSION, { 960.0f, 384.0f }, { 5, 2 });
 
-	GameState = Memory::BulkGet<struct GameState>();
+	GameState = Memory::BulkGetType<struct GameState>(1, Memory_GameState);
 	GameState->PlayerPosition = { 300.0f, Application->Height - 100.0f };
 	GameState->Enemies.reserve(50);
 	GameState->Bulltets.reserve(100);

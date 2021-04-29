@@ -4,7 +4,6 @@
 #include <Types.hpp>
 #include <Config.hpp>
 #include <Logging.hpp>
-#include <Timing.hpp>
 #include <GraphicsCommon.hpp>
 #include <Tags.hpp>
 
@@ -12,136 +11,38 @@
 #include <string>
 #include <robin_hood.h>
 
-template<class Key, class Value, SystemTag Tag>
-struct SimdFlatMap
-{
-	using Node = std::pair<uint16, Value>;
-	BulkVector<Node> Nodes;
+#if USE_CUSTOM_ALLOCATORS
 
-	void reserve(size_t size)
-	{
-		Nodes.reserve(size);
-	}
-	
-	std::pair<bool, bool> insert(Node node)
-	{
-		Nodes.push_back(node);
-		return { true, true };
-	}
+template<class T>
+using TempVector = std::vector<T, TempStdAllocator<T>>;
+using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
+using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
 
-	Value& at(uint32 id)
-	{
-		DxCycleBlock(Tag, CC_SimdFlatMap_At);
-		auto current = Nodes.data();
-		
-		__m128i value = _mm_set1_epi16(id);
-		
-		for (size_t i = 0; i < Nodes.size(); i += 8, current += 8)
-		{
-			__m128i keys = _mm_set_epi16(current[7].first, current[6].first, current[5].first, current[4].first,
-										 current[3].first, current[2].first, current[1].first, current[0].first);
-			__m128i result = _mm_cmpeq_epi16(keys, value);
-			unsigned long mask = (unsigned long) _mm_movemask_epi8(result);
-			unsigned long index;
-			_BitScanForward(&index, mask);
+template<class T>
+using BulkVector = std::vector<T, BulkStdAllocator<T>>;
+using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
+using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
 
-			if(mask)
-			{
-				return current[index >> 1].second;
-			}
-		}
-		
-		Assert(false, "Can't find element in has table.");
-		return current->second;
-	}
+using String = std::string_view;
 
-	auto begin()
-	{
-		return Nodes.begin();
-	}
+template<class Key, class Value>
+using Map = robin_hood::unordered_map<Key, Value>;
 
-	auto end()
-	{
-		return Nodes.end();
-	}
-	
-	const auto begin() const
-	{
-		return Nodes.begin();
-	}
+#else
 
-	const auto end() const
-	{
-		return Nodes.end();
-	}			
-};
+template<class T>
+using TempVector = std::vector<T>;
+using TempString = std::string;
 
-template<class Key, class Value, SystemTag Tag>
-struct SimdFlatMapDense
-{
-	using Node = std::pair<uint16, Value>;
-	BulkVector<uint16> Nodes;
-	BulkVector<Value> Values;
+template<class T>
+using BulkVector = std::vector<T>;
+using BulkString = std::string;
 
-	void reserve(size_t size)
-	{
-		Nodes.reserve(size);
-		Values.reserve(size);
-	}
-	
-	std::pair<bool, bool> insert(Node node)
-	{
-		Nodes.push_back(node.first);
-		Values.push_back(node.second);
-		return { true, true };
-	}
+using String = std::string_view;
 
-	Value& at(uint32 id)
-	{
-		DxCycleBlock(Tag, CC_SimdFlatMap_At);
-		auto current = Nodes.data();
-		
-		__m128i value = _mm_set1_epi16(id);
-		
-		for (size_t i = 0; i < Nodes.size(); i += 8, current += 8)
-		{
-			__m128i keys = _mm_set_epi16(current[7], current[6], current[5], current[4],
-										 current[3], current[2], current[1], current[0]);
-			__m128i result = _mm_cmpeq_epi16(keys, value);
-			unsigned long mask = (unsigned long) _mm_movemask_epi8(result);
-			unsigned long index;
-			_BitScanForward(&index, mask);
+template<class Key, class Value>
+using Map = robin_hood::unordered_map<Key, Value>;
 
-			if(mask)
-			{
-				return Values[i + (index >> 1)];
-			}
-		}
-		
-		Assert(false, "Can't find element in has table.");
-		return Values[0];
-	}
+#endif
 
-	auto begin()
-	{
-		return Values.begin();
-	}
 
-	auto end()
-	{
-		return Values.end();
-	}
-	
-	const auto begin() const
-	{
-		return Values.begin();
-	}
-
-	const auto end() const
-	{
-		return Values.end();
-	}			
-};
-
-template<class Key, class Value, SystemTag Tag>
-using GPUResourceMap = SimdFlatMap<Key, Value, Tag>;

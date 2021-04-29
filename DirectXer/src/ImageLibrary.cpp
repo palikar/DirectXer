@@ -42,7 +42,7 @@ ImageAtlas ImageLibrary::InitAtlas()
 	Atlases.push_back(newAtlas);
 
 	// @Note: 8Kb Per atlas for tect packing; maybe we can bump this to 16KB for best rect packing results
-	auto space = Memory::BulkGet<stbrp_node>(RectsCount);
+	auto space = Memory::BulkGetType<stbrp_node>(RectsCount);
 	stbrp_init_target(&Atlases.back().RectContext, ImageAtlasSize, ImageAtlasSize, space, RectsCount);
 
 	return Atlases.back();

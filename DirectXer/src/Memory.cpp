@@ -1,5 +1,7 @@
 #include <Memory.hpp>
 #include <Platform.hpp>
+#include <Timing.hpp>
+#include <Tags.hpp>
 
 
 const size_t Memory::TempMemoryRequired = Megabytes(256);
@@ -132,14 +134,14 @@ void Memory::ResetTempScope()
 void* Memory::TempAlloc(size_t t_Size)
 {
 	auto& arena = g_TempScopes.GetCurrentArena();
-	Assert(arena.Memory, "Currently there is not temporary memory scope");
+	Assert(arena.Memory, "Currently there is no temporary memory scope");
 
 	if(ArenaHasPlace(arena, t_Size))
 	{
 		return ArenaAllocation(arena, t_Size);
 	}
 
-	Assert(arena.Memory, "The current temporary scope has not enough space.");
+	Assert(false, "The current temporary scope has not enough space.");
 	return nullptr;
 }
 
@@ -167,6 +169,20 @@ void* Memory::TempRealloc(void* t_Mem, size_t t_Size)
 void Memory::TempDealloc(void*)
 {}
 
+void* Memory::BulkGet(size_t t_Size, SystemTag Tag)
+{
+	Assert(EnoughBulkMemory(t_Size), "Not enough bulk memory");
+	auto res = g_Memory.BulkMemoryCurrent;
+
+	g_Memory.BulkMemoryCurrent += t_Size;
+	g_Memory.BulkMemorySize += t_Size;
+
+	Telemetry::AddMemory(Memory_Bulk, t_Size);
+	Telemetry::AddMemory(Tag, t_Size);
+	
+	return res;
+}	
+
 void* Memory::BulkGet(size_t t_Size)
 {
 	Assert(EnoughBulkMemory(t_Size), "Not enough bulk memory");
@@ -174,10 +190,11 @@ void* Memory::BulkGet(size_t t_Size)
 
 	g_Memory.BulkMemoryCurrent += t_Size;
 	g_Memory.BulkMemorySize += t_Size;
+
+	Telemetry::AddMemory(Memory_Bulk, t_Size);
 	
 	return res;
-}
-	
+}	
 
 void* TempAlloc(size_t size)
 {

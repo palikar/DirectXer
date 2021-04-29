@@ -77,6 +77,14 @@ void App::Update(float dt)
 		
 		if (ImGui::TreeNode("Memory Tacking"))
 		{
+			String text{formater.Format("Total Temorary Memory: {} MBs", Memory::g_Memory.TempMemoryMaxSize / (1024.0f*1024.0f))};
+			ImGui::Text(text.data());
+
+			text = formater.Format("Total Bulk Memory: {} MBs", Memory::g_Memory.BulkMemoryMaxSize / (1024.0f*1024.0f));
+			ImGui::Text(text.data());
+				
+			ImGui::Separator();
+			
 			for (size_t i = 0; i < Tags_Count; ++i)
 			{
 				auto& entry = Telemetry::MemoryStates[i];

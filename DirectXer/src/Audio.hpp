@@ -3,6 +3,7 @@
 #include <Memory.hpp>
 #include <Resources.hpp>
 #include <Fileutils.hpp>
+#include <Containers.hpp>
 
 #include <AL/al.h>
 #include <AL/alext.h>

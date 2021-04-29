@@ -6,6 +6,7 @@
 #include <GraphicsCommon.hpp>
 #include <Graphics.hpp>
 #include <Platform.hpp>
+#include <Containers.hpp>
 
 #include <stb_rect_pack.h>
 

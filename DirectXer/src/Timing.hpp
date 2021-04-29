@@ -9,6 +9,7 @@
 #include <Tags.hpp>
 #include <Memory.hpp>
 #include <GraphicsCommon.hpp>
+#include <Containers.hpp>
 
 #include <optick.h>
 

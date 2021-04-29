@@ -70,6 +70,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Glm.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Graphics.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsCommon.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsContainers.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\ImageLibrary.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Input.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Lighting.hpp" />
