@@ -9,10 +9,18 @@
 
 inline constexpr float PI = 3.14159265358979323846f;
 
+// @Todo: Implement fast version of the function below that uses some
+// SIMD optimizations; also, we'll probably will have to work on
+// concrete types or at least not delegate the transformations on
+// another function; we have to keep the context here if we want to
+// operate on groups of vertecies and not only one
+
+// @Note: Transfrom some vertecies with a given transform matrix; this
+// can potentially be epxesinve operation but it is meant to be used
+// only on startup or to precompute something
 template<typename T>
 static void TransformVertices(glm::mat4 t_Mat, T* t_Vertices, size_t t_Count)
 {
-	size_t index = 0;
 	for (size_t i = 0; i < t_Count; ++i)
 	{
 		TransformVertex(*t_Vertices++, t_Mat);

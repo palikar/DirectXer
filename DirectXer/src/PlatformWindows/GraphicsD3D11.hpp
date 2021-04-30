@@ -114,8 +114,7 @@ class GraphicsD3D11
 	bool CreateDSTexture(TextureId id, TextureDescription description);
 	bool CreateRenderTexture(TextureId t_Id, RenderTargetDescription description);
 	bool CreateCubeTexture(TextureId id, TextureDescription description, void* t_Data[6]);
-	
-	bool CreateVertexBuffer(VertexBufferId id, uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
+    bool CreateVertexBuffer(VertexBufferId id, uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
 	bool CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataSize, bool dynamic = false);
 	bool CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData);
 
