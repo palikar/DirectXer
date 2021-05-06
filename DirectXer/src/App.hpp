@@ -16,12 +16,27 @@ struct CommandLineSettings
 	std::string_view ResourcesPath;
 };
 
+/*
+  @Note: The App handles anything that is shared between all games; it
+  keeps and manages the shared state of each possible game; most
+  notably, it initialized the Graphics and sets them up reay for
+  rendering
+
+*/
+
 class App
 {
 public:
+    // @Note: Called during the initialization of the platform layer's
+    // window
 	void Init(HWND t_Window);
+
+    // @Note: Called when the window is fully initialized
 	void PostInit();
+    
 	void Resize();
+
+    // @Note: the upate method is called every frame by the platform layer
 	void Update(float dt);
 		
 	// @Note: Application Data -- used by the "application" for
@@ -43,5 +58,7 @@ public:
 	// be a different "game"
 	GameClass Game;
 
+    // @Note: Keeping trackig of time so that we can do some things
+    // only periodically
 	float Timer;
 };

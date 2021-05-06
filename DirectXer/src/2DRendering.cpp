@@ -276,6 +276,10 @@ void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, FontId typeface)
 	{
 		auto rect = pos + currentPen - entry.GlyphSize;
 		currentPen += entry.Advance;
+
+        // @Note: If the tex handle is 0, it meas that we
+        // are handling the space "character" and hence we only
+        // have and advance value
 		if (entry.TexHandle == 0) continue;
 
 		auto screenSize = glm::vec2{ (entry.Size.x) * FontLibrary::AtlasSize, (entry.Size.y) * FontLibrary::AtlasSize};

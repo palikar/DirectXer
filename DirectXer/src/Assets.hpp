@@ -79,7 +79,6 @@ struct AtlasFileHeader
 	uint16 NumImages;
 };
 
-
 class ImageLibrary;
 class AudioPlayer;
 class FontLibrary;

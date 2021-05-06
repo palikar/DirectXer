@@ -1,0 +1,65 @@
+#+options: ':t *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+options: broken-links:nil c:nil creator:nil d:(not "LOGBOOK")
+#+options: date:t e:t email:nil f:t inline:t num:t p:nil pri:nil
+#+options: prop:nil stat:t tags:t tasks:t tex:t timestamp:t title:t
+#+options: toc:t todo:t |:t
+#+title: README
+#+date: <2021-04-09 Fri>
+#+author: Stanislav Arnaudov
+#+email: arnaud@sun
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 26.3 (Org mode 9.3.2)
+
+
+
+* DirecXer
+
+** Abstract
+This project is my second (or third) attempt to write something like a game engine. I've learned a ton from my first attempt with [anything] and now I want to create something better. With DirectXer I am taking a fundamentally different approach to the development process. 
+
+I am focusing much more on the game rather on the engine. First and foremost, engines should make games run. To me this meas that the engine should serve the purposes of the game and not try to be as general as possible. 
+
+The problem is the problem. And in my case, writing high performance game is the problem.
+
+Another key point of this engine is that the code is setup in a way to be very easy to port it to different platforms. IN recent months I've been introduced to mulpti platform programming and now I realize how big part it is of game development. 
+
+Currently the engine supports rendering only with DirectX11 but I hope this will change in the future and multiple bookends will be supported.
+
+
+** Goals
+
+- Use data oriented design as much as possible
+- Use object oriented design as least as possibles
+- Do not make a single virtual function call
+- Do manual memory management 
+- Do as few as possible dynamic memory allocations
+- Focus on performance and loading speed
+
+
+** Building
+
+I have some limited experience with maintaining multi-platform code and it would seem that using a single build system for all platforms brings a lot of problems and does not really solve the issues it tries to. For this personal project, I've decide I'll take the opposite approach and keep separate build files for different platforms. This potentially means maintaining several systems that do the same thing. However, I intent to keep all of the build processes as "minimal" and as simple as possible.
+
+*** Windows
+The project is developed with visual studio so there is a solution
+file. The solution should be self contained and you should be able to
+build it given you have all of the necessary libraries. Those are
+mostly system libraries of Windows and you won't have to download
+anything else.
+
+*** Linux
+For Linux, there is CMake integration. The generating of the build files and then building the project itself  should be done in the standard way:
+#+BEGIN_SRC
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j8
+#+END_SRC
+
+
+** Structure of the Project
+
+** Achievements
+Here we'll list several things \ milestones that I've achieved with
+the engine and for which I am proud of. Consider those as status
+updates and\ or demos of what the engine is capable of.

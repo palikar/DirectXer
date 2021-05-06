@@ -7,11 +7,7 @@
 #include <fmt/color.h>
 
 #include <cassert>
-#include <dxerr.h>
-#include <dxgidebug.h>
 #include <type_traits>
-
-#pragma comment(lib, "dxguid.lib")
 
 struct Logger
 {
@@ -53,6 +49,7 @@ struct Logger
 		PlatformLayer::WriteStdOut(formatBuffer.data(), formatBuffer.size());
 	}
 
+#ifdef _WIN32
 	void LogHResult(const char* t_File, uint32 t_Line, HRESULT t_Hr)
 	{
 		auto errorString = DXGetErrorString(t_Hr);
@@ -61,67 +58,11 @@ struct Logger
 
 		PrintError(t_File, t_Line, "{} :", errorString, errorDescription);		 
 	}
+#endif
     
 };
 
 inline Logger gLogger;
-
-class DxgiInfoManager
-{
-  public:
-	void Init()
-	{
-		typedef HRESULT (WINAPI* DXGIGetDebugInterface)(REFIID,void **);
-
-		const auto hModDxgiDebug = LoadLibraryEx( "dxgidebug.dll",nullptr,LOAD_LIBRARY_SEARCH_SYSTEM32 );
-		assert(hModDxgiDebug);
-			
-		const auto DxgiGetDebugInterface = reinterpret_cast<DXGIGetDebugInterface>(
-			reinterpret_cast<void*>(GetProcAddress( hModDxgiDebug,"DXGIGetDebugInterface" ))
-		);
-		assert(( DxgiGetDebugInterface != nullptr ));
-		DxgiGetDebugInterface( __uuidof(IDXGIInfoQueue),reinterpret_cast<void**>(&pDxgiInfoQueue) );
-
-		assert(pDxgiInfoQueue);
-	}
-
-	void ResetMessage()
-	{
-		assert(pDxgiInfoQueue);
-		next = pDxgiInfoQueue->GetNumStoredMessages( DXGI_DEBUG_ALL );
-	}
-
-	void Destroy()
-	{
-		assert(pDxgiInfoQueue);
-		pDxgiInfoQueue->Release();
-	}
-	
-	void PrintMessages()
-	{
-		const auto end = pDxgiInfoQueue->GetNumStoredMessages( DXGI_DEBUG_ALL );
-
-		for( auto i = next; i < end; i++ )
-		{
-			SIZE_T messageLength;
-		
-			pDxgiInfoQueue->GetMessage(DXGI_DEBUG_ALL,i,nullptr,&messageLength);
-
-			// @Improve : This will eventually cause a problem
-			auto bytes = (DXGI_INFO_QUEUE_MESSAGE*)alloca(messageLength);
-			pDxgiInfoQueue->GetMessage( DXGI_DEBUG_ALL,i, bytes, &messageLength );
-			fmt::print("\t {} : {}\n", i - next, bytes->pDescription);
-			
-	}
-
-	}
-	
-	unsigned long long next = 0u;
-	struct IDXGIInfoQueue* pDxgiInfoQueue = nullptr;
-};
-
-inline DxgiInfoManager gDxgiManager;
-
 
 #ifdef _DEBUG
 
@@ -133,7 +74,9 @@ inline DxgiInfoManager gDxgiManager;
 
 #define Assert(VALUE, MSG, ...) do { if (!(VALUE)) { gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); int* p = nullptr; *p = 4; } } while(false)
 
+#ifdef _WIN32
 #define DXLOGHRESULT(hr) gLogger.LogHResult(__FILE__, __LINE__, hr)
+#endif
 
 #else
 

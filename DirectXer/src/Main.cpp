@@ -20,35 +20,41 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 }
 
 // @Note: This is not the true main funtion; this will be called from the platform
-// specific main function (WinMain or main)
+// specific main function (WinMain or main); the point of this functions is to initalize
+// all subsystems and create the appclication object will be used by the platfrom layer
 App* InitMain(char** argv, int argc)
 {
-	OPTICK_EVENT();
+    OPTICK_EVENT();
+
+    // @Note: Initalize every subsystem here
+    Input::Init();
+    Memory::InitMemoryState();
+    PlatformLayer::Init();
+    Random::Init();
+    Audio::Init();
+
+    // @Todo: The telemetry system has to be initilzed only in profile builds
+    Telemetry::Init();
+
+    DXDEBUG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
+    App* application = Memory::BulkGetType<App>();
+
+    // @Note: Ideally we won't this be we have some things in the games
+    // that have default values that will be set only if the "root object" is
+    // initialized
+    new(application) App();
 	
-	Input::Init();
-	Memory::InitMemoryState();
-	PlatformLayer::Init();
-	Random::Init();
-	Audio::Init();
-	Telemetry::Init();
+    ParseCommandLineArguments(application->Arguments, argv, argc);
 
-	DXDEBUG("[Init] Application size {:.3} KB", sizeof(App) / 1024.0f);
-	App* application = Memory::BulkGetType<App>();
+    // @Note: Handl any command line arguemnt that are passed; ieally, we won't take
+    // any command line arguments will load the settings from some file on the diska
+    if (application->Arguments.ResourcesPath.empty())
+    {
+        DXERROR("[INIT] The resource path fiven is empty. Please provide a sensible one.");
+        assert(false);
+    }
 
-	// @Note: Ideally we won't this be we have some things in the games
-	// that have default values that will be set only if the "root object" is
-	// initialized
-	new(application) App();
-	
-	ParseCommandLineArguments(application->Arguments, argv, argc);
-
-	if (application->Arguments.ResourcesPath.empty())
-	{
-		DXERROR("[INIT] The resource path fiven is empty. Please provide a sensible one.");
-		assert(false);
-	}
-
-	Resources::Init(application->Arguments.ResourcesPath);
+    Resources::Init(application->Arguments.ResourcesPath);
 	return application;
 }
 
