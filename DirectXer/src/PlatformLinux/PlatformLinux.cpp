@@ -1,7 +1,6 @@
+#include <Memory.hpp>
+
 #include "PlatformLinux.hpp"
-
-
-
 
 void LinuxPlatformLayer::Init()
 {
@@ -46,7 +45,7 @@ size_t LinuxPlatformLayer::FileSize(LinuxPlatformLayer::FileHandle handle)
 
 void LinuxPlatformLayer::ReadFileIntoArena(LinuxPlatformLayer::FileHandle handle, size_t size, MemoryArena& t_Arena)
 {
-    read(handle, t_Arena.memory, size);
+    read(handle, t_Arena.Memory, size);
 }
 
 void LinuxPlatformLayer::CloseFile(LinuxPlatformLayer::FileHandle handle)
@@ -56,7 +55,8 @@ void LinuxPlatformLayer::CloseFile(LinuxPlatformLayer::FileHandle handle)
 
 bool LinuxPlatformLayer::IsValidPath(const char* data)
 {
-    
+
+    return true;
 }
 
 uint64 LinuxPlatformLayer::Clock()
@@ -65,7 +65,7 @@ uint64 LinuxPlatformLayer::Clock()
     times(&timeInfo);
     auto clockTicksPerSecond = sysconf(_SC_CLK_TCK);
 
-    return (uint64)(1000.0f * 1000.0f * 1000.0f * (float)tms_utimeq / (clockTicksPerSecond));
+    return (uint64)(1000.0f * 1000.0f * 1000.0f * (float)timeInfo.tms_utime / (clockTicksPerSecond));
 }
 
 

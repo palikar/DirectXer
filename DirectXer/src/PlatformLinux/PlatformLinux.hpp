@@ -1,8 +1,11 @@
-#prgma once
+#pragma once
 
 #include <Types.hpp>
 #include <Utils.hpp>
 
+#include "IncludeLinux.hpp"
+
+struct MemoryArena;
 struct LinuxPlatformLayer
 {
     using FileHandle = int;
@@ -11,7 +14,7 @@ struct LinuxPlatformLayer
 	inline static FileHandle StdOutHandle;
 	inline static FileHandle ErrOutHandle;
 
-	enum class ConsoleForeground : DWORD
+	enum class ConsoleForeground : uint16
 	{
 		BLACK = 0,
 		DARKBLUE,
