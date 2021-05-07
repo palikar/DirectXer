@@ -74,13 +74,12 @@ void App::Update(float dt)
 			ImGui::TreePop();
 		}
 
-		
 		if (ImGui::TreeNode("Memory Tacking"))
 		{
-			String text{formater.Format("Total Temorary Memory: {} MBs", Memory::g_Memory.TempMemoryMaxSize / (1024.0f*1024.0f))};
+			String text{formater.Format("Total Temorary Memory: {:.3f} MBs", Memory::g_Memory.TempMemoryMaxSize / (1024.0f*1024.0f))};
 			ImGui::Text(text.data());
 
-			text = formater.Format("Total Bulk Memory: {} MBs", Memory::g_Memory.BulkMemoryMaxSize / (1024.0f*1024.0f));
+			text = formater.Format("Total Bulk Memory: {:.3f} MBs", Memory::g_Memory.BulkMemoryMaxSize / (1024.0f*1024.0f));
 			ImGui::Text(text.data());
 				
 			ImGui::Separator();
@@ -95,6 +94,18 @@ void App::Update(float dt)
 				String text{formater.Format("[{}] : {:.2f} {}", gSystemTagNames[i], mem, unit)};
 				ImGui::BulletText(text.data());
 			}
+
+			ImGui::Separator();
+
+			auto report = Graphics.ReportMemory();
+			
+			ImGui::Text("Reported GPU Memory");
+
+			text = formater.Format("GPU Usage: {:.3f} MBs", report.Usage / (1024.0f*1024.0f));
+			ImGui::BulletText(text.data());
+
+			text = formater.Format("GPU Budget: {:.3f} MBs", report.Budget / (1024.0f*1024.0f));
+			ImGui::BulletText(text.data());
 			
 			ImGui::TreePop();
 		}

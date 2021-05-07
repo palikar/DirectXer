@@ -1,6 +1,7 @@
 #include "FontLibrary.hpp"
 #include "Resources.hpp"
 
+
 void FontBuilder::Init(size_t t_Size)
 {
 	LoadEntries.reserve(t_Size);
@@ -43,7 +44,7 @@ void FontLibrary::InitNewAtlas()
 {
 	auto texId = NextTextureId();
 	Gfx->CreateTexture(texId, {AtlasSize, AtlasSize, TF_R}, nullptr);
-	auto space = Memory::BulkGet<stbrp_node>(RectsCount);
+	auto space = Memory::BulkGetType<stbrp_node>(RectsCount);
 	stbrp_init_target(&RectContext, AtlasSize, AtlasSize, space,  RectsCount);
 	Atlases.push_back(texId);
 }

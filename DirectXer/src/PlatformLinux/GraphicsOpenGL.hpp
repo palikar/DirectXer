@@ -6,6 +6,7 @@
 #include <Utils.hpp>
 #include <GraphicsContainers.hpp>
 
+#include "IncludeLinux.hpp"
 #include <GL/glew.h>
 
 struct VBObject
@@ -34,11 +35,47 @@ struct ShaderObject
 };
 
 struct BlendingSetup
-{};
+{
+	bool Enabled;
+	
+	GLenum BlenidngOp;
+	GLenum BlenidngOpAlpha;
+
+	GLenum BlenidngSource;
+	GLenum BlenidngSourceAlpha;
+
+	GLenum BlenidngDest;
+	GLenum BlenidngDestAlpha;	
+};
 
 struct DepthStencilSetup
-{};
+{
+	bool DepthEnabled;
+	GLenum DepthFunc;
+	GLuint DepthWriteMask;
 
+	bool StencilEnabled;
+	GLuint StencilWriteMask;
+	GLuint StencilReadMask;
+
+	GLenum StencilFrontFailOp;
+	GLenum StencilFrontFunc;
+	GLenum StencilFrontPassOp;
+	GLenum StencilFrontDepthFailOp;
+
+	GLenum StencilBackFailOp;
+	GLenum StencilBackFunc;
+	GLenum StencilBackPassOp;
+	GLenum StencilBackDepthFailOp;
+};
+
+struct RasterizationSetup
+{
+	GLenum CullMode;
+	GLenum FillMode;
+	GLenum Clockwise;
+	bool ScissorEnable;
+};
 
 class GraphicsOpenGL
 {
@@ -50,7 +87,7 @@ class GraphicsOpenGL
     using TextureType = TextureObject;
     using ShaderType = ShaderObject;
 
-    void InitSwapChain(HWND hWnd, float t_Width, float t_Height);
+    void InitSwapChain(SwapChainSettings settings);
     void InitBackBuffer();
     void InitZBuffer(float width, float height);
     void InitResources();
@@ -82,29 +119,39 @@ class GraphicsOpenGL
     bool CreateCubeTexture(TextureId id, TextureDescription description, void* t_Data[6]);
     bool CreateVertexBuffer(VertexBufferId id, uint32 structSize, void* data, uint32 dataSize, bool dynamic = false);
     bool CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataSize, bool dynamic = false);
-        bool CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData);
+	bool CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData);
 
-        void UpdateCBs();
-        void UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data);
-        void UpdateVertexBuffer(VertexBufferId t_Id, void* data, uint64 t_Length);
-        void UpdateIndexBuffer(IndexBufferId t_Id, void* data, uint64 t_Length);
-        void UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
+	void UpdateCBs();
+	void UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data);
+	void UpdateVertexBuffer(VertexBufferId t_Id, void* data, uint64 t_Length);
+	void UpdateIndexBuffer(IndexBufferId t_Id, void* data, uint64 t_Length);
+	void UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
-        void DrawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
-        void Draw(TopolgyType topology, uint32 count, uint32 base);
+	void DrawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
+	void Draw(TopolgyType topology, uint32 count, uint32 base);
 
-        void ClearBuffer(float red, float green, float blue);
-        void ClearZBuffer();
-        void ClearRT(RTObject& t_RT);
-        void EndFrame();
+	void ClearBuffer(float red, float green, float blue);
+	void ClearZBuffer();
+	void ClearRT(RTObject& t_RT);
+	void EndFrame();
 
-        void DestroyZBuffer();
-        void Destroy();
+	void DestroyZBuffer();
+	void Destroy();
 
-      public:
+  public:
 
-        GPUResourceMap<TextureId, TextureObject, GPURes_Texture> Textures;
-        GPUResourceMap<VertexBufferId, VBObject, GPURes_VertexBuffer> VertexBuffers;
-        GPUResourceMap<IndexBufferId, IBObject, GPURes_IndexBuffer> IndexBuffers;
-        GPUResourceMap<ConstantBufferId, CBObject, GPURes_ConstantBuffer> ConstantBuffers;
-    };
+	RasterizationSetup RasterizationsStates[RS_COUNT];
+	BlendingSetup BlendingStates[BS_Count];
+	DepthStencilSetup DepthStencilStates[DSS_Count];
+	ShaderObject Shaders[SF_COUNT];
+
+	GLint PixelShaderCBId;
+	GLint VertexShaderCBId;
+	PSConstantBuffer PixelShaderCB;
+	VSConstantBuffer VertexShaderCB;
+
+	GPUResourceMap<TextureId, TextureObject, GPURes_Texture> Textures;
+	GPUResourceMap<VertexBufferId, VBObject, GPURes_VertexBuffer> VertexBuffers;
+	GPUResourceMap<IndexBufferId, IBObject, GPURes_IndexBuffer> IndexBuffers;
+	GPUResourceMap<ConstantBufferId, CBObject, GPURes_ConstantBuffer> ConstantBuffers;
+};

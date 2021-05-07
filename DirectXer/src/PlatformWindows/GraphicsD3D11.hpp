@@ -5,24 +5,18 @@
 #include <Math.hpp>
 #include <Utils.hpp>
 #include <GraphicsContainers.hpp>
+#include <GraphicsCommon.hpp>
+#include <Types.hpp>
 #include <Timing.hpp>
-
-#include <d3d11.h>
-#include <wrl.h>
-
-#include <vector>
-#include <array>
-#include <cmath>
-#include <sstream>
-
-#include <d3dcompiler.h>
-#include <DirectXMath.h>
 
 #include <dxerr.h>
 
-#include <GraphicsCommon.hpp>
-#include <Types.hpp>
-
+#include <d3d11.h>
+#include <wrl.h>
+#include <dxgi1_4.h>
+#include <dxgicommon.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
 
 #include "PlatformWindows\IncludeWin.hpp"
 
@@ -135,10 +129,14 @@ class GraphicsD3D11
 	void DestroyZBuffer();
 	void Destroy();
 
+	GPUMemoryReport ReportMemory();
+
   public:
 	ID3D11Device* Device{ nullptr };
-	IDXGISwapChain* Swap{ nullptr };
+	IDXGISwapChain3* Swap{ nullptr };
 	ID3D11DeviceContext* Context{ nullptr };
+	IDXGIAdapter3* Adapter{ nullptr };
+
 
 	// @Note: These are the views for the backbuffer
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };
@@ -163,4 +161,5 @@ class GraphicsD3D11
 	GPUResourceMap<IndexBufferId, IBObject, GPURes_IndexBuffer> IndexBuffers;
 	GPUResourceMap<ConstantBufferId, CBObject, GPURes_ConstantBuffer> ConstantBuffers;
 };
+
 

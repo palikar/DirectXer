@@ -443,3 +443,12 @@ void SetupConsole()
 	freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
 }
+
+void LogHResult(const char* t_File, uint32 t_Line, HRESULT t_Hr)
+{
+	auto errorString = DXGetErrorString(t_Hr);
+	char errorDescription[512];
+	DXGetErrorDescription(t_Hr, errorDescription, (DWORD)sizeof(errorDescription) );
+
+	gLogger.PrintError(t_File, t_Line, "{} :", errorString, errorDescription);		 
+}

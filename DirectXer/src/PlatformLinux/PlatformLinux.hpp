@@ -46,3 +46,26 @@ struct LinuxPlatformLayer
 	static bool IsValidPath(const char* data);
 	static uint64 Clock();
 };
+
+struct WindowSettings
+{
+    const char* ClassName;
+    const char* WindowTitle;
+    size_t InitialWidth;
+    size_t InitialHeight;
+    bool Fullscreen;
+};
+
+class LinuxWindow
+{
+  public:
+
+    App* Application;
+	Display* X11Display;
+	Window X11Window;
+	XEvent NextEvent;
+
+    void Init(WindowSettings settings);
+    int Run();
+
+};

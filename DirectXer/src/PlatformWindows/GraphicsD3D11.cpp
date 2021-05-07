@@ -41,22 +41,29 @@ void GraphicsD3D11::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
 	IndexBuffers.reserve(Config::InitialMaxIndexBuffers);
 	ConstantBuffers.reserve(Config::InitialMaxConstantBuffers);
 
-	DXGI_SWAP_CHAIN_DESC sd{ 0 };
-	sd.BufferDesc.Width = (uint32)t_Width;
-	sd.BufferDesc.Height = (uint32)t_Height;
-	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 0;
-	sd.BufferDesc.RefreshRate.Denominator = 0;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	DXGI_SWAP_CHAIN_DESC1 sd{ 0 };
+	sd.BufferCount = 2;
+	sd.Width = (uint32)t_Width;
+	sd.Height = (uint32)t_Height;
+	sd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount = 1;
-	sd.OutputWindow = hWnd;
-	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Flags = 0;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsd{};
+	fsd.RefreshRate.Numerator = 60;
+	fsd.RefreshRate.Denominator = 1;
+	fsd.Windowed = true;
+
+	IDXGIFactory4* dxgiFactory;
+	IDXGISwapChain1* swapChain;
+	IDXGIDevice* dxgiDevice;
+	IDXGIAdapter* adapter;
+
+	[[maybe_unused]]HRESULT hr;
+	GFX_CALL(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory)));
 
 	UINT initFlags{0};
 	if (DebugBuild)
@@ -70,16 +77,28 @@ void GraphicsD3D11::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
 		D3D_FEATURE_LEVEL_11_0,
 	};
 
-	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, initFlags,featureLevels,
-										   2, D3D11_SDK_VERSION, &sd, &Swap, &Device, nullptr, &Context));
+	
+	GFX_CALL(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, initFlags,
+					  featureLevels, 2, D3D11_SDK_VERSION, &Device, nullptr, &Context));
+
+	GFX_CALL(dxgiFactory->CreateSwapChainForHwnd(Device, hWnd, &sd, &fsd, nullptr, &swapChain));
+	GFX_CALL(swapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&Swap));
+	
+	GFX_CALL(Device->QueryInterface(__uuidof(IDXGIDevice), (void**)(&dxgiDevice)));
+	
+	GFX_CALL(dxgiDevice->GetAdapter(&adapter));
+	GFX_CALL(adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)(&Adapter)));
+
+	dxgiFactory->Release();
+	swapChain->Release();
+	adapter->Release();
+
 
 	DXDEBUG("[Graphics] Direct3D: {}", FeatureLevelToString(Device->GetFeatureLevel()));
 }
 
 void GraphicsD3D11::InitBackBuffer()
 {
-
 	ID3D11Resource* pBackBuffer{ nullptr };
 
 	[[maybe_unused]]HRESULT hr;
@@ -243,7 +262,9 @@ void GraphicsD3D11::Destroy()
 void GraphicsD3D11::EndFrame()
 {
 	HRESULT hr;
-	if( FAILED( hr = Swap->Present( 1u, 0u ) ) )
+	DXGI_PRESENT_PARAMETERS params{0};
+	params.DirtyRectsCount = 0;
+	if( FAILED( hr = Swap->Present1( 1u, 0u, &params ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
@@ -254,6 +275,7 @@ void GraphicsD3D11::EndFrame()
 			DXWARNING("[Graphics] Can't present frame but we'll not crash here");
 		}
 	}
+	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
 }
 
 void GraphicsD3D11::ClearBuffer(float red, float green, float blue)
@@ -837,4 +859,14 @@ void GraphicsD3D11::Draw(TopolgyType topology, uint32 count, uint32 base)
 
 	Context->Draw(count, base);
 }
-	
+
+GPUMemoryReport GraphicsD3D11::ReportMemory()
+{
+	DXGI_QUERY_VIDEO_MEMORY_INFO info;
+	Adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info);
+	GPUMemoryReport report;
+	report.Budget = info.Budget;
+	report.Usage = info.CurrentUsage;
+	return report;
+}
+

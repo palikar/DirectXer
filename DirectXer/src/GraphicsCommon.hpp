@@ -152,6 +152,19 @@ struct RTObject
 	TextureId DepthStencil;
 };
 
+struct SwapChainSettings
+{
+	void* Display;
+	float Width;
+	float Height;
+};
+
+struct GPUMemoryReport
+{
+	uint64 Budget;
+	uint64 Usage;
+};
+
 inline void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)
 {
 	t_Vertex.pos = t_Mat * glm::vec4(t_Vertex.pos, 1.0f);
@@ -181,5 +194,3 @@ inline uint8 BytesPerPixel(TextureFormat format)
 	
 	return 0;
 }
-
-	

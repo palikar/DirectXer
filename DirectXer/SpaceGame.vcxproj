@@ -224,7 +224,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>4194304</StackReserveSize>
       <HeapReserveSize>268435456</HeapReserveSize>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -249,7 +249,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>4194304</StackReserveSize>
       <HeapReserveSize>268435456</HeapReserveSize>
     </Link>
@@ -273,7 +273,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;D3DCompiler.lib;shlwapi.lib;dinput8.lib;dxguid.lib;Mincore.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>4194304</StackReserveSize>
       <HeapReserveSize>268435456</HeapReserveSize>
     </Link>

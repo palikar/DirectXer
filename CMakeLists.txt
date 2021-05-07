@@ -43,26 +43,6 @@ endif ()
 #         -Wformat=2)
 # endif()
 
-# option(LIBCPP "Build with libc++" FALSE)
-# if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND ${ALL_WARNINGS})
-#     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.3)
-#         target_compile_options(project_warnings INTERFACE
-#             -Wduplicated-branches)
-#     endif()
-#     target_compile_options(project_warnings INTERFACE
-#         -Wmisleading-indentation
-#         -Wduplicated-cond
-#         -Wlogical-op
-#         -Wuseless-cast)
-#     target_link_libraries(project_options INTERFACE stdc++fs)
-# else()
-#     if(LIBCPP)
-#         target_compile_options(project_options INTERFACE -stdlib=libc++)
-#     else()
-#         target_link_libraries(project_options INTERFACE stdc++fs)
-#     endif()
-# endif()
-
 target_link_libraries(project_options INTERFACE -fno-exceptions)
 target_include_directories(project_options INTERFACE ./DirectXer/src)
 
@@ -145,6 +125,8 @@ target_include_directories(Optik PUBLIC ThirdParty/Optik/include)
 add_executable(SpaceGame    
     ./DirectXer/src/PlatformLinux/LinuxMain.cpp
     ./DirectXer/src/PlatformLinux/PlatformLinux.cpp
+    ./DirectXer/src/PlatformLinux/GraphicsOpenGL.cpp
+    
     )
 
 target_link_libraries(SpaceGame

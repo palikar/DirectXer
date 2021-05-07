@@ -20,7 +20,7 @@ struct Logger
 		fmt::format_to(formatBuffer, "[{}:{}] ", strrchr(t_File, '\\') + 1, t_Line);
 		fmt::format_to(formatBuffer, t_Format, t_Args ... );
 		fmt::format_to(formatBuffer, "\n");
-
+ 
 		PlatformLayer::SetOuputColor(PlatformLayer::ConsoleForeground::WHITE);
 		PlatformLayer::WriteStdOut(formatBuffer.data(), formatBuffer.size());
 	}
@@ -49,17 +49,6 @@ struct Logger
 		PlatformLayer::WriteStdOut(formatBuffer.data(), formatBuffer.size());
 	}
 
-#ifdef _WIN32
-	void LogHResult(const char* t_File, uint32 t_Line, HRESULT t_Hr)
-	{
-		auto errorString = DXGetErrorString(t_Hr);
-		char errorDescription[512];
-		DXGetErrorDescription(t_Hr, errorDescription, (DWORD)sizeof(errorDescription) );
-
-		PrintError(t_File, t_Line, "{} :", errorString, errorDescription);		 
-	}
-#endif
-    
 };
 
 inline Logger gLogger;
@@ -73,10 +62,6 @@ inline Logger gLogger;
 #define DXPRINT(MSG, ...) gLogger.Print(MSG, __VA_ARGS__)
 
 #define Assert(VALUE, MSG, ...) do { if (!(VALUE)) { gLogger.PrintError(__FILE__, __LINE__, MSG, __VA_ARGS__); int* p = nullptr; *p = 4; } } while(false)
-
-#ifdef _WIN32
-#define DXLOGHRESULT(hr) gLogger.LogHResult(__FILE__, __LINE__, hr)
-#endif
 
 #else
 

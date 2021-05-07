@@ -15,6 +15,7 @@
 #include "IncludeWin.hpp"
 
 void SetupConsole();
+void LogHResult(const char* t_File, uint32 t_Line, HRESULT t_Hr);
 	
 struct WindowsSettings
 {
@@ -93,7 +94,6 @@ struct WindowsPlatformLayer
 	
 };
 
-
 class DxgiInfoManager
 {
   public:
@@ -149,3 +149,5 @@ class DxgiInfoManager
 };
 
 inline DxgiInfoManager gDxgiManager;
+
+#define DXLOGHRESULT(hr) LogHResult(__FILE__, __LINE__, hr)

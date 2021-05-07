@@ -1,37 +1,10 @@
 #include <Platform.hpp>
-// #include <Memory.hpp>
-// #include <Resources.hpp>
-// #include <App.hpp>
+#include <Memory.hpp>
+#include <Resources.hpp>
+#include <App.hpp>
 
 
-// extern App* InitMain(char** argv, int argc);
-
-struct WindowSettings
-{
-    const char* ClassName;
-    const char* WindowTitle;
-    size_t InitialWidth;
-    size_t InitialHeight;
-    bool Fullscreen;
-};
-
-class LinuxWindow
-{
-  public:
-
-    // App* Application;
-
-    void Init(WindowSettings settings)
-    {
-    }
-    
-    int Run()
-    {
-
-        return 0;
-    }
-
-};
+extern App* InitMain(char** argv, int argc);
 
 int main(int argc, char** argv)
 {
@@ -44,7 +17,7 @@ int main(int argc, char** argv)
 	settings.Fullscreen = 0;
         
     LinuxWindow window;
-    // window.Application = InitMain(argv, argc);
+    window.Application = InitMain(argv, argc);
 
     window.Init(settings);
 

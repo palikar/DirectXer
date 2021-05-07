@@ -68,4 +68,39 @@ uint64 LinuxPlatformLayer::Clock()
     return (uint64)(1000.0f * 1000.0f * 1000.0f * (float)timeInfo.tms_utime / (clockTicksPerSecond));
 }
 
+void LinuxWindow::Init(WindowSettings settings)
+{
 
+	X11Display = XOpenDisplay(NULL);
+	int screen = DefaultScreen(X11Display);
+
+	XSetWindowAttributes windowAttribs{0};
+	// windowAttribs.border_pixel = BlackPixel(display, screenId);
+	// windowAttribs.background_pixel = WhitePixel(display, screenId);
+	// windowAttribs.override_redirect = True;
+	// windowAttribs.colormap = XCreateColormap(display, RootWindow(display, screenId), visual->visual, AllocNone);
+	// windowAttribs.event_mask = ExposureMask;
+	
+	X11Window = XCreateSimpleWindow(X11Display, RootWindow(X11Display, screen), 10, 10,
+									settings.InitialWidth, settings.InitialHeight, 1,
+									BlackPixel(X11Display, screen), WhitePixel(X11Display, screen));
+	
+	XSelectInput(X11Display, X11Window, ExposureMask | KeyPressMask);
+	XMapWindow(X11Display, X11Window);
+}
+    
+int LinuxWindow::Run()
+{
+
+
+	while (1)
+	{
+		XNextEvent(X11Display, &NextEvent);
+
+		if (e.type == KeyPress) break;
+
+	}
+	
+	XCloseDisplay(X11Display);
+	return 0;
+}
