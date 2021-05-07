@@ -36,6 +36,7 @@ enum AssetType : uint16
 	Type_Wav,
 	Type_Texture,
 	Type_Skybox,
+	Type_Mesh,
 };
 
 struct AssetToLoad
@@ -93,6 +94,8 @@ struct AssetBundlerContext
 	std::vector<WavLoadEntry> LoadWavs;
 	std::vector<FontLoadEntry> LoadFonts;
 
+	std::vector<MeshLoadEntry> LoadMeshes;
+
 	// @Note: The byte data of everything above
 	std::vector<unsigned char> Data;
 };
@@ -133,6 +136,7 @@ void LoadWav(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blo
 void LoadFont(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 void LoadTexture(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
+void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 
 inline uint32 NewAssetName(AssetBundlerContext& context, AssetType type, const char* name, uint32 id = 0) 
 {
@@ -145,6 +149,20 @@ inline uint32 NewAssetName(AssetBundlerContext& context, AssetType type, const c
 inline TextureId NextTextureAssetId()
 {
 	static TextureId next = 0;
+	++next;
+	return 1 << 15 | next;
+}
+
+inline TextureId NextVBAssetId()
+{
+	static VertexBufferId next = 0;
+	++next;
+	return 1 << 15 | next;
+}
+
+inline TextureId NextIBAssetId()
+{
+	static IndexBufferId next = 0;
 	++next;
 	return 1 << 15 | next;
 }

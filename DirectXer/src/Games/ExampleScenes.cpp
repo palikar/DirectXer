@@ -223,6 +223,13 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->BindTexture(1, T_CHECKER);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
+	Graphics->BindVertexBuffer(32769);
+	Graphics->BindIndexBuffer(32769);
+	Graphics->DrawIndex(TT_TRIANGLES, 1332, 0, 0);
+
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
+	
 	RenderSkyBox();
 
 	// @Note: UI rendering beggins here

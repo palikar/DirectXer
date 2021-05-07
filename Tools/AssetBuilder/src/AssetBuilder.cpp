@@ -19,15 +19,19 @@
   @Note: Checklist for adding as new asset type
 
   1. Add the new type to the AssetType enum
-  2. Create a new load structure that will be read by the loading code
-  3. Adjust the base offset calculation
-  4. Apply the base offset to the entries of the new structure
-  5. Create new counter variable and its handling
+  2. Create a new load structure that will be read by the loading code (in Assets.hpp)
+  3. Adjust the base offset calculation (in Calculatebaseoffset)				 
+  4. Apply the base offset to the entries of the new structure (in Applybaseoffset)
+  5. Create new counter variable and its handling (in AssetColletionHeader in Assets.hpp)
   6. Create a new loader
+  7. Output the loaded data to the final asset file
 
 */
 
 static AssetToLoad AssetsToLoad[] = {
+
+	{Type_Mesh, Tag_Level,  "models/first_tree.obj", "M_TREE_1"},
+	
 	{Type_Skybox, Tag_Level, "sky", "T_SKY"},
 
 	{Type_Texture, Tag_Level, "checker.png", "T_CHECKER"},
@@ -94,6 +98,8 @@ static size_t CalculateBaseOffset(AssetBundlerContext& context)
 	offset += sizeof(ImageLoadEntry) * context.LoadImages.size();
 	offset += sizeof(WavLoadEntry) * context.LoadWavs.size();
 	offset += sizeof(FontLoadEntry) * context.LoadFonts.size();
+	
+	offset += sizeof(MeshLoadEntry) * context.LoadMeshes.size();
 
 	return offset;
 }
@@ -128,6 +134,12 @@ static void ApplyBaseOffset(AssetBundlerContext& context, size_t offset)
 		entry.DataOffset[3] += offset; 
 		entry.DataOffset[4] += offset; 
 		entry.DataOffset[5] += offset; 
+	}
+
+	for (auto& entry : context.LoadMeshes) 
+	{
+		entry.DataOffsetVBO += offset;
+		entry.DataOffsetIBO += offset;
 	}
 
 }
@@ -249,6 +261,12 @@ int main(int argc, char *argv[])
 			  std::cout << fmt::format("{} \t->\t Bundling Skybox [{:.3} MB] [{}]\n", asset.Id, (4*dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
 			  break;
 		  }
+		  case Type_Mesh: 
+		  {
+			  LoadMesh(asset, context, dataBlob);
+			  std::cout << fmt::format("{} \t->\t Bundling Mesh [{:.3} MB] [{}]\n", asset.Id, (dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
+			  break;
+		  }
 		}
 	}
 
@@ -259,6 +277,7 @@ int main(int argc, char *argv[])
  	context.Header.LoadWavsCount = (uint32)context.LoadWavs.size();
  	context.Header.LoadFontsCount  = (uint32)context.LoadFonts.size();
 	context.Header.SkyboxesCount  = (uint32)context.Skyboxes.size();
+	context.Header.LoadMeshesCount  = (uint32)context.LoadMeshes.size();
 	
 	fmt::print("----------Done building assets----------\n");
 	fmt::print("Textures: \t[{}]\n", context.Header.TexturesCount);
@@ -331,6 +350,8 @@ int main(int argc, char *argv[])
 
 	outfile.write((char*)context.Skyboxes.data(), sizeof(SkyboxLoadEntry)*context.Skyboxes.size());
 
+	outfile.write((char*)context.LoadMeshes.data(), sizeof(MeshLoadEntry)*context.LoadMeshes.size());
+
 	outfile.write((char*)dataBlob.Data.data(), sizeof(char) * dataBlob.Data.size());
 	
 	outfile.close();
@@ -346,6 +367,7 @@ int main(int argc, char *argv[])
 	GenerateHeaderArrays(headerFile, context, Type_Image, "Images");
 	GenerateHeaderArrays(headerFile, context, Type_Wav, "Wavs");
 	GenerateHeaderArrays(headerFile, context, Type_Font, "Fonts");
+	GenerateHeaderArrays(headerFile, context, Type_Mesh, "Meshes");
 	
 	headerFile << fmt::format("static inline AssetFile AssetFiles[] = {{\n");
 	headerFile << fmt::format("\t{{ \"{}\", {} }},\n", assetFileName, baseOffset + dataBlob.Data.size());

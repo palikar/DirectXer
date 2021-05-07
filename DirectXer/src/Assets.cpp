@@ -88,6 +88,20 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		};
 		context.Graphics->CreateCubeTexture(entry.Id, entry.Desc, datas);
 	}
+
+	for (uint32 i = 0; i < header.LoadMeshesCount; ++i)
+	{
+		MeshLoadEntry& entry = ReadBlob<MeshLoadEntry>(current);
+
+		context.Graphics->CreateVertexBuffer(entry.Vbo, entry.VBDesc.StructSize,
+											 GetData(fileArena, entry.DataOffsetVBO),
+											 entry.VBDesc.DataSize);
+
+		context.Graphics->CreateIndexBuffer(entry.Ibo, GetData(fileArena, entry.DataOffsetIBO),
+			entry.VBDesc.DataSize);
+		
+	}
+
 	
 	
 	

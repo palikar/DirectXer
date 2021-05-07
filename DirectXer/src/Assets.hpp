@@ -23,6 +23,8 @@ struct AssetColletionHeader
 	uint32 LoadImagesCount;
 	uint32 LoadWavsCount;
 	uint32 LoadFontsCount;
+
+	uint32 LoadMeshesCount;
 	
 	uint32 VersionSpec;	
 };
@@ -71,6 +73,23 @@ struct FontLoadEntry
 	FontId Id;
 	size_t DataOffset;
 	size_t DataSize;
+};
+
+struct MeshLoadEntry
+{
+	struct BufferDesc
+	{
+		uint32 StructSize;
+		uint32 DataSize;
+		bool Dynamic;
+	};
+	BufferDesc VBDesc;
+	BufferDesc IBDesc;
+	VertexBufferId Vbo;
+	IndexBufferId Ibo;
+	
+	size_t DataOffsetVBO;
+	size_t DataOffsetIBO;
 };
 
 struct AtlasFileHeader

@@ -1,5 +1,7 @@
 #include "AssetBuilder.hpp"
 
+#include <sstream>
+
 struct  WavHeader
 {
 	/* RIFF Chunk Descriptor */
@@ -42,6 +44,38 @@ static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 
 	return v;
  }
+
+static std::string LoadFileIntoString(const std::string &t_filename)
+{
+	auto v = LoadFile(t_filename);
+	return std::string(v.begin(), v.end());
+}
+
+static std::vector<std::string> SplitLine(const std::string &s, char delimiter)
+{
+    std::vector<std::string> tokens;
+
+    size_t last = 0;
+    size_t next = 0;
+
+    while ((next = s.find(delimiter, last)) != std::string::npos)
+    {
+        tokens.push_back(s.substr(last, next - last));
+        last = next + 1;
+    }
+    tokens.push_back(s.substr(last));
+    return tokens;
+}
+
+static glm::i32vec3 GetIndexData(std::string part)
+{
+	auto parts = SplitLine(part, '/');
+	return glm::i32vec3{
+		std::stoi(parts[0].c_str()) - 1,
+		std::stoi(parts[1].c_str()) - 1,
+		std::stoi(parts[2].c_str()) - 1};
+}
+
 
 void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
@@ -164,4 +198,104 @@ void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& 
 
 	context.Skyboxes.push_back(skybox);
 
+}
+
+void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	auto content = LoadFileIntoString(asset.Path);
+	std::stringstream stream(content);
+	std::string line;
+
+	std::vector<ColorVertex> VertexData;
+	std::vector<uint32> IndexData;
+
+	std::vector<glm::vec3> Pos;
+	std::vector<glm::vec3> Norms;
+	std::vector<glm::vec2> UVs;
+
+	std::unordered_map<std::string, uint32> indexMap;
+
+	while(std::getline(stream, line, '\n'))
+	{
+		if (line[0] == 'v' && line[1] == ' ')
+		{
+			auto parts = SplitLine(line, ' ');
+			Pos.push_back(glm::vec3{
+					std::stof(parts[1].c_str()),
+					std::stof(parts[2].c_str()),
+					std::stof(parts[3].c_str())});
+		}
+		else if (line[0] == 'v' && line[1] == 'n')
+		{
+			auto parts = SplitLine(line, ' ');
+			Norms.push_back(glm::vec3{
+					std::stof(parts[1].c_str()),
+					std::stof(parts[2].c_str()),
+					std::stof(parts[3].c_str())});
+		}
+		else if (line[0] == 'v' && line[1] == 't')
+		{
+			auto parts = SplitLine(line, ' ');
+			UVs.push_back(glm::vec2{
+					std::stof(parts[1].c_str()),
+					std::stof(parts[2].c_str())});
+		}
+		else if (line[0] == 'f' && line[1] == ' ')
+		{
+			auto parts = SplitLine(line, ' ');
+
+			const auto vtn1 = GetIndexData(parts[1]);
+			const auto vtn2 = GetIndexData(parts[2]);
+			const auto vtn3 = GetIndexData(parts[3]);
+			
+			const auto i = (uint32) VertexData.size();
+
+			ColorVertex nextVertex;
+			if (indexMap.insert({parts[1], i}).second)
+			{
+				nextVertex.pos = Pos[vtn1.x];
+				nextVertex.normal = Norms[vtn1.z];
+				nextVertex.uv = UVs[vtn1.y];
+				VertexData.push_back(nextVertex);
+			}
+			
+			if (indexMap.insert({parts[2], i + 1}).second)
+			{
+				nextVertex.pos = Pos[vtn2.x];
+				nextVertex.normal = Norms[vtn2.z];
+				nextVertex.uv = UVs[vtn2.y];
+				VertexData.push_back(nextVertex);
+			}
+			
+			if (indexMap.insert({parts[3], i + 2}).second)
+			{
+				nextVertex.pos = Pos[vtn3.x];
+				nextVertex.normal = Norms[vtn3.z];
+				nextVertex.uv = UVs[vtn3.y];
+				VertexData.push_back(nextVertex);
+			}
+
+			IndexData.push_back(indexMap[parts[1]]);
+			IndexData.push_back(indexMap[parts[2]]);
+			IndexData.push_back(indexMap[parts[3]]);
+			
+		}
+    }
+
+	MeshLoadEntry mesh;
+
+	mesh.VBDesc.StructSize = sizeof(ColorVertex);
+	mesh.VBDesc.DataSize = (uint32)(sizeof(ColorVertex) * VertexData.size());
+	mesh.IBDesc.StructSize = 0;
+	mesh.IBDesc.DataSize = (uint32)(sizeof(uint32) * IndexData.size());
+	
+	mesh.Vbo = NextVBAssetId();
+	mesh.Ibo = NextIBAssetId();
+
+	mesh.DataOffsetVBO = blob.PutData((unsigned char*)VertexData.data(), sizeof(ColorVertex) * VertexData.size());
+	mesh.DataOffsetIBO = blob.PutData((unsigned char*)IndexData.data(), sizeof(uint32) * IndexData.size());
+
+	context.LoadMeshes.push_back(mesh);
+
+	NewAssetName(context, Type_Mesh, asset.Id, 45);
 }

@@ -17,6 +17,7 @@
 #define I_SHOOT              11
 #define I_FACEBOOK           12
 #define I_INSTAGRAM          13
+#define M_TREE_1             45
 #define T_SKY             32772
 #define T_CHECKER         32773
 #define T_ROCKS_COLOR     32774
@@ -87,8 +88,18 @@ static inline uint32 FontsIds[] = {
 
 /* ------------------------------  */
 
+static inline const char* MeshesNames[] = {
+	"M_TREE_1",
+};
+
+static inline uint32 MeshesIds[] = {
+	45,
+};
+
+/* ------------------------------  */
+
 static inline AssetFile AssetFiles[] = {
-	{ "resources/SpaceAssets.dbundle", 114080764 },
+	{ "resources/SpaceAssets.dbundle", 114138636 },
 };
 
 static inline size_t SpaceGameAssetFile = 0;
