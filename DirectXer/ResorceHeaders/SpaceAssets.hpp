@@ -17,17 +17,17 @@
 #define I_SHOOT              11
 #define I_FACEBOOK           12
 #define I_INSTAGRAM          13
-#define M_TREE_1             45
+#define M_TREE_1             14
 #define T_SKY             32772
 #define T_CHECKER         32773
 #define T_ROCKS_COLOR     32774
 #define T_FLOOR_COLOR     32775
 #define T_ROCKS_AO        32776
 #define T_ROCKS_NORMAL    32777
-#define F_DroidSans_24       14
-#define F_DroidSansBold_24   15
-#define A_SHOOT              16
-#define A_EXPLODE            17
+#define F_DroidSans_24       15
+#define F_DroidSansBold_24   16
+#define A_SHOOT              17
+#define A_EXPLODE            18
 
 
 static inline const char* ImagesNames[] = {
@@ -70,8 +70,8 @@ static inline const char* WavsNames[] = {
 };
 
 static inline uint32 WavsIds[] = {
-	16,
 	17,
+	18,
 };
 
 /* ------------------------------  */
@@ -82,8 +82,8 @@ static inline const char* FontsNames[] = {
 };
 
 static inline uint32 FontsIds[] = {
-	14,
 	15,
+	16,
 };
 
 /* ------------------------------  */
@@ -93,13 +93,13 @@ static inline const char* MeshesNames[] = {
 };
 
 static inline uint32 MeshesIds[] = {
-	45,
+	14,
 };
 
 /* ------------------------------  */
 
 static inline AssetFile AssetFiles[] = {
-	{ "resources/SpaceAssets.dbundle", 114138636 },
+	{ "resources/SpaceAssets.dbundle", 114138664 },
 };
 
 static inline size_t SpaceGameAssetFile = 0;

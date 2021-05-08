@@ -212,8 +212,15 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 	std::vector<glm::vec3> Pos;
 	std::vector<glm::vec3> Norms;
 	std::vector<glm::vec2> UVs;
-
+	
 	std::unordered_map<std::string, uint32> indexMap;
+	
+	VertexData.reserve(1024);
+	IndexData.reserve(2048);
+	Pos.reserve(1024);
+	Norms.reserve(1024);
+	UVs.reserve(1024);
+	indexMap.reserve(2048);
 
 	while(std::getline(stream, line, '\n'))
 	{
@@ -282,20 +289,26 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 		}
     }
 
-	MeshLoadEntry mesh;
+	VBLoadEntry vbo;
+	vbo.StructSize = sizeof(ColorVertex);
+	vbo.DataSize = (uint32)(sizeof(ColorVertex) * VertexData.size());
+	vbo.Dynamic = false;
+	vbo.DataOffset = blob.PutData((unsigned char*)VertexData.data(), sizeof(ColorVertex) * VertexData.size());
+	vbo.Id = NextVBAssetId();
 
-	mesh.VBDesc.StructSize = sizeof(ColorVertex);
-	mesh.VBDesc.DataSize = (uint32)(sizeof(ColorVertex) * VertexData.size());
-	mesh.IBDesc.StructSize = 0;
-	mesh.IBDesc.DataSize = (uint32)(sizeof(uint32) * IndexData.size());
+	IBLoadEntry ibo;
+	ibo.DataSize = (uint32)(sizeof(uint32) * IndexData.size());
+	ibo.Dynamic = false;
+	ibo.DataOffset = blob.PutData((unsigned char*)IndexData.data(), sizeof(uint32) * IndexData.size());
+	ibo.Id = NextIBAssetId();
 	
-	mesh.Vbo = NextVBAssetId();
-	mesh.Ibo = NextIBAssetId();
+	MeshLoadEntry mesh;
+	mesh.Mesh.VertexBuffer= vbo.Id;
+	mesh.Mesh.IndexBuffer = ibo.Id;
+	mesh.Mesh.IndexCount = (uint32)IndexData.size();
+	mesh.Id = NewAssetName(context, Type_Mesh, asset.Id);
 
-	mesh.DataOffsetVBO = blob.PutData((unsigned char*)VertexData.data(), sizeof(ColorVertex) * VertexData.size());
-	mesh.DataOffsetIBO = blob.PutData((unsigned char*)IndexData.data(), sizeof(uint32) * IndexData.size());
-
+	context.VBsToCreate.push_back(vbo);
+	context.IBsToCreate.push_back(ibo);
 	context.LoadMeshes.push_back(mesh);
-
-	NewAssetName(context, Type_Mesh, asset.Id, 45);
 }

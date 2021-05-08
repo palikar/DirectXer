@@ -35,6 +35,8 @@ enum AssetType : uint16
 	Type_Font,
 	Type_Wav,
 	Type_Texture,
+	Type_IndexBuffer,
+	Type_VertexBuffer,
 	Type_Skybox,
 	Type_Mesh,
 };
@@ -77,8 +79,10 @@ struct AssetBundlerContext
 	AssetColletionHeader Header;
 	std::vector<AssetDefine> Defines;
 	
-	// @Note: Those textures will be created through the Graphics
+	// @Note: Those objects will be created through the Graphics
 	std::vector<TextureLoadEntry> TexturesToCreate;
+	std::vector<VBLoadEntry> VBsToCreate;
+	std::vector<IBLoadEntry> IBsToCreate;
 
 	// @Note: Those images and atlases are purely meta data which 
 	// will be inserte into the ImageLibrary's images map; the textures will

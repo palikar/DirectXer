@@ -44,3 +44,43 @@ struct BufferBuilder
 	GPUGeometry CreateBuffer(Graphics& graphics);
 
 };
+
+struct MeshGeometryInfo
+{
+	VertexBufferId VertexBuffer;
+	IndexBufferId IndexBuffer;
+	uint32 IndexCount{0};
+};
+
+using MeshId = uint32;
+
+struct Mesh
+{
+	MeshGeometryInfo Geometry;
+};
+
+struct MeshCatalog
+{
+	Map<MeshId, Mesh> Meshes;
+	Graphics* Gfx;
+
+	void Init(Graphics* graphics)
+	{
+		Gfx = graphics;
+		Meshes.reserve(32);
+	}
+
+	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {})
+	{
+		const auto mesh = Meshes.at(id);
+
+		Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
+		Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
+		Gfx->UpdateCBs();
+		
+		Gfx->BindVertexBuffer(mesh.Geometry.VertexBuffer);
+		Gfx->BindIndexBuffer(mesh.Geometry.IndexBuffer);
+		Gfx->SetShaderConfiguration(SC_DEBUG_COLOR);
+		Gfx->DrawIndex(TT_TRIANGLES, mesh.Geometry.IndexCount, 0, 0);
+	}
+};

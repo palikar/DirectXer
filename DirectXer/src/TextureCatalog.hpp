@@ -38,3 +38,11 @@ struct TextureCatalog
 	
 	TextureId LoadCube(Graphics& graphics, const char* name[6]);
 };
+
+
+struct EntityCatalog
+{
+
+
+
+};

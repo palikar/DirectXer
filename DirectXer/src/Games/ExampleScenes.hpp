@@ -58,6 +58,8 @@ public:
 	SpriteSheetHolder SpriteSheets;
 	Scene CurrentScene;
 	TextureCatalog Textures;
+	MeshCatalog MeshesLib;
+
 
 	AudioPlayer AudioEngine;
 

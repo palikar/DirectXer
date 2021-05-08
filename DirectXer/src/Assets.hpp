@@ -6,6 +6,7 @@
 #include <ImageLibrary.hpp>
 #include <Audio.hpp>
 #include <FontLibrary.hpp>
+#include <GeometryUtils.hpp>
 
 enum Tag : uint16
 {
@@ -15,6 +16,8 @@ enum Tag : uint16
 struct AssetColletionHeader
 {
 	uint32 TexturesCount;
+	uint32 IBsCount;
+	uint32 VBsCount;
 
 	uint32 ImagesCount;
 	uint32 AtlasesCount;
@@ -34,6 +37,25 @@ struct TextureLoadEntry
 	TextureDescription Desc;
 	TextureId Id;
 	size_t DataOffset;
+};
+
+struct IBLoadEntry
+{
+	uint32 DataSize;
+	bool Dynamic;
+	
+	size_t DataOffset;
+	IndexBufferId Id;
+};
+
+struct VBLoadEntry
+{
+	uint32 StructSize;
+	uint32 DataSize;
+	bool Dynamic;
+
+	size_t DataOffset;
+	VertexBufferId Id;
 };
 
 struct SkyboxLoadEntry
@@ -77,19 +99,8 @@ struct FontLoadEntry
 
 struct MeshLoadEntry
 {
-	struct BufferDesc
-	{
-		uint32 StructSize;
-		uint32 DataSize;
-		bool Dynamic;
-	};
-	BufferDesc VBDesc;
-	BufferDesc IBDesc;
-	VertexBufferId Vbo;
-	IndexBufferId Ibo;
-	
-	size_t DataOffsetVBO;
-	size_t DataOffsetIBO;
+	MeshGeometryInfo Mesh;
+	uint32 Id;
 };
 
 struct AtlasFileHeader
@@ -107,6 +118,7 @@ struct AssetBuildingContext
 	ImageLibrary* ImageLib;
 	FontLibrary* FontLib;
 	AudioPlayer* WavLib;
+	MeshCatalog* MeshesLib;
 
 	Graphics* Graphics;
 };

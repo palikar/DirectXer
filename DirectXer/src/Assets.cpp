@@ -43,6 +43,22 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		const TextureLoadEntry& entry = ReadBlob<TextureLoadEntry>(current);
 		context.Graphics->CreateTexture(entry.Id, entry.Desc, GetData(fileArena, entry));
 	}
+
+	for (uint32 i = 0; i < header.VBsCount; ++i)
+	{
+		const VBLoadEntry& entry = ReadBlob<VBLoadEntry>(current);
+
+		context.Graphics->CreateVertexBuffer(entry.Id, entry.StructSize,
+											 GetData(fileArena, entry),
+											 entry.DataSize, entry.Dynamic);
+	}
+
+	for (uint32 i = 0; i < header.IBsCount; ++i)
+	{
+		const IBLoadEntry& entry = ReadBlob<IBLoadEntry>(current);
+		context.Graphics->CreateIndexBuffer(entry.Id, GetData(fileArena, entry), entry.DataSize);
+	}
+
 	
 	for (uint32 i = 0; i < header.ImagesCount; ++i)
 	{
@@ -92,14 +108,7 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 	for (uint32 i = 0; i < header.LoadMeshesCount; ++i)
 	{
 		MeshLoadEntry& entry = ReadBlob<MeshLoadEntry>(current);
-
-		context.Graphics->CreateVertexBuffer(entry.Vbo, entry.VBDesc.StructSize,
-											 GetData(fileArena, entry.DataOffsetVBO),
-											 entry.VBDesc.DataSize);
-
-		context.Graphics->CreateIndexBuffer(entry.Ibo, GetData(fileArena, entry.DataOffsetIBO),
-			entry.VBDesc.DataSize);
-		
+		context.MeshesLib->Meshes.insert({ MeshId{entry.Id}, Mesh{entry.Mesh} });
 	}
 
 	

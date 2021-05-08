@@ -90,15 +90,16 @@ static size_t CalculateBaseOffset(AssetBundlerContext& context)
 
 	offset += sizeof(AssetColletionHeader);
 	offset += sizeof(TextureLoadEntry) * context.TexturesToCreate.size();
+	offset += sizeof(IBLoadEntry) * context.IBsToCreate.size();
+	offset += sizeof(VBLoadEntry) * context.VBsToCreate.size();
+
 	offset += sizeof(ImageEntry) * context.Images.size();
 	offset += sizeof(ImageAtlas) * context.Atlases.size();
 	
 	offset += sizeof(SkyboxLoadEntry) * context.Skyboxes.size();
-
 	offset += sizeof(ImageLoadEntry) * context.LoadImages.size();
 	offset += sizeof(WavLoadEntry) * context.LoadWavs.size();
 	offset += sizeof(FontLoadEntry) * context.LoadFonts.size();
-	
 	offset += sizeof(MeshLoadEntry) * context.LoadMeshes.size();
 
 	return offset;
@@ -107,6 +108,16 @@ static size_t CalculateBaseOffset(AssetBundlerContext& context)
 static void ApplyBaseOffset(AssetBundlerContext& context, size_t offset)
 {
 	for (auto& entry : context.TexturesToCreate) 
+	{
+		entry.DataOffset += offset; 
+	}
+
+	for (auto& entry : context.VBsToCreate) 
+	{
+		entry.DataOffset += offset; 
+	}
+
+	for (auto& entry : context.IBsToCreate)
 	{
 		entry.DataOffset += offset; 
 	}
@@ -136,12 +147,6 @@ static void ApplyBaseOffset(AssetBundlerContext& context, size_t offset)
 		entry.DataOffset[5] += offset; 
 	}
 
-	for (auto& entry : context.LoadMeshes) 
-	{
-		entry.DataOffsetVBO += offset;
-		entry.DataOffsetIBO += offset;
-	}
-
 }
 
 static void GenerateHeaderArrays(std::ofstream& headerFile, AssetBundlerContext& context, AssetType type, std::string_view arrayName)
@@ -155,7 +160,6 @@ static void GenerateHeaderArrays(std::ofstream& headerFile, AssetBundlerContext&
 		if(define.Type == type) headerFile << fmt::format("\t{},\n", define.Id);
 	headerFile << "};\n\n";
 	headerFile << "/* ------------------------------  */\n\n";
-
 }
 
 static void GenerateHeaderDefines(std::ofstream& headerFile, AssetBundlerContext& context)
@@ -264,13 +268,17 @@ int main(int argc, char *argv[])
 		  case Type_Mesh: 
 		  {
 			  LoadMesh(asset, context, dataBlob);
-			  std::cout << fmt::format("{} \t->\t Bundling Mesh [{:.3} MB] [{}]\n", asset.Id, (dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
+			  const float mem = dataBlob.lastSize > 1024*1024 ? dataBlob.lastSize / (1024.0f*1024.0f) : dataBlob.lastSize / 1024.0f;
+			  const char* unit = dataBlob.lastSize > 1024*1024 ? "MBs" : "KBs";
+			  std::cout << fmt::format("{} \t->\t Bundling Mesh [{:.3} {}] [{}]\n", asset.Id, mem, unit, asset.Path);
 			  break;
 		  }
 		}
 	}
 
 	context.Header.TexturesCount = (uint32)context.TexturesToCreate.size();
+	context.Header.VBsCount = (uint32)context.VBsToCreate.size();
+	context.Header.IBsCount = (uint32)context.IBsToCreate.size();
 	context.Header.ImagesCount = (uint32)context.Images.size();
 	context.Header.AtlasesCount = (uint32)context.Atlases.size();
 	context.Header.LoadImagesCount = (uint32)context.LoadImages.size();
@@ -308,6 +316,10 @@ int main(int argc, char *argv[])
 	  |---------------.......------------------|
 	  |---------------Texture_i----------------|
 	  |----------------------------------------|
+	  |------------------VB_i------------------| -- struct VBLoadEntry
+	  |----------------------------------------|
+	  |------------------IB_i------------------| -- struct IBLoadEntry
+	  |----------------------------------------|
 	  |---------------Image_1------------------| -- struct ImageEntry
 	  |---------------Image_2------------------|
 	  |---------------.......------------------|
@@ -340,6 +352,8 @@ int main(int argc, char *argv[])
 	outfile.write((char*)&context.Header, sizeof(AssetColletionHeader));
 	
 	outfile.write((char*)context.TexturesToCreate.data(), sizeof(TextureLoadEntry)*context.TexturesToCreate.size());
+	outfile.write((char*)context.VBsToCreate.data(), sizeof(VBLoadEntry)*context.VBsToCreate.size());
+	outfile.write((char*)context.IBsToCreate.data(), sizeof(IBLoadEntry)*context.IBsToCreate.size());
 	
 	outfile.write((char*)context.Images.data(), sizeof(ImageEntry)*context.Images.size());
 	outfile.write((char*)context.Atlases.data(), sizeof(ImageAtlas)*context.Atlases.size());
@@ -347,9 +361,7 @@ int main(int argc, char *argv[])
 	outfile.write((char*)context.LoadImages.data(), sizeof(ImageLoadEntry)*context.LoadImages.size());
 	outfile.write((char*)context.LoadWavs.data(), sizeof(WavLoadEntry)*context.LoadWavs.size());
 	outfile.write((char*)context.LoadFonts.data(), sizeof(FontLoadEntry)*context.LoadFonts.size());
-
 	outfile.write((char*)context.Skyboxes.data(), sizeof(SkyboxLoadEntry)*context.Skyboxes.size());
-
 	outfile.write((char*)context.LoadMeshes.data(), sizeof(MeshLoadEntry)*context.LoadMeshes.size());
 
 	outfile.write((char*)dataBlob.Data.data(), sizeof(char) * dataBlob.Data.size());

@@ -61,7 +61,13 @@ void SpaceGame::Init()
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
 
 	Memory::EstablishTempScope(Megabytes(4));
-	AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine, Graphics};
+	AssetBuildingContext masterBuilder{0};
+	masterBuilder.ImageLib = &Renderer2D.ImageLib;
+	masterBuilder.FontLib = &Renderer2D.FontLib;
+	masterBuilder.WavLib = &AudioEngine;
+	masterBuilder.MeshesLib = nullptr;
+	masterBuilder.Graphics = Graphics;
+	
 	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
 	Memory::EndTempScope();	
 

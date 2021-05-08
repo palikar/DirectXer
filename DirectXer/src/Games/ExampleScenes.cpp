@@ -29,9 +29,16 @@ void ExampleScenes::Init()
 	CurrentRastState = RS_NORMAL;
 
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
+	MeshesLib.Init(Graphics);
 
 	Memory::EstablishTempScope(Megabytes(4));
-	AssetBuildingContext masterBuilder{&Renderer2D.ImageLib, &Renderer2D.FontLib, &AudioEngine, Graphics};
+	AssetBuildingContext masterBuilder{0};
+	masterBuilder.ImageLib = &Renderer2D.ImageLib;
+	masterBuilder.FontLib = &Renderer2D.FontLib;
+	masterBuilder.WavLib = &AudioEngine;
+	masterBuilder.MeshesLib = &MeshesLib;
+	masterBuilder.Graphics = Graphics;
+	
 	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
 	Memory::EndTempScope();	
 
@@ -223,9 +230,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->BindTexture(1, T_CHECKER);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	Graphics->BindVertexBuffer(32769);
-	Graphics->BindIndexBuffer(32769);
-	Graphics->DrawIndex(TT_TRIANGLES, 1332, 0, 0);
+	MeshesLib.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f});
 
 	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
 	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);

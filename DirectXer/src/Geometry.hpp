@@ -26,6 +26,14 @@ enum GeometryType : uint16
 	GT_SPOTLIGHTHELPER     = 11 | (0x01 << 8),
 };
 
+struct GeometryInfo
+{
+	uint32 vertexCount{0};
+	uint32 indexCount{0};
+
+	GeometryType type{0};
+};
+
 struct CubeGeometry
 {
 	float width{1.0};
@@ -77,14 +85,6 @@ struct LinesGeometry
 
 };
 
-struct GeometryInfo
-{
-	uint32 vertexCount{0};
-	uint32 indexCount{0};
-
-	GeometryType type{0};
-};
-
 struct TorusGeometry
 {
 	float radius{ 1.0f };
@@ -104,7 +104,6 @@ struct ConeGeometry
 	float thetaStart{0.0f};
 	float thetaLength{2.0f * PI};	
 };
-
 
 inline GeometryInfo CylinderGeometryInfo(const CylinderGeometry& t_CylinderInfo)
 {
