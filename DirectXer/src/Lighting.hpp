@@ -24,7 +24,6 @@ struct SpotLight
 	uint64 _padding;
 };
 
-	
 struct Lighting
 {
 	glm::vec4 ambLightColor{0.0f, 0.0f, 0.0f, 1.0f};
@@ -37,9 +36,11 @@ struct Lighting
 	
 };
 
-
 struct LightSetup
 {
 	Lighting lighting;
 	ConstantBufferId bufferId;
 };
+
+
+bool ControlLightingImGui(Lighting& light);

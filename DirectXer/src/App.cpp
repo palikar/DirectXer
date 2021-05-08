@@ -41,8 +41,6 @@ void App::Update(float dt)
 
 	TempFormater formater;
 
-	ImGui::Begin("App");
-	
 	if (ImGui::CollapsingHeader("Telemetry"))
 	{
 		
@@ -111,7 +109,6 @@ void App::Update(float dt)
 		}
 	}
 	
-	ImGui::End();
 }
 
 void App::PostInit()

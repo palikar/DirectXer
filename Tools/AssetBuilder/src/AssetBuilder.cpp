@@ -33,6 +33,7 @@ static AssetToLoad AssetsToLoad[] = {
 	{Type_Mesh, Tag_Level,  "models/first_tree.obj", "M_TREE_1"},
 	
 	{Type_Skybox, Tag_Level, "sky", "T_SKY"},
+	{Type_Skybox, Tag_Level, "night_sky", "T_NIGHT_SKY"},
 
 	{Type_Texture, Tag_Level, "checker.png", "T_CHECKER"},
 	{Type_Texture, Tag_Level, "rocks_color.png", "T_ROCKS_COLOR"},
@@ -264,7 +265,7 @@ int main(int argc, char *argv[])
 		  case Type_Skybox: 
 		  {
 			  LoadSkybox(asset, context, dataBlob);
-			  std::cout << fmt::format("{} \t->\t Bundling Skybox [{:.3} MB] [{}]\n", asset.Id, (4*dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
+			  std::cout << fmt::format("{} \t->\t Bundling Skybox [{:.3} MB] [{}]\n", asset.Id, (6*dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
 			  break;
 		  }
 		  case Type_Mesh: 

@@ -92,7 +92,7 @@ float3 ApplyDirLight(float3 normal, float3 diffuseFactor)
 }
 
 float3 ApplyPointLight(PointLight light, float3 normal, float3 surface_pos, float3 surface_to_camera,
-    float3 diffuseFactor, float3 specularFactor, float specularExponent)
+		       float3 diffuseFactor, float3 specularFactor, float specularExponent)
 {
     float3 light_to_surface  = normalize(light.Position.xyz - surface_pos).xyz;
     float dist_to_light = length(light.Position.xyz - surface_pos);
@@ -112,6 +112,31 @@ float3 ApplyPointLight(PointLight light, float3 normal, float3 surface_pos, floa
     return (diffuse + specular) * attenuation;
 }
 
+float3 ApplySpotLight(SpotLight light, float3 normal, float3 surface_pos, float3 surface_to_camera,
+		      float3 diffuseFactor, float3 specularFactor, float specularExponent)
+{
+    float3 light_to_surface  = normalize(light.Position.xyz - surface_pos).xyz;
+    float theta = acos(dot(light_to_surface, normalize(-light.Dir).xyz));
+
+    if(theta < light.Params.r) {
+        float epsilon  = light.Params.g - light.Params.r;
+        float intensity = clamp((theta - light.Params.r) / epsilon, 0.0, 1.0);
+
+	float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
+        float3 diffuse = diffuseFactor.rgb * light.Color.rgb * diffuse_coefficient * light.Color.a;
+
+        float specular_coefficient = 0.0;
+        if(diffuse_coefficient > 0.0) {
+            specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), specularExponent);
+        }
+        float3 specular = specular_coefficient * specularFactor.rgb * light.Color.rgb;
+
+        return (diffuse + specular) * intensity;
+    }
+    return float3(0.0, 0.0, 0.0);
+
+}
+
 VSOut main( VSIn input)
 {
     VSOut output = (VSOut)0;
@@ -124,7 +149,7 @@ VSOut main( VSIn input)
     float3 finalColor = float3(0.0f, 0.0f, 0.0f);
     float3 diffuseFactor = KdMap.SampleLevel(pointSamp, input.uv, 0).rgb;
 
-    finalColor += ApplyAmbientLight(Ka);
+    finalColor += ApplyAmbientLight(diffuseFactor);
     finalColor += ApplyDirLight(input.normal, diffuseFactor);
 
     for (int i = 0; i < 5; ++i)
@@ -133,6 +158,12 @@ VSOut main( VSIn input)
 	{
 	    finalColor += ApplyPointLight(PointLights[i], input.normal, worldPos, toCamera,
 					  diffuseFactor, Ks, Ns);
+	}
+
+	if (SpotLights[i].active)
+	{
+	    finalColor += ApplySpotLight(SpotLights[i], input.normal, worldPos, toCamera,
+					 diffuseFactor, Ks, Ns);
 	}
     }
 

@@ -25,7 +25,7 @@ static uint32 SHIPIMAGE = 4;
 
 void ExampleScenes::Init()
 {
-	CurrentScene = SCENE_OBJECTS;
+	CurrentScene = SCENE_BALLS;
 	
 	CurrentRastState = RS_NORMAL;
 
@@ -74,6 +74,11 @@ void ExampleScenes::Init()
 	phongMat.config = SC_DEBUG_PHONG;
 	phongMat.data = NextConstantBufferId();
 	Graphics->CreateConstantBuffer(phongMat.data, sizeof(PhongMaterialData), &texMatData);
+
+	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
+	phongMatData.Diffuse  = {0.5f, 0.5f, 0.5f, 0.0f };
+	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 
 
 	// Create lighing
@@ -150,16 +155,19 @@ void ExampleScenes::Update(float dt)
 	case SCENE_OBJECTS:
 		ProcessObjectsScene(dt);
 		break;
+	case SCENE_BALLS:
+		ProcessBallsScene(dt);
+		break;
 		
 	}
 
 }
 
-void ExampleScenes::RenderSkyBox()
+void ExampleScenes::RenderSkyBox(TextureId sky)
 {
 	// @Speed: The texture will be bount most of the time
 	Graphics->SetShaderConfiguration(SC_DEBUG_SKY);
-	Graphics->BindTexture(0, T_SKY);
+	Graphics->BindTexture(0, sky);
 	Graphics->VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
 	Graphics->VertexShaderCB.invModel = glm::inverse(Graphics->VertexShaderCB.model);
 	Graphics->UpdateCBs();
@@ -176,7 +184,7 @@ void ExampleScenes::SetupCamera(Camera t_Camera)
 
 void ExampleScenes::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
 {
-	Graphics->VertexShaderCB.model = t_Rotation *  t_Translation * t_Scale;
+	Graphics->VertexShaderCB.model = t_Rotation *  t_Scale * t_Translation;
 	Graphics->VertexShaderCB.invModel = glm::inverse(Graphics->VertexShaderCB.model);
 	Graphics->UpdateCBs();
 	DebugGeometry.DrawGeometry(*Graphics, t_Id);
@@ -284,11 +292,9 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
-	
-	
 	bool lightChanged = false;
 	Graphics->BindPSConstantBuffers(Light.bufferId, 2);
-	ImGui::Begin("Scene Setup");
+	
 	if (ImGui::CollapsingHeader("Ligting"))
 	{
 		if (ImGui::TreeNode("Directional light"))
@@ -312,6 +318,8 @@ void ExampleScenes::ProcessPhongScene(float dt)
 		
 		if (ImGui::TreeNode("Point light"))
 		{
+			ImGui::Checkbox("Active", (bool*)&Light.lighting.pointLights[0].Active);
+			
 			ImGui::Text("Color");
 			ImGui::SameLine();
 			lightChanged |= ImGui::ColorEdit3("Color", (float*)&Light.lighting.pointLights[0].Color);
@@ -323,6 +331,8 @@ void ExampleScenes::ProcessPhongScene(float dt)
 
 		if (ImGui::TreeNode("Spot Light"))
 		{
+			ImGui::Checkbox("Active", (bool*)&Light.lighting.spotLights[0].Active);
+			
 			ImGui::Text("Color");
 			ImGui::SameLine();
 			lightChanged |= ImGui::ColorEdit3("Color", (float*)&Light.lighting.spotLights[0].color);
@@ -333,7 +343,6 @@ void ExampleScenes::ProcessPhongScene(float dt)
 			ImGui::TreePop();
 		}		
 	}
-
 	
 	static float lightRadius = 1.0;
 	lightChanged |= ImGui::SliderFloat("Light Radius: ", (float*)&lightRadius, 0.1f, 1.5f, "%.3f");
@@ -391,7 +400,6 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
 	RenderDebugGeometry(SPHERE, init_translate(-1.0f, 1.0, -3.0f), init_scale(0.20f, 0.20f, 0.20f));
 
-	ImGui::End();
 	RenderSkyBox();
 }
 
@@ -502,6 +510,80 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
 	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
 	
-	RenderSkyBox();
+	RenderSkyBox(T_NIGHT_SKY);
 }
 
+void ExampleScenes::ProcessBallsScene(float dt)
+{
+	static float t = 0.0f;
+	t += 1.1f * dt;
+	t = t > 100.0f ? 0.0f : t;
+	
+	static int ball_grid_x = 20;
+    static int ball_grid_y = 20;
+	static float offset = 2.5f;
+	static float ballScale = 1.0f;
+	static float lightRadius = 1.0;
+
+	ControlLightingImGui(Light.lighting);
+	
+	if (ImGui::CollapsingHeader("Ball Scene"))
+	{
+		ImGui::Text("Balls material");
+		ImGui::ColorEdit3("Ambient Factor:", (float*)&phongMatData.Ambient);
+		ImGui::ColorEdit3("Diffuse Factor:", (float*)&phongMatData.Diffuse);
+		ImGui::ColorEdit3("Specular Factor:", (float*)&phongMatData.Specular);
+
+		ImGui::Separator();
+		ImGui::Text("Balls Setup");
+		ImGui::SliderInt("Ball Grid X", &ball_grid_x, 10, 30);
+		ImGui::SliderInt("Ball Grid Y", &ball_grid_y, 10, 30);
+		ImGui::SliderFloat("Offset", &offset, 1.5f, 4.0f);
+		ImGui::SliderFloat("Ball Scale", &ballScale, 0.05f, 1.3f);
+	}
+	
+	ControlCameraFPS(camera, dt);
+	
+	Light.lighting.spotLights[0].position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(t), 1.0f, (0.5f * (ball_grid_y - 3) * offset), 0.0f};
+	Light.lighting.pointLights[0].Position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(t), 1.0f, (- 0.5f * (ball_grid_y - 3) * offset), 0.0f};
+
+	ControlCameraFPS(camera, dt);
+
+	// The rendering starts here
+	
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics->ClearZBuffer();
+	Graphics->SetDepthStencilState(DSS_Normal);
+
+	Graphics->SetShaderConfiguration(SC_DEBUG_PHONG);
+	
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
+
+	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
+	SetupCamera(camera);
+
+	
+	Graphics->BindPSConstantBuffers(texMat.data, 1);
+	Graphics->BindPSConstantBuffers(Light.bufferId, 2);
+	Graphics->BindPSConstantBuffers(phongMat.data, 3);
+
+	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	Graphics->UpdateCBs();
+
+	for (int i = 0; i < ball_grid_x; ++i)
+	{
+		for (int j = 0; j < ball_grid_y; ++j)
+		{
+			glm::vec3 ballPosition(i * offset - (ball_grid_x * offset * 0.5f),
+								   0.0f,
+								   j * offset - (ball_grid_y * offset * 0.5f));
+
+			RenderDebugGeometry(SPHERE, init_translate(ballPosition), init_scale(ballScale, ballScale, ballScale));
+		}
+
+	}
+
+	RenderSkyBox(T_NIGHT_SKY);
+}

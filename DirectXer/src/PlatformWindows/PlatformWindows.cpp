@@ -278,9 +278,13 @@ int WindowsWindow::Run()
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			const float delta= (float)clockToMilliseconds(dt) / 1000.0f;
+			ImGui::Begin("DirectXer");
+			
+			const float delta = (float)clockToMilliseconds(dt) / 1000.0f;
 			Application->Update(delta);
 			Application->Game.Update(delta);
+
+			ImGui::End();
 
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); 
@@ -291,8 +295,8 @@ int WindowsWindow::Run()
 			dt = endFrame - beginFrame;
 			deltaTime += dt;
 			frames++;
-
-			if( clockToMilliseconds(deltaTime)>1000.0)
+			
+			if (clockToMilliseconds(deltaTime) > 1000.0)
 			{
 				frameRate = (double)frames * 0.5 +  frameRate * 0.5;
 				deltaTime -= CLOCKS_PER_SEC;

@@ -195,6 +195,14 @@ void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& 
 		fmt::format("{}/back.png", asset.Path.c_str()),
 	};
 
+	for (size_t i = 0; i < 6; ++i)
+	{
+		if (!fs::is_regular_file(paths[i]))
+		{
+			paths[i] = fs::path(paths[i]).replace_extension("jpg").string();
+		}
+
+	}
 	SkyboxLoadEntry skybox;
 	skybox.Id = NextTextureAssetId();
 
@@ -202,14 +210,14 @@ void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& 
 	
 	for (size_t i = 0; i < 6; ++i)
 	{
-		stbi_set_flip_vertically_on_load(1);
+		stbi_set_flip_vertically_on_load(0);
 		int width, height, channels;
 		unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channels, 4);
 
 		skybox.Desc.Width = width;
 		skybox.Desc.Height = height;
 		skybox.Desc.Format = TF_RGBA;
-		skybox.DataOffset[i] = blob.PutData(data, width*height*channels);
+		skybox.DataOffset[i] = blob.PutData(data, width*height*4);
 
 		stbi_image_free(data);
 	}

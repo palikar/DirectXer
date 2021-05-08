@@ -18,6 +18,7 @@ enum Scene
 	SCENE_PHONGS		= 1,
 	SCENE_SPACE_GAME	= 2,
 	SCENE_OBJECTS		= 3,
+	SCENE_BALLS		    = 4,
 	SCENE_COUNT
 };
 
@@ -35,7 +36,7 @@ public:
 	void PostInit() {};
 	
 	void SetupCamera(Camera t_Camera);
-	void RenderSkyBox();
+	void RenderSkyBox(TextureId sky = 32773);
 	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4(1), glm::mat4 t_Scale = glm::mat4(1), glm::mat4 t_Rotation = glm::mat4(1));
 	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
 
@@ -43,6 +44,7 @@ public:
 	void ProcessPhongScene(float dt);
 	void ProcessSpaceScene(float dt);
 	void ProcessObjectsScene(float dt);
+	void ProcessBallsScene(float dt);
 	
 	Graphics* Graphics;
 	App* Application;

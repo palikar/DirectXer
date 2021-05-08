@@ -21,11 +21,12 @@
 #define Material_001         14
 #define M_TREE_1             15
 #define T_SKY             32773
-#define T_CHECKER         32774
-#define T_ROCKS_COLOR     32775
-#define T_FLOOR_COLOR     32776
-#define T_ROCKS_AO        32777
-#define T_ROCKS_NORMAL    32778
+#define T_NIGHT_SKY       32774
+#define T_CHECKER         32775
+#define T_ROCKS_COLOR     32776
+#define T_FLOOR_COLOR     32777
+#define T_ROCKS_AO        32778
+#define T_ROCKS_NORMAL    32779
 #define F_DroidSans_24       16
 #define F_DroidSansBold_24   17
 #define A_SHOOT              18
@@ -101,7 +102,7 @@ static inline uint32 MeshesIds[] = {
 /* ------------------------------  */
 
 static inline AssetFile AssetFiles[] = {
-	{ "resources/SpaceAssets.dbundle", 114124656 },
+	{ "resources/SpaceAssets.dbundle", 139290544 },
 };
 
 static inline size_t SpaceGameAssetFile = 0;
