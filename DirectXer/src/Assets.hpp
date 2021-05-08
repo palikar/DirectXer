@@ -7,6 +7,7 @@
 #include <Audio.hpp>
 #include <FontLibrary.hpp>
 #include <GeometryUtils.hpp>
+#include <Materials.hpp>
 
 enum Tag : uint16
 {
@@ -19,6 +20,8 @@ struct AssetColletionHeader
 	uint32 IBsCount;
 	uint32 VBsCount;
 
+	uint32 MaterialsCount;
+	
 	uint32 ImagesCount;
 	uint32 AtlasesCount;
 	uint32 SkyboxesCount;
@@ -26,7 +29,6 @@ struct AssetColletionHeader
 	uint32 LoadImagesCount;
 	uint32 LoadWavsCount;
 	uint32 LoadFontsCount;
-
 	uint32 LoadMeshesCount;
 	
 	uint32 VersionSpec;	
@@ -65,6 +67,12 @@ struct SkyboxLoadEntry
 	size_t DataOffset[6];
 };
 
+struct MaterialLoadEntry
+{
+	MtlMaterial Desc;
+	MaterialId Id;
+};
+
 // @Note: Will be put directly into the images map of the ImageLibrary
 struct ImageEntry
 {
@@ -99,7 +107,7 @@ struct FontLoadEntry
 
 struct MeshLoadEntry
 {
-	MeshGeometryInfo Mesh;
+	Mesh Mesh;
 	uint32 Id;
 };
 

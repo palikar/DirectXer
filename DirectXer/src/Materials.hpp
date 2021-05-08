@@ -23,6 +23,9 @@
  
 */
 
+
+using MaterialId = uint32;
+
 // @Note: Basci textured material that supports color and AO maps, does not receive
 // lightning, and can mix the texture color with some solid color
 struct TexturedMaterial
@@ -59,4 +62,33 @@ struct PhongMaterialData
 	glm::vec4 Emissive{ 0.0f, 0.0f, 0.0f, 0.0f};
 	float SpecularChininess {1.0};
 	glm::vec3 _padding;
+};
+
+// @Note: Loaded from Mtl file;
+struct MtlMaterialData
+{
+	float Ns;
+	glm::vec3 Ka;
+
+	float Ni;
+	glm::vec3 Kd;
+
+	float d;
+	glm::vec3 Ks;
+
+	glm::vec3 Ke;
+	uint32 illum;
+};
+
+struct MtlMaterial : public MtlMaterialData
+{
+	ShaderConfig Program;
+
+	ConstantBufferId Cbo;
+	
+	TextureId KaMap;
+	TextureId KdMap;
+	TextureId KsMap;
+	TextureId NsMap;
+	TextureId dMap;
 };

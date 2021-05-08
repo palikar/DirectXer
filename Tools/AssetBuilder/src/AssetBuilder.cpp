@@ -95,6 +95,8 @@ static size_t CalculateBaseOffset(AssetBundlerContext& context)
 
 	offset += sizeof(ImageEntry) * context.Images.size();
 	offset += sizeof(ImageAtlas) * context.Atlases.size();
+
+	offset += sizeof(MaterialLoadEntry) * context.Materials.size();
 	
 	offset += sizeof(SkyboxLoadEntry) * context.Skyboxes.size();
 	offset += sizeof(ImageLoadEntry) * context.LoadImages.size();
@@ -286,6 +288,7 @@ int main(int argc, char *argv[])
  	context.Header.LoadFontsCount  = (uint32)context.LoadFonts.size();
 	context.Header.SkyboxesCount  = (uint32)context.Skyboxes.size();
 	context.Header.LoadMeshesCount  = (uint32)context.LoadMeshes.size();
+	context.Header.MaterialsCount  = (uint32)context.Materials.size();
 	
 	fmt::print("----------Done building assets----------\n");
 	fmt::print("Textures: \t[{}]\n", context.Header.TexturesCount);
@@ -295,6 +298,8 @@ int main(int argc, char *argv[])
 	fmt::print("LoadWavs: \t[{}]\n", context.Header.LoadWavsCount);
 	fmt::print("LoadFonts: \t[{}]\n", context.Header.LoadFontsCount);
 	fmt::print("Skyboxes: \t[{}]\n", context.Header.SkyboxesCount);
+	fmt::print("Meshes: \t[{}]\n", context.Header.LoadMeshesCount);
+	fmt::print("Materials: \t[{}]\n", context.Header.MaterialsCount);
 
 	
 	// @Note: The offsets in the context are relative to the beginning of the DataBlob;
@@ -338,6 +343,10 @@ int main(int argc, char *argv[])
 	  |----------------------------------------|
 	  |---------------Skyboxes-----------------| -- struct SkyboxLoadEntry
 	  |----------------------------------------|
+	  -----------------Meshes------------------| -- struct MeshLoadEntry
+	  |----------------------------------------|
+	  |---------------Material-----------------| -- struct MaterialLoadEntry
+	  |----------------------------------------|
 	  |----------------DATA--------------------| -- unsigned char[]
 
 	*/
@@ -363,6 +372,7 @@ int main(int argc, char *argv[])
 	outfile.write((char*)context.LoadFonts.data(), sizeof(FontLoadEntry)*context.LoadFonts.size());
 	outfile.write((char*)context.Skyboxes.data(), sizeof(SkyboxLoadEntry)*context.Skyboxes.size());
 	outfile.write((char*)context.LoadMeshes.data(), sizeof(MeshLoadEntry)*context.LoadMeshes.size());
+	outfile.write((char*)context.Materials.data(), sizeof(MaterialLoadEntry)*context.Materials.size());
 
 	outfile.write((char*)dataBlob.Data.data(), sizeof(char) * dataBlob.Data.size());
 	

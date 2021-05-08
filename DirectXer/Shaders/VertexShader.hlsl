@@ -17,7 +17,6 @@ cbuffer VSPrim : register(b0)
     uint shaderType;
 };
 
-
 VSOut main(uint vI : SV_VERTEXID, float3 pos : Position, float3 color : Color, float2 uv: Texcoord, float3 norm: Normal)
 {
     VSOut output = (VSOut)0;

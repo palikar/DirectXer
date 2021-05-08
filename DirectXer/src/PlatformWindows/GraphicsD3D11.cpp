@@ -11,6 +11,9 @@
 #include <QuadPixelShader.hpp>
 #include <QuadVertexShader.hpp>
 
+#include <MTLPixelShader.hpp>
+#include <MTLVertexShader.hpp>
+
 static DXGI_FORMAT TFToDXGI(TextureFormat format)
 {
 	switch (format)
@@ -171,25 +174,58 @@ void GraphicsD3D11::InitRasterizationsStates()
 
 void GraphicsD3D11::InitSamplers()
 {
-	D3D11_SAMPLER_DESC desc;
-	desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	desc.MipLODBias = 0.0f;
-	desc.MaxAnisotropy = 1;
-	desc.ComparisonFunc = D3D11_COMPARISON_NOT_EQUAL;
-	desc.BorderColor[0] = 0.0f;
-	desc.BorderColor[1] = 0.0f;
-	desc.BorderColor[2] = 0.0f;
-	desc.BorderColor[3] = 0.0f;
-	desc.MinLOD = 0.0f;
-	desc.MaxLOD = D3D11_FLOAT32_MAX;
+	{
+		// Linear sampler
+		
+		D3D11_SAMPLER_DESC desc;
+		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.MipLODBias = 0.0f;
+		desc.MaxAnisotropy = 1;
+		desc.ComparisonFunc = D3D11_COMPARISON_NOT_EQUAL;
+		desc.BorderColor[0] = 0.0f;
+		desc.BorderColor[1] = 0.0f;
+		desc.BorderColor[2] = 0.0f;
+		desc.BorderColor[3] = 0.0f;
+		desc.MinLOD = 0.0f;
+		desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	ID3D11SamplerState* state;
-	Device->CreateSamplerState(&desc, &state);
+		ID3D11SamplerState* state;
+		Device->CreateSamplerState(&desc, &state);
 
-	Context->PSSetSamplers(0, 1, &state);
+		Context->PSSetSamplers(0, 1, &state);
+		Context->VSSetSamplers(0, 1, &state);
+	}
+
+	{
+		// Point sampler
+		
+		D3D11_SAMPLER_DESC desc;
+		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.MipLODBias = 0.0f;
+		desc.MaxAnisotropy = 1;
+		desc.ComparisonFunc = D3D11_COMPARISON_NOT_EQUAL;
+		desc.BorderColor[0] = 0.0f;
+		desc.BorderColor[1] = 0.0f;
+		desc.BorderColor[2] = 0.0f;
+		desc.BorderColor[3] = 0.0f;
+		desc.MinLOD = 0.0f;
+		desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		ID3D11SamplerState* state;
+		Device->CreateSamplerState(&desc, &state);
+
+		Context->PSSetSamplers(1, 1, &state);
+		Context->VSSetSamplers(1, 1, &state);
+	}
+	
+
+	
 }
 
 void GraphicsD3D11::InitBlending()
@@ -626,6 +662,22 @@ void GraphicsD3D11::InitResources()
 		Shaders[SF_QUAD] = shaderObject;
 	}
 
+	{
+		// MTL shader
+		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
+			{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Texcoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+		
+		ShaderObject shaderObject;
+		GFX_CALL(Device->CreatePixelShader(g_MTLPixelShader, Size(g_MTLPixelShader), nullptr, &shaderObject.ps));
+		GFX_CALL(Device->CreateVertexShader(g_MTLVertexShader, Size(g_MTLVertexShader), nullptr, &shaderObject.vs));
+		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_MTLVertexShader, Size(g_MTLVertexShader), &shaderObject.il));
+		Shaders[SF_MTL] = shaderObject;
+	}
+
+		
 	D3D11_BUFFER_DESC vertexShaderCBDesc{ 0 };
 	vertexShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;
 	vertexShaderCBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -783,6 +835,11 @@ void GraphicsD3D11::UpdateIndexBuffer(IndexBufferId t_Id, void* data, uint64 t_L
 void GraphicsD3D11::BindTexture(uint32 t_Slot, TextureId t_Id)
 {
 	Context->PSSetShaderResources(t_Slot, 1, &Textures.at(t_Id).srv);
+}
+
+void GraphicsD3D11::BindVSTexture(uint32 t_Slot, TextureId t_Id)
+{
+	Context->VSSetShaderResources(t_Slot, 1, &Textures.at(t_Id).srv);
 }
 
 void GraphicsD3D11::SetViewport(float x, float y, float width, float height)

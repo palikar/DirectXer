@@ -107,11 +107,18 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 
 	for (uint32 i = 0; i < header.LoadMeshesCount; ++i)
 	{
-		MeshLoadEntry& entry = ReadBlob<MeshLoadEntry>(current);
-		context.MeshesLib->Meshes.insert({ MeshId{entry.Id}, Mesh{entry.Mesh} });
+		MeshLoadEntry& entry = ReadBlob<MeshLoadEntry>(current); 
+		context.MeshesLib->Meshes.insert({ MeshId{entry.Id}, entry.Mesh });
 	}
 
+	for (uint32 i = 0; i < header.MaterialsCount; ++i)
+	{
+		MaterialLoadEntry& entry = ReadBlob<MaterialLoadEntry>(current);
+		entry.Desc.Cbo = NextConstantBufferId();
+		context.MeshesLib->Materials.insert({ MaterialId{entry.Id}, entry.Desc });
+		
+		context.Graphics->CreateConstantBuffer(entry.Desc.Cbo, sizeof(MtlMaterialData), &entry.Desc);
 	
-	
+	}
 	
 }

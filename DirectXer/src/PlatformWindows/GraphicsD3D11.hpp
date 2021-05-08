@@ -90,6 +90,7 @@ class GraphicsD3D11
 	void ResizeBackBuffer(float width, float height);
 
 	void BindTexture(uint32 t_Slot, TextureId t_Id);
+	void BindVSTexture(uint32 t_Slot, TextureId t_Id);
 	void BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
 	void BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
 	void BindVertexBuffer(VertexBufferId t_Id, uint32 offset = 0);

@@ -5,6 +5,7 @@
 #include <GeometryDebug.hpp>
 #include <Memory.hpp>
 #include <Containers.hpp>
+#include <Materials.hpp>
 
 struct BufferDescriptor
 {
@@ -57,11 +58,14 @@ using MeshId = uint32;
 struct Mesh
 {
 	MeshGeometryInfo Geometry;
+	MaterialId Material;
 };
 
 struct MeshCatalog
 {
 	Map<MeshId, Mesh> Meshes;
+	Map<MaterialId, MtlMaterial> Materials;
+	
 	Graphics* Gfx;
 
 	void Init(Graphics* graphics)
@@ -73,14 +77,21 @@ struct MeshCatalog
 	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {})
 	{
 		const auto mesh = Meshes.at(id);
+		const auto material = Materials.at(mesh.Material);
 
+		Gfx->SetShaderConfiguration(material.Program);
+
+		Gfx->BindVSConstantBuffers(material.Cbo, 1);
+		Gfx->BindVertexBuffer(mesh.Geometry.VertexBuffer);
+		Gfx->BindIndexBuffer(mesh.Geometry.IndexBuffer);
+		
 		Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
 		Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 		Gfx->UpdateCBs();
-		
-		Gfx->BindVertexBuffer(mesh.Geometry.VertexBuffer);
-		Gfx->BindIndexBuffer(mesh.Geometry.IndexBuffer);
-		Gfx->SetShaderConfiguration(SC_DEBUG_COLOR);
+
+		Gfx->BindVSTexture(0, material.KaMap);
+		Gfx->BindVSTexture(1, material.KdMap);
+
 		Gfx->DrawIndex(TT_TRIANGLES, mesh.Geometry.IndexCount, 0, 0);
 	}
 };

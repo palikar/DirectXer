@@ -15,6 +15,8 @@
 #include <fmt/format.h>
 #include <filesystem>
 
+namespace fs = std::filesystem;
+
 //@Note: as we don't have different structs for the different types of entries
 // (and we probably should at some point), each entry can have some extra information
 // that is context dependent based on the type of the asset to be packaged; this structure
@@ -39,6 +41,7 @@ enum AssetType : uint16
 	Type_VertexBuffer,
 	Type_Skybox,
 	Type_Mesh,
+	Type_Material,
 };
 
 struct AssetToLoad
@@ -89,6 +92,8 @@ struct AssetBundlerContext
 	// be created with the "TexturesToCreate" entries
 	std::vector<ImageEntry> Images;
 	std::vector<ImageAtlas> Atlases;
+
+	std::vector<MaterialLoadEntry> Materials;
 
 	std::vector<SkyboxLoadEntry> Skyboxes;
 	

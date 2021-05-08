@@ -33,6 +33,13 @@ struct ColorVertex
 	glm::vec3 normal;
 };
 
+struct MtlVertex
+{
+	glm::vec3 pos;
+	glm::vec2 uv;
+	glm::vec3 normal;
+};
+
 struct Vertex2D
 {
 	glm::vec2 pos;
@@ -87,6 +94,7 @@ enum ShaderFile : uint8
 	SF_DEBUG   = 0,
 	SF_2D      = 1,
 	SF_QUAD    = 2,
+	SF_MTL     = 3,
 
 	SF_COUNT
 };
@@ -99,12 +107,14 @@ enum ShaderType : uint8
 	ST_TEX_SIMPLE  = 3,
 	ST_PHONG       = 4,
 				   
-				   
 	ST_RECT        = 5,
 	ST_CIRCLE      = 6,
 				   
 	ST_SIMPLE_QUAD = 7,
 
+	ST_1_MTL       = 8,
+	ST_2_MTL       = 9,
+	
 	ST_COUNT
 };
 
@@ -122,6 +132,9 @@ enum ShaderConfig
 	SC_2D_CIRCLE         = SF_2D    | (ST_CIRCLE    << 8),
 	
 	SC_QUAD_SIMPLE       = SF_QUAD  | (ST_SIMPLE_QUAD << 8),
+
+	SC_MTL_1             = SF_MTL   | (ST_1_MTL       << 8),
+	SC_MTL_2             = SF_MTL   | (ST_2_MTL       << 8),
 	
 	SC_COUNT
 };

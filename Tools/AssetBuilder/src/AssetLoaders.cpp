@@ -76,6 +76,24 @@ static glm::i32vec3 GetIndexData(std::string part)
 		std::stoi(parts[2].c_str()) - 1};
 }
 
+static bool StartsWith(const std::string &str, const std::string &prefix)
+{
+	return str.size() >= prefix.size() && 0 == str.compare(0, prefix.size(), prefix);
+}
+
+static std::string ReplaceAll(std::string str, const std::string &from, const std::string &to)
+{
+    if (from.empty()) return str;
+
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();  // In case 'to' contains 'from', like
+                                   // replacing 'x' with 'yx'
+    }
+    return str;
+}
 
 void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
@@ -200,13 +218,120 @@ void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& 
 
 }
 
+static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	auto content = LoadFileIntoString(path.string());
+	std::stringstream stream(content);
+	std::string line;
+
+	std::string newMatName;
+
+	MtlMaterial newMat{0};
+
+	const ShaderConfig configs[] = {
+		SC_MTL_1,
+		SC_MTL_2
+	};
+	
+	while(std::getline(stream, line, '\n'))
+	{
+		if (line[0] == '#') continue;
+
+		if (StartsWith(line, "newmtl"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMatName = ReplaceAll(parts[1], ".", "_");
+		}
+		else if (StartsWith(line, "Ns"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.Ns = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "Ni"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.Ni = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "d"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.d = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "illum"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.illum = (uint32)std::stoi(parts[1].c_str());
+			assert(newMat.illum <= 2);
+			newMat.Program = configs[newMat.illum - 1];
+		}
+		else if (StartsWith(line, "Ka"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.Ka = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "Kd"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.Kd = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "Ks"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.Ks = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "Ke"))
+		{
+			auto parts = SplitLine(line, ' ');
+			newMat.Ke = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "map_Kd"))
+		{
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line,"map_Kd ", "");
+			texAsset.Id = "Kd_Map";
+			LoadTexture(texAsset, context, blob);
+			newMat.KdMap = context.TexturesToCreate.back().Id;	
+		}
+		else if (StartsWith(line, "map_Ka"))
+		{
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line,"map_Ka ", "");
+			texAsset.Id = "Ka_Map";
+			LoadTexture(texAsset, context, blob);
+			newMat.KaMap = context.TexturesToCreate.back().Id;	
+		}
+		
+	}
+
+	MaterialLoadEntry newEntry;
+	newEntry.Desc = newMat;
+	newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
+	context.Materials.push_back(newEntry);
+}
+	
 void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	auto content = LoadFileIntoString(asset.Path);
 	std::stringstream stream(content);
 	std::string line;
 
-	std::vector<ColorVertex> VertexData;
+	std::vector<MtlVertex> VertexData;
 	std::vector<uint32> IndexData;
 
 	std::vector<glm::vec3> Pos;
@@ -222,9 +347,21 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 	UVs.reserve(1024);
 	indexMap.reserve(2048);
 
+	VBLoadEntry vbo;
+	IBLoadEntry ibo;
+	MeshLoadEntry mesh;
+
 	while(std::getline(stream, line, '\n'))
 	{
-		if (line[0] == 'v' && line[1] == ' ')
+		if (line[0] == '#') continue;
+		
+		if (StartsWith(line, "mtllib"))
+		{
+			 auto parts = SplitLine(line, ' ');
+			 auto materialPath = fs::path(asset.Path).parent_path() / fs::path(parts[1]);
+			 LoadMaterial(materialPath, context, blob);
+		}
+		else if (line[0] == 'v' && line[1] == ' ')
 		{
 			auto parts = SplitLine(line, ' ');
 			Pos.push_back(glm::vec3{
@@ -255,10 +392,9 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 			const auto vtn2 = GetIndexData(parts[2]);
 			const auto vtn3 = GetIndexData(parts[3]);
 			
-			const auto i = (uint32) VertexData.size();
-
-			ColorVertex nextVertex;
-			if (indexMap.insert({parts[1], i}).second)
+			MtlVertex nextVertex;
+			
+			if (indexMap.insert({parts[1], (uint32)VertexData.size()}).second)
 			{
 				nextVertex.pos = Pos[vtn1.x];
 				nextVertex.normal = Norms[vtn1.z];
@@ -266,7 +402,7 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 				VertexData.push_back(nextVertex);
 			}
 			
-			if (indexMap.insert({parts[2], i + 1}).second)
+			if (indexMap.insert({parts[2], (uint32)VertexData.size()}).second)
 			{
 				nextVertex.pos = Pos[vtn2.x];
 				nextVertex.normal = Norms[vtn2.z];
@@ -274,7 +410,7 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 				VertexData.push_back(nextVertex);
 			}
 			
-			if (indexMap.insert({parts[3], i + 2}).second)
+			if (indexMap.insert({parts[3], (uint32)VertexData.size()}).second)
 			{
 				nextVertex.pos = Pos[vtn3.x];
 				nextVertex.normal = Norms[vtn3.z];
@@ -287,25 +423,30 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 			IndexData.push_back(indexMap[parts[3]]);
 			
 		}
+		else if (StartsWith(line, "usemtl"))
+		{
+			auto parts = SplitLine(line, ' ');
+			auto matName = ReplaceAll(parts[1], ".", "_");
+			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&matName](auto def) { return def.Name == matName; });
+			assert(id != context.Defines.end());
+			mesh.Mesh.Material = id->Id;			
+		}
     }
 
-	VBLoadEntry vbo;
-	vbo.StructSize = sizeof(ColorVertex);
-	vbo.DataSize = (uint32)(sizeof(ColorVertex) * VertexData.size());
+	vbo.StructSize = sizeof(MtlVertex);
+	vbo.DataSize = (uint32)(sizeof(MtlVertex) * VertexData.size());
 	vbo.Dynamic = false;
-	vbo.DataOffset = blob.PutData((unsigned char*)VertexData.data(), sizeof(ColorVertex) * VertexData.size());
+	vbo.DataOffset = blob.PutData((unsigned char*)VertexData.data(), sizeof(MtlVertex) * VertexData.size());
 	vbo.Id = NextVBAssetId();
 
-	IBLoadEntry ibo;
 	ibo.DataSize = (uint32)(sizeof(uint32) * IndexData.size());
 	ibo.Dynamic = false;
 	ibo.DataOffset = blob.PutData((unsigned char*)IndexData.data(), sizeof(uint32) * IndexData.size());
 	ibo.Id = NextIBAssetId();
 	
-	MeshLoadEntry mesh;
-	mesh.Mesh.VertexBuffer= vbo.Id;
-	mesh.Mesh.IndexBuffer = ibo.Id;
-	mesh.Mesh.IndexCount = (uint32)IndexData.size();
+	mesh.Mesh.Geometry.VertexBuffer= vbo.Id;
+	mesh.Mesh.Geometry.IndexBuffer = ibo.Id;
+	mesh.Mesh.Geometry.IndexCount = (uint32)IndexData.size();
 	mesh.Id = NewAssetName(context, Type_Mesh, asset.Id);
 
 	context.VBsToCreate.push_back(vbo);
