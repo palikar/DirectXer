@@ -778,7 +778,16 @@ bool GraphicsD3D11::CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, voi
 	desc.StructureByteStride = 0;
 
 	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
+	if (t_InitData)
+	{
+		D3D11_SUBRESOURCE_DATA data;
+		data.pSysMem = t_InitData;
+		GFX_CALL(Device->CreateBuffer(&desc, &data, &cb.id));
+	}
+	else
+	{
+		GFX_CALL(Device->CreateBuffer(&desc, nullptr, &cb.id));
+	}
 
 	[[maybe_unused]]bool res = ConstantBuffers.insert({id, cb}).second;
 	Assert(res, "Usage of non-existaned constant buffer");

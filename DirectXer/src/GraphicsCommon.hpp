@@ -17,7 +17,7 @@ struct VSConstantBuffer
 	glm::mat4 projection{};
 	glm::mat4 invModel;
 	uint32 shaderType;
-	uint64 _padding;
+	glm::vec3 cameraPos;
 };
 
 struct SimpleVertex

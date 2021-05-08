@@ -14,9 +14,10 @@
 
 enum Scene
 {
-	SCENE_FIRST   = 0,
-	SCENE_PHONGS  = 1,
-	SCENE_SPACE_GAME  = 2,
+	SCENE_FIRST			= 0,
+	SCENE_PHONGS		= 1,
+	SCENE_SPACE_GAME	= 2,
+	SCENE_OBJECTS		= 3,
 	SCENE_COUNT
 };
 
@@ -41,6 +42,7 @@ public:
 	void ProcessFirstScene(float dt);
 	void ProcessPhongScene(float dt);
 	void ProcessSpaceScene(float dt);
+	void ProcessObjectsScene(float dt);
 	
 	Graphics* Graphics;
 	App* Application;

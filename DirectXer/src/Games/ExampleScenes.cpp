@@ -25,7 +25,8 @@ static uint32 SHIPIMAGE = 4;
 
 void ExampleScenes::Init()
 {
-	CurrentScene = SCENE_FIRST;
+	CurrentScene = SCENE_OBJECTS;
+	
 	CurrentRastState = RS_NORMAL;
 
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
@@ -83,7 +84,12 @@ void ExampleScenes::Init()
 	Light.lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
 	Light.lighting.dirLightDir = { 0.5f, 0.471f, 0.0f, 0.0f };
 
-	Light.lighting.pointLights[0].Active = 1;
+	Light.lighting.pointLights[0].Active = 0;
+	Light.lighting.spotLights[0].Active = 1;
+
+	Light.lighting.spotLights[0].color = {0.5f, 0.5f, 0.5f, 1.0f};
+	Light.lighting.spotLights[0].Params = {0.5f, 0.0f, 0.0f, 0.0f};
+	Light.lighting.spotLights[0].dir = {0.0f, -0.8f, 0.0f, 0.0f};
 
 	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
@@ -141,6 +147,10 @@ void ExampleScenes::Update(float dt)
 	case SCENE_SPACE_GAME:
 		ProcessSpaceScene(dt);
 		break;
+	case SCENE_OBJECTS:
+		ProcessObjectsScene(dt);
+		break;
+		
 	}
 
 }
@@ -161,6 +171,7 @@ void ExampleScenes::SetupCamera(Camera t_Camera)
 {
 	Graphics->VertexShaderCB.view = glm::transpose(t_Camera.view());
 	Graphics->PixelShaderCB.cameraPos = t_Camera.Pos;
+	Graphics->VertexShaderCB.cameraPos = t_Camera.Pos;
 }
 
 void ExampleScenes::RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation, glm::mat4 t_Scale, glm::mat4 t_Rotation)
@@ -273,6 +284,8 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	t = t > 100.0f ? 0.0f : t;
 	ControlCameraFPS(camera, dt);
 
+	
+	
 	bool lightChanged = false;
 	Graphics->BindPSConstantBuffers(Light.bufferId, 2);
 	ImGui::Begin("Scene Setup");
@@ -308,7 +321,17 @@ void ExampleScenes::ProcessPhongScene(float dt)
 			ImGui::TreePop();
 		}
 
-		
+		if (ImGui::TreeNode("Spot Light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |= ImGui::ColorEdit3("Color", (float*)&Light.lighting.spotLights[0].color);
+			lightChanged |= ImGui::SliderFloat("Intensity", (float*)&Light.lighting.spotLights[0].color.a, 0.0f, 1.0f, "%.3f");
+			
+			lightChanged |= ImGui::SliderFloat("Outer Rad", (float*)&Light.lighting.spotLights[0].Params.r, 0.0f, 5.0f, "%.3f");
+			lightChanged |= ImGui::SliderFloat("Inner Rad", (float*)&Light.lighting.spotLights[0].Params.g, 0.0f, 5.0f, "%.3f");
+			ImGui::TreePop();
+		}		
 	}
 
 	
@@ -317,6 +340,8 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	float lightX = std::sin(t) * lightRadius;
 	float lightY = std::cos(t) * lightRadius;
 
+	Light.lighting.spotLights[0].position = {2.0f *std::sin(t), 1.0f, 2.0f, 0.0f};
+	
 	Light.lighting.pointLights[0].Position = {lightX, 0.5f, lightY, 0.0f};
 
 	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
@@ -401,3 +426,82 @@ void ExampleScenes::ProcessSpaceScene(float dt)
 	
 	
 }
+
+void ExampleScenes::ProcessObjectsScene(float dt)
+{
+	static float t = 0.0f;
+	t += 1.0f * dt;
+	t = t > 100.0f ? 0.0f : t;
+	
+	bool lightChanged = false;
+	Graphics->BindPSConstantBuffers(Light.bufferId, 2);
+	if (ImGui::CollapsingHeader("Ligting"))
+	{
+		if (ImGui::TreeNode("Directional light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
+			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
+			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Ambient light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
+			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.ambLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
+			ImGui::TreePop();
+		}
+		
+		if (ImGui::TreeNode("Point light"))
+		{
+			ImGui::Text("Color");
+			ImGui::SameLine();
+			lightChanged |= ImGui::ColorEdit3("Color", (float*)&Light.lighting.pointLights[0].Color);
+			lightChanged |= ImGui::SliderFloat("Constant: ", (float*)&Light.lighting.pointLights[0].Params.r, 0.0f, 2.0f, "Amount = %.3f");
+			lightChanged |= ImGui::SliderFloat("Linear: ", (float*)&Light.lighting.pointLights[0].Params.g, 0.0f, 2.0f, "Amount = %.3f");
+			lightChanged |= ImGui::SliderFloat("Quadreatic: ", (float*)&Light.lighting.pointLights[0].Params.b, 0.0f, 2.0f, "Amount = %.3f");
+			ImGui::TreePop();
+		}		
+	}
+
+	static float lightRadius = 1.0;
+	lightChanged |= ImGui::SliderFloat("Light Radius: ", (float*)&lightRadius, 0.1f, 1.5f, "%.3f");
+	float lightX = std::sin(t) * lightRadius;
+	float lightY = std::cos(t) * lightRadius;
+
+	Light.lighting.pointLights[0].Position = {lightX, 0.5f, lightY, 0.0f};
+
+	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	ControlCameraFPS(camera, dt);
+
+	// @Note: Rendering begins here
+
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics->ClearZBuffer();
+	Graphics->SetDepthStencilState(DSS_Normal);
+
+	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
+	SetupCamera(camera);
+
+	Graphics->SetShaderConfiguration(SC_DEBUG_PHONG);
+	Graphics->BindPSConstantBuffers(phongMat.data, 3);
+
+	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
+	phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
+	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
+	// RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(5.0f, 1.0f, 5.0f));
+
+	MeshesLib.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f}, Light.bufferId);
+	
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
+	
+	RenderSkyBox();
+}
+

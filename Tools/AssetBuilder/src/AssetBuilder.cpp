@@ -300,7 +300,6 @@ int main(int argc, char *argv[])
 	fmt::print("Skyboxes: \t[{}]\n", context.Header.SkyboxesCount);
 	fmt::print("Meshes: \t[{}]\n", context.Header.LoadMeshesCount);
 	fmt::print("Materials: \t[{}]\n", context.Header.MaterialsCount);
-
 	
 	// @Note: The offsets in the context are relative to the beginning of the DataBlob;
 	// when we put them on disk, some of the data in the context will be in front of the
@@ -350,7 +349,7 @@ int main(int argc, char *argv[])
 	  |----------------DATA--------------------| -- unsigned char[]
 
 	*/
-
+	
 	std::string assetFileName = fmt::format("{}.dbundle", arguments.Output);
 
 	fmt::print("Saving [{} Bytes] of meta data in [{}]\n", baseOffset, assetFileName);

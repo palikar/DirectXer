@@ -74,7 +74,7 @@ struct MeshCatalog
 		Meshes.reserve(32);
 	}
 
-	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {})
+	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {}, ConstantBufferId light ={})
 	{
 		const auto mesh = Meshes.at(id);
 		const auto material = Materials.at(mesh.Material);
@@ -82,6 +82,8 @@ struct MeshCatalog
 		Gfx->SetShaderConfiguration(material.Program);
 
 		Gfx->BindVSConstantBuffers(material.Cbo, 1);
+		Gfx->BindVSConstantBuffers(light, 2);
+		
 		Gfx->BindVertexBuffer(mesh.Geometry.VertexBuffer);
 		Gfx->BindIndexBuffer(mesh.Geometry.IndexBuffer);
 		

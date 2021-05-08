@@ -15,6 +15,7 @@ cbuffer VSPrim : register(b0)
     matrix projection;
     matrix invModel;
     uint shaderType;
+    float3 CameraPos;
 };
 
 VSOut main(uint vI : SV_VERTEXID, float3 pos : Position, float3 color : Color, float2 uv: Texcoord, float3 norm: Normal)
@@ -38,7 +39,7 @@ VSOut main(uint vI : SV_VERTEXID, float3 pos : Position, float3 color : Color, f
 	view_m[3][2] = 0.0f;
 
 	output.pos = mul(float4(pos, 1.0), mul(model, mul(view_m, projection)));
-	output.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);	
+	output.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);
 	
 	return output;
     }

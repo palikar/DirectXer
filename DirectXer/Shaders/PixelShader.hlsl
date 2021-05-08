@@ -116,7 +116,7 @@ float3 apply_spot_light(SpotLight light, float3 normal, float3 surface_pos, floa
         /* float distance_to_light = length(light.position - surface_pos); */
 
         float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
-        float3 diffuse = Diffuse.rgb * light.Color.rgb * diffuse_coefficient;
+        float3 diffuse = Diffuse.rgb * light.Color.rgb * diffuse_coefficient * light.Color.a;
 
         float specular_coefficient = 0.0;
         if(diffuse_coefficient > 0.0) {
