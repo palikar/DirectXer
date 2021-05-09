@@ -20,6 +20,8 @@
 #define Kd_Map            32772
 #define Material_001         14
 #define M_TREE_1             15
+#define SimpleColor          16
+#define M_SUZANNE            17
 #define T_SKY             32773
 #define T_NIGHT_SKY       32774
 #define T_CHECKER         32775
@@ -27,10 +29,10 @@
 #define T_FLOOR_COLOR     32777
 #define T_ROCKS_AO        32778
 #define T_ROCKS_NORMAL    32779
-#define F_DroidSans_24       16
-#define F_DroidSansBold_24   17
-#define A_SHOOT              18
-#define A_EXPLODE            19
+#define F_DroidSans_24       18
+#define F_DroidSansBold_24   19
+#define A_SHOOT              20
+#define A_EXPLODE            21
 
 
 static inline const char* ImagesNames[] = {
@@ -73,8 +75,8 @@ static inline const char* WavsNames[] = {
 };
 
 static inline uint32 WavsIds[] = {
-	18,
-	19,
+	20,
+	21,
 };
 
 /* ------------------------------  */
@@ -85,24 +87,26 @@ static inline const char* FontsNames[] = {
 };
 
 static inline uint32 FontsIds[] = {
-	16,
-	17,
+	18,
+	19,
 };
 
 /* ------------------------------  */
 
 static inline const char* MeshesNames[] = {
 	"M_TREE_1",
+	"M_SUZANNE",
 };
 
 static inline uint32 MeshesIds[] = {
 	15,
+	17,
 };
 
 /* ------------------------------  */
 
 static inline AssetFile AssetFiles[] = {
-	{ "resources/SpaceAssets.dbundle", 139290544 },
+	{ "resources/SpaceAssets.dbundle", 139365228 },
 };
 
 static inline size_t SpaceGameAssetFile = 0;

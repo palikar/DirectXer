@@ -248,60 +248,75 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 		if (StartsWith(line, "newmtl"))
 		{
 			auto parts = SplitLine(line, ' ');
+			
 			newMatName = ReplaceAll(parts[1], ".", "_");
 		}
 		else if (StartsWith(line, "Ns"))
 		{
 			auto parts = SplitLine(line, ' ');
+
 			newMat.Ns = std::stof(parts[1].c_str());
+			newMat.illum |= NS_FACT_MASK;
 		}
 		else if (StartsWith(line, "Ni"))
 		{
 			auto parts = SplitLine(line, ' ');
+
 			newMat.Ni = std::stof(parts[1].c_str());
 		}
 		else if (StartsWith(line, "d"))
 		{
 			auto parts = SplitLine(line, ' ');
+			
 			newMat.d = std::stof(parts[1].c_str());
+			newMat.illum |= D_FACT_MASK;
 		}
 		else if (StartsWith(line, "illum"))
 		{
 			auto parts = SplitLine(line, ' ');
-			newMat.illum = (uint32)std::stoi(parts[1].c_str());
-			assert(newMat.illum <= 2);
-			newMat.Program = configs[newMat.illum - 1];
+
+			newMat.illum |= (uint32)std::stoi(parts[1].c_str());
+			assert((newMat.illum & 0xFF) <= 2);
+			newMat.Program = configs[(newMat.illum & 0xFF) - 1];
 		}
 		else if (StartsWith(line, "Ka"))
 		{
 			auto parts = SplitLine(line, ' ');
+
 			newMat.Ka = {
 				std::stof(parts[1].c_str()),
 				std::stof(parts[2].c_str()),
 				std::stof(parts[3].c_str())
 			};
+			newMat.illum |= KA_FACT_MASK;
 		}
 		else if (StartsWith(line, "Kd"))
 		{
 			auto parts = SplitLine(line, ' ');
+
 			newMat.Kd = {
 				std::stof(parts[1].c_str()),
 				std::stof(parts[2].c_str()),
 				std::stof(parts[3].c_str())
 			};
+
+			newMat.illum |= KD_FACT_MASK;
 		}
 		else if (StartsWith(line, "Ks"))
 		{
 			auto parts = SplitLine(line, ' ');
+
 			newMat.Ks = {
 				std::stof(parts[1].c_str()),
 				std::stof(parts[2].c_str()),
 				std::stof(parts[3].c_str())
 			};
+			newMat.illum |= KS_FACT_MASK;
 		}
 		else if (StartsWith(line, "Ke"))
 		{
 			auto parts = SplitLine(line, ' ');
+
 			newMat.Ke = {
 				std::stof(parts[1].c_str()),
 				std::stof(parts[2].c_str()),
@@ -314,7 +329,10 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 			texAsset.Path = ReplaceAll(line,"map_Kd ", "");
 			texAsset.Id = "Kd_Map";
 			LoadTexture(texAsset, context, blob);
-			newMat.KdMap = context.TexturesToCreate.back().Id;	
+			
+			newMat.KdMap = context.TexturesToCreate.back().Id;
+			newMat.illum |= KD_TEX_MASK;
+			newMat.illum &= ~KD_FACT_MASK;
 		}
 		else if (StartsWith(line, "map_Ka"))
 		{
@@ -322,7 +340,43 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 			texAsset.Path = ReplaceAll(line,"map_Ka ", "");
 			texAsset.Id = "Ka_Map";
 			LoadTexture(texAsset, context, blob);
-			newMat.KaMap = context.TexturesToCreate.back().Id;	
+			
+			newMat.KaMap = context.TexturesToCreate.back().Id;
+			newMat.illum |= KA_TEX_MASK;
+			newMat.illum &= ~KA_FACT_MASK;
+		}
+		else if (StartsWith(line, "map_Ks"))
+		{
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line,"map_Ks ", "");
+			texAsset.Id = "Ks_Map";
+			LoadTexture(texAsset, context, blob);
+			
+			newMat.KsMap = context.TexturesToCreate.back().Id;
+			newMat.illum |= D_TEX_MASK;
+			newMat.illum &= ~D_FACT_MASK;
+		}
+		else if (StartsWith(line, "map_Ns"))
+		{
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line,"map_Ns ", "");
+			texAsset.Id = "Ns_Map";
+			LoadTexture(texAsset, context, blob);
+			
+			newMat.NsMap = context.TexturesToCreate.back().Id;
+			newMat.illum |= NS_TEX_MASK;
+			newMat.illum &= ~NS_FACT_MASK;
+		}
+		else if (StartsWith(line, "map_d"))
+		{
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line,"map_d ", "");
+			texAsset.Id = "d_Map";
+			LoadTexture(texAsset, context, blob);
+			
+			newMat.dMap = context.TexturesToCreate.back().Id;
+			newMat.illum |= D_TEX_MASK;
+			newMat.illum &= ~D_FACT_MASK;
 		}
 		
 	}
@@ -429,6 +483,23 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 			IndexData.push_back(indexMap[parts[1]]);
 			IndexData.push_back(indexMap[parts[2]]);
 			IndexData.push_back(indexMap[parts[3]]);
+
+			if (parts.size() > 4)
+			{
+				const auto vtn4 = GetIndexData(parts[4]);
+				if (indexMap.insert({parts[4], (uint32)VertexData.size()}).second)
+				{
+					nextVertex.pos = Pos[vtn4.x];
+					nextVertex.normal = Norms[vtn4.z];
+					nextVertex.uv = UVs[vtn4.y];
+					VertexData.push_back(nextVertex);
+				}
+
+				IndexData.push_back(indexMap[parts[4]]);
+				IndexData.push_back(indexMap[parts[1]]);
+				IndexData.push_back(indexMap[parts[3]]);
+
+			}
 			
 		}
 		else if (StartsWith(line, "usemtl"))

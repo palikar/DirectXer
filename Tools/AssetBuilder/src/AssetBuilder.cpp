@@ -31,6 +31,7 @@
 static AssetToLoad AssetsToLoad[] = {
 
 	{Type_Mesh, Tag_Level,  "models/first_tree.obj", "M_TREE_1"},
+	{Type_Mesh, Tag_Level,  "models/simple_monkey.obj", "M_SUZANNE"},
 	
 	{Type_Skybox, Tag_Level, "sky", "T_SKY"},
 	{Type_Skybox, Tag_Level, "night_sky", "T_NIGHT_SKY"},

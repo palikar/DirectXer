@@ -79,7 +79,7 @@ struct MeshCatalog
 		const auto mesh = Meshes.at(id);
 		const auto material = Materials.at(mesh.Material);
 
-		Gfx->SetShaderConfiguration(material.Program);
+ 		Gfx->SetShaderConfiguration(material.Program);
 
 		Gfx->BindVSConstantBuffers(material.Cbo, 1);
 		Gfx->BindVSConstantBuffers(light, 2);

@@ -1,4 +1,19 @@
 
+#define KA_TEX_MASK  0x00100
+#define KA_FACT_MASK 0x00200
+
+#define KD_TEX_MASK  0x00400
+#define KD_FACT_MASK 0x00800
+
+#define KS_TEX_MASK  0x01000
+#define KS_FACT_MASK 0x02000
+
+#define NS_TEX_MASK  0x04000
+#define NS_FACT_MASK 0x08000
+
+#define D_TEX_MASK   0x10000
+#define D_FACT_MASK  0x20000
+
 struct PointLight
 {
     float4 Color;
@@ -147,7 +162,15 @@ VSOut main( VSIn input)
     float3 toCamera = -normalize(worldPos - CameraPos);
 
     float3 finalColor = float3(0.0f, 0.0f, 0.0f);
-    float3 diffuseFactor = KdMap.SampleLevel(pointSamp, input.uv, 0).rgb;
+
+    float3 diffuseFactor = Kd * ((illum & KD_FACT_MASK) >> 11)
+	+ KdMap.SampleLevel(pointSamp, input.uv, 0).rgb * ((illum & KD_TEX_MASK) >> 10);
+
+    float3 specularFactor = Ks * ((illum & KS_FACT_MASK) >> 13)
+	+ KsMap.SampleLevel(pointSamp, input.uv, 0).rgb * ((illum & KS_TEX_MASK) >> 12);
+    
+    float specularExponent = Ns * ((illum * NS_FACT_MASK) >> 15)
+	+ NsMap.SampleLevel(pointSamp, input.uv, 0).r * ((illum & NS_TEX_MASK) >> 14);
 
     finalColor += ApplyAmbientLight(diffuseFactor);
     finalColor += ApplyDirLight(input.normal, diffuseFactor);
@@ -157,13 +180,13 @@ VSOut main( VSIn input)
 	if (PointLights[i].active)
 	{
 	    finalColor += ApplyPointLight(PointLights[i], input.normal, worldPos, toCamera,
-					  diffuseFactor, Ks, Ns);
+					  diffuseFactor, specularFactor, specularExponent);
 	}
 
 	if (SpotLights[i].active)
 	{
 	    finalColor += ApplySpotLight(SpotLights[i], input.normal, worldPos, toCamera,
-					 diffuseFactor, Ks, Ns);
+					 diffuseFactor, specularFactor, specularExponent);
 	}
     }
 
