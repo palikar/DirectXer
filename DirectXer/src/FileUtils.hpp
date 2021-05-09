@@ -18,3 +18,10 @@ inline void ReadWholeFile(const char* t_Path, MemoryArena& t_Arena)
 
 	PlatformLayer::CloseFile(handle);
 }
+
+inline void DumpArenaToFile(const char* t_Path, MemoryArena& t_Arena)
+{
+	auto handle = PlatformLayer::OpenFileForWriting(t_Path);
+	PlatformLayer::WriteArenaIntoFile(handle, t_Arena);
+	PlatformLayer::CloseFile(handle);
+}

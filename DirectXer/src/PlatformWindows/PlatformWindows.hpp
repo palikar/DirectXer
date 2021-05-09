@@ -85,8 +85,10 @@ struct WindowsPlatformLayer
 	static void WriteErrOut(const char* data, size_t len);
 	static void* Allocate(size_t t_Size);
 	static FileHandle OpenFileForReading(const char* t_Path);
+	static FileHandle OpenFileForWriting(const char* t_Path);
 	static size_t FileSize(FileHandle handle);
 	static void ReadFileIntoArena(FileHandle handle, size_t size, MemoryArena& t_Arena);
+	static void WriteArenaIntoFile(FileHandle handle, MemoryArena& t_Arena);
 	static void CloseFile(FileHandle handle);
 	static bool IsValidPath(const char* data);
 	static uint64 Clock();

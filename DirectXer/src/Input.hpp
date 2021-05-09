@@ -137,10 +137,10 @@ enum class KeyCode : uint16_t
     KPEnter    = 335,
     KPEqual    = 336,
 
-    LeftShift    = 340,
-    LeftControl  = 341,
-    LeftAlt      = 342,
-    LeftSuper    = 343,
+    LeftShift    = 16,
+    LeftControl  = 17,
+    LeftAlt      = 18,
+    LeftSuper    = 91,
     RightShift   = 344,
     RightControl = 345,
     RightAlt     = 346,
@@ -160,7 +160,6 @@ enum class MouseCode : uint16_t
     BUTTON_8 = 7
 
 };
-
 
 #define GAMEPAD_DPAD_UP 	   0x0001
 #define GAMEPAD_DPAD_DOWN 	   0x0002
@@ -196,7 +195,6 @@ struct Input
 {
 	static Input gInput;
 	static constexpr int MAX_KEYS = 360;
-
 
 	// @Imporve use lots of 8 bit things and then bitshift
 	bool KeyboardPressedKeys[MAX_KEYS]{0};
@@ -356,6 +354,4 @@ struct Input
 	}
 
     static void Init();
-
-
 };

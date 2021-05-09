@@ -58,6 +58,16 @@ WindowsPlatformLayer::FileHandle WindowsPlatformLayer::OpenFileForReading(const 
 	return handle;
 }
 
+WindowsPlatformLayer::FileHandle WindowsPlatformLayer::OpenFileForWriting(const char* t_Path)
+{
+	FileHandle handle = CreateFile(t_Path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (handle == INVALID_HANDLE_VALUE)
+	{
+		DXERROR("Can't open file: {} ", t_Path);
+	}
+	return handle;
+}
+
 size_t WindowsPlatformLayer::FileSize(FileHandle handle)
 {
 	DWORD fileSize = GetFileSize(handle, NULL);
@@ -77,11 +87,20 @@ void WindowsPlatformLayer::ReadFileIntoArena(FileHandle handle, size_t size, Mem
 	t_Arena.Size += readBytes;
 }
 
+void WindowsPlatformLayer::WriteArenaIntoFile(FileHandle handle, MemoryArena& t_Arena)
+{
+	DWORD readBytes;
+	WriteFile(handle, t_Arena.Memory, (DWORD)t_Arena.Size, &readBytes, NULL);
+
+	// @Note: maybe save this for later
+	FlushFileBuffers(handle);
+}
+
 void WindowsPlatformLayer::CloseFile(FileHandle handle)
 {
 	// @Todo: Probably queue this in some vector and close them in one go
 	// at some point
-	// CloseHandle(handle);
+	 CloseHandle(handle);
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

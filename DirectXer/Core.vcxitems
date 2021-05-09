@@ -48,6 +48,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Serialization.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TextureCatalog.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +86,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Resources.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Serialization.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Tags.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\TextureCatalog.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Timing.hpp" />

@@ -21,7 +21,7 @@ struct MemoryArena
 	void Put(const void* data, size_t len);
 	void* GetMemory(size_t len);
 	void Reset();
-	
+
 	template<typename T>
 	void Put(const T& value)
 	{

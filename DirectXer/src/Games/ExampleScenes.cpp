@@ -96,23 +96,40 @@ void ExampleScenes::Init()
 	Light.lighting.spotLights[0].Params = {0.5f, 0.0f, 0.0f, 0.0f};
 	Light.lighting.spotLights[0].dir = {0.0f, -0.8f, 0.0f, 0.0f};
 
-	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	SaveContext = {0};
+	
+	SaveContext.Camera = &camera;
+	SaveContext.Lighting = &Light.lighting;
+	SaveContext.PhongMaterials[0] = &phongMatData;
 
-	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
-	Graphics->SetViewport(0, 0, 800, 600);
-	Graphics->SetRasterizationState(CurrentRastState);
-
+	
 	camera.Pos = { 1.0f, 0.5f, 1.0f };
 	camera.lookAt({ 0.0f, 0.0f, 0.0f });
 
+	
+	auto saveFile = Resources::ResolveFilePath("setup.ddata");
+	if (PlatformLayer::IsValidPath(saveFile))
+	{
+		Serialization::LoadFromFile(saveFile, SaveContext);
+	}	
+	
 	SpriteSheets.Init(5, &Renderer2D);
 	SpriteSheets.PutSheet(I_SHOOT, { 640.0f, 470.0f }, { 8, 5 });
 
-	uiRenderTarget.Color = NextTextureId();
-	uiRenderTarget.DepthStencil = NextTextureId();
+	{
+		uiRenderTarget.Color = NextTextureId();
+		uiRenderTarget.DepthStencil = NextTextureId();
+	
+		Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
 
-	Graphics->CreateRenderTexture(uiRenderTarget.Color, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
-	Graphics->CreateDSTexture(uiRenderTarget.DepthStencil, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
+		Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
+		Graphics->SetViewport(0, 0, 800, 600);
+		Graphics->SetRasterizationState(CurrentRastState);
+
+		Graphics->CreateRenderTexture(uiRenderTarget.Color, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
+		Graphics->CreateDSTexture(uiRenderTarget.DepthStencil, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
+
+	}
 
 }
 
@@ -541,6 +558,21 @@ void ExampleScenes::ProcessBallsScene(float dt)
 		ImGui::SliderFloat("Offset", &offset, 1.5f, 4.0f);
 		ImGui::SliderFloat("Ball Scale", &ballScale, 0.05f, 1.3f);
 	}
+
+	if (ImGui::CollapsingHeader("Serialization"))
+	{
+		if (ImGui::Button("Save Setup"))
+		{
+			Serialization::DumpToFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("LoadSetup"))
+		{
+			Serialization::LoadFromFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
+		}
+	}
+
 	
 	ControlCameraFPS(camera, dt);
 	

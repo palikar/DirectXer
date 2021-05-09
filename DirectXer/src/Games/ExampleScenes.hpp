@@ -11,6 +11,7 @@
 #include <Memory.hpp>
 #include <Audio.hpp>
 #include <Containers.hpp>
+#include <Serialization.hpp>
 
 enum Scene
 {
@@ -64,6 +65,7 @@ public:
 	TextureCatalog Textures;
 	MeshCatalog MeshesLib;
 
+	SerializationContext SaveContext;
 
 	AudioPlayer AudioEngine;
 

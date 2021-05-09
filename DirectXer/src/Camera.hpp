@@ -8,7 +8,6 @@ struct Camera
 	glm::vec3 Pos{0.0, 0.0, 0.0};
 	glm::quat Rot{0.0, 0.0, 0.0, 1.0};
 
-
 	inline void rotate(float t_Amount, glm::vec3 t_Axis)
 	{
 		Rot *= glm::angleAxis(t_Amount, t_Axis);
@@ -29,7 +28,6 @@ struct Camera
 		Pos += t_Dir*t_Amount;
 	}
 
-
 	inline glm::vec3 at()
 	{
 		return forward(Rot);
@@ -44,46 +42,47 @@ struct Camera
 	{
 		return -glm::normalize(glm::cross(at(), up()));
 	}
-
-
-
 };
 
 static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 {
-
+	const float highSpeed = 15.0f;
+	
 	if (Input::gInput.IsKeyPressed(KeyCode::W))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * 1.0f * dt;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * speed * dt;
 	}
 
 	if (Input::gInput.IsKeyPressed(KeyCode::S))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -1.0f * dt;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -1.0f * dt * speed;
 	}
 
 	if (Input::gInput.IsKeyPressed(KeyCode::A))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 1.0f * dt;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 1.0f * dt * speed;
 	}
 	
 	if (Input::gInput.IsKeyPressed(KeyCode::D))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -1.0f * dt;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -1.0f * dt * speed;
 	}
 		
 	if (Input::gInput.IsKeyPressed(KeyCode::E))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * 1.0f * dt;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * 1.0f * dt * speed;
 	}
 
 	if (Input::gInput.IsKeyPressed(KeyCode::Q))
 	{
-		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * -1.0f * dt;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * -1.0f * dt * speed;
 	}
-
-
-
 
 	static bool initialClick = false;
 	static glm::vec2 look{0,0};
@@ -134,7 +133,5 @@ static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 	{
 		initialClick = false;
 	}
-
-
 }
 

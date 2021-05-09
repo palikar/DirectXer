@@ -28,7 +28,6 @@ struct Resources
 		FormatBuffer.clear();
 		fmt::format_to(FormatBuffer, "{}/{}", ResourcesRoot, t_File);
 		return FormatBuffer.c_str();
-
 	}
 
 };

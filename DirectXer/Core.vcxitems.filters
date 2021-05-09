@@ -68,6 +68,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Audio.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Lighting.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Serialization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">
@@ -117,5 +118,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Tags.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Timing.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsContainers.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Serialization.hpp" />
   </ItemGroup>
 </Project>
