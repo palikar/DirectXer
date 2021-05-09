@@ -123,7 +123,13 @@ struct AssetDataBlob
 		auto res = CurrentOffset;
 		CurrentOffset += newData.size() - offset;
 		lastSize = newData.size() - offset;
-		Data.insert(Data.end(), newData.begin() + offset, newData.end());
+		//Data.insert(Data.end()
+		//, newData.begin() + offset, newData.end());
+		
+		auto oldSize = Data.size();
+		Data.resize(Data.size() + newData.size() - offset);
+		memcpy(Data.data() + oldSize, newData.data() + offset, newData.size() - offset);
+		
 		return res;
 	}
 
@@ -132,10 +138,12 @@ struct AssetDataBlob
 		auto res = CurrentOffset;
 		CurrentOffset += size;
 		lastSize = size;
-		for (size_t i = 0; i < size; ++i)
-		{
-			Data.push_back(newData[i]);
-		}
+	
+		// @Note: this make the code super fast
+		auto oldSize = Data.size();
+		Data.resize(Data.size() + size);
+		memcpy(Data.data() + oldSize, newData, size);
+		
 		return res;
 	}
 };

@@ -126,7 +126,7 @@ App* InitMain(char** argv, int argc)
 // @Done: Container for geometry info!
 // @Done: Color vertex type -- hence solid color material (ish)
 // @Done: Texture catalog but a good one, not holding textures in memory all the time
-// @Todo: Loading obj files
+// @Done: Loading obj files
 // @Todo: Mouse picking
 // @Todo: Tags for the textures -- for certain level, for certain material instance
 //     -- load all textures in a level

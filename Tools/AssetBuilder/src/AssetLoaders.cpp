@@ -250,6 +250,10 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 			auto parts = SplitLine(line, ' ');
 			
 			newMatName = ReplaceAll(parts[1], ".", "_");
+
+			// @Note: We don't want to load the same material twice
+			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
+			if( id != context.Defines.end()) return;
 		}
 		else if (StartsWith(line, "Ns"))
 		{
@@ -386,6 +390,24 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 	newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
 	context.Materials.push_back(newEntry);
 }
+
+static uint32 LoadDefaultMaterial(AssetBundlerContext& context)
+{
+	MtlMaterial newMat{0};
+
+	newMat.Kd = glm::vec3{1.0f, 1.0f, 0.0f};
+	newMat.Ks = glm::vec3{1.0f, 0.0f, 1.0f};
+	newMat.Ka = glm::vec3{0.0f, 1.0f, 1.0f};
+
+	newMat.Program = SC_MTL_1;
+	
+	MaterialLoadEntry newEntry;
+	newEntry.Desc = newMat;
+	newEntry.Id = NewAssetName(context, Type_Material, "DefaultMaterial");
+	context.Materials.push_back(newEntry);
+
+	return newEntry.Id;
+}
 	
 void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
@@ -411,7 +433,7 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 
 	VBLoadEntry vbo;
 	IBLoadEntry ibo;
-	MeshLoadEntry mesh;
+	MeshLoadEntry mesh = { 0 };
 
 	while(std::getline(stream, line, '\n'))
 	{
@@ -508,7 +530,7 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 			auto matName = ReplaceAll(parts[1], ".", "_");
 			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&matName](auto def) { return def.Name == matName; });
 			assert(id != context.Defines.end());
-			mesh.Mesh.Material = id->Id;			
+			mesh.Mesh.Material = id->Id;
 		}
     }
 
@@ -522,6 +544,15 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 	ibo.Dynamic = false;
 	ibo.DataOffset = blob.PutData((unsigned char*)IndexData.data(), sizeof(uint32) * IndexData.size());
 	ibo.Id = NextIBAssetId();
+
+	// @Note: If the obj file does not define a material, we have to load and use a default one
+	if (mesh.Mesh.Material == 0)
+	{
+		auto define = std::find_if(context.Defines.begin(), context.Defines.end(), [](auto def) { return def.Name == "DefaultMaterial"; });
+
+		if (define != context.Defines.end()) mesh.Mesh.Material = define->Id;
+		else mesh.Mesh.Material = LoadDefaultMaterial(context);
+	}
 	
 	mesh.Mesh.Geometry.VertexBuffer= vbo.Id;
 	mesh.Mesh.Geometry.IndexBuffer = ibo.Id;

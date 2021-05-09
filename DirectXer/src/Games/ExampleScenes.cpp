@@ -522,7 +522,8 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
 	// RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(5.0f, 1.0f, 5.0f));
 
-	MeshesLib.DrawMesh(M_SUZANNE, {0.0f, 1.0f, 0.0f}, {4.05f, 4.05f, 4.05f}, Light.bufferId);
+	MeshesLib.DrawMesh(M_SUZANNE, {0.0f, -3.0f, 0.0f}, {4.05f, 4.05f, 4.05f}, Light.bufferId);
+	MeshesLib.DrawMesh(M_TREE_1, {0.0f, 3.0f, 0.0f}, {0.5f, 0.5f, 0.5f}, Light.bufferId);
 	
 	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
 	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
