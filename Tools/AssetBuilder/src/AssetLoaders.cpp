@@ -248,12 +248,25 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 		if (StartsWith(line, "newmtl"))
 		{
 			auto parts = SplitLine(line, ' ');
+
+			if (!newMatName.empty())
+			{
+				MaterialLoadEntry newEntry;
+				newEntry.Desc = newMat;
+				newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
+				context.Materials.push_back(newEntry);
+			}
 			
 			newMatName = ReplaceAll(parts[1], ".", "_");
 
 			// @Note: We don't want to load the same material twice
 			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
-			if( id != context.Defines.end()) return;
+			if( id != context.Defines.end())
+			{
+				newMatName.clear();
+			}
+
+			newMat = {0};
 		}
 		else if (StartsWith(line, "Ns"))
 		{
@@ -385,10 +398,13 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 		
 	}
 
-	MaterialLoadEntry newEntry;
-	newEntry.Desc = newMat;
-	newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
-	context.Materials.push_back(newEntry);
+	if (!newMatName.empty())
+	{
+		MaterialLoadEntry newEntry;
+		newEntry.Desc = newMat;
+		newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
+		context.Materials.push_back(newEntry);
+	}	
 }
 
 static uint32 LoadDefaultMaterial(AssetBundlerContext& context)

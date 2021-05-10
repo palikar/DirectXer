@@ -163,23 +163,34 @@ class TempStdAllocator
 	inline bool operator==(TempStdAllocator const&) const { return true; }		
 };
 
-template<typename T>
+struct MemoryTag
+{};
+
+template<typename T, SystemTag Tag = Tag_Unknown>
 class BulkStdAllocator
 {
   public:
+	template<typename U>
+	struct rebind {
+		typedef BulkStdAllocator<U, Tag> other;
+	};
 
 	BulkStdAllocator(){};
-	
-	BulkStdAllocator(const BulkStdAllocator&){};
+
+	template<typename U>
+	BulkStdAllocator(const BulkStdAllocator<U, Tag>&){};
 	
 	typedef T value_type;
-	typedef size_t size_type;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+	typedef value_type& reference;
+	typedef const value_type& const_reference;
+	typedef std::size_t size_type;
 	typedef std::ptrdiff_t difference_type;
-	typedef std::true_type is_always_equal;
 
 	T* allocate(size_type t_Size)
 	{
-		return (T*)Memory::BulkGet(sizeof(T) * t_Size, Tag_Unknown);
+		return (T*)Memory::BulkGet(sizeof(T) * t_Size, Tag);
 	}
 	
 	void deallocate(T*, size_type)

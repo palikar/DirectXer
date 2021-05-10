@@ -19,7 +19,7 @@ using TempString = std::basic_string<char, std::char_traits<char>, TempStdAlloca
 using TempWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, TempStdAllocator<wchar_t>>;
 
 template<class T>
-using BulkVector = std::vector<T, BulkStdAllocator<T>>;
+using BulkVector = std::vector<T, BulkStdAllocator<T, Memory_Bulk>>;
 using BulkString = std::basic_string<char, std::char_traits<char>, BulkStdAllocator<char>>;
 using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkStdAllocator<wchar_t>>;
 

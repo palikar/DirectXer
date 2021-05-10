@@ -2,7 +2,7 @@
 
 #include <Types.hpp>
 
-enum SystemTag : uint32
+enum SystemTag
 {
 	GPURes_VertexBuffer	  = 0,
 	GPURes_IndexBuffer	  = 1,
