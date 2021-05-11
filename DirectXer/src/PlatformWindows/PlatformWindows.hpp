@@ -11,6 +11,7 @@
 
 #include <Types.hpp>
 #include <Utils.hpp>
+#include <GraphicsCommon.hpp>
 
 #include "IncludeWin.hpp"
 
@@ -40,6 +41,8 @@ public:
 	UINT WindowStyle;
 	RECT WindowRect;
 	bool Minimized;
+
+	GPUTimingResult LastGpuTiming;
 	
 	void Init(WindowsSettings t_Settings);
 	void ToggleFullscreen();

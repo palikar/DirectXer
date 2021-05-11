@@ -12,6 +12,7 @@
 #include <dxerr.h>
 
 #include <d3d11.h>
+#include <d3d11_1.h>
 #include <wrl.h>
 #include <dxgi1_4.h>
 #include <dxgicommon.h>
@@ -130,6 +131,14 @@ class GraphicsD3D11
 	void DestroyZBuffer();
 	void Destroy();
 
+	void MakeMarker(const char* name);
+	void PushMarker(const char* name);
+	void PopMarker();
+
+	void BeginTimingQuery();
+	void EndTimingQuery();
+	bool GetTimingResult(GPUTimingResult& result);
+
 	GPUMemoryReport ReportMemory();
 
   public:
@@ -137,7 +146,11 @@ class GraphicsD3D11
 	IDXGISwapChain3* Swap{ nullptr };
 	ID3D11DeviceContext* Context{ nullptr };
 	IDXGIAdapter3* Adapter{ nullptr };
+	ID3DUserDefinedAnnotation* Annotator{ nullptr };
 
+	ID3D11Query* BeginTimeQuery{ nullptr };
+	ID3D11Query* EndTimeQuery{ nullptr };
+	ID3D11Query* DisjointTimestampQuery{ nullptr };
 
 	// @Note: These are the views for the backbuffer
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };

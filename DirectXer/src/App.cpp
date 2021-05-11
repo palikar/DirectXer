@@ -107,6 +107,14 @@ void App::Update(float dt)
 			
 			ImGui::TreePop();
 		}
+
+		if (ImGui::TreeNode("Timing"))
+		{
+			String text{formater.Format("Last GPU timing query: {:.3f} ms", Window->LastGpuTiming.Time)};
+			ImGui::BulletText(text.data());
+			
+			ImGui::TreePop();
+		}
 	}
 	
 }

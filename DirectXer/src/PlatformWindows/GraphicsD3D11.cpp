@@ -96,6 +96,7 @@ void GraphicsD3D11::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
 	swapChain->Release();
 	adapter->Release();
 
+	GFX_CALL(Context->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (void**)&Annotator));
 
 	DXDEBUG("[Graphics] Direct3D: {}", FeatureLevelToString(Device->GetFeatureLevel()));
 }
@@ -936,3 +937,85 @@ GPUMemoryReport GraphicsD3D11::ReportMemory()
 	return report;
 }
 
+void GraphicsD3D11::MakeMarker(const char* name)
+{
+	int retval;
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, name, -1, NULL, 0);
+
+	LPWSTR lpWideCharStr = (LPWSTR)alloca(retval * sizeof(WCHAR));
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, name, -1, lpWideCharStr, retval);
+
+	Annotator->SetMarker(lpWideCharStr);
+}
+
+void GraphicsD3D11::PushMarker(const char* name)
+{
+	int retval;
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, name, -1, NULL, 0);
+
+	LPWSTR lpWideCharStr = (LPWSTR)alloca(retval * sizeof(WCHAR));
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, name, -1, lpWideCharStr, retval);
+
+	Annotator->BeginEvent(lpWideCharStr);
+}
+
+void GraphicsD3D11::PopMarker()
+{
+	Annotator->EndEvent();
+}
+
+void GraphicsD3D11::BeginTimingQuery()
+{
+	if (DisjointTimestampQuery) return;
+	
+	D3D11_QUERY_DESC desc{ 0 };
+	desc.MiscFlags = 0;
+
+	[[maybe_unused]] HRESULT hr;
+	desc.Query =  D3D11_QUERY_TIMESTAMP_DISJOINT;
+	GFX_CALL(Device->CreateQuery(&desc, &DisjointTimestampQuery));
+	
+	desc.Query =  D3D11_QUERY_TIMESTAMP;
+	GFX_CALL(Device->CreateQuery(&desc, &BeginTimeQuery));
+	GFX_CALL(Device->CreateQuery(&desc, &EndTimeQuery));
+
+	Context->Begin(DisjointTimestampQuery);
+	Context->End(BeginTimeQuery);
+}
+
+void GraphicsD3D11::EndTimingQuery()
+{
+	Context->End(EndTimeQuery);
+	Context->End(DisjointTimestampQuery);
+}
+
+bool GraphicsD3D11::GetTimingResult(GPUTimingResult& result)
+{
+	//result.Time = 0.0f;
+	if (!DisjointTimestampQuery) return true;
+
+	if (Context->GetData(DisjointTimestampQuery, NULL, 0, 0) != S_OK) return false;
+
+	D3D11_QUERY_DATA_TIMESTAMP_DISJOINT disjointData;
+	if (Context->GetData(DisjointTimestampQuery, &disjointData, sizeof(D3D11_QUERY_DATA_TIMESTAMP_DISJOINT), 0) != S_OK) return false;
+
+	if (disjointData.Disjoint) return false;
+
+	UINT64 beginTime;
+	if (Context->GetData(BeginTimeQuery, &beginTime, sizeof(UINT64), 0) != S_OK) return false;
+		
+	UINT64 endTime;
+	if (Context->GetData(EndTimeQuery, &endTime, sizeof(UINT64), 0) != S_OK) return false;
+
+	result.Time = float(endTime - beginTime) / float(disjointData.Frequency) * 1000.0f;
+
+	BeginTimeQuery->Release();
+	EndTimeQuery->Release();
+	DisjointTimestampQuery->Release();
+
+	BeginTimeQuery = nullptr;
+	EndTimeQuery = nullptr;
+	DisjointTimestampQuery = nullptr;
+	
+	return true;
+}

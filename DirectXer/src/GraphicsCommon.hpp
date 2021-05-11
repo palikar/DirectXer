@@ -178,6 +178,11 @@ struct GPUMemoryReport
 	uint64 Usage;
 };
 
+struct GPUTimingResult
+{
+	float Time;	
+};
+
 inline void TransformVertex(SimpleVertex& t_Vertex, glm::mat4 t_Mat)
 {
 	t_Vertex.pos = t_Mat * glm::vec4(t_Vertex.pos, 1.0f);

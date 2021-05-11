@@ -267,6 +267,8 @@ int WindowsWindow::Run()
 	double  frameRate = 30;
 	double  averageFrameTimeMilliseconds = 33.333;
 
+	bool inGpuTiming = false;
+
 	while (true)
 	{
 		Input::gInput.Update();
@@ -298,6 +300,12 @@ int WindowsWindow::Run()
 			ImGui::NewFrame();
 
 			ImGui::Begin("DirectXer");
+
+			if(Application->Graphics.GetTimingResult(LastGpuTiming))
+			{
+				inGpuTiming = true;
+				Application->Graphics.BeginTimingQuery();
+			}
 			
 			const float delta = (float)clockToMilliseconds(dt) / 1000.0f;
 			Application->Update(delta);
@@ -306,9 +314,16 @@ int WindowsWindow::Run()
 			ImGui::End();
 
 			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); 
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
+			if(inGpuTiming)
+			{
+				Application->Graphics.EndTimingQuery();
+				inGpuTiming = false;
+			}
+			
 			Application->Graphics.EndFrame();
+			
 			clock_t endFrame = clock();
 
 			dt = endFrame - beginFrame;
