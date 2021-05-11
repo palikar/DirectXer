@@ -43,6 +43,7 @@ public:
 	bool Minimized;
 
 	GPUTimingResult LastGpuTiming;
+	GPUStatsResult LastGpuStats;
 	
 	void Init(WindowsSettings t_Settings);
 	void ToggleFullscreen();

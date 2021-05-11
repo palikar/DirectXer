@@ -313,6 +313,8 @@ void GraphicsD3D11::EndFrame()
 		}
 	}
 	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
+	LastCallsCount = DrawCallsCount;
+	DrawCallsCount = 0;
 }
 
 void GraphicsD3D11::ClearBuffer(float red, float green, float blue)
@@ -908,6 +910,7 @@ void GraphicsD3D11::DrawIndex(TopolgyType topology, uint32 count, uint32 offset,
 	}
 
 	Context->DrawIndexed(count/factor, offset, base);
+	DrawCallsCount += 1;
 }
 
 void GraphicsD3D11::Draw(TopolgyType topology, uint32 count, uint32 base)
@@ -925,6 +928,7 @@ void GraphicsD3D11::Draw(TopolgyType topology, uint32 count, uint32 base)
 	}
 
 	Context->Draw(count, base);
+	DrawCallsCount += 1;
 }
 
 GPUMemoryReport GraphicsD3D11::ReportMemory()
@@ -1018,4 +1022,41 @@ bool GraphicsD3D11::GetTimingResult(GPUTimingResult& result)
 	DisjointTimestampQuery = nullptr;
 	
 	return true;
+}
+
+void GraphicsD3D11::BeginStatisticsQuery()
+{
+	if (StatisticsQuery) return;
+	
+	D3D11_QUERY_DESC desc{ 0 };
+	desc.MiscFlags = 0;
+
+	[[maybe_unused]] HRESULT hr;
+	desc.Query =  D3D11_QUERY_PIPELINE_STATISTICS;
+	GFX_CALL(Device->CreateQuery(&desc, &StatisticsQuery));
+
+	Context->Begin(StatisticsQuery);
+}
+
+void GraphicsD3D11::EndStatisticsQuery()
+{
+	Context->End(StatisticsQuery);
+}
+
+bool GraphicsD3D11::GetStatisticsResult(GPUStatsResult& result)
+{
+	if (!StatisticsQuery) return true;
+
+	D3D11_QUERY_DATA_PIPELINE_STATISTICS stats;
+	if (Context->GetData(StatisticsQuery, &stats, sizeof(D3D11_QUERY_DATA_PIPELINE_STATISTICS), 0) != S_OK) return false;
+
+	result.VerticesCount = stats.IAVertices;
+	result.PrimitivesCount = stats.IAPrimitives;
+	result.VSInvocationsCount = stats.VSInvocations;
+	result.PSInvocationsCount = stats.PSInvocations;
+
+	StatisticsQuery->Release();
+	StatisticsQuery = nullptr;
+	return true;
+	
 }

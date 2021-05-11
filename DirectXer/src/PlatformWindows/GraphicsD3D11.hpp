@@ -135,6 +135,10 @@ class GraphicsD3D11
 	void PushMarker(const char* name);
 	void PopMarker();
 
+	void BeginStatisticsQuery();
+	void EndStatisticsQuery();
+	bool GetStatisticsResult(GPUStatsResult& result);
+	
 	void BeginTimingQuery();
 	void EndTimingQuery();
 	bool GetTimingResult(GPUTimingResult& result);
@@ -151,6 +155,10 @@ class GraphicsD3D11
 	ID3D11Query* BeginTimeQuery{ nullptr };
 	ID3D11Query* EndTimeQuery{ nullptr };
 	ID3D11Query* DisjointTimestampQuery{ nullptr };
+	ID3D11Query* StatisticsQuery{ nullptr };
+
+	uint32 LastCallsCount;
+	uint32 DrawCallsCount;
 
 	// @Note: These are the views for the backbuffer
 	ID3D11RenderTargetView* RenderTargetView{ nullptr };

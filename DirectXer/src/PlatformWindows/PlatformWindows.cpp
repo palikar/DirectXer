@@ -268,6 +268,7 @@ int WindowsWindow::Run()
 	double  averageFrameTimeMilliseconds = 33.333;
 
 	bool inGpuTiming = false;
+	bool inGpuStats = false;
 
 	while (true)
 	{
@@ -306,6 +307,12 @@ int WindowsWindow::Run()
 				inGpuTiming = true;
 				Application->Graphics.BeginTimingQuery();
 			}
+
+			if(Application->Graphics.GetStatisticsResult(LastGpuStats))
+			{
+				inGpuStats = true;
+				Application->Graphics.BeginStatisticsQuery();
+			}
 			
 			const float delta = (float)clockToMilliseconds(dt) / 1000.0f;
 			Application->Update(delta);
@@ -320,6 +327,12 @@ int WindowsWindow::Run()
 			{
 				Application->Graphics.EndTimingQuery();
 				inGpuTiming = false;
+			}
+			
+			if(inGpuStats)
+			{
+				Application->Graphics.EndStatisticsQuery();
+				inGpuStats = false;
 			}
 			
 			Application->Graphics.EndFrame();

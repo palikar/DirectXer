@@ -115,6 +115,28 @@ void App::Update(float dt)
 			
 			ImGui::TreePop();
 		}
+
+		if (ImGui::TreeNode("GPU Pipeline"))
+		{
+			String text{formater.Format("Vertices count processed: {}", Window->LastGpuStats.VerticesCount)};
+			ImGui::BulletText(text.data());
+
+			text = formater.Format("Primitve count processed: {}", Window->LastGpuStats.PrimitivesCount);
+			ImGui::BulletText(text.data());
+
+			text = formater.Format("Vertex shader calls: {}", Window->LastGpuStats.VSInvocationsCount);
+			ImGui::BulletText(text.data());
+
+			text = formater.Format("Pixel shader calls: {}", Window->LastGpuStats.PSInvocationsCount);
+			ImGui::BulletText(text.data());
+
+			ImGui::Separator();
+
+			text = formater.Format("Draw calls count: {}", Graphics.LastCallsCount);
+			ImGui::BulletText(text.data());
+			
+			ImGui::TreePop();
+		}
 	}
 	
 }
