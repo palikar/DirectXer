@@ -298,6 +298,8 @@ void GraphicsD3D11::Destroy()
 
 void GraphicsD3D11::EndFrame()
 {
+	DxProfileCode(DxTimedBlock(Phase_Rendering, "Present"));
+	
 	HRESULT hr;
 	DXGI_PRESENT_PARAMETERS params{0};
 	params.DirtyRectsCount = 0;

@@ -49,8 +49,8 @@ class Renderer2D
     FontLibrary FontLib;
 
     // @Note: The CPU memory for the Vertex and Index buffers
-    BulkVector<Vertex2D> Vertices;
-    BulkVector<uint32> Indices;
+    BulkVector<Vertex2D, Memory_2DRendering> Vertices;
+    BulkVector<uint32, Memory_2DRendering> Indices;
     VertexBufferId vbo;
     IndexBufferId ibo;
     
@@ -101,7 +101,7 @@ struct SpriteSheetHolder
 		uint32 ImageIndex;
 	};
 
-	BulkVector<SpriteSheet> Sheets;
+	BulkVector<SpriteSheet, Memory_2DRendering> Sheets;
 	Renderer2D* Gfx2D;
 
     void Init(size_t t_Size, Renderer2D* Gfx)

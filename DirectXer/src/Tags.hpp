@@ -4,17 +4,20 @@
 
 enum SystemTag
 {
-	GPURes_VertexBuffer	  = 0,
-	GPURes_IndexBuffer	  = 1,
-	GPURes_Texture		  = 2,
-	GPURes_ConstantBuffer = 3,
+	GPURes_VertexBuffer,
+	GPURes_IndexBuffer,
+	GPURes_Texture,
+	GPURes_ConstantBuffer,
 
-	Phase_Init			  = 4,
-	Phase_Update		  = 5,
+	Phase_Init,
+	Phase_Update,
+	Phase_Rendering,
 
-	Memory_Bulk  		  = 6,
-	Memory_GameState  	  = 7,
-
+	Memory_Bulk,
+	Memory_GameState,
+	Memory_2DRendering,
+	Memory_3DRendering,
+	Memory_GPUResource,
 
 	Tag_Unknown,
 	Tags_Count,
@@ -29,9 +32,13 @@ static inline const char* gSystemTagNames[] =
 
 	"Init",
 	"Update",
+	"Rendering",
 
 	"Bulk Memory",
 	"GameState Memory",
+	"2DRendering Memory",
+	"3DRendering Memory",
+	"GPUResource Memory",
 
 	"Unknow",
 };

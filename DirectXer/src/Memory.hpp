@@ -163,9 +163,6 @@ class TempStdAllocator
 	inline bool operator==(TempStdAllocator const&) const { return true; }		
 };
 
-struct MemoryTag
-{};
-
 template<typename T, SystemTag Tag = Tag_Unknown>
 class BulkStdAllocator
 {

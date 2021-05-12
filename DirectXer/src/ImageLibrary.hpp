@@ -64,7 +64,7 @@ class ImageLibrary
   public:
 	Graphics* Gfx;
 	Map<ImageId, Image> Images;
-	BulkVector<ImageAtlas> Atlases;
+	BulkVector<ImageAtlas, Memory_2DRendering> Atlases;
 
 	void Init(Graphics* Gfx);
 	TextureId Pack(stbrp_rect& t_Rect);

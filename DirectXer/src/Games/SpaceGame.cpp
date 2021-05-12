@@ -43,9 +43,9 @@ struct Animation
 
 struct GameState
 {
-	BulkVector<Enemy> Enemies;
-	BulkVector<Bullet> Bulltets;
-	BulkVector<Animation> Animations;
+	BulkVector<Enemy, Memory_GameState> Enemies;
+	BulkVector<Bullet, Memory_GameState> Bulltets;
+	BulkVector<Animation, Memory_GameState> Animations;
 	uint32 Score;
 	uint32 SpawndedEnemies;
 	glm::vec2 PlayerPosition;

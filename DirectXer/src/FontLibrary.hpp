@@ -67,9 +67,9 @@ public:
 
 	FT_Library FTLibrary;
 	Graphics* Gfx;
-	BulkVector<TextureId> Atlases;
+	BulkVector<TextureId, Memory_2DRendering> Atlases;
 	stbrp_context RectContext;
-	BulkVector<AtlasEntry> AtlasGlyphEntries;
+	BulkVector<AtlasEntry, Memory_2DRendering> AtlasGlyphEntries;
 	Map<char, size_t> CharMap;
 	Map<FontId, size_t> IdMap;
 

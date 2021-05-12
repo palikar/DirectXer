@@ -350,6 +350,9 @@ int WindowsWindow::Run()
 				averageFrameTimeMilliseconds = 1000.0 / (frameRate == 0 ? 0.001 : frameRate);
 
 				DXLOG("[SYS] Frame time: {:.2} ms; FPS: {} ", averageFrameTimeMilliseconds, frames);
+
+				LastFPS = (float)frames;
+				LastFrameTime = (float)averageFrameTimeMilliseconds;
 			
 				frames = 0;
 			}

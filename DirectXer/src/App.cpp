@@ -34,38 +34,27 @@ void App::Init(HWND t_Window)
 		OPTICK_FRAME("MainThread");
 	}
 }
-	
+
 void App::Update(float dt)
 {
 	OPTICK_FRAME("MainThread");
 
 	TempFormater formater;
-
+	
 	if (ImGui::CollapsingHeader("Telemetry"))
 	{
 		
 		if (ImGui::TreeNode("Cycle Counters"))
 		{
+
 			for (const auto& [id, entry] : Telemetry::CycleCounters)
 			{
 				const uint32 counter = uint32(id & 0xFFFFFFFF);
 				const uint32 sys = uint32((id & (uint64)(0xFFFFFFFF) << 32) >> 32);
 
 				String text{formater.Format("[{}][{}] : {} Avrg. Cycles",
-						gCycleCounterTagNames[counter], gSystemTagNames[sys], entry.AvgCycles)};
+											gCycleCounterTagNames[counter], gSystemTagNames[sys], entry.AvgCycles)};
 
-				ImGui::BulletText(text.data());
-			}
-			
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("Timed Blocks"))
-		{
-			for (const auto& [id, entry] : Telemetry::BlockTimers)
-			{
-				const uint32 tag = uint32(id & 0xFFFFFFFF);
-				String text{formater.Format("[{}] [{}] : {} ms", gSystemTagNames[tag], entry.Msg, entry.Time)};
 				ImGui::BulletText(text.data());
 			}
 			
@@ -81,17 +70,32 @@ void App::Update(float dt)
 			ImGui::Text(text.data());
 				
 			ImGui::Separator();
-			
-			for (size_t i = 0; i < Tags_Count; ++i)
-			{
-				auto& entry = Telemetry::MemoryStates[i];
-				if (entry.CurrentMemory == 0) continue;
-				
+			ImGui::Text("CPU Memory Counters");
+
+			auto displayMemory = [&text, &formater](SystemTag tag){
+				auto& entry = Telemetry::MemoryStates[tag];
+				if (entry.CurrentMemory == 0) return;
+
 				float mem = entry.CurrentMemory > 1024*1024 ? entry.CurrentMemory / (1024.0f*1024.0f) : entry.CurrentMemory / 1024.0f;
 				const char* unit = entry.CurrentMemory > 1024*1024 ? "MBs" : "KBs";
-				String text{formater.Format("[{}] : {:.2f} {}", gSystemTagNames[i], mem, unit)};
-				ImGui::BulletText(text.data());
-			}
+				text = formater.Format("[{}] : {:.2f} {}", gSystemTagNames[tag], mem, unit);
+				ImGui::BulletText(text.data());			
+			};
+
+			displayMemory(Memory_Bulk);
+			displayMemory(Memory_GameState);
+			displayMemory(Memory_2DRendering);
+			displayMemory(Memory_3DRendering);
+			displayMemory(Memory_GPUResource);
+
+			ImGui::Separator();
+
+			ImGui::Text("GPU Memory Counters");
+			
+			displayMemory(GPURes_VertexBuffer);
+			displayMemory(GPURes_IndexBuffer);
+			displayMemory(GPURes_Texture);
+			displayMemory(GPURes_ConstantBuffer);
 
 			ImGui::Separator();
 
@@ -99,10 +103,10 @@ void App::Update(float dt)
 			
 			ImGui::Text("Reported GPU Memory");
 
-			text = formater.Format("GPU Usage: {:.3f} MBs", report.Usage / (1024.0f*1024.0f));
+			text = formater.Format("GPU Usage: {:.3f} MBs", report.Usage / (1024.0f * 1024.0f));
 			ImGui::BulletText(text.data());
 
-			text = formater.Format("GPU Budget: {:.3f} MBs", report.Budget / (1024.0f*1024.0f));
+			text = formater.Format("GPU Budget: {:.3f} GBs", report.Budget / (1024.0f * 1024.0f * 1024.0f));
 			ImGui::BulletText(text.data());
 			
 			ImGui::TreePop();
@@ -110,9 +114,35 @@ void App::Update(float dt)
 
 		if (ImGui::TreeNode("Timing"))
 		{
-			String text{formater.Format("Last GPU timing query: {:.3f} ms", Window->LastGpuTiming.Time)};
+			String text;
+
+			ImGui::Text("Timed Blocks:");
+			auto displayTimingBlocksOfType = [&text, &formater](SystemTag requiredTag){
+				for (const auto& [id, entry] : Telemetry::BlockTimers)
+				{
+					const uint32 tag = uint32(id & 0xFFFFFFFF);
+					if ( tag != requiredTag) continue;
+					text = formater.Format("[{}] [{}] : {} ms", gSystemTagNames[tag], entry.Msg, entry.Time);
+					ImGui::BulletText(text.data());
+				}
+			};
+
+			displayTimingBlocksOfType(Phase_Init);
+			displayTimingBlocksOfType(Phase_Rendering);
+
+			ImGui::Separator();
+			
+			ImGui::Text("Performance:");
+			
+			text = formater.Format("FPS: {:.3f} ms", Window->LastFPS);
+			ImGui::BulletText(text.data());
+
+			text = formater.Format("Frame time: {:.3f} ms", Window->LastFrameTime);
 			ImGui::BulletText(text.data());
 			
+			text = formater.Format("Last GPU timing query: {:.3f} ms", Window->LastGpuTiming.Time);
+			ImGui::BulletText(text.data());
+
 			ImGui::TreePop();
 		}
 
@@ -132,7 +162,7 @@ void App::Update(float dt)
 
 			ImGui::Separator();
 
-			text = formater.Format("Draw calls count: {}", Graphics.LastCallsCount);
+			text = formater.Format("Draw calls count: {}", Graphics.LastCallsCount); 
 			ImGui::BulletText(text.data());
 			
 			ImGui::TreePop();

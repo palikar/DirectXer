@@ -44,6 +44,8 @@ public:
 
 	GPUTimingResult LastGpuTiming;
 	GPUStatsResult LastGpuStats;
+	float LastFPS;
+	float LastFrameTime;
 	
 	void Init(WindowsSettings t_Settings);
 	void ToggleFullscreen();
