@@ -154,7 +154,10 @@ void LoadFont(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 void LoadTexture(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
+void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob);
 
+uint32 LoadDefaultMaterial(AssetBundlerContext& context);
+	
 inline uint32 NewAssetName(AssetBundlerContext& context, AssetType type, const char* name, uint32 id = 0) 
 {
 	static uint32 next = 0;

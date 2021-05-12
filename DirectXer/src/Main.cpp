@@ -161,13 +161,13 @@ App* InitMain(char** argv, int argc)
 // @Todo: Inter image based animator setup
 
 // == Telemtry ==
-// @Todo Current Temporary and Bulk
-// @Todo GPU memory tracking
-// @Todo GPU timing tracking
-// @Todo Bulk Memory tracking
-// @Todo Allocation tracking
-// @Todo Tagged bulk allocation
-// @Todo Temorary memory tracking(?)
+// @Done: Current Bulk
+// @Done: GPU memory tracking
+// @Done: GPU timing tracking
+// @Done: Bulk Memory tracking
+// @Done: Allocation tracking
+// @Done: Tagged bulk allocation
+// @Todo: Temorary memory tracking(?)
 
 // == Memory ==
 // @Todo Tracking support for the map

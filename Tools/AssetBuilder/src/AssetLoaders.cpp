@@ -95,6 +95,8 @@ static std::string ReplaceAll(std::string str, const std::string &from, const st
     return str;
 }
 
+// ------------------------------------------------------------------------------------ //
+
 void LoadImage(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	int width, height, channels;
@@ -226,9 +228,9 @@ void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& 
 
 }
 
-static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataBlob& blob)
+void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
-	auto content = LoadFileIntoString(path.string());
+	auto content = LoadFileIntoString(asset.Path);
 	std::stringstream stream(content);
 	std::string line;
 
@@ -407,24 +409,6 @@ static void LoadMaterial(fs::path path, AssetBundlerContext& context, AssetDataB
 	}	
 }
 
-static uint32 LoadDefaultMaterial(AssetBundlerContext& context)
-{
-	MtlMaterial newMat{0};
-
-	newMat.Kd = glm::vec3{1.0f, 1.0f, 0.0f};
-	newMat.Ks = glm::vec3{1.0f, 0.0f, 1.0f};
-	newMat.Ka = glm::vec3{0.0f, 1.0f, 1.0f};
-
-	newMat.Program = SC_MTL_1;
-	
-	MaterialLoadEntry newEntry;
-	newEntry.Desc = newMat;
-	newEntry.Id = NewAssetName(context, Type_Material, "DefaultMaterial");
-	context.Materials.push_back(newEntry);
-
-	return newEntry.Id;
-}
-	
 void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	auto content = LoadFileIntoString(asset.Path);
@@ -459,7 +443,9 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 		{
 			 auto parts = SplitLine(line, ' ');
 			 auto materialPath = fs::path(asset.Path).parent_path() / fs::path(parts[1]);
-			 LoadMaterial(materialPath, context, blob);
+			 AssetToLoad asset;
+			 asset.Path = materialPath.string();
+			 LoadMaterial(asset, context, blob);
 		}
 		else if (line[0] == 'v' && line[1] == ' ')
 		{
@@ -578,4 +564,24 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 	context.VBsToCreate.push_back(vbo);
 	context.IBsToCreate.push_back(ibo);
 	context.LoadMeshes.push_back(mesh);
+}
+
+// ------------------------------------------------------------------------------------ //
+
+uint32 LoadDefaultMaterial(AssetBundlerContext& context)
+{
+	MtlMaterial newMat{0};
+
+	newMat.Kd = glm::vec3{1.0f, 1.0f, 0.0f};
+	newMat.Ks = glm::vec3{1.0f, 0.0f, 1.0f};
+	newMat.Ka = glm::vec3{0.0f, 1.0f, 1.0f};
+
+	newMat.Program = SC_MTL_1;
+	
+	MaterialLoadEntry newEntry;
+	newEntry.Desc = newMat;
+	newEntry.Id = NewAssetName(context, Type_Material, "DefaultMaterial");
+	context.Materials.push_back(newEntry);
+
+	return newEntry.Id;
 }
