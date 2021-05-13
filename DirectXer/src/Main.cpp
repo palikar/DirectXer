@@ -170,22 +170,24 @@ App* InitMain(char** argv, int argc)
 // @Todo: Temorary memory tracking(?)
 
 // == Memory ==
-// @Todo Tracking support for the map
 // @Todo Allocating general arenas in BulkStorage
 
-
-
-    // if( pressing_left )  virtual_position.x -= MOVE_SPEED*time_step; 
-    // if( pressing_right ) virtual_position.x += MOVE_SPEED*time_step; 
-    // if( pressing_up )    virtual_position.y -= MOVE_SPEED*time_step; 
-    // if( pressing_down )  virtual_position.y += MOVE_SPEED*time_step; 
-    // sprite.position += (virtual_position-sprite.position) * (CHASE_SPEED*time_step); 
+// ***** Queue *****
+// @Todo Tracking support for the map <--- this one
 
 
 
-    // player_velocity -= player_velocity * (DAMPING*time_step); 
-    // if( pressing_left )  player_velocity.x -= MOVE_FORCE*time_step; 
-    // if( pressing_right ) player_velocity.x += MOVE_FORCE*time_step; 
-    // if( pressing_up )    player_velocity.y -= MOVE_FORCE*time_step;
-    // if( pressing_down )  player_velocity.y += MOVE_FORCE*time_step; 
-    // sprite.position += player_velocity * time_step; 
+// if( pressing_left )  virtual_position.x -= MOVE_SPEED*time_step; 
+// if( pressing_right ) virtual_position.x += MOVE_SPEED*time_step; 
+// if( pressing_up )    virtual_position.y -= MOVE_SPEED*time_step; 
+// if( pressing_down )  virtual_position.y += MOVE_SPEED*time_step; 
+// sprite.position += (virtual_position-sprite.position) * (CHASE_SPEED*time_step); 
+
+
+
+// player_velocity -= player_velocity * (DAMPING*time_step); 
+// if( pressing_left )  player_velocity.x -= MOVE_FORCE*time_step; 
+// if( pressing_right ) player_velocity.x += MOVE_FORCE*time_step; 
+// if( pressing_up )    player_velocity.y -= MOVE_FORCE*time_step;
+// if( pressing_down )  player_velocity.y += MOVE_FORCE*time_step; 
+// sprite.position += player_velocity * time_step; 

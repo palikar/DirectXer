@@ -63,8 +63,8 @@ struct Mesh
 
 struct MeshCatalog
 {
-	Map<MeshId, Mesh> Meshes;
-	Map<MaterialId, MtlMaterial> Materials;
+	Map<MeshId, Mesh, Memory_3DRendering> Meshes;
+	Map<MaterialId, MtlMaterial, Memory_3DRendering> Materials;
 	
 	Graphics* Gfx;
 

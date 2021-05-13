@@ -70,8 +70,8 @@ public:
 	BulkVector<TextureId, Memory_2DRendering> Atlases;
 	stbrp_context RectContext;
 	BulkVector<AtlasEntry, Memory_2DRendering> AtlasGlyphEntries;
-	Map<char, size_t> CharMap;
-	Map<FontId, size_t> IdMap;
+	Map<char, size_t, Memory_2DRendering> CharMap;
+	Map<FontId, size_t, Memory_2DRendering> IdMap;
 
 	void Init(Graphics* t_Graphics);
 	void InitNewAtlas();

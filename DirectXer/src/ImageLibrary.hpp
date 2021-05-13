@@ -7,6 +7,7 @@
 #include <Graphics.hpp>
 #include <Platform.hpp>
 #include <Containers.hpp>
+#include <Tags.hpp>
 
 #include <stb_rect_pack.h>
 
@@ -63,7 +64,7 @@ class ImageLibrary
 {
   public:
 	Graphics* Gfx;
-	Map<ImageId, Image> Images;
+	Map<ImageId, Image, Memory_2DRendering> Images;
 	BulkVector<ImageAtlas, Memory_2DRendering> Atlases;
 
 	void Init(Graphics* Gfx);

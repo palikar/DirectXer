@@ -351,7 +351,7 @@ inline T unaligned_load(void const* ptr) noexcept {
 // Allocates bulks of memory for objects of type T. This deallocates the memory in the destructor,
 // and keeps a linked list of the allocated memory around. Overhead per allocation is the size of a
 // pointer.
-template <typename T, size_t MinNumAllocs = 4, size_t MaxNumAllocs = 256>
+template <typename T, typename AllocationScheme, size_t MinNumAllocs = 4, size_t MaxNumAllocs = 256>
 class BulkPoolAllocator {
 public:
     BulkPoolAllocator() noexcept = default;
@@ -393,7 +393,7 @@ public:
         while (mListForFree) {
             T* tmp = *mListForFree;
             ROBIN_HOOD_LOG("std::free")
-            std::free(mListForFree);
+            AllocationScheme::free(mListForFree);
             mListForFree = reinterpret_cast_no_cast_align_warning<T**>(tmp);
         }
         mHead = nullptr;
@@ -429,14 +429,14 @@ public:
         if (numBytes < ALIGNMENT + ALIGNED_SIZE) {
             // not enough data for at least one element. Free and return.
             ROBIN_HOOD_LOG("std::free")
-            std::free(ptr);
+            AllocationScheme::free(ptr);
         } else {
             ROBIN_HOOD_LOG("add to buffer")
             add(ptr, numBytes);
         }
     }
 
-    void swap(BulkPoolAllocator<T, MinNumAllocs, MaxNumAllocs>& other) noexcept {
+    void swap(BulkPoolAllocator<T, AllocationScheme, MinNumAllocs, MaxNumAllocs>& other) noexcept {
         using std::swap;
         swap(mHead, other.mHead);
         swap(mListForFree, other.mListForFree);
@@ -498,7 +498,7 @@ private:
         size_t const bytes = ALIGNMENT + ALIGNED_SIZE * numElementsToAlloc;
         ROBIN_HOOD_LOG("std::malloc " << bytes << " = " << ALIGNMENT << " + " << ALIGNED_SIZE
                                       << " * " << numElementsToAlloc)
-        add(assertNotNull<std::bad_alloc>(std::malloc(bytes)), bytes);
+        add(assertNotNull<std::bad_alloc>(AllocationScheme::malloc(bytes)), bytes);
         return mHead;
     }
 
@@ -525,22 +525,22 @@ private:
     T** mListForFree{nullptr};
 };
 
-template <typename T, size_t MinSize, size_t MaxSize, bool IsFlat>
+template <typename T, size_t MinSize, size_t MaxSize, bool IsFlat, typename AllocationScheme>
 struct NodeAllocator;
 
 // dummy allocator that does nothing
-template <typename T, size_t MinSize, size_t MaxSize>
-struct NodeAllocator<T, MinSize, MaxSize, true> {
+template <typename T, size_t MinSize, size_t MaxSize, typename AllocationScheme>
+struct NodeAllocator<T, MinSize, MaxSize, true, AllocationScheme> {
 
     // we are not using the data, so just free it.
     void addOrFree(void* ptr, size_t ROBIN_HOOD_UNUSED(numBytes) /*unused*/) noexcept {
         ROBIN_HOOD_LOG("std::free")
-        std::free(ptr);
+        AllocationScheme::free(ptr);
     }
 };
 
-template <typename T, size_t MinSize, size_t MaxSize>
-struct NodeAllocator<T, MinSize, MaxSize, false> : public BulkPoolAllocator<T, MinSize, MaxSize> {};
+template <typename T, size_t MinSize, size_t MaxSize, typename AllocationScheme>
+struct NodeAllocator<T, MinSize, MaxSize, false, AllocationScheme> : public BulkPoolAllocator<T, AllocationScheme, MinSize, MaxSize> {};
 
 // dummy hash, unsed as mixer when robin_hood::hash is already used
 template <typename T>
@@ -894,7 +894,7 @@ struct WrapKeyEqual : public T {
 // boolean to the front.
 // https://www.reddit.com/r/cpp/comments/ahp6iu/compile_time_binary_size_reductions_and_cs_future/eeguck4/
 template <bool IsFlat, size_t MaxLoadFactor100, typename Key, typename T, typename Hash,
-          typename KeyEqual>
+          typename KeyEqual, typename AllocationScheme>
 class Table
     : public WrapHash<Hash>,
       public WrapKeyEqual<KeyEqual>,
@@ -902,7 +902,7 @@ class Table
           typename std::conditional<
               std::is_void<T>::value, Key,
               robin_hood::pair<typename std::conditional<IsFlat, Key, Key const>::type, T>>::type,
-          4, 16384, IsFlat> {
+	4, 16384, IsFlat, AllocationScheme> {
 public:
     static constexpr bool is_flat = IsFlat;
     static constexpr bool is_map = !std::is_void<T>::value;
@@ -918,7 +918,7 @@ public:
     using size_type = size_t;
     using hasher = Hash;
     using key_equal = KeyEqual;
-    using Self = Table<IsFlat, MaxLoadFactor100, key_type, mapped_type, hasher, key_equal>;
+    using Self = Table<IsFlat, MaxLoadFactor100, key_type, mapped_type, hasher, key_equal, AllocationScheme>;
 
 private:
     static_assert(MaxLoadFactor100 > 10 && MaxLoadFactor100 < 100,
@@ -935,7 +935,7 @@ private:
     static constexpr uint8_t InitialInfoInc = 1U << InitialInfoNumBits;
     static constexpr size_t InfoMask = InitialInfoInc - 1U;
     static constexpr uint8_t InitialInfoHashShift = 0;
-    using DataPool = detail::NodeAllocator<value_type, 4, 16384, IsFlat>;
+    using DataPool = detail::NodeAllocator<value_type, 4, 16384, IsFlat, AllocationScheme>;
 
     // type needs to be wider than uint8_t.
     using InfoType = uint32_t;
@@ -1323,7 +1323,7 @@ private:
 #endif
         }
 
-        friend class Table<IsFlat, MaxLoadFactor100, key_type, mapped_type, hasher, key_equal>;
+        friend class Table<IsFlat, MaxLoadFactor100, key_type, mapped_type, hasher, key_equal, AllocationScheme>;
         NodePtr mKeyVals{nullptr};
         uint8_t const* mInfo{nullptr};
     };
@@ -1582,7 +1582,7 @@ public:
             ROBIN_HOOD_LOG("std::malloc " << numBytesTotal << " = calcNumBytesTotal("
                                           << numElementsWithBuffer << ")")
             mKeyVals = static_cast<Node*>(
-                detail::assertNotNull<std::bad_alloc>(std::malloc(numBytesTotal)));
+                detail::assertNotNull<std::bad_alloc>(AllocationScheme::malloc(numBytesTotal)));
             // no need for calloc because clonData does memcpy
             mInfo = reinterpret_cast<uint8_t*>(mKeyVals + numElementsWithBuffer);
             mNumElements = o.mNumElements;
@@ -1631,7 +1631,7 @@ public:
             if (0 != mMask) {
                 // only deallocate if we actually have data!
                 ROBIN_HOOD_LOG("std::free")
-                std::free(mKeyVals);
+                AllocationScheme::free(mKeyVals);
             }
 
             auto const numElementsWithBuffer = calcNumElementsWithBuffer(o.mMask + 1);
@@ -1639,7 +1639,7 @@ public:
             ROBIN_HOOD_LOG("std::malloc " << numBytesTotal << " = calcNumBytesTotal("
                                           << numElementsWithBuffer << ")")
             mKeyVals = static_cast<Node*>(
-                detail::assertNotNull<std::bad_alloc>(std::malloc(numBytesTotal)));
+                detail::assertNotNull<std::bad_alloc>(AllocationScheme::malloc(numBytesTotal)));
 
             // no need for calloc here because cloneData performs a memcpy.
             mInfo = reinterpret_cast<uint8_t*>(mKeyVals + numElementsWithBuffer);
@@ -2362,7 +2362,7 @@ private:
         // [-Werror=free-nonheap-object]
         if (mKeyVals != reinterpret_cast_no_cast_align_warning<Node*>(&mMask)) {
             ROBIN_HOOD_LOG("std::free")
-            std::free(mKeyVals);
+            AllocationScheme::free(mKeyVals);
         }
     }
 
@@ -2391,38 +2391,38 @@ private:
 
 // map
 
-template <typename Key, typename T, typename Hash = hash<Key>,
+template <typename Key, typename T, typename AllocationScheme, typename Hash = hash<Key>,
           typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
-using unordered_flat_map = detail::Table<true, MaxLoadFactor100, Key, T, Hash, KeyEqual>;
+using unordered_flat_map = detail::Table<true, MaxLoadFactor100, Key, T, Hash, KeyEqual, AllocationScheme>;
 
-template <typename Key, typename T, typename Hash = hash<Key>,
+template <typename Key, typename T, typename AllocationScheme, typename Hash = hash<Key>,
           typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
-using unordered_node_map = detail::Table<false, MaxLoadFactor100, Key, T, Hash, KeyEqual>;
+using unordered_node_map = detail::Table<false, MaxLoadFactor100, Key, T, Hash, KeyEqual, AllocationScheme>;
 
-template <typename Key, typename T, typename Hash = hash<Key>,
+template <typename Key, typename T, typename AllocationScheme, typename Hash = hash<Key>,
           typename KeyEqual = std::equal_to<Key>, size_t MaxLoadFactor100 = 80>
 using unordered_map =
     detail::Table<sizeof(robin_hood::pair<Key, T>) <= sizeof(size_t) * 6 &&
                       std::is_nothrow_move_constructible<robin_hood::pair<Key, T>>::value &&
                       std::is_nothrow_move_assignable<robin_hood::pair<Key, T>>::value,
-                  MaxLoadFactor100, Key, T, Hash, KeyEqual>;
+                  MaxLoadFactor100, Key, T, Hash, KeyEqual, AllocationScheme>;
 
 // set
 
-template <typename Key, typename Hash = hash<Key>, typename KeyEqual = std::equal_to<Key>,
-          size_t MaxLoadFactor100 = 80>
-using unordered_flat_set = detail::Table<true, MaxLoadFactor100, Key, void, Hash, KeyEqual>;
+// template <typename Key, typename Hash = hash<Key>, typename KeyEqual = std::equal_to<Key>,
+//           size_t MaxLoadFactor100 = 80>
+// using unordered_flat_set = detail::Table<true, MaxLoadFactor100, Key, void, Hash, KeyEqual>;
 
-template <typename Key, typename Hash = hash<Key>, typename KeyEqual = std::equal_to<Key>,
-          size_t MaxLoadFactor100 = 80>
-using unordered_node_set = detail::Table<false, MaxLoadFactor100, Key, void, Hash, KeyEqual>;
+// template <typename Key, typename Hash = hash<Key>, typename KeyEqual = std::equal_to<Key>,
+//           size_t MaxLoadFactor100 = 80>
+// using unordered_node_set = detail::Table<false, MaxLoadFactor100, Key, void, Hash, KeyEqual>;
 
-template <typename Key, typename Hash = hash<Key>, typename KeyEqual = std::equal_to<Key>,
-          size_t MaxLoadFactor100 = 80>
-using unordered_set = detail::Table<sizeof(Key) <= sizeof(size_t) * 6 &&
-                                        std::is_nothrow_move_constructible<Key>::value &&
-                                        std::is_nothrow_move_assignable<Key>::value,
-                                    MaxLoadFactor100, Key, void, Hash, KeyEqual>;
+// template <typename Key, typename Hash = hash<Key>, typename KeyEqual = std::equal_to<Key>,
+//           size_t MaxLoadFactor100 = 80>
+// using unordered_set = detail::Table<sizeof(Key) <= sizeof(size_t) * 6 &&
+//                                         std::is_nothrow_move_constructible<Key>::value &&
+//                                         std::is_nothrow_move_assignable<Key>::value,
+//                                     MaxLoadFactor100, Key, void, Hash, KeyEqual>;
 
 } // namespace robin_hood
 

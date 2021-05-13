@@ -13,6 +13,19 @@
 
 #if USE_CUSTOM_ALLOCATORS
 
+template<SystemTag Tag = Tag_Unknown>
+struct RobinAllocator
+{
+	static  void* malloc(size_t size)
+	{
+		return Memory::BulkGet(size, Tag);
+	}
+
+	static void free(void* ptr)
+	{
+	}
+};
+
 template<class T>
 using TempVector = std::vector<T, TempStdAllocator<T>>;
 using TempString = std::basic_string<char, std::char_traits<char>, TempStdAllocator<char>>;
@@ -25,8 +38,8 @@ using BulkWString = std::basic_string<wchar_t, std::char_traits<wchar_t>, BulkSt
 
 using String = std::string_view;
 
-template<class Key, class Value>
-using Map = robin_hood::unordered_map<Key, Value>;
+template<class Key, class Value, SystemTag Tag = Tag_Unknown>
+using Map = robin_hood::unordered_map<Key, Value, RobinAllocator<Tag>>;
 
 #else
 
