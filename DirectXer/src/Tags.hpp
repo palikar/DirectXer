@@ -18,6 +18,7 @@ enum SystemTag
 	Memory_2DRendering,
 	Memory_3DRendering,
 	Memory_GPUResource,
+	Memory_Audio,
 
 	Tag_Unknown,
 	Tags_Count,
@@ -39,6 +40,7 @@ static inline const char* gSystemTagNames[] =
 	"2DRendering Memory",
 	"3DRendering Memory",
 	"GPUResource Memory",
+	"Audio Memory",
 
 	"Unknow",
 };

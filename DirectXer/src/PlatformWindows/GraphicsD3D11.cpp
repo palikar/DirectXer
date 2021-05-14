@@ -13,6 +13,7 @@
 
 #include <MTLPixelShader.hpp>
 #include <MTLVertexShader.hpp>
+#include <MTLInstancedVertexShader.hpp>
 
 static DXGI_FORMAT TFToDXGI(TextureFormat format)
 {
@@ -464,6 +465,34 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 	return true;
 }
 
+void GraphicsD3D11::DestroyCubeTexture(TextureId id)
+{
+	auto tex = Textures.erase_at(id);
+
+	tex.tp->Release();
+	if (tex.srv) tex.srv->Release();
+	if (tex.rtv) tex.rtv->Release();
+	if (tex.dsv) tex.dsv->Release();
+}
+
+void GraphicsD3D11::DestroyVertexBuffer(VertexBufferId id)
+{
+	auto buf = VertexBuffers.erase_at(id);
+	buf.id->Release();
+}
+
+void GraphicsD3D11::DestroyIndexBuffer(IndexBufferId id)
+{
+	auto buf = IndexBuffers.erase_at(id);
+	buf.id->Release();
+}
+
+void GraphicsD3D11::DestroyConstantBuffer(ConstantBufferId id)
+{
+	auto buf = ConstantBuffers.erase_at(id);
+	buf.id->Release();
+}
+
 void GraphicsD3D11::SetRenderTarget(RTObject& t_RT)
 {
 	ID3D11RenderTargetView* rtv = Textures.at(t_RT.Color).rtv;
@@ -681,6 +710,32 @@ void GraphicsD3D11::InitResources()
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_MTLVertexShader, Size(g_MTLVertexShader), &shaderObject.il));
 		Shaders[SF_MTL] = shaderObject;
 	}
+
+	{
+		// MTL Instanced shader
+		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
+			{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Texcoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+
+			{"MODEL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"MODEL", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"MODEL", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"MODEL", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+
+			{"INVMODEL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64 + 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"INVMODEL", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64 + 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"INVMODEL", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64 + 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"INVMODEL", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64 + 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		};
+		
+		ShaderObject shaderObject;
+		shaderObject.ps = Shaders[SF_MTL].ps;
+		GFX_CALL(Device->CreateVertexShader(g_MTLInstancedVertexShader, Size(g_MTLInstancedVertexShader), nullptr, &shaderObject.vs));
+		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_MTLInstancedVertexShader, Size(g_MTLInstancedVertexShader), &shaderObject.il));
+		Shaders[SF_MTL] = shaderObject;
+	}
+
 
 		
 	D3D11_BUFFER_DESC vertexShaderCBDesc{ 0 };
@@ -930,6 +985,23 @@ void GraphicsD3D11::Draw(TopolgyType topology, uint32 count, uint32 base)
 	}
 
 	Context->Draw(count, base);
+	DrawCallsCount += 1;
+}
+
+void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset,  uint32 base)
+{
+	uint32 factor = 1;
+	switch (topology) {
+	  case TT_TRIANGLES:
+		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		  break;
+	  case TT_LINES:
+		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		  factor = 2;
+		  break;
+	}
+
+	Context->DrawInstanced(count/factor, instances, offset, base);
 	DrawCallsCount += 1;
 }
 

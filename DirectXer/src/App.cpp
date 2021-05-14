@@ -84,6 +84,7 @@ void App::Update(float dt)
 
 			displayMemory(Memory_Bulk);
 			displayMemory(Memory_GameState);
+			displayMemory(Memory_Audio);
 			displayMemory(Memory_2DRendering);
 			displayMemory(Memory_3DRendering);
 			displayMemory(Memory_GPUResource);

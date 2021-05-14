@@ -114,6 +114,11 @@ class GraphicsD3D11
 	bool CreateIndexBuffer(IndexBufferId id, void* data, uint32 dataSize, bool dynamic = false);
 	bool CreateConstantBuffer(ConstantBufferId id, uint32 t_Size, void* t_InitData);
 
+	void DestroyCubeTexture(TextureId id);
+    void DestroyVertexBuffer(VertexBufferId id);
+	void DestroyIndexBuffer(IndexBufferId id);
+	void DestroyConstantBuffer(ConstantBufferId id);
+
 	void UpdateCBs();
 	void UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data);
 	void UpdateVertexBuffer(VertexBufferId t_Id, void* data, uint64 t_Length);
@@ -121,6 +126,7 @@ class GraphicsD3D11
 	void UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
 	void DrawIndex(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
+	void DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset = 0,  uint32 base = 0);
 	void Draw(TopolgyType topology, uint32 count, uint32 base);
 
 	void ClearBuffer(float red, float green, float blue);
@@ -183,5 +189,3 @@ class GraphicsD3D11
 	GPUResourceMap<IndexBufferId, IBObject, GPURes_IndexBuffer> IndexBuffers;
 	GPUResourceMap<ConstantBufferId, CBObject, GPURes_ConstantBuffer> ConstantBuffers;
 };
-
-

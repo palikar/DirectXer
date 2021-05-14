@@ -52,7 +52,7 @@ class AudioPlayer
 		unsigned Source;
 	};
 
-	Map<WavId, AudioEntry, Memory_2DRendering> AudioEntries;
+	Map<WavId, AudioEntry, Memory_Audio> AudioEntries;
 	void Build(AudioBuilder& t_Builder);
 	void CreateMemoryWav(WavId id, const WavDescription& desc, void* data);
 	void Play(uint32 t_Id, float t_Gain);

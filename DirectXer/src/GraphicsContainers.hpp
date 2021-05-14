@@ -20,7 +20,7 @@ struct SimdFlatMap
 		return { true, true };
 	}
 
-	Value& at(uint32 id)
+	auto value_at(uint32 id)
 	{
 		DxCycleBlock(Tag, CC_SimdFlatMap_At);
 		auto current = Nodes.data();
@@ -38,12 +38,26 @@ struct SimdFlatMap
 
 			if(mask)
 			{
-				return current[index >> 1].second;
+				return Nodes.begin() + (index >> 1);
 			}
 		}
 		
-		Assert(false, "Can't find element in has table.");
-		return current->second;
+		return Nodes.end();
+	}
+
+	Value& at(uint32 id)
+	{
+		auto it = value_at(id);
+		Assert(it != Nodes.end(), "Can't find element in has table.");
+		return it->second;
+	}
+
+	Value erase_at(uint32 id)
+	{
+		auto it = value_at(id);
+		Value res = it->second;
+		Nodes.erase(it);
+		return res;
 	}
 
 	auto begin()

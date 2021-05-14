@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Timing.hpp>
 #include "Audio.hpp"
 
 struct  WavHeader
@@ -64,6 +65,7 @@ static int InitAL()
 	if (!name || alcGetError(device) != AL_NO_ERROR)
 		name = alcGetString(device, ALC_DEVICE_SPECIFIER);
 	printf("Opened \"%s\"\n", name);
+
 
 	return 0;
 }
@@ -164,4 +166,5 @@ void AudioPlayer::CreateMemoryWav(WavId id, const WavDescription& desc, void* da
 	alSourcei(sourceid, AL_BUFFER, bufferid);
 
 	AudioEntries.insert({id, AudioEntry{bufferid, sourceid}});
+	Telemetry::AddMemory(Memory_Audio, desc.Size);
 }

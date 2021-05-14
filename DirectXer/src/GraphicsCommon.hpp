@@ -40,6 +40,12 @@ struct MtlVertex
 	glm::vec3 normal;
 };
 
+struct MtlInstanceData
+{
+	glm::mat4 model;
+	glm::mat4 invModel;
+};
+
 struct Vertex2D
 {
 	glm::vec2 pos;
@@ -95,6 +101,7 @@ enum ShaderFile : uint8
 	SF_2D      = 1,
 	SF_QUAD    = 2,
 	SF_MTL     = 3,
+	SF_MTLInst = 4,
 
 	SF_COUNT
 };

@@ -1,0 +1,214 @@
+#define KA_TEX_MASK  0x00100
+#define KA_FACT_MASK 0x00200
+
+#define KD_TEX_MASK  0x00400
+#define KD_FACT_MASK 0x00800
+
+#define KS_TEX_MASK  0x01000
+#define KS_FACT_MASK 0x02000
+
+#define NS_TEX_MASK  0x04000
+#define NS_FACT_MASK 0x08000
+
+#define D_TEX_MASK   0x10000
+#define D_FACT_MASK  0x20000
+
+struct PointLight
+{
+    float4 Color;
+    float4 Position;
+    float4 Params;
+    bool active;
+};
+
+struct SpotLight
+{
+    float4 Color;
+    float4 Position;
+    float4 Dir;
+    float4 Params;
+    bool active;
+};
+
+struct VSOut
+{
+    float4 pos : SV_Position;
+    float3 color : COLOR0;
+};
+
+cbuffer VSPrim : register(b0)
+{
+    matrix model;
+    matrix view;
+    matrix projection;
+    matrix invModel;
+    uint shaderType;
+    float3 CameraPos;
+};
+
+cbuffer MTLMat : register(b1)
+{
+    float Ns;
+    float3 Ka;
+
+    float Ni;
+    float3 Kd;
+
+    float d;
+    float3 Ks;
+
+    float3 Ke;
+    uint illum;
+};
+
+cbuffer LightningBuf : register(b2)
+{
+    float4 AmbientLightColor;
+
+    float4 DirLightColor;
+    float4 DirLightDir;
+
+    PointLight PointLights[5];
+    SpotLight SpotLights[5];    
+};
+
+float3 ApplyAmbientLight(float3 ambientReflectance)
+{
+    return AmbientLightColor.a * AmbientLightColor.rgb * ambientReflectance;
+}
+
+float3 ApplyDirLight(float3 normal, float3 diffuseFactor)
+{
+    const float3 light_to_surface = normalize(DirLightDir).xyz;
+    const float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
+    float3 diffuse = diffuse_coefficient * diffuseFactor.rgb * DirLightColor.rgb * DirLightColor.a;
+    return diffuse;
+}
+
+float3 ApplyPointLight(PointLight light, float3 normal, float3 surface_pos, float3 surface_to_camera,
+		       float3 diffuseFactor, float3 specularFactor, float specularExponent)
+{
+    float3 light_to_surface  = normalize(light.Position.xyz - surface_pos).xyz;
+    float dist_to_light = length(light.Position.xyz - surface_pos);
+
+    float attenuation = 1.0f / (light.Params.r + light.Params.g * dist_to_light +
+                                light.Params.b * (dist_to_light * dist_to_light));
+
+
+    float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
+    float3 diffuse = diffuse_coefficient * diffuseFactor.rgb * light.Color.rgb;
+
+    float specular_coefficient = 0.0;
+    if(diffuse_coefficient > 0.0)
+        specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), specularExponent);
+    float3 specular = specularFactor.rgb * light.Color.rgb * 1.0f;
+
+    return (diffuse + specular) * attenuation;
+}
+
+float3 ApplySpotLight(SpotLight light, float3 normal, float3 surface_pos, float3 surface_to_camera,
+		      float3 diffuseFactor, float3 specularFactor, float specularExponent)
+{
+    float3 light_to_surface  = normalize(light.Position.xyz - surface_pos).xyz;
+    float theta = acos(dot(light_to_surface, normalize(-light.Dir).xyz));
+
+    if(theta < light.Params.r) {
+        float epsilon  = light.Params.g - light.Params.r;
+        float intensity = clamp((theta - light.Params.r) / epsilon, 0.0, 1.0);
+
+	float diffuse_coefficient = max(0.0, dot(normal, light_to_surface));
+        float3 diffuse = diffuseFactor.rgb * light.Color.rgb * diffuse_coefficient * light.Color.a;
+
+        float specular_coefficient = 0.0;
+        if(diffuse_coefficient > 0.0) {
+            specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), specularExponent);
+        }
+        float3 specular = specular_coefficient * specularFactor.rgb * light.Color.rgb;
+
+        return (diffuse + specular) * intensity;
+    }
+    return float3(0.0, 0.0, 0.0);
+
+}
+
+SamplerState linearSamp : register(s0);
+SamplerState pointSamp : register(s1);
+
+Texture2D KaMap : register(t0);
+Texture2D KdMap : register(t1);
+Texture2D KsMap : register(t3);
+Texture2D NsMap : register(t4);
+Texture2D dMap  : register(t5);
+
+float3 Shade(float3 worldPos, float3 toCamera, float2 uv, float3 normal)
+{
+    float3 finalColor = float3(0.0f, 0.0f, 0.0f);
+
+    float3 diffuseFactor = Kd * ((illum & KD_FACT_MASK) >> 11)
+	+ KdMap.SampleLevel(pointSamp, uv, 0).rgb * ((illum & KD_TEX_MASK) >> 10);
+
+    float3 specularFactor = Ks * ((illum & KS_FACT_MASK) >> 13)
+	+ KsMap.SampleLevel(pointSamp, uv, 0).rgb * ((illum & KS_TEX_MASK) >> 12);
+    
+    float specularExponent = Ns * ((illum * NS_FACT_MASK) >> 15)
+	+ NsMap.SampleLevel(pointSamp, uv, 0).r * ((illum & NS_TEX_MASK) >> 14);
+
+    finalColor += ApplyAmbientLight(diffuseFactor);
+    finalColor += ApplyDirLight(normal, diffuseFactor);
+
+    for (int i = 0; i < 5; ++i)
+    {
+	if (PointLights[i].active)
+	{
+	    finalColor += ApplyPointLight(PointLights[i], normal, worldPos, toCamera,
+					  diffuseFactor, specularFactor, specularExponent);
+	}
+
+	if (SpotLights[i].active)
+	{
+	    finalColor += ApplySpotLight(SpotLights[i], normal, worldPos, toCamera,
+					 diffuseFactor, specularFactor, specularExponent);
+	}
+    }
+
+    return finalColor;
+}
+
+float4x4 inverse(float4x4 m) {
+    float n11 = m[0][0], n12 = m[1][0], n13 = m[2][0], n14 = m[3][0];
+    float n21 = m[0][1], n22 = m[1][1], n23 = m[2][1], n24 = m[3][1];
+    float n31 = m[0][2], n32 = m[1][2], n33 = m[2][2], n34 = m[3][2];
+    float n41 = m[0][3], n42 = m[1][3], n43 = m[2][3], n44 = m[3][3];
+
+    float t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
+    float t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
+    float t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
+    float t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+
+    float det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
+    float idet = 1.0f / det;
+
+    float4x4 ret;
+
+    ret[0][0] = t11 * idet;
+    ret[0][1] = (n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44) * idet;
+    ret[0][2] = (n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44) * idet;
+    ret[0][3] = (n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43) * idet;
+
+    ret[1][0] = t12 * idet;
+    ret[1][1] = (n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44) * idet;
+    ret[1][2] = (n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44) * idet;
+    ret[1][3] = (n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43) * idet;
+
+    ret[2][0] = t13 * idet;
+    ret[2][1] = (n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44) * idet;
+    ret[2][2] = (n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44) * idet;
+    ret[2][3] = (n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43) * idet;
+
+    ret[3][0] = t14 * idet;
+    ret[3][1] = (n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34) * idet;
+    ret[3][2] = (n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34) * idet;
+    ret[3][3] = (n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33) * idet;
+
+    return ret;
+}

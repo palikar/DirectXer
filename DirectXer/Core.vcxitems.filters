@@ -36,6 +36,9 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\MTLVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\MTLInstancedVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp">
@@ -119,5 +122,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Timing.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GraphicsContainers.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Serialization.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Shaders\MTLCommon.ihlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

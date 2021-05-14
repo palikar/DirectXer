@@ -465,7 +465,7 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 		if (ImGui::TreeNode("Directional light"))
 		{
 			ImGui::Text("Color");
-			ImGui::SameLine();
+			ImGui::SameLine();
 			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
 			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
 			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
@@ -529,6 +529,12 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
 	
 	RenderSkyBox(T_NIGHT_SKY);
+
+
+	BulkVector<MtlInstanceData> instData;
+	instData.resize(32);
+
+	
 }
 
 void ExampleScenes::ProcessBallsScene(float dt)

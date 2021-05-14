@@ -91,12 +91,10 @@ App* InitMain(char** argv, int argc)
 // @Done: Debug: Print out the current feature level\API
 // @Done: Draw
 // @Done: Memory tracking for common objects
+// @Done: Debug marksers
+// @Done: Timing queries
+// @Done: Destroying objects
 
-// @Todo: Debug marksers
-// @Todo: Timing queries
-// @Todo: DrawInstanced
-// @Todo: Texture arrays
-// @Todo: Destroying objects
 // @Todo: Release the things that are not needed
 
 // @Done: Lines "geometry" + ability to use lines primiteves
@@ -131,6 +129,8 @@ App* InitMain(char** argv, int argc)
 // @Todo: Tags for the textures -- for certain level, for certain material instance
 //     -- load all textures in a level
 //     -- get textures for some material instance
+//     -> this is probably part of some bigger setup to stream resources asynchronously
+// @Todo: Deffered loading of scenes resources
 
 // == Debug ==
 // @Done: Axis helper
@@ -151,14 +151,14 @@ App* InitMain(char** argv, int argc)
 // @Todo: Some job\task system for basic multithreading support
 //    -- maybe this is only useful for loading resources
 //    -- Defer certain things "for later"
-// @Todo: Deffered loading of scenes resources
-// @Todo: Memory tracking -- temp; bulk; GPU memory; general
+// @Done: Memory tracking -- temp; bulk; GPU memory; general
 // purpose allocations
 //    -- Have some global tracking structs in Memory.hpp and track
 //the memory consumption in Debug
 // @Todo: Input Abstraction -- left, right, actionXXX, axis x/y
 // @Todo: 2D Collision detection with something like GJK Algorithm
 // @Todo: Inter image based animator setup
+// @Todo: 3D renderer API
 
 // == Telemtry ==
 // @Done: Current Bulk
@@ -167,27 +167,11 @@ App* InitMain(char** argv, int argc)
 // @Done: Bulk Memory tracking
 // @Done: Allocation tracking
 // @Done: Tagged bulk allocation
+// @Done Tracking support for the map
 // @Todo: Temorary memory tracking(?)
 
 // == Memory ==
 // @Todo Allocating general arenas in BulkStorage
 
 // ***** Queue *****
-// @Todo Tracking support for the map <--- this one
-
-
-
-// if( pressing_left )  virtual_position.x -= MOVE_SPEED*time_step; 
-// if( pressing_right ) virtual_position.x += MOVE_SPEED*time_step; 
-// if( pressing_up )    virtual_position.y -= MOVE_SPEED*time_step; 
-// if( pressing_down )  virtual_position.y += MOVE_SPEED*time_step; 
-// sprite.position += (virtual_position-sprite.position) * (CHASE_SPEED*time_step); 
-
-
-
-// player_velocity -= player_velocity * (DAMPING*time_step); 
-// if( pressing_left )  player_velocity.x -= MOVE_FORCE*time_step; 
-// if( pressing_right ) player_velocity.x += MOVE_FORCE*time_step; 
-// if( pressing_up )    player_velocity.y -= MOVE_FORCE*time_step;
-// if( pressing_down )  player_velocity.y += MOVE_FORCE*time_step; 
-// sprite.position += player_velocity * time_step; 
+// @Todo: DrawInstanced <--- this one
