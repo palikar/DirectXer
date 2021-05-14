@@ -33,12 +33,16 @@ struct ExtraData
 
 enum AssetType : uint16
 {
+	// @Note: This ordering is important! it should match the one of
+	// GPUResourceType in Assets.hpp
+	Type_Texture,
+	Type_VertexBuffer,
+	Type_IndexBuffer,
+	Type_ConstantBuffer,
+	
 	Type_Image,
 	Type_Font,
 	Type_Wav,
-	Type_Texture,
-	Type_IndexBuffer,
-	Type_VertexBuffer,
 	Type_Skybox,
 	Type_Mesh,
 	Type_Material,
@@ -163,7 +167,7 @@ inline uint32 NewAssetName(AssetBundlerContext& context, AssetType type, const c
 	static uint32 next = 0;
 	uint32 nextId = (id == 0 ?  ++next : id);
 	context.Defines.push_back({ name, nextId, type });
-	return next;
+	return nextId;
 }
 
 inline TextureId NextTextureAssetId()
@@ -173,16 +177,23 @@ inline TextureId NextTextureAssetId()
 	return 1 << 15 | next;
 }
 
-inline TextureId NextVBAssetId()
+inline VertexBufferId NextVBAssetId()
 {
 	static VertexBufferId next = 0;
 	++next;
 	return 1 << 15 | next;
 }
 
-inline TextureId NextIBAssetId()
+inline IndexBufferId NextIBAssetId()
 {
 	static IndexBufferId next = 0;
+	++next;
+	return 1 << 15 | next;
+}
+
+inline ConstantBufferId NextCBAssetId()
+{
+	static ConstantBufferId next = 0;
 	++next;
 	return 1 << 15 | next;
 }

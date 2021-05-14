@@ -94,8 +94,10 @@ App* InitMain(char** argv, int argc)
 // @Done: Debug marksers
 // @Done: Timing queries
 // @Done: Destroying objects
+// @Done: DrawInstanced
 
 // @Todo: Release the things that are not needed
+// @Todo: Debug names
 
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
@@ -174,4 +176,4 @@ App* InitMain(char** argv, int argc)
 // @Todo Allocating general arenas in BulkStorage
 
 // ***** Queue *****
-// @Todo: DrawInstanced <--- this one
+//  <--- this one

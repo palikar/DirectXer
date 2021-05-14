@@ -68,7 +68,7 @@ public:
 	SerializationContext SaveContext;
 
 	AudioPlayer AudioEngine;
-
+	VertexBufferId InstDataBuffer;
 
 	RTObject uiRenderTarget;
 

@@ -94,7 +94,7 @@ class GraphicsD3D11
 	void BindVSTexture(uint32 t_Slot, TextureId t_Id);
 	void BindPSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
 	void BindVSConstantBuffers(ConstantBufferId t_Id, uint16 t_Slot);
-	void BindVertexBuffer(VertexBufferId t_Id, uint32 offset = 0);
+	void BindVertexBuffer(VertexBufferId t_Id, uint32 offset = 0, uint32 slot = 0);
 	void BindIndexBuffer(IndexBufferId id);
 
 	void SetScissor(Rectangle2D t_Rect);
@@ -118,6 +118,11 @@ class GraphicsD3D11
     void DestroyVertexBuffer(VertexBufferId id);
 	void DestroyIndexBuffer(IndexBufferId id);
 	void DestroyConstantBuffer(ConstantBufferId id);
+
+	void SetTextureName(TextureId id, String name);
+	void SetVertexBufferName(VertexBufferId id, String name);
+	void SetIndexBufferName(IndexBufferId id, String name);
+	void SetConstantBufferName(ConstantBufferId id, String name);
 
 	void UpdateCBs();
 	void UpdateCBs(ConstantBufferId& t_Id, uint32 t_Length, void* t_Data);

@@ -91,8 +91,8 @@ struct MeshCatalog
 		Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 		Gfx->UpdateCBs();
 
-		Gfx->BindVSTexture(0, material.KaMap);
-		Gfx->BindVSTexture(1, material.KdMap);
+		if (material.KaMap) Gfx->BindVSTexture(0, material.KaMap);
+		if (material.KdMap) Gfx->BindVSTexture(1, material.KdMap);
 
 		Gfx->DrawIndex(TT_TRIANGLES, mesh.Geometry.IndexCount, 0, 0);
 	}

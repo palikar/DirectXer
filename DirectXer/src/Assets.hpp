@@ -14,6 +14,25 @@ enum Tag : uint16
 	Tag_Level
 };
 
+enum GPUResourceType : uint8
+{
+	// @Note: This ordering is important! it should match the one of
+	// AssetType in AssetBuilder.hpp
+	GP_Texture,
+	GP_VertexBuffer,
+	GP_IndexBuffer,
+	GP_ConstantBuffer,
+
+	GP_Count,
+};
+
+struct GPUResource
+{
+	GPUResourceType Type;
+	uint16 Id;
+	const char* Name;
+};
+
 struct AssetColletionHeader
 {
 	uint32 TexturesCount;
@@ -71,6 +90,7 @@ struct MaterialLoadEntry
 {
 	MtlMaterial Desc;
 	MaterialId Id;
+	ConstantBufferId Buffer;
 };
 
 // @Note: Will be put directly into the images map of the ImageLibrary
@@ -140,4 +160,6 @@ struct AssetFile
 struct AssetStore
 {
 	static void LoadAssetFile(AssetFile file, AssetBuildingContext& builders);
+
+	static void SetDebugNames(Graphics* Graphics, GPUResource* resources, size_t counts);
 };

@@ -178,7 +178,7 @@ void LoadTexture(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob&
 	texEntry.Desc.Height = height;
 	texEntry.Desc.Format = TF_RGBA;
 	texEntry.DataOffset = blob.PutData(data, width*height*channels);
-		
+
 	context.TexturesToCreate.push_back(texEntry);
 	
 	NewAssetName(context, Type_Texture, asset.Id, texEntry.Id);
@@ -235,6 +235,7 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 	std::string line;
 
 	std::string newMatName;
+	std::string texName;
 
 	MtlMaterial newMat{0};
 
@@ -344,9 +345,11 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 		}
 		else if (StartsWith(line, "map_Kd"))
 		{
+			texName = fmt::format("{}_Kd_Map", newMatName);
+			
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(line,"map_Kd ", "");
-			texAsset.Id = "Kd_Map";
+			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
 			newMat.KdMap = context.TexturesToCreate.back().Id;
@@ -355,9 +358,11 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 		}
 		else if (StartsWith(line, "map_Ka"))
 		{
+			texName = fmt::format("{}_Ka_Map", newMatName);
+			
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(line,"map_Ka ", "");
-			texAsset.Id = "Ka_Map";
+			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
 			newMat.KaMap = context.TexturesToCreate.back().Id;
@@ -366,9 +371,11 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 		}
 		else if (StartsWith(line, "map_Ks"))
 		{
+			texName = fmt::format("{}_Ks_Map", newMatName);
+			
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(line,"map_Ks ", "");
-			texAsset.Id = "Ks_Map";
+			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
 			newMat.KsMap = context.TexturesToCreate.back().Id;
@@ -377,9 +384,11 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 		}
 		else if (StartsWith(line, "map_Ns"))
 		{
+			texName = fmt::format("{}_Ns_Map", newMatName);
+			
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(line,"map_Ns ", "");
-			texAsset.Id = "Ns_Map";
+			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
 			newMat.NsMap = context.TexturesToCreate.back().Id;
@@ -388,9 +397,11 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 		}
 		else if (StartsWith(line, "map_d"))
 		{
+			texName = fmt::format("{}_map_Map", newMatName);
+			
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(line,"map_d ", "");
-			texAsset.Id = "d_Map";
+			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
 			newMat.dMap = context.TexturesToCreate.back().Id;
@@ -405,6 +416,10 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 		MaterialLoadEntry newEntry;
 		newEntry.Desc = newMat;
 		newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
+		
+		std::string debugName = fmt::format("{}_CB", newMatName.c_str());
+		newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, debugName.c_str(), NextCBAssetId());
+		
 		context.Materials.push_back(newEntry);
 	}	
 }
@@ -536,16 +551,24 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 		}
     }
 
+	std::string debugName;
+	
 	vbo.StructSize = sizeof(MtlVertex);
 	vbo.DataSize = (uint32)(sizeof(MtlVertex) * VertexData.size());
 	vbo.Dynamic = false;
 	vbo.DataOffset = blob.PutData((unsigned char*)VertexData.data(), sizeof(MtlVertex) * VertexData.size());
 	vbo.Id = NextVBAssetId();
 
+	debugName = fmt::format("{}_VB", asset.Id);
+	NewAssetName(context, Type_VertexBuffer, debugName.c_str(), vbo.Id);
+
 	ibo.DataSize = (uint32)(sizeof(uint32) * IndexData.size());
 	ibo.Dynamic = false;
 	ibo.DataOffset = blob.PutData((unsigned char*)IndexData.data(), sizeof(uint32) * IndexData.size());
 	ibo.Id = NextIBAssetId();
+
+	debugName = fmt::format("{}_IB", asset.Id);
+	NewAssetName(context, Type_IndexBuffer, debugName.c_str(), ibo.Id);
 
 	// @Note: If the obj file does not define a material, we have to load and use a default one
 	if (mesh.Mesh.Material == 0)
@@ -581,6 +604,8 @@ uint32 LoadDefaultMaterial(AssetBundlerContext& context)
 	MaterialLoadEntry newEntry;
 	newEntry.Desc = newMat;
 	newEntry.Id = NewAssetName(context, Type_Material, "DefaultMaterial");
+	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, DefaultMaterial_CB, NextCBAssetId());
+		
 	context.Materials.push_back(newEntry);
 
 	return newEntry.Id;

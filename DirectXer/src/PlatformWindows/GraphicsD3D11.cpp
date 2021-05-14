@@ -15,6 +15,13 @@
 #include <MTLVertexShader.hpp>
 #include <MTLInstancedVertexShader.hpp>
 
+
+#define CSTR_TO_WIDE(cstr, wstr)										\
+	int __retval;														\
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, cstr, -1, NULL, 0); \
+	LPWSTR lpWideCharStr = (LPWSTR)alloca(retval * sizeof(WCHAR));		\
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, cstr, -1, lpWideCharStr, retval)
+
 static DXGI_FORMAT TFToDXGI(TextureFormat format)
 {
 	switch (format)
@@ -36,6 +43,11 @@ static const char* FeatureLevelToString(D3D_FEATURE_LEVEL level)
 	  case D3D_FEATURE_LEVEL_11_1: return "D3D_FEATURE_LEVEL_11_1";
 	  default: return "Unknow feature level";
 	}
+}
+
+static inline void SetDebugName(ID3D11DeviceChild* res, String name)
+{
+	if(res) res->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
 }
 
 void GraphicsD3D11::InitSwapChain(HWND hWnd, float t_Width, float t_Height)
@@ -109,6 +121,10 @@ void GraphicsD3D11::InitBackBuffer()
 	[[maybe_unused]]HRESULT hr;
 	GFX_CALL(Swap->GetBuffer(0, __uuidof(ID3D11Resource), (void**)(&pBackBuffer)));
 	GFX_CALL(Device->CreateRenderTargetView(pBackBuffer, nullptr, &RenderTargetView));
+
+	SetDebugName(pBackBuffer, "Backbuffer RT");
+	SetDebugName(RenderTargetView, "Backbuffer RT");
+	
 	pBackBuffer->Release();
 }
 
@@ -147,6 +163,8 @@ void GraphicsD3D11::InitZBuffer(float width, float height)
 	Context->OMSetRenderTargets(1, &RenderTargetView, DepthStencilView);
 	Assert(DepthStencilView, "Can't create the depth stencil view for the backbuffer");
 
+	SetDebugName(depthStencil, "Backbuffer DS");
+	SetDebugName(DepthStencilView, "Backbuffer DS");
 }
 
 void GraphicsD3D11::InitRasterizationsStates()
@@ -171,6 +189,9 @@ void GraphicsD3D11::InitRasterizationsStates()
 
 	RasterizationsStates[RS_NORMAL] = rastStateNormal;
 	RasterizationsStates[RS_DEBUG] = rastStateDebug;
+
+	SetDebugName(RasterizationsStates[RS_NORMAL], "Normal RS");
+	SetDebugName(RasterizationsStates[RS_DEBUG], "Debug RS");
 
 }
 
@@ -199,6 +220,8 @@ void GraphicsD3D11::InitSamplers()
 
 		Context->PSSetSamplers(0, 1, &state);
 		Context->VSSetSamplers(0, 1, &state);
+
+		SetDebugName(state, "Linear Sampler");
 	}
 
 	{
@@ -224,10 +247,9 @@ void GraphicsD3D11::InitSamplers()
 
 		Context->PSSetSamplers(1, 1, &state);
 		Context->VSSetSamplers(1, 1, &state);
-	}
-	
 
-	
+		SetDebugName(state, "Point Sampler");
+	}
 }
 
 void GraphicsD3D11::InitBlending()
@@ -250,6 +272,8 @@ void GraphicsD3D11::InitBlending()
 
 		[[maybe_unused]]HRESULT hr;
 		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_AlphaBlending]));
+
+		SetDebugName(BlendingStates[BS_AlphaBlending], "Alpha Blending");
 	}
 
 	// premultiplied alpha
@@ -265,8 +289,9 @@ void GraphicsD3D11::InitBlending()
 
 		[[maybe_unused]]HRESULT hr;
 		GFX_CALL(Device->CreateBlendState( &desc, &BlendingStates[BS_PremultipliedAlpha]));
-	}
 
+		SetDebugName(BlendingStates[BS_PremultipliedAlpha], "Premultipled Alpha");
+	}
 }
 
 void GraphicsD3D11::SetBlendingState(BlendingState t_State)
@@ -463,6 +488,32 @@ bool GraphicsD3D11::CreateDSTexture(TextureId id, TextureDescription description
 	Telemetry::AddMemory(GPURes_Texture, BytesPerPixel(description.Format) * description.Width * description.Height);
 	
 	return true;
+}
+
+void GraphicsD3D11::SetTextureName(TextureId id, String name)
+{
+	auto obj = Textures.at(id);
+	obj.tp->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
+	obj.srv->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
+	if (obj.rtv) obj.rtv->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
+	if (obj.dsv) obj.dsv->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
+}
+void GraphicsD3D11::SetVertexBufferName(VertexBufferId id, String name)
+{
+	auto obj = VertexBuffers.at(id);
+	obj.id->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
+}
+
+void GraphicsD3D11::SetIndexBufferName(IndexBufferId id, String name)
+{
+	auto obj = IndexBuffers.at(id);
+	obj.id->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
+}
+
+void GraphicsD3D11::SetConstantBufferName(ConstantBufferId id, String name)
+{
+	auto obj = ConstantBuffers.at(id);
+	obj.id->SetPrivateData(WKPDID_D3DDebugObjectName, (uint32)name.size(), name.data());
 }
 
 void GraphicsD3D11::DestroyCubeTexture(TextureId id)
@@ -667,6 +718,10 @@ void GraphicsD3D11::InitResources()
 		GFX_CALL(Device->CreateVertexShader(g_VertexShader, Size(g_VertexShader), nullptr, &shaderObject.vs));
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_VertexShader, Size(g_VertexShader), &shaderObject.il));
 		Shaders[SF_DEBUG] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "DebugPixelShader");
+		SetDebugName(shaderObject.vs, "DebugVertexShader");
+		SetDebugName(shaderObject.il, "ColorVertex");
 	}
 
 	{
@@ -684,6 +739,11 @@ void GraphicsD3D11::InitResources()
 		GFX_CALL(Device->CreateVertexShader(g_2DVertexShader, Size(g_2DVertexShader), nullptr, &shaderObject.vs));
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_2DVertexShader, Size(g_2DVertexShader), &shaderObject.il));
 		Shaders[SF_2D] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "2DPixelShader");
+		SetDebugName(shaderObject.vs, "2DVertexShader");
+		SetDebugName(shaderObject.il, "Vertex2D");
+		
 	}
 
 	{
@@ -709,6 +769,10 @@ void GraphicsD3D11::InitResources()
 		GFX_CALL(Device->CreateVertexShader(g_MTLVertexShader, Size(g_MTLVertexShader), nullptr, &shaderObject.vs));
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_MTLVertexShader, Size(g_MTLVertexShader), &shaderObject.il));
 		Shaders[SF_MTL] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "MtlPixelShader");
+		SetDebugName(shaderObject.vs, "MtlVertexShader");
+		SetDebugName(shaderObject.il, "MtlVertex");
 	}
 
 	{
@@ -733,7 +797,11 @@ void GraphicsD3D11::InitResources()
 		shaderObject.ps = Shaders[SF_MTL].ps;
 		GFX_CALL(Device->CreateVertexShader(g_MTLInstancedVertexShader, Size(g_MTLInstancedVertexShader), nullptr, &shaderObject.vs));
 		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_MTLInstancedVertexShader, Size(g_MTLInstancedVertexShader), &shaderObject.il));
-		Shaders[SF_MTL] = shaderObject;
+		Shaders[SF_MTLInst] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "MtlInstancedPixelShader");
+		SetDebugName(shaderObject.vs, "MtlInstancedVertexShader");
+		SetDebugName(shaderObject.il, "MtlVertexInstanced");
 	}
 
 
@@ -750,6 +818,8 @@ void GraphicsD3D11::InitResources()
 	vertexShaderCBData.pSysMem = &VertexShaderCB;
 	GFX_CALL(Device->CreateBuffer(&vertexShaderCBDesc, &vertexShaderCBData, &VertexShaderCBId));
 
+	SetDebugName(VertexShaderCBId, "Primary VS Constant Buffer");
+
 	Context->VSSetConstantBuffers(0, 1, &VertexShaderCBId);
 
 
@@ -765,6 +835,8 @@ void GraphicsD3D11::InitResources()
 	pixelShaderCBData.pSysMem = &PixelShaderCB;
 	GFX_CALL(Device->CreateBuffer(&pixelShaderCBDesc, &pixelShaderCBData, &PixelShaderCBId));
 	Context->PSSetConstantBuffers(0, 1, &PixelShaderCBId);
+
+	SetDebugName(PixelShaderCBId, "Primary PS Constant Buffer");
 
 }
 
@@ -793,8 +865,9 @@ void GraphicsD3D11::InitDepthStencilStates()
 		dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	
 		[[maybe_unused]]HRESULT hr;
-		GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_Normal]));	
+		GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_Normal]));
 
+		SetDebugName(DepthStencilStates[DSS_Normal], "Normal DS");
 	}
 
 	{
@@ -820,8 +893,9 @@ void GraphicsD3D11::InitDepthStencilStates()
 		dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	
 		[[maybe_unused]]HRESULT hr;
-		GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_2DRendering]));	
+		GFX_CALL(Device->CreateDepthStencilState(&dsDesc, &DepthStencilStates[DSS_2DRendering]));
 
+		SetDebugName(DepthStencilStates[DSS_2DRendering], "2D Rendering DS");
 	}
 }
 
@@ -944,10 +1018,10 @@ void GraphicsD3D11::BindIndexBuffer(IndexBufferId id)
 	Context->IASetIndexBuffer(IndexBuffers.at(id).id, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void GraphicsD3D11::BindVertexBuffer(VertexBufferId t_Id, uint32 offset)
+void GraphicsD3D11::BindVertexBuffer(VertexBufferId t_Id, uint32 offset, uint32 slot)
 {
 	const auto& buffer = VertexBuffers.at(t_Id);
-	Context->IASetVertexBuffers(0, 1, &buffer.id, &buffer.structSize, &offset);
+	Context->IASetVertexBuffers(slot, 1, &buffer.id, &buffer.structSize, &offset);
 }
 
 void GraphicsD3D11::DrawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
@@ -988,7 +1062,7 @@ void GraphicsD3D11::Draw(TopolgyType topology, uint32 count, uint32 base)
 	DrawCallsCount += 1;
 }
 
-void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset,  uint32 base)
+void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset, uint32 base)
 {
 	uint32 factor = 1;
 	switch (topology) {
@@ -1001,7 +1075,7 @@ void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint3
 		  break;
 	}
 
-	Context->DrawInstanced(count/factor, instances, offset, base);
+	Context->DrawIndexedInstanced(count/factor, instances, offset, base, 0);
 	DrawCallsCount += 1;
 }
 
@@ -1059,6 +1133,10 @@ void GraphicsD3D11::BeginTimingQuery()
 
 	Context->Begin(DisjointTimestampQuery);
 	Context->End(BeginTimeQuery);
+
+	SetDebugName(DisjointTimestampQuery, "DisjointTimeQuery");
+	SetDebugName(BeginTimeQuery, "BeginTimeQuery");
+	SetDebugName(EndTimeQuery, "EndTimeQuery");
 }
 
 void GraphicsD3D11::EndTimingQuery()
@@ -1110,6 +1188,8 @@ void GraphicsD3D11::BeginStatisticsQuery()
 	GFX_CALL(Device->CreateQuery(&desc, &StatisticsQuery));
 
 	Context->Begin(StatisticsQuery);
+	
+	SetDebugName(StatisticsQuery, "StatsQuery");
 }
 
 void GraphicsD3D11::EndStatisticsQuery()

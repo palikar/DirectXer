@@ -280,6 +280,9 @@ GPUGeometry BufferBuilder::CreateBuffer(Graphics& graphics)
 	auto vb = vertexBufferFactory<ColorVertex>(NextVertexBufferId(), graphics, Vertices);
 	auto ib = indexBufferFactory(NextIndexBufferId(), graphics, Indices);
 
+	graphics.SetVertexBufferName(vb, "DebugGeometryVB");
+	graphics.SetVertexBufferName(ib, "DebugGeometryIB");
+
 	Memory::ResetTempScope();
 
 	return {GeometryBuffer, vb, ib};

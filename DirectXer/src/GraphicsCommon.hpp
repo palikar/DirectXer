@@ -128,20 +128,22 @@ enum ShaderType : uint8
 enum ShaderConfig
 {
 	// Debug Rendering
-	SC_DEBUG_COLOR       = SF_DEBUG | (ST_COLOR      << 8),
-	SC_DEBUG_TEX         = SF_DEBUG | (ST_TEX        << 8),
-	SC_DEBUG_SKY         = SF_DEBUG | (ST_SKY        << 8),
-	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG | (ST_TEX_SIMPLE << 8),
-	SC_DEBUG_PHONG       = SF_DEBUG | (ST_PHONG      << 8),
+	SC_DEBUG_COLOR       = SF_DEBUG		| (ST_COLOR			<< 8),
+	SC_DEBUG_TEX         = SF_DEBUG		| (ST_TEX			<< 8),
+	SC_DEBUG_SKY         = SF_DEBUG		| (ST_SKY			<< 8),
+	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG		| (ST_TEX_SIMPLE	<< 8),
+	SC_DEBUG_PHONG       = SF_DEBUG		| (ST_PHONG			<< 8),
 
 	// 2D rendering
-	SC_2D_RECT           = SF_2D    | (ST_RECT      << 8),
-	SC_2D_CIRCLE         = SF_2D    | (ST_CIRCLE    << 8),
+	SC_2D_RECT           = SF_2D		| (ST_RECT			<< 8),
+	SC_2D_CIRCLE         = SF_2D		| (ST_CIRCLE		<< 8),
 	
-	SC_QUAD_SIMPLE       = SF_QUAD  | (ST_SIMPLE_QUAD << 8),
+	SC_QUAD_SIMPLE       = SF_QUAD		| (ST_SIMPLE_QUAD	<< 8),
 
-	SC_MTL_1             = SF_MTL   | (ST_1_MTL       << 8),
-	SC_MTL_2             = SF_MTL   | (ST_2_MTL       << 8),
+	SC_MTL_1             = SF_MTL		| (ST_1_MTL			<< 8),
+	SC_MTL_2             = SF_MTL		| (ST_2_MTL			<< 8),
+
+	SC_MTL_2_INSTANCED   = SF_MTLInst	| (ST_2_MTL			<< 8),
 	
 	SC_COUNT
 };

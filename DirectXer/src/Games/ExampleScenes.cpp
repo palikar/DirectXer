@@ -25,7 +25,7 @@ static uint32 SHIPIMAGE = 4;
 
 void ExampleScenes::Init()
 {
-	CurrentScene = SCENE_BALLS;
+	CurrentScene = SCENE_OBJECTS;
 	
 	CurrentRastState = RS_NORMAL;
 
@@ -41,6 +41,7 @@ void ExampleScenes::Init()
 	masterBuilder.Graphics = Graphics;
 	
 	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
+	AssetStore::SetDebugNames(Graphics, GPUResources, Size(GPUResources));	
 	Memory::EndTempScope();	
 
 
@@ -67,6 +68,7 @@ void ExampleScenes::Init()
 	texMat.config = SC_DEBUG_TEX;
 	texMat.data = NextConstantBufferId();
 	Graphics->CreateConstantBuffer(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	Graphics->SetConstantBufferName(texMat.data, "TexMaterialCB");
 	texMat.BaseMap = T_ROCKS_COLOR;
 	texMat.AoMap = T_ROCKS_AO;
 	texMat.EnvMap = ST_SKY;
@@ -74,6 +76,7 @@ void ExampleScenes::Init()
 	phongMat.config = SC_DEBUG_PHONG;
 	phongMat.data = NextConstantBufferId();
 	Graphics->CreateConstantBuffer(phongMat.data, sizeof(PhongMaterialData), &texMatData);
+	Graphics->SetConstantBufferName(phongMat.data, "PhongMaterialCB");
 
 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
 	phongMatData.Diffuse  = {0.5f, 0.5f, 0.5f, 0.0f };
@@ -84,6 +87,7 @@ void ExampleScenes::Init()
 	// Create lighing
 	Light.bufferId = NextConstantBufferId();
 	Graphics->CreateConstantBuffer(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	Graphics->SetConstantBufferName(Light.bufferId, "Lighting CB");
 
 	Light.lighting.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
 	Light.lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
@@ -131,6 +135,17 @@ void ExampleScenes::Init()
 
 	}
 
+	BulkVector<MtlInstanceData> instData;
+	instData.resize(32);
+
+	for (size_t i = 0; i < 32; i++)
+	{
+		instData[i].model = init_scale(1.0f, 1.0f, 1.0f) * init_translate(5.0f * (8 - (i & 0x0F)), 0.0f, 5.0f * (8 - ((i & 0xF0) >> 4)));
+		instData[i].invModel = glm::inverse(instData[i].model);
+	}
+
+	InstDataBuffer = NextVertexBufferId();
+	Graphics->CreateVertexBuffer(InstDataBuffer, sizeof(MtlInstanceData), instData.data(), 32 * sizeof(MtlInstanceData), true);
 }
 
 void ExampleScenes::Resize()
@@ -183,6 +198,8 @@ void ExampleScenes::Update(float dt)
 void ExampleScenes::RenderSkyBox(TextureId sky)
 {
 	// @Speed: The texture will be bount most of the time
+	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
+	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
 	Graphics->SetShaderConfiguration(SC_DEBUG_SKY);
 	Graphics->BindTexture(0, sky);
 	Graphics->VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
@@ -266,7 +283,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->BindTexture(1, T_CHECKER);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	MeshesLib.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f});
+	MeshesLib.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f}, Light.bufferId);
 
 	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
 	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
@@ -465,7 +482,8 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 		if (ImGui::TreeNode("Directional light"))
 		{
 			ImGui::Text("Color");
-			ImGui::SameLine();
+			ImGui::SameLine();
+
 			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
 			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
 			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
@@ -522,18 +540,24 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
 	// RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(5.0f, 1.0f, 5.0f));
 
-	MeshesLib.DrawMesh(M_SUZANNE, {0.0f, -3.0f, 0.0f}, {4.05f, 4.05f, 4.05f}, Light.bufferId);
 	MeshesLib.DrawMesh(M_TREE_1, {0.0f, 3.0f, 0.0f}, {0.5f, 0.5f, 0.5f}, Light.bufferId);
+	MeshesLib.DrawMesh(M_SUZANNE, {0.0f, -3.0f, 0.0f}, {4.05f, 4.05f, 4.05f}, Light.bufferId);
+
+	{
+		Graphics->SetShaderConfiguration(SC_MTL_2_INSTANCED);
+		auto mesh = MeshesLib.Meshes.at(M_SUZANNE);
+
+		Graphics->BindIndexBuffer(mesh.Geometry.IndexBuffer);
+		Graphics->BindVertexBuffer(mesh.Geometry.VertexBuffer, 0, 0);
+		Graphics->BindVertexBuffer(InstDataBuffer, 0, 1);
+
+		Graphics->UpdateCBs();
 	
-	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
-	
+		Graphics->DrawInstancedIndex(TT_TRIANGLES, mesh.Geometry.IndexCount, 32, 0, 0);
+
+	}
+
 	RenderSkyBox(T_NIGHT_SKY);
-
-
-	BulkVector<MtlInstanceData> instData;
-	instData.resize(32);
-
 	
 }
 

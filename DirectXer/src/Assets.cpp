@@ -114,11 +114,35 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 	for (uint32 i = 0; i < header.MaterialsCount; ++i)
 	{
 		MaterialLoadEntry& entry = ReadBlob<MaterialLoadEntry>(current);
-		entry.Desc.Cbo = NextConstantBufferId();
-		context.MeshesLib->Materials.insert({ MaterialId{entry.Id}, entry.Desc });
+		entry.Desc.Cbo = entry.Buffer;
 		
+		context.MeshesLib->Materials.insert({ MaterialId{entry.Id}, entry.Desc });
 		context.Graphics->CreateConstantBuffer(entry.Desc.Cbo, sizeof(MtlMaterialData), &entry.Desc);
-	
 	}
 	
+}
+
+void AssetStore::SetDebugNames(Graphics* Graphics, GPUResource* resources, size_t count)
+{
+	for (size_t i = 0; i < count; ++i)
+	{
+		auto entry = resources[i];
+		switch (entry.Type) {
+		  case GP_Texture: 
+			  Graphics->SetTextureName(entry.Id, entry.Name);
+			  break;
+		  case GP_VertexBuffer: 
+			  Graphics->SetVertexBufferName(entry.Id, entry.Name);
+			  break;
+		  case GP_IndexBuffer: 
+			  Graphics->SetIndexBufferName(entry.Id, entry.Name);
+			  break;
+		  case GP_ConstantBuffer: 
+			  Graphics->SetConstantBufferName(entry.Id, entry.Name);
+			  break;
+		}
+		
+	}
+		
+		
 }

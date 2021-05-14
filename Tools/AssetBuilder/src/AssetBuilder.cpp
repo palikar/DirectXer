@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
 		texEntry.Desc.Format = atlas.Format;
 		texEntry.DataOffset = dataBlob.PutData(packedImages.AtlasesBytes[i]);
 		context.TexturesToCreate.push_back(texEntry);
-		
+
 		auto texName = fmt::format("T_ATLAS_{}", context.Atlases.size());
 		NewAssetName(context, Type_Texture, texName.c_str(), texEntry.Id);
 
@@ -391,6 +391,14 @@ int main(int argc, char *argv[])
 	GenerateHeaderArrays(headerFile, context, Type_Wav, "Wavs");
 	GenerateHeaderArrays(headerFile, context, Type_Font, "Fonts");
 	GenerateHeaderArrays(headerFile, context, Type_Mesh, "Meshes");
+
+	headerFile << "GPUResource GPUResources[] = {\n";
+	for(auto& define : context.Defines)
+	{
+		if (define.Type >= GP_Count) continue;
+		headerFile << fmt::format("\t{{ GPUResourceType({}), {}, \"{}\" }},\n", define.Type, define.Id, define.Name);
+	}
+	headerFile << "};\n\n";
 	
 	headerFile << fmt::format("static inline AssetFile AssetFiles[] = {{\n");
 	headerFile << fmt::format("\t{{ \"{}\", {} }},\n", assetFileName, baseOffset + dataBlob.Data.size());

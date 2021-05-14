@@ -38,7 +38,7 @@ struct SimdFlatMap
 
 			if(mask)
 			{
-				return Nodes.begin() + (index >> 1);
+				return Nodes.begin() + i + (index >> 1);
 			}
 		}
 		
