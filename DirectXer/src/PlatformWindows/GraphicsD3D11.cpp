@@ -1036,7 +1036,7 @@ void GraphicsD3D11::DrawIndex(TopolgyType topology, uint32 count, uint32 offset,
 		  break;
 	  case TT_LINES:
 		  Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		  factor = 2;
+		  factor = 1;
 		  break;
 	}
 

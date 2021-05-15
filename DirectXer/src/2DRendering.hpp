@@ -60,6 +60,8 @@ class Renderer2D
     TextureId TexSlots[MaxTextureSlots];
     uint8 CurrentTextureSlot;
 
+	TopolgyType SceneTopology;
+
   public:
 
     void InitRenderer(Graphics* t_Graphics, Init2DParams t_Params);
@@ -68,7 +70,7 @@ class Renderer2D
     // be called each time before we want to issue a sequence of 2D
     // draw commands to the renderer; the method clears any previous
     // state and sets up the internal vertex and index buffers;
-    void BeginScene();
+    void BeginScene(TopolgyType sceneTopology = TT_TRIANGLES);
 
     // @Note: Flush the queued up draw commands and perform the
     // neccessary draw calls; each scene will be executed in as few
@@ -86,6 +88,8 @@ class Renderer2D
     void DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color, float radius);
     void DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::vec2 subPos, glm::vec2 subSize);
     void DrawText(std::string_view text, glm::vec2 pos, FontId typeface);
+
+	void DrawLine(glm::vec2 from, glm::vec2 to, glm::vec4 color);
 };
 
 // @Todo: Pusing transform matrices
@@ -110,4 +114,27 @@ struct SpriteSheetHolder
 	void DrawSprite(size_t spiretSheet, int index, glm::vec2 pos, glm::vec2 size);
 
 	void DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, glm::vec2 pos, glm::vec2 size);
+};
+
+
+struct Color
+{
+	static inline glm::vec4 Black{0.0f, 0.0f, 0.0f, 1.0f};
+    static inline glm::vec4 White{1.0f, 1.0f, 1.0f, 1.0f};
+    static inline glm::vec4 Red{1.0f, 0.0f, 0.0f, 1.0f};
+    static inline glm::vec4 Blue{0.0f, 1.0f, 0.0f, 1.0f};
+    static inline glm::vec4 Green{0.0f, 0.0f, 1.0f, 1.0f};
+    static inline glm::vec4 Cyan{0.0f, 1.0f, 1.0f, 1.0f};
+    static inline glm::vec4 Yellow{1.0f, 1.0f, 0.0f, 1.0f};
+    static inline glm::vec4 Magenta{1.0f, 0.0f, 1.0f, 1.0f};
+    static inline glm::vec4 Orange{1, 0.5, 0, 1.0f};
+    static inline glm::vec4 Aquamarine{127.0f/255.0f, 255.0f/255.0f, 212.0f/255.0f, 1.0f};
+	static inline glm::vec4 DarkViolet{148.0f/255.0f, 0.0f, 211.0f/255.0f, 1.0f};
+	static inline glm::vec4 Chartreuse{127.0f/255.0f, 255.0f/255.0f, 0.0f, 1.0f};
+	static inline glm::vec4 HotPink{255.0f/255.0f, 105.0f/255.0f, 180.0f/255.0f, 1.0f};
+	static inline glm::vec4 Gold{255.0f/255.0f, 215.0f/255.0f, 0.0f, 1.0f};
+	static inline glm::vec4 PaleGreen{152.0f/255.0f, 251.0f/255.0f, 152.0f/255.0f, 1.0f};
+	static inline glm::vec4 Teal{0.0f, 128.0f/255.0f, 128.0f/255.0f, 1.0f};
+	
+	
 };

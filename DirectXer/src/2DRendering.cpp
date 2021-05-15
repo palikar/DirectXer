@@ -24,11 +24,14 @@ void Renderer2D::InitRenderer(Graphics* t_Graphics, Init2DParams t_Params)
 
 	vbo = NextVertexBufferId();
 	Graph->CreateVertexBuffer(vbo, sizeof(Vertex2D), nullptr, (uint32)(sizeof(Vertex2D) * TotalVertices), true);
+	Graph->SetVertexBufferName(vbo, "Render2D Main VB");
+	
 	ibo = NextIndexBufferId();
 	Graph->CreateIndexBuffer(ibo , nullptr, (uint32)(sizeof(uint32) * TotalVertices * 3), true);
+	Graph->SetIndexBufferName(ibo, "Render2D Main IB");
 }
 
-void Renderer2D::BeginScene()
+void Renderer2D::BeginScene(TopolgyType sceneTopology)
 {
 	CurrentVertexCount = 0;
 		
@@ -43,7 +46,9 @@ void Renderer2D::BeginScene()
 		TexSlots[i] = {0};
 	}
 
-	CurrentVertex = &Vertices[0];		
+	CurrentVertex = &Vertices[0];
+
+	SceneTopology = sceneTopology;
 }
 
 void Renderer2D::EndScene()
@@ -67,9 +72,7 @@ void Renderer2D::EndScene()
 		Graph->BindTexture(i, TexSlots[i]);
 	}
 
-
-	Graph->DrawIndex(TT_TRIANGLES, (uint32)Indices.size(), 0u, 0u);
-
+	Graph->DrawIndex(SceneTopology, (uint32)Indices.size(), 0u, 0u);
 }
 
 uint8 Renderer2D::AttachTexture(TextureId t_Tex)
@@ -82,7 +85,7 @@ uint8 Renderer2D::AttachTexture(TextureId t_Tex)
 	if (CurrentTextureSlot >= MaxTextureSlots)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 	TexSlots[CurrentTextureSlot++] = t_Tex;
 
@@ -94,7 +97,7 @@ void Renderer2D::DrawQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color)
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 		
 	CurrentVertex->pos = pos;
@@ -129,7 +132,7 @@ void Renderer2D::DrawTriangle(const glm::vec2 vertices[3], glm::vec4 color)
 	if (CurrentVertexCount + 3 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 		
 	CurrentVertex->pos = vertices[0];
@@ -157,7 +160,7 @@ void Renderer2D::DrawFourPolygon(const glm::vec2 vertices[4], glm::vec4 color)
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 		
 	CurrentVertex->pos = vertices[0];
@@ -193,7 +196,7 @@ void Renderer2D::DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color,
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 
 	radius /= size.x;
@@ -239,7 +242,7 @@ void Renderer2D::DrawCirlce(glm::vec2 pos, float radius, glm::vec4 color)
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 			
 	const float r2 = radius;
@@ -280,7 +283,7 @@ void Renderer2D::DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size)
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 		
 	const auto& screenImage = ImageLib.Images[t_Id];
@@ -325,7 +328,7 @@ void Renderer2D::DrawText(std::string_view text, glm::vec2 pos, FontId typeface)
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 
 	Memory::EstablishTempScope(Kilobytes(5));
@@ -387,7 +390,7 @@ void Renderer2D::DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::v
 	if (CurrentVertexCount + 4 >= TotalVertices)
 	{
 		EndScene();
-		BeginScene();
+		BeginScene(SceneTopology);
 	}
 		
 	const auto& screenImage = ImageLib.Images[t_Id];
@@ -426,6 +429,30 @@ void Renderer2D::DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::v
 	CurrentVertexCount += 4;
 }
 
+void Renderer2D::DrawLine(glm::vec2 from, glm::vec2 to, glm::vec4 color)
+{
+
+	if (CurrentVertexCount + 2 >= TotalVertices)
+	{
+		EndScene();
+		BeginScene(SceneTopology);
+	}
+
+	CurrentVertex->pos = from;
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	CurrentVertex->pos = to;
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	Indices.insert(Indices.end(), { CurrentVertexCount , CurrentVertexCount + 1 });
+
+	CurrentVertexCount += 2;
+}
+
 void SpriteSheetHolder::Init(size_t t_Size, Renderer2D* Gfx)
 {
 	Sheets.reserve(t_Size);
@@ -462,7 +489,5 @@ void SpriteSheetHolder::DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, glm
 
 	Gfx2D->DrawSubImage(sheet.ImageIndex, pos, size, { x * sheet.SubSize.x, y * sheet.SubSize.y }, sheet.SubSize);
 }
-
-// Drawing Lines
 
 // Pusing transform matrices

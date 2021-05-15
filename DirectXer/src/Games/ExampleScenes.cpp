@@ -25,7 +25,7 @@ static uint32 SHIPIMAGE = 4;
 
 void ExampleScenes::Init()
 {
-	CurrentScene = SCENE_OBJECTS;
+	CurrentScene = SCENE_FIRST;
 	
 	CurrentRastState = RS_NORMAL;
 
@@ -332,6 +332,12 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 	Renderer2D.EndScene();
 
+
+	Renderer2D.BeginScene(TT_LINES);
+
+	Renderer2D.DrawLine({600.0f, 300.0f}, {620.0f, 400.0f}, {0.5f, 0.5f, 1.0f, 1.0f});
+	
+	Renderer2D.EndScene();
 }
 
 void ExampleScenes::ProcessPhongScene(float dt)
