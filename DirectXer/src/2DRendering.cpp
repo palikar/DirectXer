@@ -54,7 +54,7 @@ void Renderer2D::EndScene()
 	Graph->SetShaderConfiguration(SC_2D_RECT);
 
 	Graph->BindIndexBuffer(ibo);
-	Graph->BindVertexBuffer(vbo);
+	Graph->BindVertexBuffer(vbo, 0, 0);
 
 	Graph->UpdateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount * sizeof(Vertex2D));
 	Graph->UpdateIndexBuffer(ibo, Indices.data(), 3u * CurrentVertexCount * sizeof(uint32));
@@ -122,6 +122,69 @@ void Renderer2D::DrawQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color)
 
 	CurrentVertexCount += 4;
 		
+}
+
+void Renderer2D::DrawTriangle(const glm::vec2 vertices[3], glm::vec4 color)
+{
+	if (CurrentVertexCount + 3 >= TotalVertices)
+	{
+		EndScene();
+		BeginScene();
+	}
+		
+	CurrentVertex->pos = vertices[0];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	CurrentVertex->pos = vertices[1];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	CurrentVertex->pos = vertices[2];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	Indices.insert(Indices.end(), { CurrentVertexCount , CurrentVertexCount + 1, CurrentVertexCount + 2});
+
+	CurrentVertexCount += 3;
+}
+
+void Renderer2D::DrawFourPolygon(const glm::vec2 vertices[4], glm::vec4 color)
+{
+	if (CurrentVertexCount + 4 >= TotalVertices)
+	{
+		EndScene();
+		BeginScene();
+	}
+		
+	CurrentVertex->pos = vertices[0];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	CurrentVertex->pos = vertices[1];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	CurrentVertex->pos = vertices[2];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+	CurrentVertex->pos = vertices[3];
+	CurrentVertex->color = color;
+	CurrentVertex->type = 1;
+	++CurrentVertex;
+
+
+	Indices.insert(Indices.end(), { CurrentVertexCount , CurrentVertexCount + 1, CurrentVertexCount + 2,
+			CurrentVertexCount + 2 , CurrentVertexCount + 3, CurrentVertexCount });
+
+	CurrentVertexCount += 4;
 }
 
 void Renderer2D::DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color, float radius)
@@ -361,11 +424,44 @@ void Renderer2D::DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::v
 			CurrentVertexCount + 2 , CurrentVertexCount + 1, CurrentVertexCount + 3});
 
 	CurrentVertexCount += 4;
-		
-
-
 }
 
+void SpriteSheetHolder::Init(size_t t_Size, Renderer2D* Gfx)
+{
+	Sheets.reserve(t_Size);
+	Gfx2D = Gfx;
+}
+
+uint32 SpriteSheetHolder::PutSheet(uint32 t_ImageIndex, glm::vec2 t_Size, glm::ivec2 t_GridSize)
+{
+	SpriteSheet sheet;
+	sheet.SubSize = glm::vec2{ t_Size.x / t_GridSize.x, t_Size.y / t_GridSize.y };
+	sheet.GridSize = t_GridSize;
+	sheet.ImageIndex = t_ImageIndex;
+	Sheets.push_back(sheet);
+
+	return (uint32)Sheets.size() - 1;
+}
+
+void SpriteSheetHolder::DrawSprite(size_t spiretSheet, int index, glm::vec2 pos, glm::vec2 size)
+{
+	const auto& sheet = Sheets[spiretSheet];
+
+	const int x = index % sheet.GridSize.x;
+	const int y = index / sheet.GridSize.x;
+
+	Gfx2D->DrawSubImage(sheet.ImageIndex, pos, size, { x * sheet.SubSize.x, y * sheet.SubSize.y }, sheet.SubSize);
+}
+
+void SpriteSheetHolder::DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, glm::vec2 pos, glm::vec2 size)
+{
+	const auto& sheet = Sheets[spiretSheet];
+
+	const int x = spirtePos.x;
+	const int y = spirtePos.y;
+
+	Gfx2D->DrawSubImage(sheet.ImageIndex, pos, size, { x * sheet.SubSize.x, y * sheet.SubSize.y }, sheet.SubSize);
+}
 
 // Drawing Lines
 

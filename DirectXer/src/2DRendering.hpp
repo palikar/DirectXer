@@ -79,7 +79,8 @@ class Renderer2D
     uint8 AttachTexture(TextureId t_Tex);
     
     void DrawQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
-    void DrawTriangle(glm::vec2 vertices[3], glm::vec4 color);
+    void DrawTriangle(const glm::vec2 vertices[3], glm::vec4 color);
+	void DrawFourPolygon(const glm::vec2 vertices[4], glm::vec4 color);
     void DrawCirlce(glm::vec2 pos, float radius, glm::vec4 color);
     void DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size);
     void DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color, float radius);
@@ -88,9 +89,7 @@ class Renderer2D
 };
 
 // @Todo: Pusing transform matrices
-// @Todo: Filling trangles
 // @Todo: Drawing lines
-
 
 struct SpriteSheetHolder
 {
@@ -104,40 +103,11 @@ struct SpriteSheetHolder
 	BulkVector<SpriteSheet, Memory_2DRendering> Sheets;
 	Renderer2D* Gfx2D;
 
-    void Init(size_t t_Size, Renderer2D* Gfx)
-	{
-		Sheets.reserve(t_Size);
-		Gfx2D = Gfx;
-	}
+    void Init(size_t t_Size, Renderer2D* Gfx);
 
-	uint32 PutSheet(uint32 t_ImageIndex, glm::vec2 t_Size, glm::ivec2 t_GridSize)
-	{
-		SpriteSheet sheet;
-		sheet.SubSize = glm::vec2{ t_Size.x / t_GridSize.x, t_Size.y / t_GridSize.y };
-		sheet.GridSize = t_GridSize;
-		sheet.ImageIndex = t_ImageIndex;
-		Sheets.push_back(sheet);
+	uint32 PutSheet(uint32 t_ImageIndex, glm::vec2 t_Size, glm::ivec2 t_GridSize);
 
-		return (uint32)Sheets.size() - 1;
-	}
+	void DrawSprite(size_t spiretSheet, int index, glm::vec2 pos, glm::vec2 size);
 
-	void DrawSprite(size_t spiretSheet, int index, glm::vec2 pos, glm::vec2 size)
-	{
-		const auto& sheet = Sheets[spiretSheet];
-
-		const int x = index % sheet.GridSize.x;
-		const int y = index / sheet.GridSize.x;
-
-		Gfx2D->DrawSubImage(sheet.ImageIndex, pos, size, { x * sheet.SubSize.x, y * sheet.SubSize.y }, sheet.SubSize);
-	}
-
-	void DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, glm::vec2 pos, glm::vec2 size)
-	{
-		const auto& sheet = Sheets[spiretSheet];
-
-		const int x = spirtePos.x;
-		const int y = spirtePos.y;
-
-		Gfx2D->DrawSubImage(sheet.ImageIndex, pos, size, { x * sheet.SubSize.x, y * sheet.SubSize.y }, sheet.SubSize);
-	}
+	void DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, glm::vec2 pos, glm::vec2 size);
 };

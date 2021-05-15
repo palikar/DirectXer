@@ -108,12 +108,16 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 	for (uint32 i = 0; i < header.LoadMeshesCount; ++i)
 	{
 		MeshLoadEntry& entry = ReadBlob<MeshLoadEntry>(current); 
-		context.MeshesLib->Meshes.insert({ MeshId{entry.Id}, entry.Mesh });
+		// @Todo: Make this into something better; probalby just skip the entries for which we can't do anything
+		// in the asset loading context
+		if (context.MeshesLib) context.MeshesLib->Meshes.insert({ MeshId{entry.Id}, entry.Mesh });
 	}
 
 	for (uint32 i = 0; i < header.MaterialsCount; ++i)
 	{
 		MaterialLoadEntry& entry = ReadBlob<MaterialLoadEntry>(current);
+		if (!context.MeshesLib) continue;
+
 		entry.Desc.Cbo = entry.Buffer;
 		
 		context.MeshesLib->Materials.insert({ MaterialId{entry.Id}, entry.Desc });

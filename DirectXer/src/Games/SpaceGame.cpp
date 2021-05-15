@@ -69,6 +69,7 @@ void SpaceGame::Init()
 	masterBuilder.Graphics = Graphics;
 	
 	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
+	AssetStore::SetDebugNames(Graphics, GPUResources, Size(GPUResources));
 	Memory::EndTempScope();	
 
 	const uint32 maxSpritesCount = 10;

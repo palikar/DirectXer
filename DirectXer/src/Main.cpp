@@ -95,9 +95,9 @@ App* InitMain(char** argv, int argc)
 // @Done: Timing queries
 // @Done: Destroying objects
 // @Done: DrawInstanced
+// @Done: Debug names
+// @Done: Release the things that are not needed
 
-// @Todo: Release the things that are not needed
-// @Todo: Debug names
 
 // @Done: Lines "geometry" + ability to use lines primiteves
 // @Done: Cylinsder geometry
@@ -128,11 +128,13 @@ App* InitMain(char** argv, int argc)
 // @Done: Texture catalog but a good one, not holding textures in memory all the time
 // @Done: Loading obj files
 // @Todo: Mouse picking
+
+
+// === theses are probably part of some bigger setup to stream resources asynchronously ===
 // @Todo: Tags for the textures -- for certain level, for certain material instance
+// @Todo: Deffered loading of scenes resources
 //     -- load all textures in a level
 //     -- get textures for some material instance
-//     -> this is probably part of some bigger setup to stream resources asynchronously
-// @Todo: Deffered loading of scenes resources
 
 // == Debug ==
 // @Done: Axis helper
@@ -143,7 +145,7 @@ App* InitMain(char** argv, int argc)
 // @Done: Add the normals and uvs to the color vertex
 // @Done: Spot light helper
 // @Todo: Drop down console
-
+ 
 // == Architecture ==
 // @Done: Resizing
 // @Done: FPS independence
@@ -169,8 +171,9 @@ App* InitMain(char** argv, int argc)
 // @Done: Bulk Memory tracking
 // @Done: Allocation tracking
 // @Done: Tagged bulk allocation
-// @Done Tracking support for the map
+// @Done: Tracking support for the map
 // @Todo: Temorary memory tracking(?)
+// @Todo: Displaying the used GPU resources in ImGui
 
 // == Memory ==
 // @Todo Allocating general arenas in BulkStorage

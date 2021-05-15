@@ -41,7 +41,7 @@ void ExampleScenes::Init()
 	masterBuilder.Graphics = Graphics;
 	
 	AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
-	AssetStore::SetDebugNames(Graphics, GPUResources, Size(GPUResources));	
+	AssetStore::SetDebugNames(Graphics, GPUResources, Size(GPUResources));
 	Memory::EndTempScope();	
 
 
@@ -305,6 +305,21 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, F_DroidSansBold_24);
 	Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, F_DroidSans_24);
 
+	glm::vec2 triangle[] = {
+		{500.0f, 500.0f},
+		{500.0f, 550.0f},
+		{530.0f, 525.0f},
+	};
+	Renderer2D.DrawTriangle(triangle, {1.0f, 0.5f, 1.0f, 1.0f});
+
+	glm::vec2 polygon[] = {
+		{560.0f, 560.0f},
+		{590.0f, 530.0f},
+		{600.0f, 560.0f},
+		{555.0f, 590.0f},
+	};
+	Renderer2D.DrawFourPolygon(polygon, {0.5f, 0.5f, 1.0f, 1.0f});
+	
 	static uint32 spriteIndex = 0;
 	static float acc = 0;
 	acc += dt * 0.3f;
