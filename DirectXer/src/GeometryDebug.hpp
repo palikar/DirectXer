@@ -1,7 +1,7 @@
-#include "Glm.hpp"
-#include "Math.hpp"
-#include "Geometry.hpp"
-#include "Memory.hpp"
+#include <Glm.hpp>
+#include <Math.hpp>
+#include <Geometry.hpp>
+#include <Memory.hpp>
 
 static CylinderGeometry cylinderShape{0.005f, 0.005f, 0.25f, 10.0f, 1.0f};
 static SphereGeometry lightSphere{0.1f, 4.0f, 2.0f};

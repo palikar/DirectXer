@@ -72,7 +72,7 @@ void Renderer2D::EndScene()
 		Graph->BindTexture(i, TexSlots[i]);
 	}
 
-	Graph->DrawIndex(SceneTopology, (uint32)Indices.size(), 0u, 0u);
+	Graph->DrawIndexed(SceneTopology, (uint32)Indices.size(), 0u, 0u);
 }
 
 uint8 Renderer2D::AttachTexture(TextureId t_Tex)

@@ -5,24 +5,15 @@
 #include <GeometryDebug.hpp>
 #include <Memory.hpp>
 #include <Containers.hpp>
-#include <Materials.hpp>
+#include <3DRendering.hpp>
 
-struct BufferDescriptor
+struct IndexedGPUBuffer
 {
-	BulkVector<GeometryInfo> Infos;
-
-	void DrawGeometry(Graphics& graphics, uint32 t_Index);
-	uint32 PutGeometry(GeometryInfo t_Info);
+	VertexBufferId vbo;
+	IndexBufferId ibo;
 };
 
-struct GPUGeometry
-{
-	BufferDescriptor Description;
-	VertexBufferId Vbo;
-	IndexBufferId Ibo;	
-};
-
-struct BufferBuilder
+struct DebugGeometryBuilder
 {
 	BufferDescriptor GeometryBuffer;
 	MemoryArena BlobArena;
@@ -42,58 +33,7 @@ struct BufferBuilder
 	uint32 InitPointLightHelper();
 	uint32 InitSpotLightHelper();
 	
-	GPUGeometry CreateBuffer(Graphics& graphics);
-
+	IndexedGPUBuffer CreateBuffer(Graphics* graphics);
 };
 
-struct MeshGeometryInfo
-{
-	VertexBufferId VertexBuffer;
-	IndexBufferId IndexBuffer;
-	uint32 IndexCount{0};
-};
 
-using MeshId = uint32;
-
-struct Mesh
-{
-	MeshGeometryInfo Geometry;
-	MaterialId Material;
-};
-
-struct MeshCatalog
-{
-	Map<MeshId, Mesh, Memory_3DRendering> Meshes;
-	Map<MaterialId, MtlMaterial, Memory_3DRendering> Materials;
-	
-	Graphics* Gfx;
-
-	void Init(Graphics* graphics)
-	{
-		Gfx = graphics;
-		Meshes.reserve(32);
-	}
-
-	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {}, ConstantBufferId light ={})
-	{
-		const auto mesh = Meshes.at(id);
-		const auto material = Materials.at(mesh.Material);
-
- 		Gfx->SetShaderConfiguration(material.Program);
-
-		Gfx->BindVSConstantBuffers(material.Cbo, 1);
-		Gfx->BindVSConstantBuffers(light, 2);
-		
-		Gfx->BindVertexBuffer(mesh.Geometry.VertexBuffer);
-		Gfx->BindIndexBuffer(mesh.Geometry.IndexBuffer);
-		
-		Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
-		Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
-		Gfx->UpdateCBs();
-
-		if (material.KaMap) Gfx->BindVSTexture(0, material.KaMap);
-		if (material.KdMap) Gfx->BindVSTexture(1, material.KdMap);
-
-		Gfx->DrawIndex(TT_TRIANGLES, mesh.Geometry.IndexCount, 0, 0);
-	}
-};

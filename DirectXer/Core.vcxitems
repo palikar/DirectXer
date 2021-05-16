@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\3DRendering.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Audio.cpp" />
@@ -53,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\2DRendering.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\3DRendering.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\App.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Audio.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Camera.hpp" />

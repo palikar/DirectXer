@@ -1024,7 +1024,7 @@ void GraphicsD3D11::BindVertexBuffer(VertexBufferId t_Id, uint32 offset, uint32 
 	Context->IASetVertexBuffers(slot, 1, &buffer.id, &buffer.structSize, &offset);
 }
 
-void GraphicsD3D11::DrawIndex(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
+void GraphicsD3D11::DrawIndexed(TopolgyType topology, uint32 count, uint32 offset, uint32 base)
 {
 
 	// @Todo: Make this in a function of its own

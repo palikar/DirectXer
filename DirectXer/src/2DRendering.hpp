@@ -128,13 +128,11 @@ struct Color
     static inline glm::vec4 Yellow{1.0f, 1.0f, 0.0f, 1.0f};
     static inline glm::vec4 Magenta{1.0f, 0.0f, 1.0f, 1.0f};
     static inline glm::vec4 Orange{1, 0.5, 0, 1.0f};
-    static inline glm::vec4 Aquamarine{127.0f/255.0f, 255.0f/255.0f, 212.0f/255.0f, 1.0f};
+    static inline glm::vec4 AquaMarine{127.0f/255.0f, 255.0f/255.0f, 212.0f/255.0f, 1.0f};
 	static inline glm::vec4 DarkViolet{148.0f/255.0f, 0.0f, 211.0f/255.0f, 1.0f};
 	static inline glm::vec4 Chartreuse{127.0f/255.0f, 255.0f/255.0f, 0.0f, 1.0f};
 	static inline glm::vec4 HotPink{255.0f/255.0f, 105.0f/255.0f, 180.0f/255.0f, 1.0f};
 	static inline glm::vec4 Gold{255.0f/255.0f, 215.0f/255.0f, 0.0f, 1.0f};
 	static inline glm::vec4 PaleGreen{152.0f/255.0f, 251.0f/255.0f, 152.0f/255.0f, 1.0f};
 	static inline glm::vec4 Teal{0.0f, 128.0f/255.0f, 128.0f/255.0f, 1.0f};
-	
-	
 };

@@ -2,46 +2,33 @@
 
 #include "GeometryUtils.hpp"
 
-void BufferDescriptor::DrawGeometry(Graphics& graphics, uint32 t_Index)
-{
-	uint32 indexOffset = 0;
-	uint32 baseIndex = 0;
 
-	for (size_t j = 0; j < t_Index; ++j)
+static uint32 PutGeometry(BufferDescriptor& buffer, GeometryInfo t_Info)
+{
+	GPUGeometryInfo newInfo{0};
+	newInfo.IndexCount = t_Info.indexCount;
+	if (!buffer.Geometries.empty())
 	{
-		indexOffset += Infos[j].indexCount;
-		baseIndex += Infos[j].vertexCount;
+		auto lastGeometry = buffer.Geometries.end();
+		newInfo.BaseIndex = t_Info.vertexCount + lastGeometry->BaseIndex;
+		newInfo.IndexOffset = t_Info.indexCount + lastGeometry->IndexOffset;
 	}
+	
+	newInfo.Topology = TopolgyType(t_Info.type >> 8);
+	buffer.Geometries.push_back(newInfo);
 
-	const uint32 indexCount = Infos[t_Index].indexCount;
-	const auto topology = TopolgyType((Infos[t_Index].type & ~255) >> 8);
-	graphics.DrawIndex(topology, indexCount, indexOffset, baseIndex);
-
+	return (uint32)buffer.Geometries.size();
 }
 
-uint32 BufferDescriptor::PutGeometry(GeometryInfo t_Info)
-{
-	Infos.push_back(t_Info);
-	return (uint32)Infos.size() - 1;
-}
-
-static void SetColor(TempVector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
-{
-	for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)
-	{
-		t_Vertices[i].color = t_Color;
-	}		
-}
-
-void BufferBuilder::Init(uint8 t_GeometriesCount)
+void DebugGeometryBuilder::Init(uint8 t_GeometriesCount)
 {
 	TotalIndices = 0;
 	TotalVertices = 0;
-	GeometryBuffer.Infos.reserve(t_GeometriesCount);
+	GeometryBuffer.Geometries.reserve(t_GeometriesCount);
 	BlobArena = Memory::GetTempArena(Megabytes(4));
 }
 
-uint32 BufferBuilder::InitCube(CubeGeometry t_Cube, glm::vec3 t_Color)
+uint32 DebugGeometryBuilder::InitCube(CubeGeometry t_Cube, glm::vec3 t_Color)
 {
 	auto cubeInfo = CubeGeometryInfo(t_Cube);
 
@@ -53,10 +40,10 @@ uint32 BufferBuilder::InitCube(CubeGeometry t_Cube, glm::vec3 t_Color)
 	BlobArena.Put(cubeInfo);
 	BlobArena.Put(t_Color);
 
-	return GeometryBuffer.PutGeometry(cubeInfo);
+	return PutGeometry(GeometryBuffer, cubeInfo);
 }
 
-uint32 BufferBuilder::InitSphere(SphereGeometry t_Sphere, glm::vec3 t_Color)
+uint32 DebugGeometryBuilder::InitSphere(SphereGeometry t_Sphere, glm::vec3 t_Color)
 {
 	auto sphereInfo = SphereGeometryInfo(t_Sphere);
 
@@ -68,10 +55,10 @@ uint32 BufferBuilder::InitSphere(SphereGeometry t_Sphere, glm::vec3 t_Color)
 	BlobArena.Put(sphereInfo);
 	BlobArena.Put(t_Color);
 
-	return GeometryBuffer.PutGeometry(sphereInfo);
+	return PutGeometry(GeometryBuffer, sphereInfo);
 }
 
-uint32 BufferBuilder::InitCylinder(CylinderGeometry t_Cylinder, glm::vec3 t_Color)
+uint32 DebugGeometryBuilder::InitCylinder(CylinderGeometry t_Cylinder, glm::vec3 t_Color)
 {
 	auto cylinderInfo = CylinderGeometryInfo(t_Cylinder);
 
@@ -83,10 +70,10 @@ uint32 BufferBuilder::InitCylinder(CylinderGeometry t_Cylinder, glm::vec3 t_Colo
 	BlobArena.Put(cylinderInfo);
 	BlobArena.Put(t_Color);
 
-	return GeometryBuffer.PutGeometry(cylinderInfo);
+	return PutGeometry(GeometryBuffer, cylinderInfo);
 }
 
-uint32 BufferBuilder::InitPlane(PlaneGeometry t_Plane, glm::vec3 t_Color)
+uint32 DebugGeometryBuilder::InitPlane(PlaneGeometry t_Plane, glm::vec3 t_Color)
 {
 	auto planeInfo = PlaneGeometryInfo(t_Plane);
 
@@ -98,10 +85,10 @@ uint32 BufferBuilder::InitPlane(PlaneGeometry t_Plane, glm::vec3 t_Color)
 	BlobArena.Put(planeInfo);
 	BlobArena.Put(t_Color);
 
-	return GeometryBuffer.PutGeometry(planeInfo);
+	return PutGeometry(GeometryBuffer, planeInfo);
 }
 
-uint32 BufferBuilder::InitLines(LinesGeometry t_Lines, glm::vec3 t_Color)
+uint32 DebugGeometryBuilder::InitLines(LinesGeometry t_Lines, glm::vec3 t_Color)
 {
 	auto linesInfo = LinesGeometryInfo(t_Lines);
 
@@ -113,10 +100,10 @@ uint32 BufferBuilder::InitLines(LinesGeometry t_Lines, glm::vec3 t_Color)
 	BlobArena.Put(linesInfo);
 	BlobArena.Put(t_Color);
 
-	return GeometryBuffer.PutGeometry(linesInfo);
+	return PutGeometry(GeometryBuffer, linesInfo);
 }
 
-uint32 BufferBuilder::InitAxisHelper()
+uint32 DebugGeometryBuilder::InitAxisHelper()
 {
 	auto axisInfo = AxisHelperInfo();
 
@@ -126,10 +113,10 @@ uint32 BufferBuilder::InitAxisHelper()
 	BlobArena.Put(GT_AXISHELPER);
 	BlobArena.Put(axisInfo);
 
-	return GeometryBuffer.PutGeometry(axisInfo);
+	return PutGeometry(GeometryBuffer, axisInfo);
 }
 
-uint32 BufferBuilder::InitCameraHelper(CameraHelper t_CameraHelper)
+uint32 DebugGeometryBuilder::InitCameraHelper(CameraHelper t_CameraHelper)
 {
 	auto cameraInfo = CameraHelperInfo(t_CameraHelper);
 
@@ -140,10 +127,10 @@ uint32 BufferBuilder::InitCameraHelper(CameraHelper t_CameraHelper)
 	BlobArena.Put(cameraInfo);
 	BlobArena.Put(t_CameraHelper);
 
-	return GeometryBuffer.PutGeometry(cameraInfo);
+	return PutGeometry(GeometryBuffer, cameraInfo);
 }
 
-uint32 BufferBuilder::InitPointLightHelper()
+uint32 DebugGeometryBuilder::InitPointLightHelper()
 {
 	auto lightInfo = PointLightHelperInfo();
 
@@ -153,10 +140,10 @@ uint32 BufferBuilder::InitPointLightHelper()
 	BlobArena.Put(GT_POINGHTLIGHTHELPER);
 	BlobArena.Put(lightInfo);
 
-	return GeometryBuffer.PutGeometry(lightInfo);
+	return PutGeometry(GeometryBuffer, lightInfo);
 }
 
-uint32 BufferBuilder::InitSpotLightHelper()
+uint32 DebugGeometryBuilder::InitSpotLightHelper()
 {
 	auto lightInfo = SpotLightHelperInfo({});
 
@@ -166,10 +153,18 @@ uint32 BufferBuilder::InitSpotLightHelper()
 	BlobArena.Put(GT_SPOTLIGHTHELPER);
 	BlobArena.Put(lightInfo);
 
-	return GeometryBuffer.PutGeometry(lightInfo);
+	return PutGeometry(GeometryBuffer, lightInfo);
+}
+
+static void SetColor(TempVector<ColorVertex>& t_Vertices, const GeometryInfo& t_Geometry, uint32 offset, glm::vec3 t_Color)
+{
+	for (size_t i = offset; i < offset + t_Geometry.vertexCount ; i++)
+	{
+		t_Vertices[i].color = t_Color;
+	}		
 }
 	
-GPUGeometry BufferBuilder::CreateBuffer(Graphics& graphics)
+IndexedGPUBuffer DebugGeometryBuilder::CreateBuffer(Graphics* graphics)
 {
 	Memory::EstablishTempScope(Megabytes(4));
 
@@ -192,7 +187,7 @@ GPUGeometry BufferBuilder::CreateBuffer(Graphics& graphics)
 		
 	while (geometryType != GT_UNKNOWN)
 	{
-			
+		
 		switch(geometryType)
 		{
 		  case GT_CUBE:
@@ -277,14 +272,14 @@ GPUGeometry BufferBuilder::CreateBuffer(Graphics& graphics)
 		geometryType = ReadBlob<GeometryType>(current);
 	}
 		
-	auto vb = vertexBufferFactory<ColorVertex>(NextVertexBufferId(), graphics, Vertices);
-	auto ib = indexBufferFactory(NextIndexBufferId(), graphics, Indices);
+	auto vb = vertexBufferFactory<ColorVertex>(NextVertexBufferId(), *graphics, Vertices);
+	auto ib = indexBufferFactory(NextIndexBufferId(), *graphics, Indices);
 
-	graphics.SetVertexBufferName(vb, "DebugGeometryVB");
-	graphics.SetVertexBufferName(ib, "DebugGeometryIB");
+	graphics->SetVertexBufferName(vb, "DebugGeometryVB");
+	graphics->SetVertexBufferName(ib, "DebugGeometryIB");
 
 	Memory::ResetTempScope();
 
-	return {GeometryBuffer, vb, ib};
+	return {vb, ib};
 
 }

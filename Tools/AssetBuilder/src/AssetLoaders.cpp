@@ -579,9 +579,9 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 		else mesh.Mesh.Material = LoadDefaultMaterial(context);
 	}
 	
-	mesh.Mesh.Geometry.VertexBuffer= vbo.Id;
-	mesh.Mesh.Geometry.IndexBuffer = ibo.Id;
-	mesh.Mesh.Geometry.IndexCount = (uint32)IndexData.size();
+	mesh.Mesh.Geometry.Vbo= vbo.Id;
+	mesh.Mesh.Geometry.Ibo = ibo.Id;
+	mesh.Mesh.Geometry.Description.IndexCount = (uint32)IndexData.size();
 	mesh.Id = NewAssetName(context, Type_Mesh, asset.Id);
 
 	context.VBsToCreate.push_back(vbo);
@@ -604,7 +604,7 @@ uint32 LoadDefaultMaterial(AssetBundlerContext& context)
 	MaterialLoadEntry newEntry;
 	newEntry.Desc = newMat;
 	newEntry.Id = NewAssetName(context, Type_Material, "DefaultMaterial");
-	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, DefaultMaterial_CB, NextCBAssetId());
+	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, "DefaultMaterial_CB", NextCBAssetId());
 		
 	context.Materials.push_back(newEntry);
 

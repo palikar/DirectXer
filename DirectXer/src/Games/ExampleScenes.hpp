@@ -8,6 +8,7 @@
 #include <Materials.hpp>
 #include <Lighting.hpp>
 #include <2DRendering.hpp>
+#include <3DRendering.hpp>
 #include <Memory.hpp>
 #include <Audio.hpp>
 #include <Containers.hpp>
@@ -42,33 +43,34 @@ public:
 	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
 
 	void ProcessFirstScene(float dt);
-	void ProcessPhongScene(float dt);
-	void ProcessSpaceScene(float dt);
-	void ProcessObjectsScene(float dt);
-	void ProcessBallsScene(float dt);
+	// void ProcessPhongScene(float dt);
+	// void ProcessSpaceScene(float dt);
+	// void ProcessObjectsScene(float dt);
+	// void ProcessBallsScene(float dt);
 	
 	Graphics* Graphics;
 	App* Application;
 
 	TexturedMaterial texMat;
 	TexturedMaterialData texMatData;
+
 	PhongMaterial phongMat;
 	PhongMaterialData phongMatData;
-	BufferDescriptor DebugGeometry;
+	
 	Camera camera;
 	RasterizationState CurrentRastState;
-	LightSetup Light;
-	GPUGeometry GPUGeometryDesc;
+	
+
 	Renderer2D Renderer2D;
+	Renderer3D Renderer3D;
+	
 	SpriteSheetHolder SpriteSheets;
 	Scene CurrentScene;
 	TextureCatalog Textures;
-	MeshCatalog MeshesLib;
 
 	SerializationContext SaveContext;
 
 	AudioPlayer AudioEngine;
-	VertexBufferId InstDataBuffer;
 
 	RTObject uiRenderTarget;
 
