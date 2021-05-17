@@ -26,9 +26,9 @@ void Renderer3D::InitRenderer(Graphics* t_Graphics)
 
 void Renderer3D::InitLighting()
 {
-	Lighting.bufferId = NextConstantBufferId();
-	Graphics->CreateConstantBuffer(Light.bufferId, sizeof(Lighting), &Light.lighting);
-	Graphics->SetConstantBufferName(Light.bufferId, "Lighting CB");
+	Lighting.Cbo = NextConstantBufferId();
+	Gfx->CreateConstantBuffer(Lighting.Cbo, sizeof(Lighting), &Lighting.Lighting);
+	Gfx->SetConstantBufferName(Lighting.Cbo, "Lighting CB");
 }
 
 void Renderer3D::SetupCamera(Camera t_Camera)
@@ -36,6 +36,11 @@ void Renderer3D::SetupCamera(Camera t_Camera)
 	Gfx->VertexShaderCB.view = glm::transpose(t_Camera.view());
 	Gfx->PixelShaderCB.cameraPos = t_Camera.Pos;
 	Gfx->VertexShaderCB.cameraPos = t_Camera.Pos;
+}
+
+void Renderer3D::SetupProjection(glm::mat4 matrix)
+{
+	Gfx->VertexShaderCB.projection = glm::transpose(matrix);
 }
 
 void Renderer3D::DrawSkyBox(TextureId sky)
@@ -87,4 +92,15 @@ void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, gl
 
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);
 	
+}
+
+void Renderer3D::BeginScene(ShaderConfig config)
+{
+	CurrentConfig = config;
+	Gfx->SetShaderConfig(config);
+}
+
+void Renderer3D::EndScene()
+{
+
 }

@@ -52,10 +52,8 @@ public:
 	App* Application;
 
 	TexturedMaterial texMat;
-	TexturedMaterialData texMatData;
 
 	PhongMaterial phongMat;
-	PhongMaterialData phongMatData;
 	
 	Camera camera;
 	RasterizationState CurrentRastState;

@@ -66,41 +66,41 @@ void ExampleScenes::Init()
 
 
 	// Create material
-	texMat.config = SC_DEBUG_TEX;
-	texMat.data = NextConstantBufferId();
-	Graphics->CreateConstantBuffer(texMat.data, sizeof(TexturedMaterialData), &texMatData);
-	Graphics->SetConstantBufferName(texMat.data, "TexMaterialCB");
+	texMat.Program = SC_DEBUG_TEX;
+	texMat.Cbo = NextConstantBufferId();
 	texMat.BaseMap = T_ROCKS_COLOR;
 	texMat.AoMap = T_ROCKS_AO;
 	texMat.EnvMap = ST_SKY;
 
-	phongMat.config = SC_DEBUG_PHONG;
-	phongMat.data = NextConstantBufferId();
-	Graphics->CreateConstantBuffer(phongMat.data, sizeof(PhongMaterialData), &texMatData);
-	Graphics->SetConstantBufferName(phongMat.data, "PhongMaterialCB");
+	Graphics->CreateConstantBuffer(texMat.Cbo, sizeof(TexturedMaterialData), &texMat);
+	Graphics->SetConstantBufferName(texMat.Cbo, "TexMaterialCB");
 
-	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
-	phongMatData.Diffuse  = {0.5f, 0.5f, 0.5f, 0.0f };
-	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
-	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
+	phongMat.Program = SC_DEBUG_PHONG;
+	phongMat.Cbo = NextConstantBufferId();
+	phongMat.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
+	phongMat.Diffuse  = {0.5f, 0.5f, 0.5f, 0.0f };
+	phongMat.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMat.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 
+	Graphics->CreateConstantBuffer(phongMat.Cbo, sizeof(PhongMaterialData), &phongMat);
+	Graphics->SetConstantBufferName(phongMat.Cbo, "PhongMaterialCB");
 
-	Renderer3D.Lighting.lighting.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
-	Renderer3D.Lighting.lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
-	Renderer3D.Lighting.lighting.dirLightDir = { 0.5f, 0.471f, 0.0f, 0.0f };
+	Renderer3D.Lighting.Lighting.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
+	Renderer3D.Lighting.Lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
+	Renderer3D.Lighting.Lighting.dirLightDir = { 0.5f, 0.471f, 0.0f, 0.0f };
 
-	Renderer3D.Lighting.lighting.pointLights[0].Active = 0;
-	Renderer3D.Lighting.lighting.spotLights[0].Active = 1;
+	Renderer3D.Lighting.Lighting.pointLights[0].Active = 0;
+	Renderer3D.Lighting.Lighting.spotLights[0].Active = 1;
 
-	Renderer3D.Lighting.lighting.spotLights[0].color = {0.5f, 0.5f, 0.5f, 1.0f};
-	Renderer3D.Lighting.lighting.spotLights[0].Params = {0.5f, 0.0f, 0.0f, 0.0f};
-	Renderer3D.Lighting.lighting.spotLights[0].dir = {0.0f, -0.8f, 0.0f, 0.0f};
+	Renderer3D.Lighting.Lighting.spotLights[0].color = {0.5f, 0.5f, 0.5f, 1.0f};
+	Renderer3D.Lighting.Lighting.spotLights[0].Params = {0.5f, 0.0f, 0.0f, 0.0f};
+	Renderer3D.Lighting.Lighting.spotLights[0].dir = {0.0f, -0.8f, 0.0f, 0.0f};
 
 	SaveContext = {0};
 	
 	SaveContext.Camera = &camera;
-	SaveContext.Lighting = &Renderer3D.Lighting.lighting;
-	SaveContext.PhongMaterials[0] = &phongMatData;
+	SaveContext.Lighting = &Renderer3D.Lighting.Lighting;
+	SaveContext.PhongMaterials[0] = &phongMat;
 	
 	camera.Pos = { 1.0f, 0.5f, 1.0f };
 	camera.lookAt({ 0.0f, 0.0f, 0.0f });
@@ -119,7 +119,7 @@ void ExampleScenes::Init()
 		uiRenderTarget.Color = NextTextureId();
 		uiRenderTarget.DepthStencil = NextTextureId();
 	
-		Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+		Graphics->UpdateCBs(Renderer3D.Lighting.Cbo, sizeof(Lighting), &Renderer3D.Lighting.Lighting);
 
 		Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
 		Graphics->SetViewport(0, 0, 800, 600);
@@ -129,8 +129,8 @@ void ExampleScenes::Init()
 		Graphics->CreateDSTexture(uiRenderTarget.DepthStencil, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
 
 	}
-}
-
+} 
+ 
 void ExampleScenes::Resize()
 {
 	Renderer2D.Params.Width = Application->Width;
@@ -192,37 +192,36 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->ClearZBuffer();
 	Graphics->SetDepthStencilState(DSS_Normal);
 
-	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
-	SetupCamera(camera);
+	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
+	Renderer3D.SetupCamera(camera);
 
-	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
-	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
-	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
+	Renderer3D.BeginScene(SC_DEBUG_COLOR);
+
+	Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 
 	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
 	Graphics->BindTexture(0, texMat.EnvMap);
 	Graphics->BindTexture(1, texMat.BaseMap);
 	Graphics->BindTexture(2, texMat.AoMap);
 
-	Graphics->BindPSConstantBuffers(texMat.data, 1);
+	Graphics->BindPSConstantBuffers(texMat.Cbo, 1);
 
-	texMatData.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-	texMatData.ColorIntensity = 0.5f * std::abs(std::sin(t*3));
-	texMatData.Reflectivity = 0.0f;
-	Graphics->UpdateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	texMat.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	texMat.ColorIntensity = 0.5f * std::abs(std::sin(t*3));
+	texMat.Reflectivity = 0.0f;
+	Graphics->UpdateCBs(texMat.Cbo, sizeof(TexturedMaterialData), &texMat);
 	RenderDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
-	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
-	texMatData.ColorIntensity = 0.15f;
-	Graphics->UpdateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	texMat.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
+	texMat.ColorIntensity = 0.15f;
+	Graphics->UpdateCBs(texMat.Cbo, sizeof(TexturedMaterialData), &texMat);
 	RenderDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
 
-	texMatData.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
-	texMatData.ColorIntensity = 0.0;
+	texMat.Color = { 1.0f, 0.0f, 1.0f, 1.0f };
+	texMat.ColorIntensity = 0.0;
 
-	texMatData.Reflectivity = 0.5f;
-	Graphics->UpdateCBs(texMat.data, sizeof(TexturedMaterialData), &texMatData);
+	texMat.Reflectivity = 0.5f;
+	Graphics->UpdateCBs(texMat.Cbo, sizeof(TexturedMaterialData), &texMat);
 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
 
 
@@ -232,10 +231,8 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 	//MeshesLib.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f}, Light.bufferId);
 
-	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
-	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
-	
-	RenderSkyBox();
+
+	Renderer3D.DrawSkyBox(T_SKY);
 
 	// @Note: UI rendering beggins here
 	Renderer2D.BeginScene();

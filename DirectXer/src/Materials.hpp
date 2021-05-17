@@ -26,17 +26,6 @@
 
 using MaterialId = uint32;
 
-// @Note: Basci textured material that supports color and AO maps, does not receive
-// lightning, and can mix the texture color with some solid color
-struct TexturedMaterial
-{
-	ShaderConfig config;
-	ConstantBufferId data;
-	TextureId BaseMap;
-	TextureId AoMap;
-	TextureId EnvMap;
-};
-
 struct TexturedMaterialData
 {
 	glm::vec4 Color{ 0.0f, 0.0f, 0.0f, 1.0f };
@@ -45,13 +34,17 @@ struct TexturedMaterialData
 	float Reflectivity{ 0.0f };
 	float Refraction_ration{ 0.0 };
 };
-
-// @Note: Phong material that is pure color, implements the phong shading model
-// and can receive lightning information
-struct PhongMaterial
+// @Note: Basci textured material that supports color and AO maps, does not receive
+// lightning, and can mix the texture color with some solid color
+struct TexturedMaterial : public TexturedMaterialData
 {
-	ShaderConfig config;
-	ConstantBufferId data;
+	ShaderConfig Program;
+
+	ConstantBufferId Cbo;
+	
+	TextureId BaseMap;
+	TextureId AoMap;
+	TextureId EnvMap;
 };
 
 struct PhongMaterialData
@@ -62,6 +55,15 @@ struct PhongMaterialData
 	glm::vec4 Emissive{ 0.0f, 0.0f, 0.0f, 0.0f};
 	float SpecularChininess {1.0};
 	glm::vec3 _padding;
+};
+
+// @Note: Phong material that is pure color, implements the phong shading model
+// and can receive lightning information
+struct PhongMaterial : public PhongMaterialData
+{
+	ShaderConfig Program;
+	
+	ConstantBufferId Cbo;
 };
 
 #define KA_TEX_MASK  0x00100;
@@ -106,4 +108,33 @@ struct MtlMaterial : public MtlMaterialData
 	TextureId KsMap;
 	TextureId NsMap;
 	TextureId dMap;
+};
+
+using MaterialId = uint16;
+
+class MaterialLibrary
+{
+  public:
+	BulkVector<MtlMaterial> MtlMaterials;
+	BulkVector<PhongMaterial> PhongMaterials;
+	BulkVector<TextureMaterial> TexMaterials;
+
+	Map<MaterialId, uint16> MaterialsIndex;
+
+
+  public:
+
+	void PutMaterial(MaterialId id, MtlMaterial mat);
+	void PutMaterial(MaterialId id, PhongMaterial mat);
+	void PutMaterial(MaterialId id, TexMaterial mat);
+
+	void Update(Graphics* graphics, MaterialId id);
+	void UpdateAll(Graphics* graphics);
+
+	ConstantBufferId GetCbo(MaterialId id);
+
+	PhongMaterialData* GetPhongData(MaterialId id);
+	TexMaterialData* GetPhongData(MaterialId id);
+	MtlMaterialData* GetPhongData(MaterialId id);
+
 };
