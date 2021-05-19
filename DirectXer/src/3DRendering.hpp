@@ -61,7 +61,7 @@ class Renderer3D
 
 	DebugGeometryDescription DebugGeometries;
 
-	ShaderConfig CurrentConfig;
+	ShaderConfiguration CurrentConfig;
 
   public:
 
@@ -77,7 +77,7 @@ class Renderer3D
 	void SetupProjection(glm::mat4 matrix);
 	void SetupCamera(Camera t_Camera);
 
-	void BeginScene(ShaderConfig config);
+	void BeginScene(ShaderConfiguration config);
 	void EndScene();
 	
 	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});

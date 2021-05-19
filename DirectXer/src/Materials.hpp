@@ -24,7 +24,7 @@
 */
 
 
-using MaterialId = uint32;
+using MaterialId = uint16;
 
 struct TexturedMaterialData
 {
@@ -38,7 +38,7 @@ struct TexturedMaterialData
 // lightning, and can mix the texture color with some solid color
 struct TexturedMaterial : public TexturedMaterialData
 {
-	ShaderConfig Program;
+	ShaderConfiguration Program;
 
 	ConstantBufferId Cbo;
 	
@@ -61,7 +61,7 @@ struct PhongMaterialData
 // and can receive lightning information
 struct PhongMaterial : public PhongMaterialData
 {
-	ShaderConfig Program;
+	ShaderConfiguration Program;
 	
 	ConstantBufferId Cbo;
 };
@@ -99,7 +99,7 @@ struct MtlMaterialData
 
 struct MtlMaterial : public MtlMaterialData
 {
-	ShaderConfig Program;
+	ShaderConfiguration Program;
 
 	ConstantBufferId Cbo;
 	
@@ -110,31 +110,109 @@ struct MtlMaterial : public MtlMaterialData
 	TextureId dMap;
 };
 
-using MaterialId = uint16;
 
 class MaterialLibrary
 {
+	struct MaterialProxy
+	{
+		uint16 Index;
+		ConstantBufferId Cbo; 
+		void* Data;
+		uint32 DataSize;
+	};
+	
   public:
 	BulkVector<MtlMaterial> MtlMaterials;
 	BulkVector<PhongMaterial> PhongMaterials;
-	BulkVector<TextureMaterial> TexMaterials;
+	BulkVector<TexturedMaterial> TexMaterials;
 
-	Map<MaterialId, uint16> MaterialsIndex;
+	Map<MaterialId, MaterialProxy> MaterialsIndex;
 
 
   public:
 
-	void PutMaterial(MaterialId id, MtlMaterial mat);
-	void PutMaterial(MaterialId id, PhongMaterial mat);
-	void PutMaterial(MaterialId id, TexMaterial mat);
+	void Init()
+	{
+		MtlMaterials.reserve(16);
+		PhongMaterials.reserve(16);
+		TexMaterials.reserve(16);
 
-	void Update(Graphics* graphics, MaterialId id);
-	void UpdateAll(Graphics* graphics);
+		MaterialsIndex.reserve(16 * 3);
+	}
+	
+	void PutMaterial(MaterialId id, MtlMaterial mat)
+	{
+		MtlMaterials.push_back(mat);
 
-	ConstantBufferId GetCbo(MaterialId id);
+		MaterialProxy newMaterial;
+		newMaterial.Index = (uint16)MtlMaterials.size() - 1;
+		newMaterial.Data = &MtlMaterials[newMaterial.Index - 1];
+		newMaterial.DataSize = (uint32)sizeof(MtlMaterial);
+		newMaterial.Cbo = mat.Cbo;
 
-	PhongMaterialData* GetPhongData(MaterialId id);
-	TexMaterialData* GetPhongData(MaterialId id);
-	MtlMaterialData* GetPhongData(MaterialId id);
+		MaterialsIndex.insert({id, newMaterial});
+	}
+	
+	void PutMaterial(MaterialId id, PhongMaterial mat)
+	{
+		PhongMaterials.push_back(mat);
+
+		MaterialProxy newMaterial;
+		newMaterial.Index = (uint16)PhongMaterials.size() - 1;
+		newMaterial.Data = &PhongMaterials[newMaterial.Index - 1];
+		newMaterial.DataSize = (uint32)sizeof(PhongMaterial);
+		newMaterial.Cbo = mat.Cbo;
+
+		MaterialsIndex.insert({id, newMaterial});
+	}
+	
+	void PutMaterial(MaterialId id, TexturedMaterial mat)
+	{
+		TexMaterials.push_back(mat);
+
+		MaterialProxy newMaterial;
+		newMaterial.Index = (uint16)TexMaterials.size() - 1;
+		newMaterial.Data = &TexMaterials[newMaterial.Index - 1];
+		newMaterial.DataSize = (uint32)sizeof(TexturedMaterial);
+		newMaterial.Cbo = mat.Cbo;
+
+		MaterialsIndex.insert({id, newMaterial});
+	}
+	
+	void Update(Graphics* graphics, MaterialId id)
+	{
+		MaterialProxy mat = MaterialsIndex.at(id);
+		graphics->UpdateCBs(mat.Cbo, mat.DataSize, mat.Data);
+	}
+
+	
+	void UpdateAll(Graphics* graphics)
+	{
+		for (auto& [id, mat] : MaterialsIndex)
+		{
+			graphics->UpdateCBs(mat.Cbo, mat.DataSize, mat.Data);
+		}
+	}
+
+	ConstantBufferId GetCbo(MaterialId id)
+	{
+		return MaterialsIndex.at(id).Cbo;
+	}
+		
+
+	PhongMaterialData* GetPhongData(MaterialId id)
+	{
+		return (PhongMaterialData*)MaterialsIndex.at(id).Data;
+	}
+	
+	TexturedMaterial* GetTexturedData(MaterialId id)
+	{
+		return (TexturedMaterial*)MaterialsIndex.at(id).Data;
+	}
+	
+	MtlMaterialData* GetMtlData(MaterialId id)
+	{
+		return (MtlMaterialData*)MaterialsIndex.at(id).Data;	
+	}
 
 };

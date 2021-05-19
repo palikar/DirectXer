@@ -101,7 +101,7 @@ class GraphicsD3D11
 	void SetRasterizationState(RasterizationState t_State = RS_DEBUG);
 	void SetDepthStencilState(DepthStencilState t_State = DSS_Normal, uint32 t_RefValue = 0);
 	void SetViewport(float x, float y, float width, float height);
-	void SetShaderConfiguration(ShaderConfig t_Confing);
+	void SetShaderConfiguration(ShaderConfiguration t_Confing);
 	void SetBlendingState(BlendingState t_State);
 	void SetRenderTarget(RTObject& t_RT);
 	void ResetRenderTarget();

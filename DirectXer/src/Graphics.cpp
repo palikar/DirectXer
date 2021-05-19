@@ -1,7 +1,7 @@
 
 #include "Graphics.hpp"
 
-void DrawFullscreenQuad(Graphics* Graphics, TextureId texture, ShaderConfig type)
+void DrawFullscreenQuad(Graphics* Graphics, TextureId texture, ShaderConfiguration type)
 {
 	Graphics->BindTexture(1, texture);
 	Graphics->SetShaderConfiguration(type);

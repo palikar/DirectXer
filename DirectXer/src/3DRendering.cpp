@@ -94,10 +94,10 @@ void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, gl
 	
 }
 
-void Renderer3D::BeginScene(ShaderConfig config)
+void Renderer3D::BeginScene(ShaderConfiguration config)
 {
 	CurrentConfig = config;
-	Gfx->SetShaderConfig(config);
+	Gfx->SetShaderConfiguration(config);
 }
 
 void Renderer3D::EndScene()

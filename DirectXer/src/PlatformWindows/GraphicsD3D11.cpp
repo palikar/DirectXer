@@ -998,7 +998,7 @@ void GraphicsD3D11::SetViewport(float x, float y, float width, float height)
 	Context->RSSetViewports(1, &vp);
 }
 
-void GraphicsD3D11::SetShaderConfiguration(ShaderConfig t_Config)
+void GraphicsD3D11::SetShaderConfiguration(ShaderConfiguration t_Config)
 {
 	uint8 shaderObjectIndex = 0xFF & t_Config;
 	uint8 shaderType = (0xFF00 & t_Config) >> 8;

@@ -124,7 +124,7 @@ enum ShaderType : uint8
 	ST_COUNT
 };
 
-enum ShaderConfig
+enum ShaderConfiguration
 {
 	// Debug Rendering
 	SC_DEBUG_COLOR       = SF_DEBUG		| (ST_COLOR			<< 8),

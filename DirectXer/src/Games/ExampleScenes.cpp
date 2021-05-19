@@ -229,7 +229,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->BindTexture(1, T_CHECKER);
 	RenderDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
 
-	//MeshesLib.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f}, Light.bufferId);
+	Renderer3D.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f});
 
 
 	Renderer3D.DrawSkyBox(T_SKY);

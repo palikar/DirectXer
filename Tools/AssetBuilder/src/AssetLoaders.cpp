@@ -239,7 +239,7 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 
 	MtlMaterial newMat{0};
 
-	const ShaderConfig configs[] = {
+	const ShaderConfiguration configs[] = {
 		SC_MTL_1,
 		SC_MTL_2
 	};
