@@ -37,11 +37,10 @@ public:
 	void Resize();
 	void PostInit() {};
 	
-	void SetupCamera(Camera t_Camera);
-	void RenderSkyBox(TextureId sky = 32773);
 	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4(1), glm::mat4 t_Scale = glm::mat4(1), glm::mat4 t_Rotation = glm::mat4(1)){}
-	void RenderDebugGeometryTransform(uint32 t_Id, glm::mat4 t_Transform = glm::mat4(1));
 
+	void UpdateTime(float dt);
+	
 	void ProcessFirstScene(float dt);
 	// void ProcessPhongScene(float dt);
 	// void ProcessSpaceScene(float dt);
@@ -51,25 +50,23 @@ public:
 	Graphics* Graphics;
 	App* Application;
 
-	TexturedMaterial texMat;
-
-	PhongMaterial phongMat;
+	Scene CurrentScene;
+	AudioPlayer AudioEngine;
+	SerializationContext SaveContext;
 	
-	Camera camera;
 	RasterizationState CurrentRastState;
-	
 
-	Renderer2D Renderer2D;
 	Renderer3D Renderer3D;
 	
+	Renderer2D Renderer2D;
 	SpriteSheetHolder SpriteSheets;
-	Scene CurrentScene;
-	TextureCatalog Textures;
-
-	SerializationContext SaveContext;
-
-	AudioPlayer AudioEngine;
-
 	RTObject uiRenderTarget;
+
+	MaterialId SimplePhong;
+	MaterialId SimpleTextured;
+
+	float T = 0.0f;
+	
+
 
 };

@@ -21,7 +21,7 @@ void Renderer3D::InitRenderer(Graphics* t_Graphics)
 {
 	Gfx = t_Graphics;
 	MeshData.Meshes.reserve(32); 
-	MeshData.Materials.reserve(32); 
+	MeshData.Materials.Init();
 }
 
 void Renderer3D::InitLighting()
@@ -33,9 +33,15 @@ void Renderer3D::InitLighting()
 
 void Renderer3D::SetupCamera(Camera t_Camera)
 {
+	CurrentCamera = t_Camera;
+}
+
+void Renderer3D::UpdateCamera()
+{
 	Gfx->VertexShaderCB.view = glm::transpose(t_Camera.view());
 	Gfx->PixelShaderCB.cameraPos = t_Camera.Pos;
 	Gfx->VertexShaderCB.cameraPos = t_Camera.Pos;
+	// Gfx->UpdateCBs();
 }
 
 void Renderer3D::SetupProjection(glm::mat4 matrix)
@@ -51,7 +57,7 @@ void Renderer3D::DrawSkyBox(TextureId sky)
 	Gfx->BindTexture(0, sky);
 	Gfx->VertexShaderCB.model = init_scale(500.0f, 500.0f, 500.0f) * init_translate(0.0f, 0.0f, 0.0f);
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
-	Gfx->UpdateCBs();
+	// Gfx->UpdateCBs();
 
 	auto geom = DebugGeometries.Geometries[0];
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);
@@ -60,11 +66,17 @@ void Renderer3D::DrawSkyBox(TextureId sky)
 void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
-	const auto material = MeshData.Materials.at(mesh.Material);
+	MtlMaterial material = MeshData.Materials.GetMtl(mesh.Material);
 
 	Gfx->SetShaderConfiguration(material.Program);
-
 	Gfx->BindVSConstantBuffers(material.Cbo, 1);
+	
+	if (material.KaMap) Gfx->BindVSTexture(0, material.KaMap);
+	if (material.KdMap) Gfx->BindVSTexture(1, material.KdMap);
+	if (material.KsMap) Gfx->BindVSTexture(2, material.KsMap);
+	if (material.NsMap) Gfx->BindVSTexture(3, material.NsMap);
+	if (material.dMap ) Gfx->BindVSTexture(4, material.dMap);
+	
 		
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
@@ -72,9 +84,6 @@ void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
 	Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();
-
-	if (material.KaMap) Gfx->BindVSTexture(0, material.KaMap);
-	if (material.KdMap) Gfx->BindVSTexture(1, material.KdMap);
 
 	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
 }
@@ -90,14 +99,14 @@ void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, gl
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();
 
-	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);
-	
+	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);	
 }
 
 void Renderer3D::BeginScene(ShaderConfiguration config)
 {
 	CurrentConfig = config;
 	Gfx->SetShaderConfiguration(config);
+	Gfx->UpdateCBs();
 }
 
 void Renderer3D::EndScene()

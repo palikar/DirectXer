@@ -41,7 +41,7 @@ struct Mesh
 struct MeshCatalog
 {
 	Map<MeshId, Mesh, Memory_3DRendering> Meshes;
-	Map<MaterialId, MtlMaterial, Memory_3DRendering> Materials;
+	MaterialLibrary Materials;
 };
 
 struct DebugGeometryBuilder;
@@ -58,6 +58,7 @@ class Renderer3D
 	Graphics* Gfx;
 	MeshCatalog MeshData;
 	LightSetup Lighting;
+	Camera CurrentCamera;
 
 	DebugGeometryDescription DebugGeometries;
 
@@ -69,13 +70,12 @@ class Renderer3D
 	void InitDebugGeometry(DebugGeometryBuilder& builder);
 	void InitLighting();
 
-
 	void EnableLighting();
 	void DisableLighting();
 	void UpdateLighting();
 
 	void SetupProjection(glm::mat4 matrix);
-	void SetupCamera(Camera t_Camera);
+	void UpdateCamera();
 
 	void BeginScene(ShaderConfiguration config);
 	void EndScene();
