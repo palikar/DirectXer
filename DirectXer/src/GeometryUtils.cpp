@@ -7,17 +7,18 @@ static uint32 PutGeometry(BufferDescriptor& buffer, GeometryInfo t_Info)
 {
 	GPUGeometryInfo newInfo{0};
 	newInfo.IndexCount = t_Info.indexCount;
+	newInfo.VertexCount = t_Info.vertexCount;
 	if (!buffer.Geometries.empty())
 	{
-		auto lastGeometry = buffer.Geometries.end();
-		newInfo.BaseIndex = t_Info.vertexCount + lastGeometry->BaseIndex;
-		newInfo.IndexOffset = t_Info.indexCount + lastGeometry->IndexOffset;
+		auto lastGeometry = buffer.Geometries.back();
+		newInfo.BaseIndex = lastGeometry.VertexCount + lastGeometry.BaseIndex;
+		newInfo.IndexOffset = lastGeometry.IndexCount + lastGeometry.IndexOffset;
 	}
 	
 	newInfo.Topology = TopolgyType(t_Info.type >> 8);
 	buffer.Geometries.push_back(newInfo);
 
-	return (uint32)buffer.Geometries.size();
+	return (uint32)buffer.Geometries.size() - 1;
 }
 
 void DebugGeometryBuilder::Init(uint8 t_GeometriesCount)
@@ -276,7 +277,7 @@ IndexedGPUBuffer DebugGeometryBuilder::CreateBuffer(Graphics* graphics)
 	auto ib = indexBufferFactory(NextIndexBufferId(), *graphics, Indices);
 
 	graphics->SetVertexBufferName(vb, "DebugGeometryVB");
-	graphics->SetVertexBufferName(ib, "DebugGeometryIB");
+	graphics->SetIndexBufferName(ib, "DebugGeometryIB");
 
 	Memory::ResetTempScope();
 

@@ -18,11 +18,13 @@ struct RobinAllocator
 {
 	static  void* malloc(size_t size)
 	{
+		//return std::malloc(size);
 		return Memory::BulkGet(size, Tag);
 	}
 
 	static void free(void* ptr)
 	{
+		//std::free(ptr);
 	}
 };
 

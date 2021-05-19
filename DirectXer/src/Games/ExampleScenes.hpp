@@ -63,7 +63,9 @@ public:
 	RTObject uiRenderTarget;
 
 	MaterialId SimplePhong;
-	MaterialId SimpleTextured;
+	MaterialId RocksTextured;
+	MaterialId CheckerTextured;
+	MaterialId FloorTextured;
 
 	float T = 0.0f;
 	

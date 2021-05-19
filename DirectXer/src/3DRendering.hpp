@@ -10,6 +10,7 @@
 
 struct GPUGeometryInfo
 {
+	uint32 VertexCount;
 	uint32 IndexCount;
 	uint32 IndexOffset;
 	uint32 BaseIndex;
@@ -57,7 +58,7 @@ class Renderer3D
 
 	Graphics* Gfx;
 	MeshCatalog MeshData;
-	LightSetup Lighting;
+	LightSetup LightingSetup;
 	Camera CurrentCamera;
 
 	DebugGeometryDescription DebugGeometries;
@@ -81,6 +82,6 @@ class Renderer3D
 	void EndScene();
 	
 	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
-	void DrawDebugGeometry(uint32 id, glm::vec3 pos = {}, glm::vec3 scale = {}, glm::mat4 rotation = {});
+	void DrawDebugGeometry(uint32 id, glm::vec3 pos = {}, glm::vec3 scale = {}, glm::mat4 rotation = glm::mat4(1));
 	void DrawSkyBox(TextureId sky);
 };

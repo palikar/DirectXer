@@ -29,7 +29,6 @@ void ExampleScenes::Init()
 	CurrentRastState = RS_NORMAL;
 
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
-	//MeshesLib.Init(Graphics);
 
 	Memory::EstablishTempScope(Megabytes(4));
 	{
@@ -67,11 +66,23 @@ void ExampleScenes::Init()
 	TempFormater formater;
 
 	// Create materials
-	TexturedMaterial texMat;
-	InitMaterial(Graphics, texMat, formater.Format("TexturedMaterialCB"));
-	texMat.BaseMap = T_ROCKS_COLOR;
-	texMat.AoMap = T_ROCKS_AO;
-	texMat.EnvMap = ST_SKY;
+	TexturedMaterial rocksMat;
+	InitMaterial(Graphics, rocksMat, "RocksdMaterialCB");
+	rocksMat.BaseMap = T_ROCKS_COLOR;
+	rocksMat.AoMap = T_ROCKS_AO;
+	rocksMat.EnvMap = ST_SKY;
+
+	TexturedMaterial checkerMat;
+	InitMaterial(Graphics, checkerMat, "CheckerMaterialCB");
+	checkerMat.BaseMap = T_CHECKER;
+	checkerMat.AoMap = T_CHECKER;
+	checkerMat.EnvMap = ST_SKY;
+
+	TexturedMaterial floorMat;
+	InitMaterial(Graphics, floorMat, "CheckerMaterialCB");
+	floorMat.BaseMap = T_FLOOR_COLOR;
+	floorMat.AoMap = T_FLOOR_COLOR;;
+	floorMat.EnvMap = ST_SKY;
 
 	PhongMaterial phongMat;
 	InitMaterial(Graphics, phongMat, formater.Format("PhongMaterialCB"));
@@ -80,33 +91,44 @@ void ExampleScenes::Init()
 	phongMat.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
 	phongMat.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 
-	SimpleTextured = 1;
+	RocksTextured = 1;
+	Renderer3D.MeshData.Materials.PutMaterial(RocksTextured, rocksMat);
+	
 	SimplePhong = 2;
-	Renderer3D.MeshData.Materials.PutMaterial(SimpleTextured, texMat);
 	Renderer3D.MeshData.Materials.PutMaterial(SimplePhong, phongMat);
+	
+	CheckerTextured = 3;
+	Renderer3D.MeshData.Materials.PutMaterial(CheckerTextured, checkerMat);
+	
+	FloorTextured = 4;
+	Renderer3D.MeshData.Materials.PutMaterial(FloorTextured, floorMat);
+	
+	Renderer3D.MeshData.Materials.GenerateProxies();
 
 	// Setup the lighting
-	Renderer3D.Lighting.Lighting.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
-	Renderer3D.Lighting.Lighting.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
-	Renderer3D.Lighting.Lighting.dirLightDir = { 0.5f, 0.471f, 0.0f, 0.0f };
+	Renderer3D.LightingSetup.LightingData.ambLightColor = { 0.7f, 0.7f, 0.7f, 0.4f };
+	Renderer3D.LightingSetup.LightingData.dirLightColor = { 0.2f, 0.2f, 0.2f, 0.76f };
+	Renderer3D.LightingSetup.LightingData.dirLightDir = { 0.5f, 0.471f, 0.0f, 0.0f };
 
-	Renderer3D.Lighting.Lighting.pointLights[0].Active = 0;
-	Renderer3D.Lighting.Lighting.spotLights[0].Active = 1;
+	Renderer3D.LightingSetup.LightingData.pointLights[0].Active = 0;
+	Renderer3D.LightingSetup.LightingData.spotLights[0].Active = 1;
 
-	Renderer3D.Lighting.Lighting.spotLights[0].color = {0.5f, 0.5f, 0.5f, 1.0f};
-	Renderer3D.Lighting.Lighting.spotLights[0].Params = {0.5f, 0.0f, 0.0f, 0.0f};
-	Renderer3D.Lighting.Lighting.spotLights[0].dir = {0.0f, -0.8f, 0.0f, 0.0f};
+	Renderer3D.LightingSetup.LightingData.spotLights[0].color = {0.5f, 0.5f, 0.5f, 1.0f};
+	Renderer3D.LightingSetup.LightingData.spotLights[0].Params = {0.5f, 0.0f, 0.0f, 0.0f};
+	Renderer3D.LightingSetup.LightingData.spotLights[0].dir = {0.0f, -0.8f, 0.0f, 0.0f};
 
-	Graphics->UpdateCBs(Renderer3D.Lighting.Cbo, sizeof(Lighting), &Renderer3D.Lighting.Lighting);
+	Renderer3D.InitLighting();
 
 	// Setup camera
 	Renderer3D.CurrentCamera.Pos = { 1.0f, 0.5f, 1.0f };
 	Renderer3D.CurrentCamera.lookAt({ 0.0f, 0.0f, 0.0f });
 
+	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
+
 	SaveContext = {0};
-	SaveContext.Camera = &camera;
-	SaveContext.Lighting = &Renderer3D.Lighting.Lighting;
-	SaveContext.PhongMaterials[0] = &3dRenderer.MeshData.Materials.GetPhong(SimplePhong);
+	SaveContext.Camera = &Renderer3D.CurrentCamera;
+	SaveContext.Lighting = &Renderer3D.LightingSetup.LightingData;
+	SaveContext.PhongMaterials[0] = &Renderer3D.MeshData.Materials.GetPhong(SimplePhong);
 	
 	auto saveFile = Resources::ResolveFilePath("setup.ddata");
 	if (PlatformLayer::IsValidPath(saveFile))
@@ -127,6 +149,7 @@ void ExampleScenes::Init()
 
 	Graphics->CreateRenderTexture(uiRenderTarget.Color, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
 	Graphics->CreateDSTexture(uiRenderTarget.DepthStencil, {(uint16)Application->Width, (uint16)Application->Height, TF_RGBA});
+
 } 
  
 void ExampleScenes::Resize()
@@ -179,7 +202,7 @@ void ExampleScenes::Update(float dt)
 void ExampleScenes::UpdateTime(float dt)
 {
 	T += 1.0f * dt;
-	T = t > 10000.0f ? 0.0f : t;
+	T = T > 10000.0f ? 0.0f : T;
 }
 
 void ExampleScenes::ProcessFirstScene(float dt)
@@ -196,23 +219,29 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 	// @Note: Rendering begins here
 	{
-		Renderer3D.SetupProjection(glm::perspective(pov, Application->Width/ Application->Height, nearPlane, farPlane));
 
 		Renderer3D.BeginScene(SC_DEBUG_COLOR);
-		Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+		Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
+		Renderer3D.EnableLighting();
 
+		{
+			Renderer3D.MeshData.Materials.Bind(Graphics, RocksTextured);
 
-		// {
-		// 	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
-		// 	Renderer3D.DrawDebugGeometry(SPHERE, init_translate(4.0f, std::sin(t*3)*0.5f + 1.5f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
-		// 	Renderer3D.DrawDebugGeometry(CYLINDER, init_translate(-4.0f, 1.0f, 4.0f), init_scale(0.25f, 0.25f, 0.25f));
-		// 	Renderer3D.DrawDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(3.0f, 1.0f, 3.0f));
-		// 	Renderer3D.DrawDebugGeometry(CUBE, init_translate(0.0f, 1.0, 4.0f), init_scale(0.25f, 0.25f, 0.25f), init_rotation(t*0.25f, {0.0f, 1.0f, 0.0f}));
-		// }
+			Renderer3D.DrawDebugGeometry(SPHERE, glm::vec3(4.0f, std::sin(T*3)*0.5f + 1.5f, 4.0f), glm::vec3(0.25f, 0.25f, 0.25f));
 
-		// {
-		// 	Renderer3D.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f});
-		// }
+			Renderer3D.DrawDebugGeometry(CYLINDER, glm::vec3(-4.0f, 1.0f, 4.0f), glm::vec3(0.25f, 0.25f, 0.25f));
+
+			Renderer3D.MeshData.Materials.Bind(Graphics, CheckerTextured);
+			Renderer3D.DrawDebugGeometry(CUBE, glm::vec3(0.0f, 1.0, 4.0f), glm::vec3(0.25f, 0.25f, 0.25f), init_rotation(T*0.25f, {0.0f, 1.0f, 0.0f}));
+
+			
+			Renderer3D.MeshData.Materials.Bind(Graphics, FloorTextured);
+			Renderer3D.DrawDebugGeometry(PLANE, glm::vec3(0.0f, 0.0, 0.0f), glm::vec3(3.0f, 1.0f, 3.0f));
+		}
+
+		{
+			Renderer3D.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, {0.05f, 0.05f, 0.05f});
+		}
 
 		Renderer3D.DrawSkyBox(T_SKY);
 	}
@@ -220,52 +249,52 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 	// @Note: UI rendering beggins here
 	{
-		Renderer2D.BeginScene();
+		//Renderer2D.BeginScene();
 	
-		Renderer2D.DrawQuad({10.f, 10.f}, {200.f, 200.f}, {1.0f, 0.0f, 0.0f, 1.0f});
-		Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f}); 
-		Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
-		Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
-		Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
-		Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
+		//Renderer2D.DrawQuad({10.f, 10.f}, {200.f, 200.f}, {1.0f, 0.0f, 0.0f, 1.0f});
+		//Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f}); 
+		//Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
+		//Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+		//Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+		//Renderer2D.DrawRoundedQuad({610.0f, 110.0f}, {150.f, 150.f}, {0.0f, 1.0f, 1.0f, 1.0f}, 10.0f);
 
-		Renderer2D.DrawImage(I_INSTAGRAM, {610.0f, 310.0f}, {64.0f, 64.0f});
+		//Renderer2D.DrawImage(I_INSTAGRAM, {610.0f, 310.0f}, {64.0f, 64.0f});
 
-		Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, F_DroidSansBold_24);
-		Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, F_DroidSans_24);
+		//Renderer2D.DrawText("Hello, Sailor", {400.0f, 400.0f}, F_DroidSansBold_24);
+		//Renderer2D.DrawText("Hello, Sailor", {400.0f, 435.0f}, F_DroidSans_24);
 
-		glm::vec2 triangle[] = {
-			{500.0f, 500.0f},
-			{500.0f, 550.0f},
-			{530.0f, 525.0f},
-		};
-		Renderer2D.DrawTriangle(triangle, {1.0f, 0.5f, 1.0f, 1.0f});
+		//glm::vec2 triangle[] = {
+		//	{500.0f, 500.0f},
+		//	{500.0f, 550.0f},
+		//	{530.0f, 525.0f},
+		//};
+		//Renderer2D.DrawTriangle(triangle, {1.0f, 0.5f, 1.0f, 1.0f});
 
-		glm::vec2 polygon[] = {
-			{560.0f, 560.0f},
-			{590.0f, 530.0f},
-			{600.0f, 560.0f},
-			{555.0f, 590.0f},
-		};
-		Renderer2D.DrawFourPolygon(polygon, Color::AquaMarine);
+		//glm::vec2 polygon[] = {
+		//	{560.0f, 560.0f},
+		//	{590.0f, 530.0f},
+		//	{600.0f, 560.0f},
+		//	{555.0f, 590.0f},
+		//};
+		//Renderer2D.DrawFourPolygon(polygon, Color::AquaMarine);
 	
-		static uint32 spriteIndex = 0;
-		static float acc = 0;
-		acc += dt * 0.3f;
-		if (acc > 1.0f/24.0f)
-		{
-			spriteIndex = spriteIndex + 1 >= 7 ? 0 : ++spriteIndex;
-			acc = 0.0f;
-		}
-		SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
+		//static uint32 spriteIndex = 0;
+		//static float acc = 0;
+		//acc += dt * 0.3f;
+		//if (acc > 1.0f/24.0f)
+		//{
+		//	spriteIndex = spriteIndex + 1 >= 7 ? 0 : ++spriteIndex;
+		//	acc = 0.0f;
+		//}
+		//SpriteSheets.DrawSprite(0, spriteIndex, {400.0f, 480.0f}, {64.0f, 64.0f});
 
-		Renderer2D.EndScene();
+		//Renderer2D.EndScene();
 
-		Renderer2D.BeginScene(TT_LINES);
+		//Renderer2D.BeginScene(TT_LINES);
 
-		Renderer2D.DrawLine({600.0f, 300.0f}, {620.0f, 400.0f}, {0.5f, 0.5f, 1.0f, 1.0f});
+		//Renderer2D.DrawLine({600.0f, 300.0f}, {620.0f, 400.0f}, {0.5f, 0.5f, 1.0f, 1.0f});
 	
-		Renderer2D.EndScene();
+		//Renderer2D.EndScene();
 
 	}
 }

@@ -38,7 +38,7 @@ struct Lighting
 
 struct LightSetup
 {
-	Lighting Lighting;
+	Lighting LightingData;
 	ConstantBufferId Cbo;
 };
 

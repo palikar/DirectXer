@@ -119,8 +119,9 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		if (!context.MeshesLib) continue;
 
 		entry.Desc.Cbo = entry.Buffer;
+		entry.Desc.Id = entry.Id;
 		
-		context.MeshesLib->Materials.insert({ MaterialId{entry.Id}, entry.Desc });
+		context.MeshesLib->Materials.MtlMaterials.push_back(entry.Desc);
 		context.Graphics->CreateConstantBuffer(entry.Desc.Cbo, sizeof(MtlMaterialData), &entry.Desc);
 	}
 	

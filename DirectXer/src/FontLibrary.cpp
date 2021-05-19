@@ -38,6 +38,7 @@ void FontLibrary::Init(Graphics* t_Graphics)
 	{
 		CharMap.insert({ch, charIndex++});
 	}
+	IdMap.reserve(16);
 }
 	
 void FontLibrary::InitNewAtlas()

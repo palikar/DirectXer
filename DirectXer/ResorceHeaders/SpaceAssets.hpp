@@ -132,7 +132,7 @@ GPUResource GPUResources[] = {
 };
 
 static inline AssetFile AssetFiles[] = {
-	{ "resources/SpaceAssets.dbundle", 139365260 },
+	{ "resources/SpaceAssets.dbundle", 139365268 },
 };
 
 static inline size_t SpaceGameAssetFile = 0;
