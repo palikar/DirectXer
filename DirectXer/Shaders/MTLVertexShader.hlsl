@@ -86,8 +86,8 @@ cbuffer LightningBuf : register(b2)
 SamplerState linearSamp : register(s0);
 SamplerState pointSamp : register(s1);
 
-Texture2D KaMap : register(t0);
-Texture2D KdMap : register(t1);
+Texture2D KaMap : register(t1);
+Texture2D KdMap : register(t2);
 Texture2D KsMap : register(t3);
 Texture2D NsMap : register(t4);
 Texture2D dMap  : register(t5);

@@ -73,6 +73,7 @@ void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
 	MeshData.Materials.Bind(Gfx, mesh.Material);
+	Gfx->BindVSConstantBuffers(LightingSetup.Cbo, 2);
 
 		
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
@@ -103,7 +104,6 @@ void Renderer3D::BeginScene(ShaderConfiguration config)
 {
 	CurrentConfig = config;
 	Gfx->SetShaderConfiguration(config);
-	Gfx->UpdateCBs();
 }
 
 void Renderer3D::EndScene()

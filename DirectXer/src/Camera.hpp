@@ -96,7 +96,7 @@ static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 		}
 		else
 		{
-			const auto diff = (Input::gInput.MousePosition - Input::gInput.LastMousePosition) * 0.8f * dt;
+			const auto diff = (Input::gInput.MousePosition - Input::gInput.LastMousePosition) * 0.01f;
 			look += diff;
 
 			float x = -look.x;

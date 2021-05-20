@@ -44,8 +44,10 @@ public:
 	float32 Width;
 	float32 Height;
 	int ReturnValue{0};
-	boolean Running{true};
 	CommandLineSettings Arguments;
+
+	bool RenderImGui;
+	uint32 EnableVsync;
 
 	// @Note: Handle to the Platform's window
 	PlatformLayer::WindowType* Window;

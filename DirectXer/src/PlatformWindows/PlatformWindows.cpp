@@ -321,7 +321,11 @@ int WindowsWindow::Run()
 			ImGui::End();
 
 			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			if (Application->RenderImGui)
+			{
+				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			}
+			
 
 			if(inGpuTiming)
 			{
@@ -335,7 +339,7 @@ int WindowsWindow::Run()
 				inGpuStats = false;
 			}
 			
-			Application->Graphics.EndFrame();
+			Application->Graphics.EndFrame(Application->EnableVsync);
 			
 			clock_t endFrame = clock();
 

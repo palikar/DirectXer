@@ -32,6 +32,13 @@
 
 using MaterialId = uint16;
 
+enum MaterialType : uint16
+{
+	MT_TEXTURED,
+	MT_PHONG,
+	MT_MTL,
+};
+
 struct TexturedMaterialData
 {
 	glm::vec4 Color{ 0.0f, 0.0f, 0.0f, 1.0f };
@@ -47,6 +54,7 @@ struct TexturedMaterial : public TexturedMaterialData
 	ShaderConfiguration Program;
 	ConstantBufferId Cbo;
 	MaterialId Id;
+	MaterialType Type;
 
 	TextureId BaseMap;
 	TextureId AoMap;
@@ -70,6 +78,7 @@ struct PhongMaterial : public PhongMaterialData
 	ShaderConfiguration Program;
 	ConstantBufferId Cbo;
 	MaterialId Id;
+	MaterialType Type;
 };
 
 #define KA_TEX_MASK  0x00100;
@@ -90,19 +99,21 @@ struct PhongMaterial : public PhongMaterialData
 // @Note: Loaded from Mtl file;
 struct MtlMaterialData
 {
+	// @Note: Specular exponents
 	float Ns;
 	// @Note: Ambient factors
 	glm::vec3 Ka;
 
+	// @Note: Optical Density
 	float Ni;
 	// @Note: Diffuse factors
 	glm::vec3 Kd;
 
+	// @Note: Dissolve factor
 	float d;
 	// @Note: Specular factors
 	glm::vec3 Ks;
 
-	// @Note: Specular exponents
 	glm::vec3 Ke;
 
 	// @Note: The lowest bits of this hold the illumination models;
@@ -116,6 +127,7 @@ struct MtlMaterial : public MtlMaterialData
 	ShaderConfiguration Program;
 	ConstantBufferId Cbo;
 	MaterialId Id;
+	MaterialType Type;
 
 	TextureId KaMap;
 	TextureId KdMap;
@@ -123,7 +135,6 @@ struct MtlMaterial : public MtlMaterialData
 	TextureId NsMap;
 	TextureId dMap;
 };
-
 
 class MaterialLibrary
 {
@@ -153,175 +164,28 @@ class MaterialLibrary
 
   public:
 
-	void Init()
-	{
-		MtlMaterials.reserve(16);
-		PhongMaterials.reserve(16);
-		TexMaterials.reserve(16);
+	void Init();
 
-		UpdateViews.reserve(16 * 3);
-		BindViews.reserve(16 * 3);
-	}
+	void GenerateProxies();
+	void Update(Graphics* graphics, MaterialId id);
 
-	void PutMaterial(MaterialId id, MtlMaterial mat)
-	{
-		mat.Id = id;
-		MtlMaterials.push_back(mat);
-	}
+	void UpdateAll(Graphics* graphics);
 
-	void PutMaterial(MaterialId id, PhongMaterial mat)
-	{
-		mat.Id = id;
-		PhongMaterials.push_back(mat);
-	}
+	void Bind(Graphics* graphics, MaterialId id);
 
-	void PutMaterial(MaterialId id, TexturedMaterial mat)
-	{
-		mat.Id = id;
-		TexMaterials.push_back(mat);
-	}
+	PhongMaterialData* GetPhongData(MaterialId id);
+	TexturedMaterial* GetTexturedData(MaterialId id);
+	MtlMaterialData* GetMtlData(MaterialId id);
 
-	void GenerateProxies()
-	{
-		for (auto& mat : MtlMaterials)
-		{
-			MaterialBindProxy bind {};
-			bind.Cbo = mat.Cbo;
-			bind.Program = mat.Program;
-			bind.Textures[0] = &mat.KaMap;
-			bind.Textures[1] = &mat.KdMap;
-			bind.Textures[2] = &mat.KsMap;
-			bind.Textures[3] = &mat.NsMap;
-			bind.Textures[4] = &mat.dMap;
-			bind.BindToPS = false;
-			bind.Slot = 1;
-			BindViews.insert({mat.Id, bind});
-
-			MaterialUpdateProxy upadte;
-			upadte.Cbo = mat.Cbo;
-			upadte.Data = &mat;
-			upadte.DataSize = sizeof(MtlMaterial);
-			UpdateViews.insert({mat.Id, upadte});
-		}
-
-		for (auto& mat : PhongMaterials)
-		{
-			MaterialBindProxy bind {};
-			bind.Cbo = mat.Cbo;
-			bind.Program = mat.Program;
-			bind.BindToPS = true;
-			bind.Slot = 3;
-			BindViews.insert({mat.Id, bind});
-
-			MaterialUpdateProxy upadte;
-			upadte.Cbo = mat.Cbo;
-			upadte.Data = &mat;
-			upadte.DataSize = sizeof(MtlMaterial);
-			UpdateViews.insert({mat.Id, upadte});
-		}
-
-		for (auto& mat : TexMaterials)
-		{
-			MaterialBindProxy bind {};
-			bind.Cbo = mat.Cbo;
-			bind.Program = mat.Program;
-			bind.Textures[0] = &mat.BaseMap;
-			bind.Textures[1] = &mat.AoMap;
-			bind.Textures[2] = &mat.EnvMap;
-			bind.BindToPS = true;
-			bind.Slot = 1;
-			BindViews.insert({mat.Id, bind});
-
-			MaterialUpdateProxy upadte;
-			upadte.Cbo = mat.Cbo;
-			upadte.Data = &mat;
-			upadte.DataSize = sizeof(MtlMaterial);
-			UpdateViews.insert({mat.Id, upadte});
-		}
-
-	}
-
-
-	void Update(Graphics* graphics, MaterialId id)
-	{
-		MaterialUpdateProxy mat = UpdateViews.at(id);
-		graphics->UpdateCBs(mat.Cbo, mat.DataSize, mat.Data);
-	}
-
-	void UpdateAll(Graphics* graphics)
-	{
-		for (auto& [id, mat] : UpdateViews)
-		{
-			graphics->UpdateCBs(mat.Cbo, mat.DataSize, mat.Data);
-		}
-	}
-
-	void Bind(Graphics* graphics, MaterialId id, uint32 slot = 0)
-	{
-		MaterialBindProxy mat = BindViews.at(id);
-		graphics->SetShaderConfiguration(mat.Program);
-
-		if (mat.BindToPS)
-		{
-			graphics->BindPSConstantBuffers(mat.Cbo, mat.Slot);
-			for (uint32 i = 0; i < 5; ++i)
-			{
-				if (mat.Textures[i]) graphics->BindTexture(i + 1, *mat.Textures[i]);
-			}
-		}
-		else
-		{
-			graphics->BindVSConstantBuffers(mat.Cbo, mat.Slot);
-			for (uint32 i = 0; i < 5; ++i)
-			{
-				if (mat.Textures[i] && *mat.Textures[i] != 0) graphics->BindVSTexture(i + 1, *mat.Textures[i]);
-			}
-		}
-		
-	}
-
-	PhongMaterialData* GetPhongData(MaterialId id)
-	{
-		return (PhongMaterialData*)UpdateViews.at(id).Data;
-	}
-
-	TexturedMaterial* GetTexturedData(MaterialId id)
-	{
-		return (TexturedMaterial*)UpdateViews.at(id).Data;
-	}
-
-	MtlMaterialData* GetMtlData(MaterialId id)
-	{
-		return (MtlMaterialData*)UpdateViews.at(id).Data;
-	}
-
-
-	PhongMaterial& GetPhong(MaterialId id)
-	{
-		return *std::find_if(PhongMaterials.begin(), PhongMaterials.end(), [id](auto& m) {
-			return m.Id == id;
-		});
-	}
-
-	TexturedMaterial& GetTextured(MaterialId id)
-	{
-		return *std::find_if(TexMaterials.begin(), TexMaterials.end(), [id](auto& m) {
-			return m.Id == id;
-		});
-	}
-
-	MtlMaterial& GetMtl(MaterialId id)
-	{
-		return *std::find_if(MtlMaterials.begin(), MtlMaterials.end(), [id](auto& m) {
-			return m.Id == id;
-		});
-	}
-
+	PhongMaterial& GetPhong(MaterialId id);
+	TexturedMaterial& GetTextured(MaterialId id);
+	MtlMaterial& GetMtl(MaterialId id);
 };
 
 inline void InitMaterial(Graphics* graphics, PhongMaterial& mat, String debugName)
 {
-	mat.Program = SC_DEBUG_TEX;
+	mat.Type = MT_PHONG;
+	mat.Program = SC_DEBUG_PHONG;
 	mat.Cbo = NextConstantBufferId();
 	graphics->CreateConstantBuffer(mat.Cbo, sizeof(PhongMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);
@@ -329,8 +193,28 @@ inline void InitMaterial(Graphics* graphics, PhongMaterial& mat, String debugNam
 
 inline void InitMaterial(Graphics* graphics, TexturedMaterial& mat, String debugName)
 {
+	mat.Type = MT_TEXTURED;
 	mat.Program = SC_DEBUG_TEX;
 	mat.Cbo = NextConstantBufferId();
 	graphics->CreateConstantBuffer(mat.Cbo, sizeof(TexturedMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);
 }
+
+inline void InitMaterial(Graphics* graphics, MtlMaterial& mat, String debugName)
+{
+	mat.Type = MT_MTL;
+	mat.Program = SC_MTL_2;
+	mat.Cbo = NextConstantBufferId();
+	graphics->CreateConstantBuffer(mat.Cbo, sizeof(TexturedMaterialData), &mat);
+	graphics->SetConstantBufferName(mat.Cbo, debugName);
+}
+
+
+struct MaterialControlContext
+{
+
+};
+
+bool ControlMtlMaterialImGui(MtlMaterialData& mat, const char* name);
+bool ControlTexturedMaterialImGui(TexturedMaterialData& mat, const char* name);
+bool ControlPhongMaterialImGui(PhongMaterialData& mat, const char* name);

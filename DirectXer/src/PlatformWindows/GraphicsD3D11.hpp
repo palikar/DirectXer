@@ -137,7 +137,7 @@ class GraphicsD3D11
 	void ClearBuffer(float red, float green, float blue);
 	void ClearZBuffer();
 	void ClearRT(RTObject& t_RT);
-	void EndFrame();
+	void EndFrame(unsigned vsync = 1u);
 
 	void DestroyZBuffer();
 	void Destroy();

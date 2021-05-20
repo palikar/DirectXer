@@ -53,7 +53,7 @@ bool ControlLightingImGui(Lighting& light)
 			lightChanged |= ImGui::SliderFloat("Outer Rad", (float*)&light.spotLights[0].Params.r, 0.0f, 5.0f, "%.3f");
 			lightChanged |= ImGui::SliderFloat("Inner Rad", (float*)&light.spotLights[0].Params.g, 0.0f, 5.0f, "%.3f");
 			ImGui::TreePop();
-		}		
+		}
 	}
 	
 	return lightChanged;

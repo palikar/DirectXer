@@ -33,6 +33,9 @@ void App::Init(HWND t_Window)
 		OPTICK_THREAD("MainThread");
 		OPTICK_FRAME("MainThread");
 	}
+
+	RenderImGui = true;
+	EnableVsync = 1;
 }
 
 void App::Update(float dt)

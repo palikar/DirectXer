@@ -65,43 +65,45 @@ void ExampleScenes::Init()
 
 	TempFormater formater;
 
+	RocksTextured = 1;
+	CheckerTextured = 3;
+	FloorTextured = 4;
+	SimplePhong = 2;
+	
 	// Create materials
 	TexturedMaterial rocksMat;
 	InitMaterial(Graphics, rocksMat, "RocksdMaterialCB");
 	rocksMat.BaseMap = T_ROCKS_COLOR;
 	rocksMat.AoMap = T_ROCKS_AO;
 	rocksMat.EnvMap = ST_SKY;
+	rocksMat.Id = RocksTextured;
 
 	TexturedMaterial checkerMat;
 	InitMaterial(Graphics, checkerMat, "CheckerMaterialCB");
 	checkerMat.BaseMap = T_CHECKER;
 	checkerMat.AoMap = T_CHECKER;
 	checkerMat.EnvMap = ST_SKY;
+	checkerMat.Id = CheckerTextured;
 
 	TexturedMaterial floorMat;
 	InitMaterial(Graphics, floorMat, "CheckerMaterialCB");
 	floorMat.BaseMap = T_FLOOR_COLOR;
 	floorMat.AoMap = T_FLOOR_COLOR;;
 	floorMat.EnvMap = ST_SKY;
+	floorMat.Id = FloorTextured;
 
 	PhongMaterial phongMat;
-	InitMaterial(Graphics, phongMat, formater.Format("PhongMaterialCB"));
-	phongMat.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
-	phongMat.Diffuse  = {0.5f, 0.5f, 0.5f, 0.0f };
-	phongMat.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
+	phongMat.Ambient  = {0.5f, 0.5f, 0.5f, 0.3f };
+	phongMat.Diffuse  = {0.5f, 0.5f, 0.0f, 0.3f };
+	phongMat.Specular = {1.0f, 0.0f, 0.0f, 0.3f };
 	phongMat.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
-
-	RocksTextured = 1;
-	Renderer3D.MeshData.Materials.PutMaterial(RocksTextured, rocksMat);
+	InitMaterial(Graphics, phongMat, formater.Format("PhongMaterialCB"));
+	phongMat.Id = SimplePhong;
 	
-	SimplePhong = 2;
-	Renderer3D.MeshData.Materials.PutMaterial(SimplePhong, phongMat);
-	
-	CheckerTextured = 3;
-	Renderer3D.MeshData.Materials.PutMaterial(CheckerTextured, checkerMat);
-	
-	FloorTextured = 4;
-	Renderer3D.MeshData.Materials.PutMaterial(FloorTextured, floorMat);
+	Renderer3D.MeshData.Materials.TexMaterials.push_back(rocksMat);
+	Renderer3D.MeshData.Materials.TexMaterials.push_back(checkerMat);
+	Renderer3D.MeshData.Materials.TexMaterials.push_back(floorMat);
+	Renderer3D.MeshData.Materials.PhongMaterials.push_back(phongMat);
 	
 	Renderer3D.MeshData.Materials.GenerateProxies();
 
@@ -138,7 +140,6 @@ void ExampleScenes::Init()
 	
 	SpriteSheets.Init(5, &Renderer2D);
 	SpriteSheets.PutSheet(I_SHOOT, { 640.0f, 470.0f }, { 8, 5 });
-
 	
 	uiRenderTarget.Color = NextTextureId();
 	uiRenderTarget.DepthStencil = NextTextureId();
@@ -166,6 +167,18 @@ void ExampleScenes::Update(float dt)
 		Graphics->SetRasterizationState(CurrentRastState);
 	}
 
+	if (Input::gInput.IsKeyReleased(KeyCode::F2))
+	{
+		Application->RenderImGui = !Application->RenderImGui;
+	}
+
+	
+	if (Input::gInput.IsKeyReleased(KeyCode::F3))
+	{
+		Application->EnableVsync = (Application->EnableVsync + 1) % 2;
+	}
+
+
 	if (Input::gInput.IsKeyReleased(KeyCode::Left))
 	{
 		CurrentScene = Scene(CurrentScene - 1 < 0 ? SCENE_COUNT - 1 : CurrentScene - 1);
@@ -183,7 +196,7 @@ void ExampleScenes::Update(float dt)
 		ProcessFirstScene(dt);
 		break;
 	case SCENE_PHONGS:
-		// ProcessPhongScene(dt);
+		ProcessPhongScene(dt);
 		break;
 	case SCENE_SPACE_GAME:
 		// ProcessSpaceScene(dt);
@@ -207,6 +220,18 @@ void ExampleScenes::UpdateTime(float dt)
 
 void ExampleScenes::ProcessFirstScene(float dt)
 {
+	
+	if (ImGui::CollapsingHeader("Materials"))
+	{
+		bool changed = false;
+		ImGui::Text("Textured Materials:");
+		changed |= ControlTexturedMaterialImGui(*Renderer3D.MeshData.Materials.GetTexturedData(RocksTextured), "Rocks");
+		changed |= ControlTexturedMaterialImGui(*Renderer3D.MeshData.Materials.GetTexturedData(CheckerTextured), "Checker");
+		changed |= ControlTexturedMaterialImGui(*Renderer3D.MeshData.Materials.GetTexturedData(FloorTextured), "Floor");
+
+		Renderer3D.MeshData.Materials.UpdateAll(Graphics);		
+	}
+	
 	UpdateTime(dt);
 	ControlCameraFPS(Renderer3D.CurrentCamera, dt);
 
@@ -299,123 +324,55 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	}
 }
 
-// void ExampleScenes::ProcessPhongScene(float dt)
-// {
-// 	static float t = 0.0f;
-// 	t += 1.1f * dt;
-// 	t = t > 100.0f ? 0.0f : t;
-// 	ControlCameraFPS(camera, dt);
+void ExampleScenes::ProcessPhongScene(float dt)
+{
+	UpdateTime(dt);
+	ControlCameraFPS(Renderer3D.CurrentCamera, dt);
+	Renderer3D.UpdateCamera();
 
-// 	bool lightChanged = false;
-// 	Graphics->BindPSConstantBuffers(Light.bufferId, 2);
+	static float lightRadius = 1.0;
+	ImGui::SliderFloat("Light Radius: ", (float*)&lightRadius, 0.1f, 1.5f, "%.3f");
+	float lightX = std::sin(T) * lightRadius;
+	float lightY = std::cos(T) * lightRadius;
+
+	Renderer3D.LightingSetup.LightingData.spotLights[0].position = {2.0f * std::sin(T), 1.0f, 2.0f, 0.0f};
+	Renderer3D.LightingSetup.LightingData.pointLights[0].Position = {lightX, 0.5f, lightY, 0.0f};
+	Renderer3D.UpdateLighting();
 	
-// 	if (ImGui::CollapsingHeader("Ligting"))
-// 	{
-// 		if (ImGui::TreeNode("Directional light"))
-// 		{
-// 			ImGui::Text("Color");
-// 			ImGui::SameLine();
-// 			lightChanged |= ImGui::ColorEdit3("Color:", (float*)&Light.lighting.dirLightColor);
-// 			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.dirLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
-// 			lightChanged |= ImGui::SliderFloat("Angle:", (float*)&Light.lighting.dirLightDir.y, -1.0f, 1.0f, "Direction = %.3f");
-// 			ImGui::TreePop();
-// 		}
-
-// 		if (ImGui::TreeNode("Ambient light"))
-// 		{
-// 			ImGui::Text("Color");
-// 			ImGui::SameLine();
-// 			lightChanged |=ImGui::ColorEdit3("Color", (float*)&Light.lighting.ambLightColor);
-// 			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&Light.lighting.ambLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
-// 			ImGui::TreePop();
-// 		}
-		
-// 		if (ImGui::TreeNode("Point light"))
-// 		{
-// 			ImGui::Checkbox("Active", (bool*)&Light.lighting.pointLights[0].Active);
-			
-// 			ImGui::Text("Color");
-// 			ImGui::SameLine();
-// 			lightChanged |= ImGui::ColorEdit3("Color", (float*)&Light.lighting.pointLights[0].Color);
-// 			lightChanged |= ImGui::SliderFloat("Constant: ", (float*)&Light.lighting.pointLights[0].Params.r, 0.0f, 2.0f, "Amount = %.3f");
-// 			lightChanged |= ImGui::SliderFloat("Linear: ", (float*)&Light.lighting.pointLights[0].Params.g, 0.0f, 2.0f, "Amount = %.3f");
-// 			lightChanged |= ImGui::SliderFloat("Quadreatic: ", (float*)&Light.lighting.pointLights[0].Params.b, 0.0f, 2.0f, "Amount = %.3f");
-// 			ImGui::TreePop();
-// 		}
-
-// 		if (ImGui::TreeNode("Spot Light"))
-// 		{
-// 			ImGui::Checkbox("Active", (bool*)&Light.lighting.spotLights[0].Active);
-			
-// 			ImGui::Text("Color");
-// 			ImGui::SameLine();
-// 			lightChanged |= ImGui::ColorEdit3("Color", (float*)&Light.lighting.spotLights[0].color);
-// 			lightChanged |= ImGui::SliderFloat("Intensity", (float*)&Light.lighting.spotLights[0].color.a, 0.0f, 1.0f, "%.3f");
-			
-// 			lightChanged |= ImGui::SliderFloat("Outer Rad", (float*)&Light.lighting.spotLights[0].Params.r, 0.0f, 5.0f, "%.3f");
-// 			lightChanged |= ImGui::SliderFloat("Inner Rad", (float*)&Light.lighting.spotLights[0].Params.g, 0.0f, 5.0f, "%.3f");
-// 			ImGui::TreePop();
-// 		}		
-// 	}
 	
-// 	static float lightRadius = 1.0;
-// 	lightChanged |= ImGui::SliderFloat("Light Radius: ", (float*)&lightRadius, 0.1f, 1.5f, "%.3f");
-// 	float lightX = std::sin(t) * lightRadius;
-// 	float lightY = std::cos(t) * lightRadius;
+	Graphics->SetDepthStencilState(DSS_Normal);
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics->ClearZBuffer();
 
-// 	Light.lighting.spotLights[0].position = {2.0f *std::sin(t), 1.0f, 2.0f, 0.0f};
-	
-// 	Light.lighting.pointLights[0].Position = {lightX, 0.5f, lightY, 0.0f};
+	Renderer3D.BeginScene(SC_DEBUG_COLOR);
+	Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
+	Renderer3D.DrawDebugGeometry(SPOTLIGHT, glm::vec3(2.0f *std::sin(T), 1.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-// 	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
+	Graphics->SetRasterizationState(RS_DEBUG);
+	Renderer3D.DrawDebugGeometry(POINTLIGHT, glm::vec3(lightX, 0.5f, lightY), glm::vec3(1.0f, 1.0f, 1.0f));
+	Graphics->SetRasterizationState(RS_NORMAL);
 
-// 	// @Note: Rendering begins here
-// 	Graphics->SetDepthStencilState(DSS_Normal);
-// 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
-// 	Graphics->ClearZBuffer();
+	Renderer3D.MeshData.Materials.Bind(Graphics, SimplePhong);
+	// Renderer3D.BeginScene(SC_DEBUG_PHONG);
+	Renderer3D.DrawDebugGeometry(PLANE, glm::vec3(0.0f, 0.0, 0.0f), glm::vec3(5.0f, 1.0f, 5.0f));
+	// Renderer3D.DrawDebugGeometry(SPHERE, glm::vec3(-1.0f, 1.0, 3.0f), glm::vec3(0.20f, 0.20f, 0.20f));
+	// Renderer3D.DrawDebugGeometry(SPHERE, glm::vec3(-1.0f, 1.0, -3.0f), glm::vec3(0.20f, 0.20f, 0.20f));
 
-// 	Graphics->VertexShaderCB.projection = glm::transpose(glm::perspective(pov, Application->Width/Application->Height, nearPlane, farPlane));
-// 	SetupCamera(camera);
+	Renderer3D.DrawSkyBox(T_NIGHT_SKY);
 
-// 	Graphics->BindIndexBuffer(GPUGeometryDesc.Ibo);
-// 	Graphics->BindVertexBuffer(GPUGeometryDesc.Vbo);
-
-// 	Graphics->SetShaderConfiguration(SC_DEBUG_COLOR);
-// 	RenderDebugGeometry(AXIS, init_translate(0.0f, 0.0f, 0.0f), init_scale(1.0f, 1.0f, 1.0f));
-// 	RenderDebugGeometry(SPOTLIGHT, init_translate(2.0f *std::sin(t), 1.0f, 2.0f), init_scale(1.0f, 1.0f, 1.0f));
-
-// 	Graphics->SetRasterizationState(RS_DEBUG);
-// 	RenderDebugGeometry(POINTLIGHT, init_translate(lightX, 0.5f, lightY), init_scale(1.0f, 1.0f, 1.0f));
-// 	Graphics->SetRasterizationState(RS_NORMAL);
-
-// 	Graphics->SetShaderConfiguration(SC_DEBUG_PHONG);
-// 	Graphics->BindPSConstantBuffers(phongMat.data, 3);
-
-// 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
-// 	phongMatData.Diffuse  = {1.0f, 0.0f, 0.0f, 0.0f };
-// 	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
-// 	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
-// 	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
-// 	RenderDebugGeometry(PLANE, init_translate(0.0f, 0.0, 0.0f), init_scale(5.0f, 1.0f, 5.0f));
 	
 // 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
 // 	phongMatData.Diffuse  = {0.0f, 1.0f, 1.0f, 0.0f };
 // 	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
 // 	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 // 	phongMatData.SpecularChininess = 0.8f;
-// 	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
-// 	RenderDebugGeometry(SPHERE, init_translate(-1.0f, 1.0, 3.0f), init_scale(0.20f, 0.20f, 0.20f));
 
 // 	phongMatData.Ambient  = {0.5f, 0.5f, 0.5f, 0.0f };
 // 	phongMatData.Diffuse  = {0.0f, 1.0f, 0.0f, 0.0f };
 // 	phongMatData.Specular = {1.0f, 0.0f, 0.0f, 0.0f };
 // 	phongMatData.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
 // 	phongMatData.SpecularChininess = 1.3f;
-// 	Graphics->UpdateCBs(phongMat.data, sizeof(PhongMaterialData), &phongMatData);
-// 	RenderDebugGeometry(SPHERE, init_translate(-1.0f, 1.0, -3.0f), init_scale(0.20f, 0.20f, 0.20f));
-
-// 	RenderSkyBox();
-// }
+}
 
 // void ExampleScenes::ProcessSpaceScene(float dt)
 // {
@@ -446,8 +403,8 @@ void ExampleScenes::ProcessFirstScene(float dt)
 // 	Renderer2D.DrawImage(SHIPIMAGE, {300.0f, Application->Height - 100.0f}, {64.0f, 64.0f});
 // 	Renderer2D.EndScene();
 	
-	
 // }
+	
 
 // void ExampleScenes::ProcessObjectsScene(float dt)
 // {

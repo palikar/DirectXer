@@ -42,7 +42,7 @@ public:
 	void UpdateTime(float dt);
 	
 	void ProcessFirstScene(float dt);
-	// void ProcessPhongScene(float dt);
+	void ProcessPhongScene(float dt);
 	// void ProcessSpaceScene(float dt);
 	// void ProcessObjectsScene(float dt);
 	// void ProcessBallsScene(float dt);

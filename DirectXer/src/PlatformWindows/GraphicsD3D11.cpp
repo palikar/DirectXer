@@ -322,14 +322,14 @@ void GraphicsD3D11::Destroy()
 	DepthStencilView->Release();
 }
 
-void GraphicsD3D11::EndFrame()
+void GraphicsD3D11::EndFrame(unsigned vsync)
 {
 	DxProfileCode(DxTimedBlock(Phase_Rendering, "Present"));
 	
 	HRESULT hr;
 	DXGI_PRESENT_PARAMETERS params{0};
 	params.DirtyRectsCount = 0;
-	if( FAILED( hr = Swap->Present1( 1u, 0u, &params ) ) )
+	if( FAILED( hr = Swap->Present1( vsync, 0u, &params ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
