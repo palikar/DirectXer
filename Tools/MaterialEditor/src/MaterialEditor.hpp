@@ -393,14 +393,14 @@ static void Update(Context& context, float dt)
 	Graphics->SetDepthStencilState(DSS_Normal);
 	Graphics->SetRasterizationState(RS_NORMAL);
 
-	ControlCameraFPS(context.Renderer3D.CurrentCamera, dt);
+	ControlCameraOrbital(context.Renderer3D.CurrentCamera, dt);
 
 	context.Renderer3D.UpdateCamera();
 
 	context.Renderer3D.BeginScene(SC_DEBUG_COLOR);
 	context.Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
 
-	context.Renderer3D.DrawSkyBox(context.Textures.LoadedTextures.back().Handle);
+	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes.back().Handle);
 }
 
 

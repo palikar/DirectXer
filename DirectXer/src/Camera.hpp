@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Glm.hpp>
+#include <Math.hpp>
 #include <Input.hpp>
 
 struct Camera
@@ -133,5 +134,42 @@ static void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f)
 	{
 		initialClick = false;
 	}
+}
+
+static void ControlCameraOrbital(Camera& t_Camera, float dt = 1.0f)
+{
+	static bool initialClick = false;
+	static glm::vec2 orbit{0.0f, 0.0f};
+
+	if (Input::gInput.IsKeyPressed(MouseCode::BUTTON_2))
+	{
+		if (!initialClick)
+		{
+			initialClick = true;
+			return;
+		}
+		else
+		{
+			const auto diff = (Input::gInput.MousePosition - Input::gInput.LastMousePosition) * 0.01f;
+			orbit += diff;
+
+			orbit.y = clamp(orbit.y, -1.57f, 1.57f);
+
+			if (orbit.x > 2 * PI) orbit.x -= 2*PI;
+			if (orbit.x < -2 * PI) orbit.x += 2*PI;
+
+			const float camX = -1.0f * sin(orbit.x) * cos(orbit.y);
+			const float camY = -1.0f * sin(orbit.y);
+			const float camZ = -1.0f * cos(orbit.x) * cos(orbit.y);
+			
+			t_Camera.Pos = glm::vec3{ camX, camY, camZ };
+			t_Camera.lookAt(glm::vec3(0.0f));
+		}
+	}
+	else
+	{
+		initialClick = false;
+	}
+	
 }
 
