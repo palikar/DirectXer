@@ -82,6 +82,7 @@ class Renderer3D
 	void EndScene();
 	
 	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
+	void DrawMeshWithMaterial(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
 	void DrawDebugGeometry(uint32 id, glm::vec3 pos = {}, glm::vec3 scale = {}, glm::mat4 rotation = glm::mat4(1));
 	void DrawSkyBox(TextureId sky);
 };

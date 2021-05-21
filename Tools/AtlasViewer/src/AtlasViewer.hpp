@@ -89,6 +89,7 @@ struct AtlasViewer
 	};
 
 };
+
 struct Context
 {
 	HWND hWnd;

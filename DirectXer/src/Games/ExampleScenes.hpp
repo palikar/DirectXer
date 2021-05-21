@@ -68,7 +68,4 @@ public:
 	MaterialId FloorTextured;
 
 	float T = 0.0f;
-	
-
-
 };

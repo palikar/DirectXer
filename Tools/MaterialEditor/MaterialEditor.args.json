@@ -1,0 +1,10 @@
+{
+  "FileVersion": 2,
+  "Id": "536a196c-d3d2-4463-9699-50b09b2cea1a",
+  "Items": [
+    {
+      "Id": "f8704a5e-464b-48f2-bc54-f43e94875c87",
+      "Command": "-i SpaceGameAtlases.datlas"
+    }
+  ]
+}

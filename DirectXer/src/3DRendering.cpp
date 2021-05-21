@@ -69,13 +69,26 @@ void Renderer3D::DrawSkyBox(TextureId sky)
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);
 }
 
-void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
+void Renderer3D::DrawMeshWithMaterial(MeshId id, glm::vec3 pos, glm::vec3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
 	MeshData.Materials.Bind(Gfx, mesh.Material);
 	Gfx->BindVSConstantBuffers(LightingSetup.Cbo, 2);
 
 		
+	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
+	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
+		
+	Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
+	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
+	Gfx->UpdateCBs();
+
+	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
+}
+
+void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
+{
+	const auto mesh = MeshData.Meshes.at(id);
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
 		

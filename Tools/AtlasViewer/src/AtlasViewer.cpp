@@ -126,7 +126,7 @@ void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& c
 		  droppedFilepath.resize(droppedFilepathSize);
 		  auto bytesCopied = DragQueryFileA(dropHandle, 0, &droppedFilepath[0], droppedFilepathSize + 1);
 		  // @Note: this does not work for some reason with full path; the probelm seems to be the Win32 function
-		  // CreateFile but I don't really case right now
+		  // CreateFile but I don't really care right now
 		  // LoadAtlas(context, droppedFilepath.c_str());
 		  DragFinish(dropHandle);
 		  break;

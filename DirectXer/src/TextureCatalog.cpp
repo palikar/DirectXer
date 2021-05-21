@@ -55,7 +55,6 @@ TextureId TextureCatalog::LoadCube(Graphics& graphics, const char* name[6])
 	Defer { Memory::ResetTempMemory(); };
 
 	int width, height, channels;
-	// @Todo: Use temporary memory here
 	void* data[6];
 	stbi_set_flip_vertically_on_load(1);
 
