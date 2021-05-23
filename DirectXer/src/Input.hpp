@@ -214,8 +214,8 @@ struct Input
 	bool MousePressedKeys[10]{0};
 	bool MouseReleasedKeys[10]{0};
 
-	glm::vec2 MouseScollOffset{0.0};
-	glm::vec2 MouseLastScollOffset{0.0};
+	glm::vec2 MouseScrollOffset{0.0};
+	glm::vec2 MouseLastScrollOffset{0.0};
 
 	JoystickInput PrevJoystickState{0};
 	JoystickInput CurrentJoystickState{0};
@@ -257,6 +257,10 @@ struct Input
 		
 		PrevJoystickState = CurrentJoystickState;
 		CurrentJoystickState = {0};
+
+		MouseLastScrollOffset = MouseScrollOffset;
+		MouseScrollOffset = {0.0f, 0.0f};
+		// MouseLastScrollOffset  = {0.0f, 0.0f};
 	}
 
 	void UpdateJoystick(JoystickInput state)
@@ -301,8 +305,8 @@ struct Input
 
 	void UpdateMouseScroll(float m_Delta)
 	{
-		MouseScollOffset = {m_Delta, 0};
-		MouseLastScollOffset = MouseScollOffset;
+		MouseLastScrollOffset = MouseScrollOffset;
+		MouseScrollOffset = {m_Delta, 0};
 	}
 
 	bool IsKeyPressed(KeyCode t_Key)

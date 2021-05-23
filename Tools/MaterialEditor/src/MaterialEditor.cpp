@@ -16,10 +16,74 @@
 #include "MaterialEditor.hpp"
 #include "Editor.hpp"
 
-
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
+
+static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
+{
+	int retval;
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
+
+	LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
+	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
+	
+	if (!SUCCEEDED(retval))
+	{
+		free(lpWideCharStr);
+		return NULL;
+	}
+	
+	int numArgs;
+	LPWSTR* args;
+	args = CommandLineToArgvW(lpWideCharStr, &numArgs);
+	free(lpWideCharStr);
+
+	int storage = numArgs * sizeof(LPSTR);
+	for (int i = 0; i < numArgs; ++i)
+	{
+		BOOL lpUsedDefaultChar = FALSE;
+		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
+		if (!SUCCEEDED(retval))
+		{
+			LocalFree(args);
+			return NULL;
+		}
+
+		storage += retval;
+	}
+
+	LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
+	if (result == NULL)
+	{
+		LocalFree(args);
+		return NULL;
+	}
+
+	int bufLen = storage - numArgs * sizeof(LPSTR);
+	LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
+	for (int i = 0; i < numArgs; ++i)
+	{		
+		BOOL lpUsedDefaultChar = FALSE;
+		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
+		if (!SUCCEEDED(retval))
+		{
+			LocalFree(result);
+			LocalFree(args);
+			return NULL;
+		}
+
+		result[i] = buffer;
+		buffer += retval;
+		bufLen -= retval;
+	}
+
+	LocalFree(args);
+
+	*pNumArgs = numArgs;
+	return result;
+
+}
 
 static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& context)
 {
@@ -96,7 +160,7 @@ static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Con
 	  {
 		  const POINTS pt = MAKEPOINTS(lParam);
 		  const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-		  Input::gInput.UpdateMouseScroll((float)delta);
+		  Input::gInput.UpdateMouseScroll((float)clamp(delta, -120, 120));
 		  break;
 	  }
 
@@ -165,6 +229,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	gDxgiManager.Init();
 	Memory::InitMemoryState();
 	Input::Init();
+	PlatformLayer::Init();
 
 	int argc;
 	char** argv;

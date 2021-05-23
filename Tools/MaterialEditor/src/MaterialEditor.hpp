@@ -14,144 +14,7 @@
 #include <Platform.hpp>
 #include <TextureCatalog.hpp>
 
-#include <iostream>
-#include <unordered_map>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <cstdint>
-#include <fstream>
-#include <stb_image.h>
-#include <fmt/format.h>
-#include <filesystem>
-
-static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
-{
-	int retval;
-	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
-
-	LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
-	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
-	
-	if (!SUCCEEDED(retval))
-	{
-		free(lpWideCharStr);
-		return NULL;
-	}
-	
-	int numArgs;
-	LPWSTR* args;
-	args = CommandLineToArgvW(lpWideCharStr, &numArgs);
-	free(lpWideCharStr);
-
-	int storage = numArgs * sizeof(LPSTR);
-	for (int i = 0; i < numArgs; ++i)
-	{
-		BOOL lpUsedDefaultChar = FALSE;
-		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
-		if (!SUCCEEDED(retval))
-		{
-			LocalFree(args);
-			return NULL;
-		}
-
-		storage += retval;
-	}
-
-	LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
-	if (result == NULL)
-	{
-		LocalFree(args);
-		return NULL;
-	}
-
-	int bufLen = storage - numArgs * sizeof(LPSTR);
-	LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
-	for (int i = 0; i < numArgs; ++i)
-	{		
-		BOOL lpUsedDefaultChar = FALSE;
-		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
-		if (!SUCCEEDED(retval))
-		{
-			LocalFree(result);
-			LocalFree(args);
-			return NULL;
-		}
-
-		result[i] = buffer;
-		buffer += retval;
-		bufLen -= retval;
-	}
-
-	LocalFree(args);
-
-	*pNumArgs = numArgs;
-	return result;
-
-}
-
-static std::vector<unsigned char> LoadFile(const std::string &t_filename)
-{
-    std::ifstream infile(t_filename.c_str(), std::ios::in | std::ios::ate | std::ios::binary);
-
-	auto size = infile.tellg();
-    infile.seekg(0, std::ios::beg);
-
-	std::vector<unsigned char> v(static_cast<size_t>(size));
-	infile.read((char*)&v[0], static_cast<std::streamsize>(size));
-
-	return v;
- }
-
-static std::string LoadFileIntoString(const std::string &t_filename)
-{
-	auto v = LoadFile(t_filename);
-	return std::string(v.begin(), v.end());
-}
-
-static std::vector<std::string> SplitLine(const std::string &s, char delimiter)
-{
-    std::vector<std::string> tokens;
-
-    size_t last = 0;
-    size_t next = 0;
-
-    while ((next = s.find(delimiter, last)) != std::string::npos)
-    {
-        tokens.push_back(s.substr(last, next - last));
-        last = next + 1;
-    }
-    tokens.push_back(s.substr(last));
-    return tokens;
-}
-
-static glm::i32vec3 GetIndexData(std::string part)
-{
-	auto parts = SplitLine(part, '/');
-	return glm::i32vec3{
-		std::stoi(parts[0].c_str()) - 1,
-		std::stoi(parts[1].c_str()) - 1,
-		std::stoi(parts[2].c_str()) - 1};
-}
-
-static bool StartsWith(const std::string &str, const std::string &prefix)
-{
-	return str.size() >= prefix.size() && 0 == str.compare(0, prefix.size(), prefix);
-}
-
-static std::string ReplaceAll(std::string str, const std::string &from, const std::string &to)
-{
-    if (from.empty()) return str;
-
-    size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
-    {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length();  // In case 'to' contains 'from', like
-		// replacing 'x' with 'yx'
-    }
-    return str;
-}
+#include "Editor.hpp"
 
 struct MaterialEditor
 {
@@ -373,7 +236,7 @@ static void Init(Context& context)
 
 	const static float pov = 65.0f;
 	const static float nearPlane = 0.0001f;
-	const static float farPlane = 1000.0f;
+	const static float farPlane = 10000.0f;
 	
 	context.Renderer3D.SetupProjection(glm::perspective(pov, 1080.0f / 720.0f, nearPlane, farPlane));
 
