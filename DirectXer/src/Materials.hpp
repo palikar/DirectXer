@@ -205,7 +205,7 @@ inline void InitMaterial(Graphics* graphics, MtlMaterial& mat, String debugName)
 	mat.Type = MT_MTL;
 	mat.Program = SC_MTL_2;
 	mat.Cbo = NextConstantBufferId();
-	graphics->CreateConstantBuffer(mat.Cbo, sizeof(TexturedMaterialData), &mat);
+	graphics->CreateConstantBuffer(mat.Cbo, sizeof(MtlMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);
 }
 

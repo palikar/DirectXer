@@ -26,6 +26,18 @@ struct MaterialEditor
 
 };
 
+struct MaterialEditEntry
+{
+	MaterialType Type;
+	MaterialId Id;
+	
+	union {
+		PhongMaterial Phong;
+		MtlMaterial Mtl;
+		TexturedMaterial Mtl;
+	};
+};
+
 struct Context
 {
 	HWND hWnd;
@@ -39,14 +51,17 @@ struct Context
 	
 	TextureCatalog Textures;
 	std::vector<MeshId> Meshes;
+
+	std::vector<MaterialEditEntry> Materials;
 };
 
 static void LoadObjMesh(Context& context, const char* path)
 {
+	DXLOG("[RES] Loading {}", path);
 	auto content = LoadFileIntoString(path);
 	std::stringstream stream(content);
 	std::string line;
-
+	
 	std::vector<MtlVertex> VertexData;
 	std::vector<uint32> IndexData;
 
@@ -153,17 +168,18 @@ static void LoadObjMesh(Context& context, const char* path)
 	MeshId nextMesh = (uint16)context.Meshes.size();
 
 	context.Graphics.CreateVertexBuffer(vbo, sizeof(MtlVertex), VertexData.data(), (uint32)(sizeof(MtlVertex) * VertexData.size()), false);
-	context.Graphics.CreateIndexBuffer(ibo, IndexData.data(), (uint32)IndexData.size(), false);
+	context.Graphics.CreateIndexBuffer(ibo, IndexData.data(), (uint32)(IndexData.size() * sizeof(uint32)), false);
 
 	GPUGeometry meshGeometry;
+	meshGeometry.Vbo = vbo;
 	meshGeometry.Ibo = ibo;
-	meshGeometry.Vbo= vbo;
 	meshGeometry.Description.VertexCount = (uint32)VertexData.size();
-	meshGeometry.Description.IndexCount= (uint32)IndexData.size();
+	meshGeometry.Description.IndexCount = (uint32)IndexData.size();
+	meshGeometry.Description.Topology = TT_TRIANGLES;
 
 	Mesh mesh;
 	mesh.Geometry = meshGeometry;
-	mesh.Material= 1;
+	mesh.Material = 1;
 
 	context.Renderer3D.MeshData.Meshes.insert({nextMesh, mesh});
 	context.Meshes.push_back(nextMesh);
@@ -178,10 +194,16 @@ static uint32 AXIS;
 static uint32 POINTLIGHT;
 static uint32 SPOTLIGHT;
 
+const static float pov = 65.0f;
+const static float nearPlane = 0.0001f;
+const static float farPlane = 10000.0f;
+
 static void Init(Context& context)
 {
 	auto Graphics = &context.Graphics;
 	context.Renderer3D.InitRenderer(Graphics);
+	context.Textures.LoadedTextures.reserve(64);
+	context.Textures.LoadedCubes.reserve(16);
 
 	const char* Envs[] = {
 		"resources/night_sky",
@@ -232,16 +254,22 @@ static void Init(Context& context)
 
 	context.Renderer3D.CurrentCamera.Pos = { 1.0f, 0.5f, 1.0f };
 	context.Renderer3D.CurrentCamera.lookAt({ 0.0f, 0.0f, 0.0f });
-
-
-	const static float pov = 65.0f;
-	const static float nearPlane = 0.0001f;
-	const static float farPlane = 10000.0f;
-	
 	context.Renderer3D.SetupProjection(glm::perspective(pov, 1080.0f / 720.0f, nearPlane, farPlane));
 
-	context.Textures.LoadedTextures.reserve(64);
-	context.Textures.LoadedCubes.reserve(16);
+	context.Renderer3D.MeshData.Materials.Init();
+
+	
+	MtlMaterial basicMat = { 0 };
+	basicMat.illum = 2;
+	basicMat.Ka = {0.2f, 0.2f, 0.2f};
+	basicMat.Kd = {0.7f, 0.0f, 0.2f};
+	basicMat.Ks = {0.8f, 0.8f, 0.8f};
+	basicMat.Id = 1;
+	InitMaterial(Graphics, basicMat, "Default Material");
+
+	context.Renderer3D.MeshData.Materials.MtlMaterials.push_back(basicMat);	
+
+	context.Renderer3D.MeshData.Materials.GenerateProxies();
 }
 
 static void Update(Context& context, float dt)
@@ -263,8 +291,15 @@ static void Update(Context& context, float dt)
 	context.Renderer3D.BeginScene(SC_DEBUG_COLOR);
 	context.Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
 
+	context.Renderer3D.MeshData.Materials.Bind(Graphics, 1);
+
+	context.Renderer3D.DrawMesh(context.Meshes[0], { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
+
 	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes.back().Handle);
 }
 
 
-// camera
+// control env map
+// control lighting
+// control mesh size and position
+// control camera (?)
