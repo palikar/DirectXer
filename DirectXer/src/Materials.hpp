@@ -47,6 +47,7 @@ struct TexturedMaterialData
 	float Reflectivity{ 0.0f };
 	float Refraction_ration{ 0.0 };
 };
+
 // @Note: Basci textured material that supports color and AO maps, does not receive
 // lightning, and can mix the texture color with some solid color
 struct TexturedMaterial : public TexturedMaterialData
@@ -205,6 +206,13 @@ inline void InitMaterial(Graphics* graphics, MtlMaterial& mat, String debugName)
 	mat.Type = MT_MTL;
 	mat.Program = SC_MTL_2;
 	mat.Cbo = NextConstantBufferId();
+
+	mat.illum |= KA_FACT_MASK;
+	mat.illum |= KD_FACT_MASK;
+	mat.illum |= KS_FACT_MASK;
+	mat.illum |= NS_FACT_MASK;
+	mat.illum |= D_FACT_MASK;
+		
 	graphics->CreateConstantBuffer(mat.Cbo, sizeof(MtlMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);
 }

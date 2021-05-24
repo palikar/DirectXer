@@ -16,7 +16,6 @@
 #include "MaterialEditor.hpp"
 #include "Editor.hpp"
 
-#include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 
@@ -85,6 +84,41 @@ static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
 
 }
 
+static void ToggleFullscreen(Context& context)
+{
+
+	if(context.FullscreenMode)
+	{
+		SetWindowLong(context.hWnd, GWL_STYLE, context.WindowStyle);
+		SetWindowPos(context.hWnd, HWND_NOTOPMOST, context.WindowRect.left, context.WindowRect.top,
+					 context.WindowRect.right - context.WindowRect.left,
+					 context.WindowRect.bottom - context.WindowRect.top,
+					 SWP_FRAMECHANGED | SWP_NOACTIVATE);
+        ShowWindow(context.hWnd, SW_NORMAL);
+	}
+	else
+	{
+		GetWindowRect(context.hWnd, &context.WindowRect);
+		SetWindowLong(context.hWnd, GWL_STYLE, context.WindowStyle & ~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME));
+
+		RECT fullscreenWindowRect;
+		IDXGIOutput* Output;
+		context.Graphics.Swap->GetContainingOutput(&Output);
+		DXGI_OUTPUT_DESC Desc;
+		Output->GetDesc(&Desc);
+		fullscreenWindowRect = Desc.DesktopCoordinates;
+		Output->Release();
+
+		SetWindowPos(context.hWnd, HWND_TOPMOST, fullscreenWindowRect.left, fullscreenWindowRect.top,
+					 fullscreenWindowRect.right, fullscreenWindowRect.bottom,
+					 SWP_FRAMECHANGED | SWP_NOACTIVATE);
+        ShowWindow(context.hWnd, SW_MAXIMIZE);		
+	}
+	
+	context.FullscreenMode = !context.FullscreenMode;
+}	
+
+
 static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& context)
 {
 	switch (msg)
@@ -92,6 +126,29 @@ static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Con
 	  case WM_CLOSE:
 	  {
 		  PostQuitMessage(0);
+	  }
+
+	  case WM_SIZE:
+	  {
+		  if(wParam == SIZE_MINIMIZED)
+		  {
+			  DXDEBUG("[Event] Minimizing");
+			  break;
+		  }
+
+		  uint32 width = LOWORD(lParam);
+		  uint32 height = HIWORD(lParam);
+		  if (width == 0 || height == 0) break;
+
+		  context.Graphics.ResizeBackBuffer((float)width, (float)height);
+		  context.Graphics.DestroyZBuffer();
+		  context.Graphics.InitZBuffer((float)width, (float)height);
+		  context.Graphics.SetViewport(0, 0, (float)width, (float)height);
+
+		  context.Height = (float)height;
+		  context.Width = (float)width;
+
+		  break;
 	  }
 
 	  case WM_KILLFOCUS:
@@ -249,24 +306,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	windowClass.hCursor = nullptr;
 	windowClass.hbrBackground = nullptr;
 	windowClass.lpszMenuName = nullptr;
-	windowClass.lpszClassName = "TextureViewerClass";
+	windowClass.lpszClassName = "MaterialEdit";
 	windowClass.hIconSm = nullptr;
 	RegisterClassEx(&windowClass);
 
-	context.WindowStyle = WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+	context.WindowStyle = WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 
 	context.WindowRect.left = 100;
 	context.WindowRect.right = 1080 + context.WindowRect.left;
 	context.WindowRect.top = 100;
 	context.WindowRect.bottom = 720 + context.WindowRect.top;
 
-	auto hWnd = CreateWindow("TextureViewerClass", "Texture Viewer", context.WindowStyle,
+	context.hWnd = CreateWindow("MaterialEdit", "Material Editor", context.WindowStyle,
 							 CW_USEDEFAULT, CW_USEDEFAULT, context.WindowRect.right - context.WindowRect.left,
 							 context.WindowRect.bottom - context.WindowRect.top,
 							 nullptr, nullptr, GetModuleHandleA(NULL), &context);
 
-	DragAcceptFiles(hWnd, TRUE);
-	ShowWindow(hWnd, SW_SHOW);
+	DragAcceptFiles(context.hWnd, TRUE);
+	ShowWindow(context.hWnd, SW_SHOW);
 	
 	Init(context);
 
@@ -287,6 +344,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			DispatchMessage(&msg);
 		}
 
+		if (Input::gInput.IsKeyReleased(KeyCode::F11))
+		{
+			ToggleFullscreen(context);
+		}
 		
 		clock_t beginFrame = clock();
 		

@@ -16,6 +16,8 @@
 
 #include "Editor.hpp"
 
+#include <imgui.h>
+
 struct MaterialEditor
 {
 	struct CommandLineArguments
@@ -34,25 +36,41 @@ struct MaterialEditEntry
 	union {
 		PhongMaterial Phong;
 		MtlMaterial Mtl;
-		TexturedMaterial Mtl;
+		TexturedMaterial Tex;
 	};
 };
+
+struct MeshEditEntry
+{
+	MeshId Id;
+	float Scale{1.0f};
+	glm::vec3 Position{0.0f, 0.0f, 0.0f};
+};
+
 
 struct Context
 {
 	HWND hWnd;
 	MaterialEditor::CommandLineArguments Args;
-	bool FullscreenMode;
+	bool FullscreenMode{false};
 	UINT WindowStyle;
 	RECT WindowRect;
 	Graphics Graphics;
+	float Width;
+	float Height;
 
 	Renderer3D Renderer3D;
 	
 	TextureCatalog Textures;
-	std::vector<MeshId> Meshes;
 
+	std::vector<MeshEditEntry> Meshes;
+	std::vector<const char*> MeshNames;
 	std::vector<MaterialEditEntry> Materials;
+
+	int CurrentMeshIndex{1};
+	int CurrentMapIndex{1};
+
+	float T = 0.0f;
 };
 
 static void LoadObjMesh(Context& context, const char* path)
@@ -182,7 +200,10 @@ static void LoadObjMesh(Context& context, const char* path)
 	mesh.Material = 1;
 
 	context.Renderer3D.MeshData.Meshes.insert({nextMesh, mesh});
-	context.Meshes.push_back(nextMesh);
+
+	context.Meshes.push_back(MeshEditEntry{nextMesh});
+
+	context.MeshNames.push_back(path);
 }
 
 static uint32 CUBE;
@@ -268,15 +289,94 @@ static void Init(Context& context)
 	InitMaterial(Graphics, basicMat, "Default Material");
 
 	context.Renderer3D.MeshData.Materials.MtlMaterials.push_back(basicMat);	
-
 	context.Renderer3D.MeshData.Materials.GenerateProxies();
+
+	context.Renderer3D.InitLighting();
+}
+
+static void UpdateTime(float dt, float& T)
+{
+	T += 1.0f * dt;
+	T = T > 10000.0f ? 0.0f : T;
 }
 
 static void Update(Context& context, float dt)
 {
+	UpdateTime(dt, context.T);
+
+	static float radius1 = 2.0f;
+	static float radius2 = 2.0f;
+
+	static float height1 = 0.0f;
+	static float height2 = 3.0f;
+
+	static float spotHeight = 1.0f;
+	
+	float lightX1 = std::sin(context.T) * radius1;
+	float lightY1 = std::cos(context.T) * radius1;
+
+	float lightX2 = std::sin(context.T + PI) * radius2;
+	float lightY2 = std::cos(context.T + PI) * radius2;
+
+	auto* currentMesh = &context.Meshes[context.CurrentMeshIndex];
+	auto& Renderer3D = context.Renderer3D;
+	
+	if (ImGui::CollapsingHeader("Mesh Config"))
+	{
+		ImGui::Combo("Mesh", &context.CurrentMeshIndex, context.MeshNames.data(), (int)context.MeshNames.size());
+		currentMesh = &context.Meshes[context.CurrentMeshIndex];
+		
+		ImGui::SliderFloat("Scale", (float*)&currentMesh->Scale, 0.0f, 5.0f, "%.2f");
+		ImGui::SliderFloat3("Position", (float*)&currentMesh->Position, -5.0f, 5.0f, "%.2f");
+	}
+
+	if (ImGui::CollapsingHeader("Environment Map"))
+	{
+		if (ImGui::BeginCombo("Map", context.Textures.LoadedCubes[context.CurrentMapIndex].Name.data()))
+		{
+			for (int i = 0; i < (int)context.Textures.LoadedCubes.size(); ++i)
+			{
+				auto& tex = context.Textures.LoadedCubes[i];
+				if (ImGui::Selectable(tex.Name.data(), i == context.CurrentMapIndex))
+				{
+					context.CurrentMapIndex = i;
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
+
+	ControlLightingImGui(context.Renderer3D.LightingSetup.LightingData);
+
+	if (ImGui::CollapsingHeader("Ligting Movement"))
+	{
+		ImGui::Text("Pointlight 1:");
+		ImGui::SliderFloat("Radius[1]", &radius1, 0.0f, 10.0f, "%.2f");
+		ImGui::SliderFloat("Height[1]", &height1, -5.0f, 10.0f, "%.2f");
+
+		ImGui::Separator();
+
+		ImGui::Text("Pointlight 2:");
+		ImGui::SliderFloat("Radius[2]", &radius2, 0.0f, 10.0f, "%.2f");
+		ImGui::SliderFloat("Height[2]", &height2, -5.0f, 10.0f, "%.2f");
+
+		ImGui::Separator();
+
+		ImGui::Text("Spotlight:");
+		ImGui::SliderFloat("Height[3]", &spotHeight, 0.0f, 5.0f, "%.2f");
+	}
+
+
+	Renderer3D.LightingSetup.LightingData.pointLights[0].Position = glm::vec4(lightX1, height1, lightY1, 0.0f);
+	Renderer3D.LightingSetup.LightingData.pointLights[1].Position = glm::vec4(lightX2, height2, lightY2, 0.0f);
+
+	ControlCameraOrbital(context.Renderer3D.CurrentCamera, dt);
+	context.Renderer3D.UpdateCamera();
+	
+	Renderer3D.UpdateLighting();
+
 	auto Graphics = &context.Graphics;
 
-	Graphics->SetViewport(0, 0, 1080, 720);
 	Graphics->SetBlendingState(BS_AlphaBlending);
 	Graphics->ResetRenderTarget();
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
@@ -284,22 +384,24 @@ static void Update(Context& context, float dt)
 	Graphics->SetDepthStencilState(DSS_Normal);
 	Graphics->SetRasterizationState(RS_NORMAL);
 
-	ControlCameraOrbital(context.Renderer3D.CurrentCamera, dt);
-
-	context.Renderer3D.UpdateCamera();
-
 	context.Renderer3D.BeginScene(SC_DEBUG_COLOR);
 	context.Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
+	Graphics->SetRasterizationState(RS_DEBUG);
+	Renderer3D.DrawDebugGeometry(POINTLIGHT, glm::vec3(lightX1, height1, lightY1), glm::vec3(1.0f));
+	Renderer3D.DrawDebugGeometry(POINTLIGHT, glm::vec3(lightX2, height2, lightY2), glm::vec3(1.0f));
+	Graphics->SetRasterizationState(RS_NORMAL);
+	Renderer3D.DrawDebugGeometry(SPOTLIGHT, glm::vec3(0.0f, spotHeight, 0.0f), glm::vec3(5.0f));
 
 	context.Renderer3D.MeshData.Materials.Bind(Graphics, 1);
 
-	context.Renderer3D.DrawMesh(context.Meshes[0], { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
+	Renderer3D.EnableLighting();
 
-	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes.back().Handle);
+	context.Renderer3D.DrawMesh(currentMesh->Id, currentMesh->Position, glm::vec3(currentMesh->Scale));
+	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes[context.CurrentMapIndex].Handle);
 }
 
 
-// control env map
 // control lighting
-// control mesh size and position
 // control camera (?)
+// serialization
+// Split up the tex and phong materials in their own shaders

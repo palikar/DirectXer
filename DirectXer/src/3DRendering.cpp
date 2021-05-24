@@ -41,13 +41,13 @@ void Renderer3D::UpdateCamera()
 
 void Renderer3D::UpdateLighting()
 {
-	Gfx->UpdateCBs(LightingSetup.Cbo, sizeof(LightingSetup), &LightingSetup.LightingData);
+	Gfx->UpdateCBs(LightingSetup.Cbo, sizeof(Lighting), &LightingSetup.LightingData);
 }
 
 void Renderer3D::EnableLighting()
 {
 	Gfx->BindPSConstantBuffers(LightingSetup.Cbo, 2);
-
+	Gfx->BindVSConstantBuffers(LightingSetup.Cbo, 2);
 }
 
 void Renderer3D::SetupProjection(glm::mat4 matrix)

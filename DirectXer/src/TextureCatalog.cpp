@@ -131,7 +131,7 @@ void TextureCatalog::LoadCubes(Graphics* graphics, const char** paths, uint32 co
 		{
 			int width, height, channels;
 			void* data[6];
-			stbi_set_flip_vertically_on_load(1);
+			stbi_set_flip_vertically_on_load(0);
 
 			const char* names[] = { "left", "right","up", 
 				"down", "front", "back"

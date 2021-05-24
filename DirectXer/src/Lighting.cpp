@@ -5,6 +5,7 @@
 
 bool ControlLightingImGui(Lighting& light)
 {
+	TempFormater formater;
 	bool lightChanged = false;
 
 	if (ImGui::CollapsingHeader("Ligting"))
@@ -27,7 +28,23 @@ bool ControlLightingImGui(Lighting& light)
 			lightChanged |= ImGui::SliderFloat("Intensity: ", (float*)&light.ambLightColor.a, 0.0f, 1.0f, "Amount = %.3f");
 			ImGui::TreePop();
 		}
-		
+
+		for (size_t i = 0; i < 5; ++i)
+		{
+			if (ImGui::TreeNode(formater.Format("Point light[{}]", i)))
+			{
+				ImGui::Checkbox("Active", (bool*)&light.pointLights[i].Active);
+			
+				ImGui::Text("Color");
+				ImGui::SameLine();
+				lightChanged |= ImGui::ColorEdit3("Color", (float*)&light.pointLights[i].Color);
+				lightChanged |= ImGui::SliderFloat("Constant: ", (float*)&light.pointLights[i].Params.r, 0.0f, 2.0f, "%.3f");
+				lightChanged |= ImGui::SliderFloat("Linear: ", (float*)&light.pointLights[i].Params.g, 0.0f, 2.0f, "%.3f");
+				lightChanged |= ImGui::SliderFloat("Quadreatic: ", (float*)&light.pointLights[i].Params.b, 0.0f, 2.0f, "%.3f");
+				ImGui::TreePop();
+			}
+		}
+ 
 		if (ImGui::TreeNode("Point light"))
 		{
 			ImGui::Checkbox("Active", (bool*)&light.pointLights[0].Active);
@@ -35,9 +52,9 @@ bool ControlLightingImGui(Lighting& light)
 			ImGui::Text("Color");
 			ImGui::SameLine();
 			lightChanged |= ImGui::ColorEdit3("Color", (float*)&light.pointLights[0].Color);
-			lightChanged |= ImGui::SliderFloat("Constant: ", (float*)&light.pointLights[0].Params.r, 0.0f, 2.0f, "Amount = %.3f");
-			lightChanged |= ImGui::SliderFloat("Linear: ", (float*)&light.pointLights[0].Params.g, 0.0f, 2.0f, "Amount = %.3f");
-			lightChanged |= ImGui::SliderFloat("Quadreatic: ", (float*)&light.pointLights[0].Params.b, 0.0f, 2.0f, "Amount = %.3f");
+			lightChanged |= ImGui::SliderFloat("Constant: ", (float*)&light.pointLights[0].Params.r, 0.0f, 2.0f, "%.3f");
+			lightChanged |= ImGui::SliderFloat("Linear: ", (float*)&light.pointLights[0].Params.g, 0.0f, 2.0f, "%.3f");
+			lightChanged |= ImGui::SliderFloat("Quadreatic: ", (float*)&light.pointLights[0].Params.b, 0.0f, 2.0f, "%.3f");
 			ImGui::TreePop();
 		}
 
