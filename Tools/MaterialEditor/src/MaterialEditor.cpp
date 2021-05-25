@@ -74,8 +74,10 @@ void Init(Context& context)
 	context.Renderer3D.SetupProjection(glm::perspective(pov, 1080.0f / 720.0f, nearPlane, farPlane));
 
 	context.Renderer3D.MeshData.Materials.Init();
-
+	context.Renderer3D.InitLighting();
 	
+	context.Materials.reserve(32);
+
 	MtlMaterial basicMat = { 0 };
 	basicMat.illum = 2;
 	basicMat.Ka = {0.2f, 0.2f, 0.2f};
@@ -87,9 +89,127 @@ void Init(Context& context)
 	context.Renderer3D.MeshData.Materials.MtlMaterials.push_back(basicMat);	
 	context.Renderer3D.MeshData.Materials.GenerateProxies();
 
-	context.Materials.reserve(32);
+	MaterialEditEntry basicEntry;
+	basicEntry.Name = "Default MTL";
+	basicEntry.Type = MT_MTL;
+	basicEntry.Id = basicMat.Id;
+	basicEntry.Mtl = &context.Renderer3D.MeshData.Materials.MtlMaterials[0];
 
-	context.Renderer3D.InitLighting();
+	context.Materials.push_back(basicEntry);
+}
+
+inline static MaterialId NextMaterialId = 1;
+
+static void NewMtlMaterial(Context& context)
+{
+	const size_t mtlCount = context.Renderer3D.MeshData.Materials.MtlMaterials.size(); 
+	
+	MtlMaterial basicMat = { 0 };
+	basicMat.illum = 2;
+	basicMat.Ka = {0.2f, 0.2f, 0.2f};
+	basicMat.Kd = {0.7f, 0.0f, 0.2f};
+	basicMat.Ks = {0.8f, 0.8f, 0.8f};
+	basicMat.Id = ++NextMaterialId;
+
+	TempFormater formater;
+	InitMaterial(&context.Graphics, basicMat, formater.Format("Mtl Material {}", mtlCount));
+
+	context.Renderer3D.MeshData.Materials.MtlMaterials.push_back(basicMat);	
+	context.Renderer3D.MeshData.Materials.GenerateProxy(basicMat);
+
+	MaterialEditEntry basicEntry;
+	basicEntry.Type = MT_MTL;
+	basicEntry.Id = basicMat.Id;
+	basicEntry.Mtl = &context.Renderer3D.MeshData.Materials.MtlMaterials.back();
+	basicEntry.Name = formater.Format("Mtl Material {}", mtlCount);
+
+	context.Materials.push_back(basicEntry);
+}
+
+static void NewPhongMaterial(Context& context)
+{
+	const size_t phongCount = context.Renderer3D.MeshData.Materials.PhongMaterials.size(); 
+	
+	PhongMaterial basicMat;
+	memset(&basicMat, 0, sizeof(PhongMaterial));
+	basicMat.Ambient = {0.2f, 0.2f, 0.2f, 0.4f};
+	basicMat.Diffuse = {0.7f, 0.0f, 0.2f, 0.4f};
+	basicMat.Specular = {0.8f, 0.8f, 0.8f, 0.4f};
+	basicMat.Emissive = {0.8f, 0.8f, 0.8f, 0.4f};
+	basicMat.SpecularChininess = 1.3f;
+	
+	basicMat.Id = ++NextMaterialId;
+
+	TempFormater formater;
+	InitMaterial(&context.Graphics, basicMat, formater.Format("Phong Material {}", phongCount));
+
+	context.Renderer3D.MeshData.Materials.PhongMaterials.push_back(basicMat);	
+	context.Renderer3D.MeshData.Materials.GenerateProxy(basicMat);
+
+	MaterialEditEntry basicEntry;
+	basicEntry.Type = MT_PHONG;
+	basicEntry.Id = basicMat.Id;
+	basicEntry.Phong = &context.Renderer3D.MeshData.Materials.PhongMaterials.back();
+	basicEntry.Name = formater.Format("Phong Material {}", phongCount);
+
+	context.Materials.push_back(basicEntry);
+}
+
+static void NewTexMaterial(Context& context)
+{
+	const size_t texCount = context.Renderer3D.MeshData.Materials.TexMaterials.size(); 
+	
+	TexturedMaterial basicMat;
+	memset(&basicMat, 0, sizeof(TexturedMaterial));
+	basicMat.Color = {0.7f, 0.1f, 0.1f, 0.5f};
+	basicMat.ColorIntensity =  0.0f;
+	basicMat.AoIntensity =  0.0f;
+	basicMat.Reflectivity =  0.0f;
+	basicMat.Refraction_ration = 0.0;
+
+	basicMat.BaseMap = context.Textures.LoadedTextures[0].Handle;
+	basicMat.AoMap = context.Textures.LoadedTextures[0].Handle;
+	basicMat.EnvMap = context.Textures.LoadedTextures[context.CurrentMapIndex].Handle;
+	
+	basicMat.Id = ++NextMaterialId;
+
+	TempFormater formater;
+	InitMaterial(&context.Graphics, basicMat, formater.Format("Textured Material {}", texCount));
+
+	context.Renderer3D.MeshData.Materials.TexMaterials.push_back(basicMat);	
+	context.Renderer3D.MeshData.Materials.GenerateProxy(basicMat);
+
+	MaterialEditEntry basicEntry;
+	basicEntry.Type = MT_PHONG;
+	basicEntry.Id = basicMat.Id;
+	basicEntry.Phong = &context.Renderer3D.MeshData.Materials.PhongMaterials.back();
+	basicEntry.Name = formater.Format("Textured Material {}", texCount);
+
+	context.Materials.push_back(basicEntry);
+}
+
+static void ControlCurrentMaterial(Context& context)
+{
+
+	MaterialEditEntry mat = context.Materials[context.CurrentMaterialIndex];
+	bool changed = false;
+	if(mat.Type == MT_MTL)
+	{
+		changed = ControlMtlMaterialImGui(*mat.Mtl, mat.Name.c_str(), context.Textures, &context.Graphics);
+		
+	}
+	else if(mat.Type == MT_PHONG)
+	{
+
+		
+	}
+	else if(mat.Type == MT_TEXTURED)
+	{
+
+		
+	}
+
+	if (changed) context.Renderer3D.MeshData.Materials.Update(&context.Graphics, mat.Id);
 }
 
 void Update(Context& context, float dt)
@@ -148,7 +268,33 @@ void Update(Context& context, float dt)
 
 	ImGui::Begin("Materials");
 
+	ImGui::Text("Create New Material:");
+	ImGui::SameLine();
+	if (ImGui::Button("MTL")) NewMtlMaterial(context);
+	ImGui::SameLine();
+	if (ImGui::Button("Phong")) NewPhongMaterial(context);
+	ImGui::SameLine();
+	if (ImGui::Button("Textured")) NewTexMaterial(context);
+	
+	ImGui::Separator();
+	ImGui::Text("Material Configuration");
+	if (ImGui::BeginCombo("Material", context.Materials[context.CurrentMaterialIndex].Name.c_str()))
+	{
+		for (size_t i = 0; i < context.Materials.size(); ++i)
+		{
+			auto& mat = context.Materials[i];
+			if (ImGui::Selectable(mat.Name.c_str(), i == context.CurrentMaterialIndex))
+			{
+				context.CurrentMaterialIndex = (int)i;
+			}
+		}
+
+		ImGui::EndCombo();
+	}
+
+	ControlCurrentMaterial(context);
 	ImGui::End();
+
 
 	if (context.LightHelpersState.Updating) UpdateTime(dt, context.T);
 	

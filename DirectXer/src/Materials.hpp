@@ -82,20 +82,20 @@ struct PhongMaterial : public PhongMaterialData
 	MaterialType Type;
 };
 
-#define KA_TEX_MASK  0x00100;
-#define KA_FACT_MASK 0x00200;
+#define KA_TEX_MASK  0x00100
+#define KA_FACT_MASK 0x00200
 
-#define KD_TEX_MASK  0x00400;
-#define KD_FACT_MASK 0x00800;
+#define KD_TEX_MASK  0x00400
+#define KD_FACT_MASK 0x00800
 
-#define KS_TEX_MASK  0x01000;
-#define KS_FACT_MASK 0x02000;
+#define KS_TEX_MASK  0x01000
+#define KS_FACT_MASK 0x02000
 
-#define NS_TEX_MASK  0x04000;
-#define NS_FACT_MASK 0x08000;
+#define NS_TEX_MASK  0x04000
+#define NS_FACT_MASK 0x08000
 
-#define D_TEX_MASK   0x10000;
-#define D_FACT_MASK  0x20000;
+#define D_TEX_MASK   0x10000
+#define D_FACT_MASK  0x20000
 
 // @Note: Loaded from Mtl file;
 struct MtlMaterialData
@@ -227,6 +227,7 @@ struct MaterialControlContext
 
 };
 
-bool ControlMtlMaterialImGui(MtlMaterialData& mat, const char* name);
+struct TextureCatalog;
+bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics);
 bool ControlTexturedMaterialImGui(TexturedMaterialData& mat, const char* name);
 bool ControlPhongMaterialImGui(PhongMaterialData& mat, const char* name);

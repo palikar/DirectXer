@@ -1,5 +1,7 @@
 #include "Materials.hpp"
 
+#include <TextureCatalog.hpp>
+
 #include <imgui.h>
 
 void MaterialLibrary::Init()
@@ -205,22 +207,84 @@ MtlMaterial& MaterialLibrary::GetMtl(MaterialId id)
 
 
 
-bool ControlMtlMaterialImGui(MtlMaterialData& mat, const char* name)
+bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics)
 {
 	bool changed = false;
-	if (ImGui::TreeNode(name))
-	{
-		changed |= ImGui::ColorEdit3("Ambient Factors", (float*)&mat.Ka);
-		changed |= ImGui::ColorEdit3("Diffuse Factors", (float*)&mat.Kd);
-		changed |= ImGui::ColorEdit3("Specular Factors", (float*)&mat.Ks);
-		changed |= ImGui::SliderFloat("Specular Exponent", (float*)&mat.Ns, 0.0f, 25.0f, "%.3f");
-		
-		ImGui::Separator();
-		changed |= ImGui::SliderFloat("Optical Density", (float*)&mat.Ni, 0.0f, 25.0f, "%.3f");
-		changed |= ImGui::SliderFloat("Dissolve Factor", (float*)&mat.d, 0.0f, 25.0f, "%.3f");
+	bool hasKaMask = (mat.illum & KA_TEX_MASK ) > 0;
+	bool hasKdMask = (mat.illum & KD_TEX_MASK ) > 0;
+	bool hasKsMask = (mat.illum & KS_TEX_MASK ) > 0;
+	bool hasNsMask = (mat.illum & NS_TEX_MASK ) > 0;
+	bool hasDMask  = (mat.illum & D_TEX_MASK  )  > 0;
 
-		ImGui::TreePop();
+	ImGui::Text("Texture Masks");
+
+	ImGui::Checkbox("Ka", &hasKaMask);
+	ImGui::SameLine();
+
+	ImGui::Checkbox("Kd", &hasKdMask);
+	ImGui::SameLine();
+
+	ImGui::Checkbox("Ks", &hasKsMask);
+	ImGui::SameLine();
+	
+	ImGui::Checkbox("Ns", &hasNsMask);
+	ImGui::SameLine();
+	
+	ImGui::Checkbox("D", &hasDMask);
+
+	if (hasKaMask) mat.illum |= KA_TEX_MASK;
+	else  mat.illum &= ~KA_TEX_MASK;
+
+	if (hasKdMask) mat.illum |= KD_TEX_MASK;
+	else  mat.illum &= ~KD_TEX_MASK;
+
+	if (hasKsMask) mat.illum |= KS_TEX_MASK;
+	else  mat.illum &= ~KS_TEX_MASK;
+
+	if (hasNsMask) mat.illum |= NS_TEX_MASK;
+	else  mat.illum &= ~NS_TEX_MASK;
+
+	if (hasDMask) mat.illum |= D_TEX_MASK;
+	else  mat.illum &= ~D_TEX_MASK;
+		
+	ImGui::Separator();
+		
+	ImGui::Text("Colors:");
+	changed |= ImGui::ColorEdit3("Ambient Factors", (float*)&mat.Ka);
+	changed |= ImGui::ColorEdit3("Diffuse Factors", (float*)&mat.Kd);
+	changed |= ImGui::ColorEdit3("Specular Factors", (float*)&mat.Ks);
+	changed |= ImGui::SliderFloat("Specular Exponent", (float*)&mat.Ns, 0.0f, 25.0f, "%.3f");
+
+	ImGui::Separator();
+	ImGui::Text("Mat Properties:");
+	changed |= ImGui::SliderFloat("Optical Density", (float*)&mat.Ni, 0.0f, 25.0f, "%.3f");
+	changed |= ImGui::SliderFloat("Dissolve Factor", (float*)&mat.d, 0.0f, 25.0f, "%.3f");
+
+	ImGui::Separator();
+	ImGui::Text("Maps: ");
+
+	auto it = std::find_if(textures.LoadedTextures.begin(), textures.LoadedTextures.end(), [&mat](auto& t) { return t.Handle == mat.KaMap; });
+	auto texName = it != textures.LoadedTextures.end() ? it->Name.data() : "NotSelected";
+	if (ImGui::BeginCombo("Ka Map", texName))
+	{
+		for (int i = 0; i < (int)textures.LoadedTextures.size(); ++i)
+		{
+			auto& tex = textures.LoadedTextures[i];
+			if (ImGui::Selectable(tex.Name.data(), tex.Handle == mat.KaMap))
+			{
+				mat.KaMap = tex.Handle;
+			}
+
+		}
+		ImGui::EndCombo();
 	}
+	if (mat.KaMap != 0)
+	{
+		ImGui::SameLine();
+		ImGui::Image(graphics->Textures.at(mat.KaMap).srv, { 64, 64 });
+	}
+
+	
 
 	return changed;
 }

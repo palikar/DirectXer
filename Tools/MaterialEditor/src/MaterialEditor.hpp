@@ -30,6 +30,7 @@ struct MaterialEditEntry
 {
 	MaterialType Type;
 	MaterialId Id;
+	std::string Name;
 	
 	union {
 		PhongMaterial* Phong;
@@ -80,6 +81,7 @@ struct Context
 
 	int CurrentMeshIndex{1};
 	int CurrentMapIndex{1};
+	int CurrentMaterialIndex{0};
 
 	LightHelpers LightHelpersState;
 
