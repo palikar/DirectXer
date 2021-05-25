@@ -168,6 +168,10 @@ class MaterialLibrary
 	void Init();
 
 	void GenerateProxies();
+	void GenerateProxy(PhongMaterial& mat);
+	void GenerateProxy(TexturedMaterial& mat);
+	void GenerateProxy(MtlMaterial& mat);
+	
 	void Update(Graphics* graphics, MaterialId id);
 
 	void UpdateAll(Graphics* graphics);

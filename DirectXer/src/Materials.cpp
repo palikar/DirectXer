@@ -12,6 +12,63 @@ void MaterialLibrary::Init()
 	BindViews.reserve(16 * 3);
 }
 
+void MaterialLibrary::GenerateProxy(PhongMaterial& mat)
+{
+	MaterialBindProxy bind {};
+	bind.Cbo = mat.Cbo;
+	bind.Program = mat.Program;
+	bind.BindToPS = true;
+	bind.Slot = 1;
+	BindViews.insert({mat.Id, bind});
+
+	MaterialUpdateProxy upadte;
+	upadte.Cbo = mat.Cbo;
+	upadte.Data = &mat;
+	upadte.DataSize = sizeof(MtlMaterial);
+	UpdateViews.insert({mat.Id, upadte});	
+}
+
+void MaterialLibrary::GenerateProxy(TexturedMaterial& mat)
+{
+	MaterialBindProxy bind {};
+	bind.Cbo = mat.Cbo;
+	bind.Program = mat.Program;
+	bind.Textures[0] = &mat.BaseMap;
+	bind.Textures[1] = &mat.AoMap;
+	bind.Textures[2] = &mat.EnvMap;
+	bind.BindToPS = true;
+	bind.Slot = 1;
+	BindViews.insert({mat.Id, bind});
+
+	MaterialUpdateProxy upadte;
+	upadte.Cbo = mat.Cbo;
+	upadte.Data = &mat;
+	upadte.DataSize = sizeof(MtlMaterial);
+	UpdateViews.insert({mat.Id, upadte});	
+}
+
+void MaterialLibrary::GenerateProxy(MtlMaterial& mat)
+{
+	MaterialBindProxy bind {};
+	bind.Cbo = mat.Cbo;
+	bind.Program = mat.Program;
+	bind.Textures[0] = &mat.KaMap;
+	bind.Textures[1] = &mat.KdMap;
+	bind.Textures[2] = &mat.KsMap;
+	bind.Textures[3] = &mat.NsMap;
+	bind.Textures[4] = &mat.dMap;
+	bind.BindToPS = false;
+	bind.Slot = 1;
+	BindViews.insert({mat.Id, bind});
+
+	MaterialUpdateProxy upadte;
+	upadte.Cbo = mat.Cbo;
+	upadte.Data = &mat;
+	upadte.DataSize = sizeof(MtlMaterial);
+	UpdateViews.insert({mat.Id, upadte});
+	
+}
+
 void MaterialLibrary::GenerateProxies()
 {
 	for (auto& mat : MtlMaterials)
@@ -41,7 +98,7 @@ void MaterialLibrary::GenerateProxies()
 		bind.Cbo = mat.Cbo;
 		bind.Program = mat.Program;
 		bind.BindToPS = true;
-		bind.Slot = 3;
+		bind.Slot = 1;
 		BindViews.insert({mat.Id, bind});
 
 		MaterialUpdateProxy upadte;
