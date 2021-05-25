@@ -327,6 +327,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	Init(context);
 
+	ToggleFullscreen(context);
+
 	clock_t dt = 0;
 	
 	while (true)

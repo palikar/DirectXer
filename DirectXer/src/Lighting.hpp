@@ -4,6 +4,9 @@
 #include <Graphics.hpp>
 #include <Glm.hpp>
 
+static inline const uint8 SpotLightsCount = 5;
+static inline const uint8 PointLightsCount = 5;
+
 struct PointLight
 {
 	glm::vec4 Color{0.4f, 0.4f, 0.4f, 0.0f};
@@ -31,8 +34,8 @@ struct Lighting
 	glm::vec4 dirLightColor{0.0f, 0.0f, 0.0f, 1.0f};
 	glm::vec4 dirLightDir{0.5, 0.5f, 0, 0};
 
-	PointLight pointLights[5];
-	SpotLight  spotLights[5];
+	PointLight pointLights[PointLightsCount];
+	SpotLight  spotLights[SpotLightsCount];
 	
 };
 
