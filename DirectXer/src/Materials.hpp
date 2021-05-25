@@ -186,7 +186,7 @@ class MaterialLibrary
 inline void InitMaterial(Graphics* graphics, PhongMaterial& mat, String debugName)
 {
 	mat.Type = MT_PHONG;
-	mat.Program = SC_DEBUG_PHONG;
+	mat.Program = SC_PHONG;
 	mat.Cbo = NextConstantBufferId();
 	graphics->CreateConstantBuffer(mat.Cbo, sizeof(PhongMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);
@@ -195,7 +195,7 @@ inline void InitMaterial(Graphics* graphics, PhongMaterial& mat, String debugNam
 inline void InitMaterial(Graphics* graphics, TexturedMaterial& mat, String debugName)
 {
 	mat.Type = MT_TEXTURED;
-	mat.Program = SC_DEBUG_TEX;
+	mat.Program = SC_TEX;
 	mat.Cbo = NextConstantBufferId();
 	graphics->CreateConstantBuffer(mat.Cbo, sizeof(TexturedMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);

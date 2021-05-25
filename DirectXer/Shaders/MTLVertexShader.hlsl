@@ -152,7 +152,7 @@ float3 ApplySpotLight(SpotLight light, float3 normal, float3 surface_pos, float3
 
 }
 
-VSOut main( VSIn input)
+VSOut main(VSIn input)
 {
     VSOut output = (VSOut)0;
 

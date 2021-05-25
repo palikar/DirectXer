@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\2DPixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\2DVertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\MTLInstancedVertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\MTLPixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\MTLVertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\PhongPixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\PhongVertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\PixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\QuadPixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\QuadVertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\TexPixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\VertexShader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Shaders\MTLCommon.ihlsl" />
+  </ItemGroup>
+</Project>

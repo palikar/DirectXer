@@ -15,6 +15,10 @@
 #include <MTLVertexShader.hpp>
 #include <MTLInstancedVertexShader.hpp>
 
+#include <PhongVertexShader.hpp>
+#include <PhongPixelShader.hpp>
+
+#include <TexPixelShader.hpp>
 
 #define CSTR_TO_WIDE(cstr, wstr)										\
 	int __retval;														\
@@ -773,6 +777,35 @@ void GraphicsD3D11::InitResources()
 		SetDebugName(shaderObject.ps, "MtlPixelShader");
 		SetDebugName(shaderObject.vs, "MtlVertexShader");
 		SetDebugName(shaderObject.il, "MtlVertex");
+	}
+
+	{
+		// Phong shader
+		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
+			{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Texcoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+		
+		ShaderObject shaderObject;
+		GFX_CALL(Device->CreatePixelShader(g_PhongPixelShader, Size(g_PhongPixelShader), nullptr, &shaderObject.ps));
+		GFX_CALL(Device->CreateVertexShader(g_PhongVertexShader, Size(g_PhongVertexShader), nullptr, &shaderObject.vs));
+		shaderObject.il = Shaders[SF_MTL].il;
+		Shaders[SF_PHONG] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "PhongPixelShader");
+		SetDebugName(shaderObject.vs, "Phong\\TexVertexShader");	
+	}
+
+	{
+		// Tex shader
+		ShaderObject shaderObject;
+		GFX_CALL(Device->CreatePixelShader(g_TexPixelShader, Size(g_TexPixelShader), nullptr, &shaderObject.ps));
+		shaderObject.vs = Shaders[SF_PHONG].vs;
+		shaderObject.il = Shaders[SF_PHONG].il;
+		Shaders[SF_TEX] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "TexPixelShader");
 	}
 
 	{

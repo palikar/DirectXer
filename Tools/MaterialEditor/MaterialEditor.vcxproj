@@ -47,13 +47,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\MaterialEditor.cpp" />
+    <ClCompile Include="src\MaterialEditorApplication.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Editor.hpp" />
     <ClInclude Include="src\MaterialEditor.hpp" />
     <ClInclude Include="src\DummyTexture.hpp" />
+    <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -109,6 +110,7 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
     <Import Project="..\..\DirectXer\Core.vcxitems" Label="Shared" />
+    <Import Project="..\..\DirectXer\ShadersD3D11.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />

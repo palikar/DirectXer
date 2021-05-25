@@ -60,15 +60,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Optik", "ThirdParty\Optik\O
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MaterialEditor", "Tools\MaterialEditor\MaterialEditor.vcxproj", "{536A196C-D3D2-4463-9699-50B09B2CEA1A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShadersD3D11", "DirectXer\ShadersD3D11.vcxitems", "{AD93A181-9B46-433F-BBB7-1ACEC80E6912}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		DirectXer\Core.vcxitems*{32d63685-09ed-459e-a8ff-95501679056a}*SharedItemsImports = 4
+		DirectXer\ShadersD3D11.vcxitems*{32d63685-09ed-459e-a8ff-95501679056a}*SharedItemsImports = 4
 		DirectXer\Core.vcxitems*{3a380954-cd7d-4508-876b-42df7c910d97}*SharedItemsImports = 9
 		DirectXer\Core.vcxitems*{536a196c-d3d2-4463-9699-50b09b2cea1a}*SharedItemsImports = 4
+		DirectXer\ShadersD3D11.vcxitems*{536a196c-d3d2-4463-9699-50b09b2cea1a}*SharedItemsImports = 4
 		DirectXer\WinMain.vcxitems.vcxitems*{981f05a7-ff2d-4aa5-a9ca-210e95ed1af0}*SharedItemsImports = 9
+		DirectXer\ShadersD3D11.vcxitems*{ad93a181-9b46-433f-bbb7-1acec80e6912}*SharedItemsImports = 9
 		DirectXer\Core.vcxitems*{d39df77f-24b0-44cc-ab02-d6a8e5d0ecf1}*SharedItemsImports = 4
+		DirectXer\ShadersD3D11.vcxitems*{d39df77f-24b0-44cc-ab02-d6a8e5d0ecf1}*SharedItemsImports = 4
 		DirectXer\WinMain.vcxitems.vcxitems*{d39df77f-24b0-44cc-ab02-d6a8e5d0ecf1}*SharedItemsImports = 4
 		DirectXer\Core.vcxitems*{e8a1e208-e806-4908-97a5-bc4fb0b09c65}*SharedItemsImports = 4
+		DirectXer\ShadersD3D11.vcxitems*{e8a1e208-e806-4908-97a5-bc4fb0b09c65}*SharedItemsImports = 4
 		DirectXer\WinMain.vcxitems.vcxitems*{e8a1e208-e806-4908-97a5-bc4fb0b09c65}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

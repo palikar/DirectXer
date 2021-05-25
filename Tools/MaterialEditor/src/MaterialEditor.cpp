@@ -1,377 +1,202 @@
-#include <algorithm>
-#include <iostream>
-#include <unordered_map>
-#include <vector>
-#include <string>
-#include <cstdint>
-#include <fstream>
-#include <cmath>
 
-#include <fmt/format.h>
-#include <filesystem>
-#include <stb_image.h>
-#include <stb_image_resize.h>
-#include <stb_rect_pack.h>
-
+#include "Utils.hpp"
 #include "MaterialEditor.hpp"
-#include "Editor.hpp"
 
-#include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
+static uint32 CUBE;
+static uint32 PLANE;
+static uint32 LINES;
+static uint32 CYLINDER;
+static uint32 SPHERE;
+static uint32 AXIS;
+static uint32 POINTLIGHT;
+static uint32 SPOTLIGHT;
 
-static LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs)
+const static float pov = 65.0f;
+const static float nearPlane = 0.0001f;
+const static float farPlane = 10000.0f;
+
+void Init(Context& context)
 {
-	int retval;
-	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, NULL, 0);
+	auto Graphics = &context.Graphics;
+	context.Renderer3D.InitRenderer(Graphics);
+	context.Textures.LoadedTextures.reserve(64);
+	context.Textures.LoadedCubes.reserve(16);
 
-	LPWSTR lpWideCharStr = (LPWSTR)malloc(retval * sizeof(WCHAR));
-	retval = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, lpWideCharStr, retval);
+	const char* Envs[] = {
+		"resources/night_sky",
+		"resources/sky",
+	};
+
+	const char* Texs[] = {
+		"resources/floor_color.png",
+		"resources/rocks_color.png",
+		"resources/rocks_normal.png",
+		"resources/rocks_ao.png",
+		"resources/checker.png",
+		"resources/bricks_color.png",
+		"resources/bricks_ao.png",
+		"resources/bricks_normal.png",
+		"resources/dummyTexture.png",
+	};
+
+	const char* Meshes[] = {
+		"resources/models/first_tree.obj",
+		"resources/models/simple_monkey.obj",
+	};
+
+	for (size_t i = 0; i < Size(Meshes); i++)
+	{
+		LoadObjMesh(context, Meshes[i]);
+	}
+
+	context.Textures.LoadTextures(Graphics, Texs, (uint32)Size(Texs));
+	context.Textures.LoadCubes(Graphics, Envs, (uint32)Size(Envs));
+
+	Memory::EstablishTempScope(Megabytes(4));
+	{
+		DebugGeometryBuilder builder;
+		builder.Init(8);
+		CUBE = builder.InitCube(CubeGeometry{}, glm::vec3{ 1.0f, 0.0f, 0.0f });
+		PLANE = builder.InitPlane(PlaneGeometry{}, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		SPHERE = builder.InitSphere(SphereGeometry{}, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		CYLINDER = builder.InitCylinder(CylinderGeometry{ 0.25, 0.25, 1.5 }, glm::vec3{ 1.0f, 1.0f, 0.0f });
+		LINES = builder.InitLines(LinesGeometry{}, glm::vec3{ 0.8f, 0.8f, 0.8f });
+		AXIS = builder.InitAxisHelper();
+		POINTLIGHT = builder.InitPointLightHelper();
+		SPOTLIGHT = builder.InitSpotLightHelper();
+
+		context.Renderer3D.InitDebugGeometry(builder);
+	}
+	Memory::EndTempScope();
+
+	context.Renderer3D.CurrentCamera.Pos = { 1.0f, 0.5f, 1.0f };
+	context.Renderer3D.CurrentCamera.lookAt({ 0.0f, 0.0f, 0.0f });
+	context.Renderer3D.SetupProjection(glm::perspective(pov, 1080.0f / 720.0f, nearPlane, farPlane));
+
+	context.Renderer3D.MeshData.Materials.Init();
+
 	
-	if (!SUCCEEDED(retval))
-	{
-		free(lpWideCharStr);
-		return NULL;
-	}
-	
-	int numArgs;
-	LPWSTR* args;
-	args = CommandLineToArgvW(lpWideCharStr, &numArgs);
-	free(lpWideCharStr);
+	MtlMaterial basicMat = { 0 };
+	basicMat.illum = 2;
+	basicMat.Ka = {0.2f, 0.2f, 0.2f};
+	basicMat.Kd = {0.7f, 0.0f, 0.2f};
+	basicMat.Ks = {0.8f, 0.8f, 0.8f};
+	basicMat.Id = 1;
+	InitMaterial(Graphics, basicMat, "Default Material");
 
-	int storage = numArgs * sizeof(LPSTR);
-	for (int i = 0; i < numArgs; ++i)
-	{
-		BOOL lpUsedDefaultChar = FALSE;
-		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, NULL, 0, NULL, &lpUsedDefaultChar);
-		if (!SUCCEEDED(retval))
-		{
-			LocalFree(args);
-			return NULL;
-		}
+	context.Renderer3D.MeshData.Materials.MtlMaterials.push_back(basicMat);	
+	context.Renderer3D.MeshData.Materials.GenerateProxies();
 
-		storage += retval;
-	}
+	context.Materials.reserve(32);
 
-	LPSTR* result = (LPSTR*)LocalAlloc(LMEM_FIXED, storage);
-	if (result == NULL)
-	{
-		LocalFree(args);
-		return NULL;
-	}
-
-	int bufLen = storage - numArgs * sizeof(LPSTR);
-	LPSTR buffer = ((LPSTR)result) + numArgs * sizeof(LPSTR);
-	for (int i = 0; i < numArgs; ++i)
-	{		
-		BOOL lpUsedDefaultChar = FALSE;
-		retval = WideCharToMultiByte(CP_ACP, 0, args[i], -1, buffer, bufLen, NULL, &lpUsedDefaultChar);
-		if (!SUCCEEDED(retval))
-		{
-			LocalFree(result);
-			LocalFree(args);
-			return NULL;
-		}
-
-		result[i] = buffer;
-		buffer += retval;
-		bufLen -= retval;
-	}
-
-	LocalFree(args);
-
-	*pNumArgs = numArgs;
-	return result;
-
+	context.Renderer3D.InitLighting();
 }
 
-static void ToggleFullscreen(Context& context)
+void Update(Context& context, float dt)
 {
-
-	if(context.FullscreenMode)
-	{
-		SetWindowLong(context.hWnd, GWL_STYLE, context.WindowStyle);
-		SetWindowPos(context.hWnd, HWND_NOTOPMOST, context.WindowRect.left, context.WindowRect.top,
-					 context.WindowRect.right - context.WindowRect.left,
-					 context.WindowRect.bottom - context.WindowRect.top,
-					 SWP_FRAMECHANGED | SWP_NOACTIVATE);
-        ShowWindow(context.hWnd, SW_NORMAL);
-	}
-	else
-	{
-		GetWindowRect(context.hWnd, &context.WindowRect);
-		SetWindowLong(context.hWnd, GWL_STYLE, context.WindowStyle & ~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME));
-
-		RECT fullscreenWindowRect;
-		IDXGIOutput* Output;
-		context.Graphics.Swap->GetContainingOutput(&Output);
-		DXGI_OUTPUT_DESC Desc;
-		Output->GetDesc(&Desc);
-		fullscreenWindowRect = Desc.DesktopCoordinates;
-		Output->Release();
-
-		SetWindowPos(context.hWnd, HWND_TOPMOST, fullscreenWindowRect.left, fullscreenWindowRect.top,
-					 fullscreenWindowRect.right, fullscreenWindowRect.bottom,
-					 SWP_FRAMECHANGED | SWP_NOACTIVATE);
-        ShowWindow(context.hWnd, SW_MAXIMIZE);		
-	}
+	auto* currentMesh = &context.Meshes[context.CurrentMeshIndex];
+	auto& Renderer3D = context.Renderer3D;
 	
-	context.FullscreenMode = !context.FullscreenMode;
-}	
-
-
-static void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& context)
-{
-	switch (msg)
+	if (ImGui::CollapsingHeader("Mesh Config"))
 	{
-	  case WM_CLOSE:
-	  {
-		  PostQuitMessage(0);
-	  }
-
-	  case WM_SIZE:
-	  {
-		  if(wParam == SIZE_MINIMIZED)
-		  {
-			  DXDEBUG("[Event] Minimizing");
-			  break;
-		  }
-
-		  uint32 width = LOWORD(lParam);
-		  uint32 height = HIWORD(lParam);
-		  if (width == 0 || height == 0) break;
-
-		  context.Graphics.ResizeBackBuffer((float)width, (float)height);
-		  context.Graphics.DestroyZBuffer();
-		  context.Graphics.InitZBuffer((float)width, (float)height);
-		  context.Graphics.SetViewport(0, 0, (float)width, (float)height);
-
-		  context.Height = (float)height;
-		  context.Width = (float)width;
-
-		  break;
-	  }
-
-	  case WM_KILLFOCUS:
-	  {
-		  Input::gInput.Reset();
-	  }
-
-	  case WM_KEYDOWN:
-	  case WM_SYSKEYDOWN:
-	  {
-		  if (!(lParam & 0x40000000))
-		  {
-			  Input::gInput.UpdateKeyboardButtonPressed(static_cast<uint16_t>(wParam));
-		  }
-		  break;
-	  }
-
-	  case WM_KEYUP:
-	  case WM_SYSKEYUP:
-	  {
+		ImGui::Combo("Mesh", &context.CurrentMeshIndex, context.MeshNames.data(), (int)context.MeshNames.size());
+		currentMesh = &context.Meshes[context.CurrentMeshIndex];
 		
-		  Input::gInput.UpdateKeyboardButtonReleased(static_cast<uint16_t>(wParam));
-		  break;
-	  }
-
-	  case WM_RBUTTONUP:
-	  {
-		  Input::gInput.UpdateMouseButtonReleased(1);
-		  break;
-	  }
-	  case WM_LBUTTONUP:
-	  {
-		  Input::gInput.UpdateMouseButtonReleased(0);
-		  break;
-	  }
-	  case WM_MBUTTONUP:
-	  {
-		  Input::gInput.UpdateMouseButtonReleased(2);
-		  break;
-	  }
-
-	  case WM_LBUTTONDOWN:
-	  {
-		  Input::gInput.UpdateMouseButtonPressed(0);
-		  break;
-	  }
-	  case WM_RBUTTONDOWN:
-	  {
-		  Input::gInput.UpdateMouseButtonPressed(1);
-		  break;
-	  }
-	  case WM_MBUTTONDOWN:
-	  {
-		  Input::gInput.UpdateMouseButtonPressed(2);
-		  break;
-	  }
-
-	  case WM_MOUSEMOVE:
-	  {
-		  const POINTS pt = MAKEPOINTS(lParam);
-		  Input::gInput.UpdateMousePos({ pt.x, pt.y });
-		  break;
-	  }
-
-	  case WM_MOUSEWHEEL:
-	  {
-		  const POINTS pt = MAKEPOINTS(lParam);
-		  const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-		  Input::gInput.UpdateMouseScroll((float)clamp(delta, -120, 120));
-		  break;
-	  }
-
+		ImGui::SliderFloat("Scale", (float*)&currentMesh->Scale, 0.0f, 5.0f, "%.2f");
+		ImGui::SliderFloat3("Position", (float*)&currentMesh->Position, -5.0f, 5.0f, "%.2f");
 	}
-}
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) return false;
-	
-	if (msg == WM_CREATE)
+	if (ImGui::CollapsingHeader("Environment Map"))
 	{
-		auto context = (Context*)((LPCREATESTRUCTA)lParam)->lpCreateParams;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)context);
-
-		context->Graphics.InitSwapChain(hWnd, 1080, 720);
-		context->Graphics.InitBackBuffer();
-		context->Graphics.InitZBuffer(1080, 720);
-		context->Graphics.InitResources();
-		context->Graphics.InitRasterizationsStates();
-		context->Graphics.InitSamplers();
-		context->Graphics.InitBlending();
-		context->Graphics.InitDepthStencilStates();
-
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
-
-		ImGui_ImplWin32_Init(hWnd);
-		ImGui_ImplDX11_Init(context->Graphics.Device, context->Graphics.Context);
-	}
-	else
-	{
-		auto context = (Context*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		HandleMessage(hWnd, msg, wParam, lParam, *context);
-	}
-	
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-
-}
-
-static void ParseCommandLineArguments(int argc, char *argv[], MaterialEditor::CommandLineArguments& arguments)
-{
-	for (size_t i = 0; i < argc; ++i)
-	{
-		std::string current{argv[i]};
-		if(current == "-r") {
-			arguments.Root = argv[++i];
-		} else if (current == "-i") {
-			arguments.Input = argv[++i];
-		}
-	}
-}
-
-static double clockToMilliseconds(clock_t ticks)
-{
-    return (ticks/(double)CLOCKS_PER_SEC)*1000.0;
-}
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdSHow)
-{
-	SetupConsole();
-	gDxgiManager.Init();
-	Memory::InitMemoryState();
-	Input::Init();
-	PlatformLayer::Init();
-
-	int argc;
-	char** argv;
-	argv = CommandLineToArgvA(GetCommandLine(), &argc);
-
-	Context context;
-	ParseCommandLineArguments(argc, argv, context.Args);
-
-	WNDCLASSEX windowClass{ 0 };
-	windowClass.cbSize = sizeof(windowClass);
-	windowClass.style = CS_OWNDC;
-	windowClass.lpfnWndProc = HandleMsg;
-	windowClass.cbClsExtra = 0;
-	windowClass.cbWndExtra = 0;
-	windowClass.hInstance = GetModuleHandleA(NULL);
-	windowClass.hIcon = nullptr;
-	windowClass.hCursor = nullptr;
-	windowClass.hbrBackground = nullptr;
-	windowClass.lpszMenuName = nullptr;
-	windowClass.lpszClassName = "MaterialEdit";
-	windowClass.hIconSm = nullptr;
-	RegisterClassEx(&windowClass);
-
-	context.WindowStyle = WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
-
-	context.WindowRect.left = 100;
-	context.WindowRect.right = 1080 + context.WindowRect.left;
-	context.WindowRect.top = 100;
-	context.WindowRect.bottom = 720 + context.WindowRect.top;
-
-	context.hWnd = CreateWindow("MaterialEdit", "Material Editor", context.WindowStyle,
-							 CW_USEDEFAULT, CW_USEDEFAULT, context.WindowRect.right - context.WindowRect.left,
-							 context.WindowRect.bottom - context.WindowRect.top,
-							 nullptr, nullptr, GetModuleHandleA(NULL), &context);
-
-	DragAcceptFiles(context.hWnd, TRUE);
-	ShowWindow(context.hWnd, SW_SHOW);
-	
-	Init(context);
-
-	ToggleFullscreen(context);
-
-	clock_t dt = 0;
-	
-	while (true)
-	{
-		Input::gInput.Update();
-		
-		MSG msg;
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		if (ImGui::BeginCombo("Map", context.Textures.LoadedCubes[context.CurrentMapIndex].Name.data()))
 		{
-			if (msg.message == WM_QUIT)
+			for (int i = 0; i < (int)context.Textures.LoadedCubes.size(); ++i)
 			{
-				return (int)msg.wParam;
+				auto& tex = context.Textures.LoadedCubes[i];
+				if (ImGui::Selectable(tex.Name.data(), i == context.CurrentMapIndex))
+				{
+					context.CurrentMapIndex = i;
+				}
 			}
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			ImGui::EndCombo();
 		}
-
-		if (Input::gInput.IsKeyReleased(KeyCode::F11))
-		{
-			ToggleFullscreen(context);
-		}
-		
-		clock_t beginFrame = clock();
-		
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		ImGui::Begin("DX Materials");
-		const float delta = (float)clockToMilliseconds(dt) / 1000.0f;
-		Update(context, delta);
-
-		ImGui::End();
-
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-		context.Graphics.EndFrame();
-
-		clock_t endFrame = clock();
-
-		dt = endFrame - beginFrame;
 	}
 
-	return 0;
+	ControlLightingImGui(context.Renderer3D.LightingSetup.LightingData);
+
+	if (ImGui::CollapsingHeader("Ligting Movement"))
+	{
+
+		ImGui::Checkbox("Movement", &context.LightHelpersState.Updating);
+		ImGui::Separator();
+		
+		ImGui::Text("Pointlight 1:");
+		ImGui::SliderFloat("Radius[1]", &context.LightHelpersState.PointLight1Radius, 0.0f, 10.0f, "%.2f");
+		ImGui::SliderFloat("Height[1]", &context.LightHelpersState.PointLight1Height, -5.0f, 10.0f, "%.2f");
+
+		ImGui::Separator();
+
+		ImGui::Text("Pointlight 2:");
+		ImGui::SliderFloat("Radius[2]", &context.LightHelpersState.PointLight2Radius, 0.0f, 10.0f, "%.2f");
+		ImGui::SliderFloat("Height[2]", &context.LightHelpersState.PointLight2Height, -5.0f, 10.0f, "%.2f");
+
+		ImGui::Separator();
+
+		ImGui::Text("Spotlight:");
+		ImGui::SliderFloat("Height[3]", &context.LightHelpersState.SpotHeight, 0.0f, 5.0f, "%.2f");
+	}
+
+	ImGui::Begin("Materials");
+
+	ImGui::End();
+
+	if (context.LightHelpersState.Updating) UpdateTime(dt, context.T);
+	
+	const float lightX1 = std::sin(context.T) * context.LightHelpersState.PointLight1Radius;
+	const float lightY1 = std::cos(context.T) * context.LightHelpersState.PointLight1Radius;
+	const float lightX2 = std::sin(context.T + PI) * context.LightHelpersState.PointLight2Radius;
+	const float lightY2 = std::cos(context.T + PI) * context.LightHelpersState.PointLight2Radius;
+
+	glm::vec3 light1Pos{lightX1, context.LightHelpersState.PointLight1Height, lightY1};
+	glm::vec3 light2Pos{lightX2, context.LightHelpersState.PointLight2Height, lightY2};
+	glm::vec3 spotLight{ 0.0f, context.LightHelpersState.SpotHeight, 0.0f };
+	
+	Renderer3D.LightingSetup.LightingData.pointLights[0].Position = glm::vec4(light1Pos, 0.0f);
+	Renderer3D.LightingSetup.LightingData.pointLights[1].Position = glm::vec4(light2Pos, 0.0f);
+
+	ControlCameraOrbital(context.Renderer3D.CurrentCamera, dt);
+	context.Renderer3D.UpdateCamera();
+	
+	Renderer3D.UpdateLighting();
+
+	auto Graphics = &context.Graphics;
+
+	Graphics->SetBlendingState(BS_AlphaBlending);
+	Graphics->ResetRenderTarget();
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics->ClearZBuffer();
+	Graphics->SetDepthStencilState(DSS_Normal);
+	Graphics->SetRasterizationState(RS_NORMAL);
+
+	context.Renderer3D.BeginScene(SC_DEBUG_COLOR);
+	context.Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, glm::vec3(1.0f));
+	Graphics->SetRasterizationState(RS_DEBUG);
+
+	if (Renderer3D.LightingSetup.LightingData.pointLights[0].Active)
+		Renderer3D.DrawDebugGeometry(POINTLIGHT, light1Pos, glm::vec3(1.0f));
+	
+	if (Renderer3D.LightingSetup.LightingData.pointLights[1].Active)
+		Renderer3D.DrawDebugGeometry(POINTLIGHT, light2Pos, glm::vec3(1.0f));
+	
+	Graphics->SetRasterizationState(RS_NORMAL);
+
+	if (Renderer3D.LightingSetup.LightingData.spotLights[0].Active)
+		Renderer3D.DrawDebugGeometry(SPOTLIGHT, spotLight, glm::vec3(5.0f));
+
+	context.Renderer3D.MeshData.Materials.Bind(Graphics, 1);
+
+	Renderer3D.EnableLighting();
+
+	context.Renderer3D.DrawMesh(currentMesh->Id, currentMesh->Position, glm::vec3(currentMesh->Scale));
+	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes[context.CurrentMapIndex].Handle);
 }

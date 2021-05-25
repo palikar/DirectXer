@@ -74,3 +74,12 @@ static std::string ReplaceAll(std::string str, const std::string &from, const st
     }
     return str;
 }
+
+struct Context;
+void LoadObjMesh(Context& context, const char* path);
+
+static void UpdateTime(float dt, float& T)
+{
+	T += 1.0f * dt;
+	T = T > 10000.0f ? 0.0f : T;
+}

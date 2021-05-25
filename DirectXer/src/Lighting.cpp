@@ -45,18 +45,22 @@ bool ControlLightingImGui(Lighting& light)
 			}
 		}
 
-		if (ImGui::TreeNode("Spot light"))
+		for (size_t i = 0; i < SpotLightsCount; ++i)
 		{
-			ImGui::Checkbox("Active", (bool*)&light.spotLights[0].Active);
+					
+			if (ImGui::TreeNode(formater.Format("Spot light[{}]", i)))
+			{
+				ImGui::Checkbox("Active", (bool*)&light.spotLights[i].Active);
 
-			ImGui::Text("Color");
-			ImGui::SameLine();
-			lightChanged |= ImGui::ColorEdit3("Color", (float*)&light.spotLights[0].color);
-			lightChanged |= ImGui::SliderFloat("Intensity", (float*)&light.spotLights[0].color.a, 0.0f, 1.0f, "%.3f");
+				ImGui::Text("Color");
+				ImGui::SameLine();
+				lightChanged |= ImGui::ColorEdit3("Color", (float*)&light.spotLights[i].color);
+				lightChanged |= ImGui::SliderFloat("Intensity", (float*)&light.spotLights[i].color.a, 0.0f, 1.0f, "%.3f");
 
-			lightChanged |= ImGui::SliderFloat("Outer Rad", (float*)&light.spotLights[0].Params.r, 0.0f, 5.0f, "%.3f");
-			lightChanged |= ImGui::SliderFloat("Inner Rad", (float*)&light.spotLights[0].Params.g, 0.0f, 5.0f, "%.3f");
-			ImGui::TreePop();
+				lightChanged |= ImGui::SliderFloat("Outer Rad", (float*)&light.spotLights[i].Params.r, 0.0f, 5.0f, "%.3f");
+				lightChanged |= ImGui::SliderFloat("Inner Rad", (float*)&light.spotLights[i].Params.g, 0.0f, 5.0f, "%.3f");
+				ImGui::TreePop();
+			}
 		}
 	}
 

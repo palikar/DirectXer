@@ -101,6 +101,8 @@ enum ShaderFile : uint8
 	SF_QUAD    = 2,
 	SF_MTL     = 3,
 	SF_MTLInst = 4,
+	SF_PHONG   = 5,
+	SF_TEX     = 6,
 
 	SF_COUNT
 };
@@ -128,10 +130,8 @@ enum ShaderConfiguration
 {
 	// Debug Rendering
 	SC_DEBUG_COLOR       = SF_DEBUG		| (ST_COLOR			<< 8),
-	SC_DEBUG_TEX         = SF_DEBUG		| (ST_TEX			<< 8),
 	SC_DEBUG_SKY         = SF_DEBUG		| (ST_SKY			<< 8),
 	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG		| (ST_TEX_SIMPLE	<< 8),
-	SC_DEBUG_PHONG       = SF_DEBUG		| (ST_PHONG			<< 8),
 
 	// 2D rendering
 	SC_2D_RECT           = SF_2D		| (ST_RECT			<< 8),
@@ -139,10 +139,15 @@ enum ShaderConfiguration
 	
 	SC_QUAD_SIMPLE       = SF_QUAD		| (ST_SIMPLE_QUAD	<< 8),
 
+	// Materials
+	
 	SC_MTL_1             = SF_MTL		| (ST_1_MTL			<< 8),
 	SC_MTL_2             = SF_MTL		| (ST_2_MTL			<< 8),
 
 	SC_MTL_2_INSTANCED   = SF_MTLInst	| (ST_2_MTL			<< 8),
+
+	SC_PHONG			 = SF_PHONG		| (ST_PHONG			<< 8),
+	SC_TEX   			 = SF_TEX		| (ST_TEX			<< 8),
 	
 	SC_COUNT
 };
