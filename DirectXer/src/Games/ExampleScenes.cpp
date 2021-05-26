@@ -144,7 +144,7 @@ void ExampleScenes::Init()
 	uiRenderTarget.Color = NextTextureId();
 	uiRenderTarget.DepthStencil = NextTextureId();
 	
-	Graphics->SetShaderConfiguration(SC_DEBUG_TEX);
+	Graphics->SetShaderConfiguration(SC_TEX);
 	Graphics->SetViewport(0, 0, 800, 600);
 	Graphics->SetRasterizationState(CurrentRastState);
 

@@ -859,6 +859,9 @@ namespace ImGui
     IMGUI_API void*         MemAlloc(size_t size);
     IMGUI_API void          MemFree(void* ptr);
 
+    IMGUI_API void          ToggleButton(const char* str_id, bool* v);
+
+
 } // namespace ImGui
 
 //-----------------------------------------------------------------------------
@@ -1988,6 +1991,7 @@ namespace ImGui
     static inline ImDrawList* GetOverlayDrawList()            { return GetForegroundDrawList(); }
     // OBSOLETED in 1.66 (from Sep 2018)
     static inline void  SetScrollHere(float center_ratio=0.5f){ SetScrollHereY(center_ratio); }
+
 }
 #endif
 
@@ -2709,6 +2713,10 @@ struct ImFont
     IMGUI_API void              SetGlyphVisible(ImWchar c, bool visible);
     IMGUI_API void              SetFallbackChar(ImWchar c);
     IMGUI_API bool              IsGlyphRangeUnused(unsigned int c_begin, unsigned int c_last);
+
+    // Extra goodies:
+
+
 };
 
 #if defined(__clang__)

@@ -226,7 +226,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 static LRESULT CALLBACK HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) return false;
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) return DefWindowProc(hWnd, msg, wParam, lParam);
 	
 	if (msg == WM_CREATE)
 	{

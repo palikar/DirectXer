@@ -68,16 +68,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">OpenAL.dir\Debug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Build\$(Configuration)\bin_$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Build\$(Configuration)\obj_$(Platform)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">OpenAL32</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\Release\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">OpenAL.dir\Release\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">OpenAL.dir\Release\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Build\$(Configuration)\bin_$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">$(SolutionDir)\Build\$(Configuration)\bin_$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Build\$(Configuration)\obj_$(Platform)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">$(SolutionDir)\Build\$(Configuration)\obj_$(Platform)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">OpenAL32</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">OpenAL32</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
@@ -86,14 +86,14 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\MinSizeRel\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">OpenAL.dir\MinSizeRel\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(SolutionDir)\Build\$(Configuration)\bin_$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(SolutionDir)\Build\$(Configuration)\obj_$(Platform)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">OpenAL32</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build\RelWithDebInfo\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">OpenAL.dir\RelWithDebInfo\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\Build\$(Configuration)\bin_$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\Build\$(Configuration)\obj_$(Platform)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">OpenAL32</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
@@ -101,7 +101,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir);$(ProjectDir)..\al;$(ProjectDir)..\include;$(ProjectDir)..\alc;$(ProjectDir)..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /w14640</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -148,7 +148,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir);$(ProjectDir)..\al;$(ProjectDir)..\include;$(ProjectDir)..\alc;$(ProjectDir)..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /w14640</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ConformanceMode>true</ConformanceMode>
@@ -195,7 +195,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir);$(ProjectDir)..\al;$(ProjectDir)..\include;$(ProjectDir)..\alc;$(ProjectDir)..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /w14640</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ConformanceMode>true</ConformanceMode>
@@ -243,7 +243,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir);$(ProjectDir)..\al;$(ProjectDir)..\include;$(ProjectDir)..\alc;$(ProjectDir)..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /w14640</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ConformanceMode>true</ConformanceMode>
@@ -290,7 +290,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\include;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\build;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\alc;C:\Users\Stanislav Arnaudov\source\repos\DirectXer\ThirdParty\openal-soft-1.21.1\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir);$(ProjectDir)..\al;$(ProjectDir)..\include;$(ProjectDir)..\alc;$(ProjectDir)..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /w14640</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ConformanceMode>true</ConformanceMode>
