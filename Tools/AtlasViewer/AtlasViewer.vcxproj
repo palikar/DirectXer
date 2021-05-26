@@ -108,6 +108,7 @@
   <ImportGroup Label="Shared">
     <Import Project="..\..\DirectXer\Core.vcxitems" Label="Shared" />
     <Import Project="..\..\DirectXer\ShadersD3D11.vcxitems" Label="Shared" />
+    <Import Project="..\..\DirectXer\PlatformWin32.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />

@@ -3,4 +3,10 @@
   <ItemGroup>
     <None Include="SpaceGame.args.json" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Games\SpaceGame.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Games\SpaceGame.hpp" />
+  </ItemGroup>
 </Project>

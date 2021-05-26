@@ -1,23 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Games">
-      <UniqueIdentifier>{807e6c80-51cf-40f7-83c1-6bebd8da3097}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PlatformWindows">
-      <UniqueIdentifier>{493c6387-9b13-46ee-b8c3-e63708935437}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.cpp">
-      <Filter>Games</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.cpp">
-      <Filter>PlatformWindows</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.cpp">
-      <Filter>PlatformWindows</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\2DRendering.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />
@@ -25,13 +8,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Main.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Memory.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Input.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\PlatformWindows\GraphicsD3D11.cpp">
-      <Filter>PlatformWindows</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Graphics.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\Games\SpaceGame.cpp">
-      <Filter>Games</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Random.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\TextureCatalog.cpp" />
@@ -45,16 +22,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\ExampleScenes.hpp">
-      <Filter>Games</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\GameDefinition.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\PlatformWindows.hpp">
-      <Filter>PlatformWindows</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\WindowsMessageMap.hpp">
-      <Filter>PlatformWindows</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\2DRendering.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\App.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Camera.hpp" />
@@ -78,15 +46,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\TextureCatalog.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Types.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Utils.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\IncludeWin.hpp">
-      <Filter>PlatformWindows</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\PlatformWindows\GraphicsD3D11.hpp">
-      <Filter>PlatformWindows</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\Games\SpaceGame.hpp">
-      <Filter>Games</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Random.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Audio.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\Tags.hpp" />

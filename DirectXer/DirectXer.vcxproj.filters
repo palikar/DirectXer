@@ -3,4 +3,10 @@
   <ItemGroup>
     <None Include="DirectXer.args.json" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Games\ExampleScenes.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Games\ExampleScenes.hpp" />
+  </ItemGroup>
 </Project>
