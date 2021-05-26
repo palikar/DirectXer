@@ -118,6 +118,10 @@ void LoadObjMesh(Context& context, const char* path)
 	context.Graphics.CreateVertexBuffer(vbo, sizeof(MtlVertex), VertexData.data(), (uint32)(sizeof(MtlVertex) * VertexData.size()), false);
 	context.Graphics.CreateIndexBuffer(ibo, IndexData.data(), (uint32)(IndexData.size() * sizeof(uint32)), false);
 
+	TempFormater formater;
+	context.Graphics.SetVertexBufferName(ibo, formater.Format("{} VB", path));
+	context.Graphics.SetIndexBufferName(ibo, formater.Format("{} IB", path));
+
 	GPUGeometry meshGeometry;
 	meshGeometry.Vbo = vbo;
 	meshGeometry.Ibo = ibo;

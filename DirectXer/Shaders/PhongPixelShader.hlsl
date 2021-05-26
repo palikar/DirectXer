@@ -29,12 +29,12 @@ cbuffer PSPrimBuf : register(b0)
     uint shaderType;
 };
 
-cbuffer PhongMaterialBuf : register(b3)
+cbuffer PhongMaterialBuf : register(b1)
 {
-    float4 Ambient;
-    float4 Diffuse;
-    float4 Specular;
-    float4 Emissive;
+    float3 Ambient;
+    float3 Diffuse;
+    float3 Specular;
+    float3 Emissive;
     float SpecularShininess;
 };
 
@@ -78,7 +78,7 @@ float3 apply_point_light(PointLight light, float3 normal, float3 surface_pos, fl
     float specular_coefficient = 0.0;
     if(diffuse_coefficient > 0.0)
         specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), SpecularShininess);
-    float3 specular = Specular.rgb * light.Color.rgb * 1.0f;
+    float3 specular = Specular.rgb * light.Color.rgb * specular_coefficient;
 
     return (diffuse + specular) * attenuation;
 }

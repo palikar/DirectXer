@@ -122,7 +122,7 @@ float3 ApplyPointLight(PointLight light, float3 normal, float3 surface_pos, floa
     float specular_coefficient = 0.0;
     if(diffuse_coefficient > 0.0)
         specular_coefficient = pow(max(0.0, dot(surface_to_camera, reflect(-light_to_surface, normal))), specularExponent);
-    float3 specular = specularFactor.rgb * light.Color.rgb * 1.0f;
+    float3 specular = specularFactor.rgb * light.Color.rgb * specular_coefficient;
 
     return (diffuse + specular) * attenuation;
 }

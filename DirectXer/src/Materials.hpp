@@ -64,12 +64,14 @@ struct TexturedMaterial : public TexturedMaterialData
 
 struct PhongMaterialData
 {
-	glm::vec4 Ambient{ 0.0f, 0.0f, 0.0f, 0.0f};
-	glm::vec4 Diffuse{ 0.0f, 0.0f, 0.0f, 0.0f};
-	glm::vec4 Specular{ 0.0f, 0.0f, 0.0f, 0.0f};
-	glm::vec4 Emissive{ 0.0f, 0.0f, 0.0f, 0.0f};
+	glm::vec3 Ambient{ 0.0f, 0.0f, 0.0f};
+	float __pading0;
+	glm::vec3 Diffuse{ 0.0f, 0.0f, 0.0f};
+	float __pading1;
+	glm::vec3 Specular{ 0.0f, 0.0f, 0.0f};
+	float __pading2;
+	glm::vec3 Emissive{ 0.0f, 0.0f, 0.0f};
 	float SpecularChininess {1.0};
-	glm::vec3 _padding;
 };
 
 // @Note: Phong material that is pure color, implements the phong shading model
@@ -229,5 +231,5 @@ struct MaterialControlContext
 
 struct TextureCatalog;
 bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics);
-bool ControlTexturedMaterialImGui(TexturedMaterialData& mat, const char* name);
-bool ControlPhongMaterialImGui(PhongMaterialData& mat, const char* name);
+bool ControlTexturedMaterialImGui(TexturedMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics);
+bool ControlPhongMaterialImGui(PhongMaterial& mat, const char* name);

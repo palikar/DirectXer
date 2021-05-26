@@ -80,42 +80,45 @@ TextureId TextureCatalog::LoadCube(Graphics& graphics, const char* name[6])
 
 void TextureCatalog::LoadTextures(Graphics* graphics, const char** paths, uint32 count)
 {
-		// @Note: We'll use this for loading the contents of the file
-		MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));
+	// @Note: We'll use this for loading the contents of the file
+	MemoryArena fileArena = Memory::GetTempArena(Megabytes(16));
 
-		// @Note: This will be used for the STB allocations
-		Memory::EstablishTempScope(Megabytes(128));
-		Defer {
-			Memory::EndTempScope();
-			Memory::DestoryTempArena(fileArena);
-		};
+	// @Note: This will be used for the STB allocations
+	Memory::EstablishTempScope(Megabytes(128));
+	Defer {
+		Memory::EndTempScope();
+		Memory::DestoryTempArena(fileArena);
+	};
 
-		for (uint32 i = 0; i < count; ++i)
+	for (uint32 i = 0; i < count; ++i)
+	{
+		fileArena.Reset();
+
+		DXLOG("[RES] Loading {}", paths[i]);
+
+		ReadWholeFile(paths[i], fileArena);
+
+		int width, height, channels;
+		unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
+		if (data == nullptr)
 		{
-			fileArena.Reset();
+			DXERROR("Can't load texture {}. Reason: {}", paths[i], stbi_failure_reason());
+		}
 
-			DXLOG("[RES] Loading {}", paths[i]);
-
-			ReadWholeFile(paths[i], fileArena);
-
-			int width, height, channels;
-			unsigned char* data = stbi_load_from_memory((unsigned char*)fileArena.Memory, (int)fileArena.Size, &width, &height, &channels, 4);
-			if (data == nullptr)
-			{
-				DXERROR("Can't load texture {}. Reason: {}", paths[i], stbi_failure_reason());
-			}
-
-			LoadedTexture newTex;
-			newTex.Handle = NextTextureId();
-			newTex.Path = paths[i];
-			newTex.Name = paths[i];
+		LoadedTexture newTex;
+		newTex.Handle = NextTextureId();
+		newTex.Path = paths[i];
+		newTex.Name = paths[i];
 
 			
-			graphics->CreateTexture(newTex.Handle, {(uint16)width, (uint16)height, TF_RGBA}, data);
-			Memory::ResetTempScope();
-			LoadedTextures.push_back(newTex);
-		}
+		graphics->CreateTexture(newTex.Handle, {(uint16)width, (uint16)height, TF_RGBA}, data);
+		graphics->SetTextureName(newTex.Handle, paths[i]);
+		
+		Memory::ResetTempScope();
+		LoadedTextures.push_back(newTex);
+
 	}
+}
 
 void TextureCatalog::LoadCubes(Graphics* graphics, const char** paths, uint32 count)
 {

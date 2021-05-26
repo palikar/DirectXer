@@ -132,10 +132,10 @@ static void NewPhongMaterial(Context& context)
 	
 	PhongMaterial basicMat;
 	memset(&basicMat, 0, sizeof(PhongMaterial));
-	basicMat.Ambient = {0.2f, 0.2f, 0.2f, 0.4f};
-	basicMat.Diffuse = {0.7f, 0.0f, 0.2f, 0.4f};
-	basicMat.Specular = {0.8f, 0.8f, 0.8f, 0.4f};
-	basicMat.Emissive = {0.8f, 0.8f, 0.8f, 0.4f};
+	basicMat.Ambient = {0.2f, 0.2f, 0.2f};
+	basicMat.Diffuse = {0.7f, 0.0f, 0.2f};
+	basicMat.Specular = {0.8f, 0.8f, 0.8f};
+	basicMat.Emissive = {0.8f, 0.8f, 0.8f};
 	basicMat.SpecularChininess = 1.3f;
 	
 	basicMat.Id = ++NextMaterialId;
@@ -144,7 +144,7 @@ static void NewPhongMaterial(Context& context)
 	InitMaterial(&context.Graphics, basicMat, formater.Format("Phong Material {}", phongCount));
 
 	context.Renderer3D.MeshData.Materials.PhongMaterials.push_back(basicMat);	
-	context.Renderer3D.MeshData.Materials.GenerateProxy(basicMat);
+	context.Renderer3D.MeshData.Materials.GenerateProxy(context.Renderer3D.MeshData.Materials.PhongMaterials.back());
 
 	MaterialEditEntry basicEntry;
 	basicEntry.Type = MT_PHONG;
@@ -177,10 +177,10 @@ static void NewTexMaterial(Context& context)
 	InitMaterial(&context.Graphics, basicMat, formater.Format("Textured Material {}", texCount));
 
 	context.Renderer3D.MeshData.Materials.TexMaterials.push_back(basicMat);	
-	context.Renderer3D.MeshData.Materials.GenerateProxy(basicMat);
+	context.Renderer3D.MeshData.Materials.GenerateProxy(context.Renderer3D.MeshData.Materials.TexMaterials.back());
 
 	MaterialEditEntry basicEntry;
-	basicEntry.Type = MT_PHONG;
+	basicEntry.Type = MT_TEXTURED;
 	basicEntry.Id = basicMat.Id;
 	basicEntry.Phong = &context.Renderer3D.MeshData.Materials.PhongMaterials.back();
 	basicEntry.Name = formater.Format("Textured Material {}", texCount);
@@ -200,13 +200,11 @@ static void ControlCurrentMaterial(Context& context)
 	}
 	else if(mat.Type == MT_PHONG)
 	{
-
-		
+		changed = ControlPhongMaterialImGui(*mat.Phong, mat.Name.c_str());
 	}
 	else if(mat.Type == MT_TEXTURED)
 	{
-
-		
+		changed = ControlTexturedMaterialImGui(*mat.Tex, mat.Name.c_str(), context.Textures, &context.Graphics);
 	}
 
 	if (changed) context.Renderer3D.MeshData.Materials.Update(&context.Graphics, mat.Id);
@@ -339,10 +337,11 @@ void Update(Context& context, float dt)
 	if (Renderer3D.LightingSetup.LightingData.spotLights[0].Active)
 		Renderer3D.DrawDebugGeometry(SPOTLIGHT, spotLight, glm::vec3(5.0f));
 
-	context.Renderer3D.MeshData.Materials.Bind(Graphics, 1);
 
 	Renderer3D.EnableLighting();
 
+	context.Renderer3D.MeshData.Materials.Bind(&context.Graphics, context.Materials[context.CurrentMaterialIndex].Id);
+	
 	context.Renderer3D.DrawMesh(currentMesh->Id, currentMesh->Position, glm::vec3(currentMesh->Scale));
 	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes[context.CurrentMapIndex].Handle);
 }

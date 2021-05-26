@@ -26,7 +26,7 @@ void MaterialLibrary::GenerateProxy(PhongMaterial& mat)
 	MaterialUpdateProxy upadte;
 	upadte.Cbo = mat.Cbo;
 	upadte.Data = &mat;
-	upadte.DataSize = sizeof(MtlMaterial);
+	upadte.DataSize = sizeof(PhongMaterialData);
 	UpdateViews.insert({mat.Id, upadte});	
 }
 
@@ -45,7 +45,7 @@ void MaterialLibrary::GenerateProxy(TexturedMaterial& mat)
 	MaterialUpdateProxy upadte;
 	upadte.Cbo = mat.Cbo;
 	upadte.Data = &mat;
-	upadte.DataSize = sizeof(MtlMaterial);
+	upadte.DataSize = sizeof(TexturedMaterialData);
 	UpdateViews.insert({mat.Id, upadte});	
 }
 
@@ -207,6 +207,35 @@ MtlMaterial& MaterialLibrary::GetMtl(MaterialId id)
 
 
 
+
+static void ChooseTexture(Graphics* graphics, TextureCatalog& catalog, const char* title, TextureId& texId)
+{
+	auto it = std::find_if(catalog.LoadedTextures.begin(), catalog.LoadedTextures.end(), [&texId](auto& t) { return t.Handle == texId; });
+	auto texName = it != catalog.LoadedTextures.end() ? it->Name.data() : "NotSelected";
+	if (ImGui::BeginCombo(title, texName))
+	{
+		for (int i = 0; i < (int)catalog.LoadedTextures.size(); ++i)
+		{
+			auto& tex = catalog.LoadedTextures[i];
+			if (ImGui::Selectable(tex.Name.data(), tex.Handle == texId))
+			{
+				texId = tex.Handle;
+			}
+
+		}
+		ImGui::EndCombo();
+	}
+	if (texId != 0)
+	{
+		ImGui::SameLine();
+		ImGui::Image(graphics->Textures.at(texId).srv, { 64, 64 });
+	}
+
+	
+
+
+}
+
 bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics)
 {
 	bool changed = false;
@@ -220,30 +249,25 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 
 	ImGui::Checkbox("Ka", &hasKaMask);
 	ImGui::SameLine();
-
-	ImGui::Checkbox("Kd", &hasKdMask);
-	ImGui::SameLine();
-
-	ImGui::Checkbox("Ks", &hasKsMask);
-	ImGui::SameLine();
-	
-	ImGui::Checkbox("Ns", &hasNsMask);
-	ImGui::SameLine();
-	
-	ImGui::Checkbox("D", &hasDMask);
-
 	if (hasKaMask) mat.illum |= KA_TEX_MASK;
 	else  mat.illum &= ~KA_TEX_MASK;
 
+	ImGui::Checkbox("Kd", &hasKdMask);
+	ImGui::SameLine();
 	if (hasKdMask) mat.illum |= KD_TEX_MASK;
 	else  mat.illum &= ~KD_TEX_MASK;
 
+	ImGui::Checkbox("Ks", &hasKsMask);
+	ImGui::SameLine();
 	if (hasKsMask) mat.illum |= KS_TEX_MASK;
 	else  mat.illum &= ~KS_TEX_MASK;
-
+	
+	ImGui::Checkbox("Ns", &hasNsMask);
+	ImGui::SameLine();
 	if (hasNsMask) mat.illum |= NS_TEX_MASK;
 	else  mat.illum &= ~NS_TEX_MASK;
 
+	ImGui::Checkbox("D", &hasDMask);
 	if (hasDMask) mat.illum |= D_TEX_MASK;
 	else  mat.illum &= ~D_TEX_MASK;
 		
@@ -263,65 +287,46 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 	ImGui::Separator();
 	ImGui::Text("Maps: ");
 
-	auto it = std::find_if(textures.LoadedTextures.begin(), textures.LoadedTextures.end(), [&mat](auto& t) { return t.Handle == mat.KaMap; });
-	auto texName = it != textures.LoadedTextures.end() ? it->Name.data() : "NotSelected";
-	if (ImGui::BeginCombo("Ka Map", texName))
-	{
-		for (int i = 0; i < (int)textures.LoadedTextures.size(); ++i)
-		{
-			auto& tex = textures.LoadedTextures[i];
-			if (ImGui::Selectable(tex.Name.data(), tex.Handle == mat.KaMap))
-			{
-				mat.KaMap = tex.Handle;
-			}
-
-		}
-		ImGui::EndCombo();
-	}
-	if (mat.KaMap != 0)
-	{
-		ImGui::SameLine();
-		ImGui::Image(graphics->Textures.at(mat.KaMap).srv, { 64, 64 });
-	}
-
+	ChooseTexture(graphics, textures, "Ka Map", mat.KaMap);
+	ChooseTexture(graphics, textures, "Kd Map", mat.KdMap);
+	ChooseTexture(graphics, textures, "Ks Map", mat.KsMap);
+	ChooseTexture(graphics, textures, "Ns Map", mat.NsMap);
+	ChooseTexture(graphics, textures, "d Map", mat.dMap);
 	
 
 	return changed;
 }
 
-bool ControlTexturedMaterialImGui(TexturedMaterialData& mat, const char* name)
+bool ControlTexturedMaterialImGui(TexturedMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics)
 {
 	bool changed = false;
-	if (ImGui::TreeNode(name))
-	{
-		changed |= ImGui::ColorEdit3("Color: ", (float*)&mat.Color);
-		ImGui::Separator();
-		changed |= ImGui::SliderFloat("Color Intensity", (float*)&mat.ColorIntensity, 0.0f, 1.0f, "%.3f");
-		changed |= ImGui::SliderFloat("AO Intensity", (float*)&mat.AoIntensity, 0.0f, 1.0f, "%.3f");
-		changed |= ImGui::SliderFloat("Reflectivity", (float*)&mat.Reflectivity, 0.0f, 1.0f, "%.3f");
-		changed |= ImGui::SliderFloat("Refraction Ration", (float*)&mat.Refraction_ration, 0.0f, 1.0f, "%.3f");
+	changed |= ImGui::ColorEdit3("Color: ", (float*)&mat.Color);
+	ImGui::Separator();
 
-		ImGui::TreePop();
-	}
+	ImGui::Text("Factors:");
+	changed |= ImGui::SliderFloat("Color Intensity", (float*)&mat.ColorIntensity, 0.0f, 1.0f, "%.3f");
+	changed |= ImGui::SliderFloat("AO Intensity", (float*)&mat.AoIntensity, 0.0f, 1.0f, "%.3f");
+	changed |= ImGui::SliderFloat("Reflectivity", (float*)&mat.Reflectivity, 0.0f, 1.0f, "%.3f");
+	changed |= ImGui::SliderFloat("Refraction Ration", (float*)&mat.Refraction_ration, 0.0f, 1.0f, "%.3f");
+
+	ImGui::Text("Maps:");
+
+	ChooseTexture(graphics, textures, "Base Map", mat.BaseMap);
+	ChooseTexture(graphics, textures, "Ao Map", mat.AoMap);
 
 	return changed;
 }
 
-bool ControlPhongMaterialImGui(PhongMaterialData& mat, const char* name)
+bool ControlPhongMaterialImGui(PhongMaterial& mat, const char* name)
 {
 	bool changed = false;
-	if (ImGui::TreeNode(name))
-	{
-		changed |= ImGui::ColorEdit3("Ambient Factors", (float*)&mat.Ambient);
-		changed |= ImGui::ColorEdit3("Diffuse Factors", (float*)&mat.Diffuse);
-		changed |= ImGui::ColorEdit3("Specular Factors", (float*)&mat.Specular);
-		changed |= ImGui::ColorEdit3("Emissive Factors", (float*)&mat.Emissive);
-		ImGui::Separator();
+	changed |= ImGui::ColorEdit3("Ambient Factors", (float*)&mat.Ambient);
+	changed |= ImGui::ColorEdit3("Diffuse Factors", (float*)&mat.Diffuse);
+	changed |= ImGui::ColorEdit3("Specular Factors", (float*)&mat.Specular);
+	changed |= ImGui::ColorEdit3("Emissive Factors", (float*)&mat.Emissive);
+	ImGui::Separator();
 		
-		changed |= ImGui::SliderFloat("Specular Exponent", (float*)&mat.SpecularChininess, 0.0f, 25.0f, "%.3f");
-
-		ImGui::TreePop();
-	}
+	changed |= ImGui::SliderFloat("Specular Exponent", (float*)&mat.SpecularChininess, 0.0f, 25.0f, "%.3f");
 
 	return changed;
 }
