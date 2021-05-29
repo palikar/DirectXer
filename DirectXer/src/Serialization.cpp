@@ -46,6 +46,7 @@ void Serialization::DumpToFile(const char* path, SerializationContext& context)
 		{
 			((SerializationHeader*)blobArena.Memory)->EntriesCount += 1;
 			blobArena.Put(SE_TexMat);
+			blobArena.Put(i);
 			blobArena.Put(*context.TexturedMaterials[i]);
 		}
 
@@ -53,11 +54,23 @@ void Serialization::DumpToFile(const char* path, SerializationContext& context)
 		{
 			((SerializationHeader*)blobArena.Memory)->EntriesCount += 1;
 			blobArena.Put(SE_MtlMat);
+			blobArena.Put(i);
 			blobArena.Put(*context.MtlMaterials[i]);
 		}
 		
 	}
 
+	for (uint32 i = 0; i < 8; ++i)
+	{
+		if (context.Datas[i].Size)
+		{
+			((SerializationHeader*)blobArena.Memory)->EntriesCount += 1;
+			blobArena.Put(SE_Data);
+			blobArena.Put(i);
+			blobArena.Put(context.Datas[i].Size);
+			blobArena.Put(context.Datas[i].Data, context.Datas[i].Size);
+		}
+	}
 
 	DumpArenaToFile(path, blobArena);	
 }
@@ -97,6 +110,15 @@ void Serialization::LoadFromFile(const char* path, SerializationContext& context
 		  {
 			  auto index = ReadBlob<uint32>(current);
 			  *context.TexturedMaterials[index] = ReadBlob<TexturedMaterialData>(current);
+			  break;
+		  }
+		  case SE_Data:
+		  {
+			  auto index = ReadBlob<uint32>(current);
+			  auto size = ReadBlob<size_t>(current);
+			  context.Datas[index].Size = size;
+			  memcpy(context.Datas[index].Data, current, size);
+			  ReadBlobAndMove<int>(current, size);
 			  break;
 		  }
 		  default: continue;

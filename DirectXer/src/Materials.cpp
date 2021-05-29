@@ -155,7 +155,7 @@ void MaterialLibrary::Bind(Graphics* graphics, MaterialId id)
 		graphics->BindPSConstantBuffers(mat.Cbo, mat.Slot);
 		for (uint32 i = 0; i < 5; ++i)
 		{
-			if (mat.Textures[i]) graphics->BindTexture(i + 1, *mat.Textures[i]);
+			if (mat.Textures[i] && *mat.Textures[i] != 0) graphics->BindTexture(i + 1, *mat.Textures[i]);
 		}
 	}
 	else
@@ -205,13 +205,11 @@ MtlMaterial& MaterialLibrary::GetMtl(MaterialId id)
 	});
 }
 
-
-
-
-static void ChooseTexture(Graphics* graphics, TextureCatalog& catalog, const char* title, TextureId& texId)
+static bool ChooseTexture(Graphics* graphics, TextureCatalog& catalog, const char* title, TextureId& texId)
 {
 	auto it = std::find_if(catalog.LoadedTextures.begin(), catalog.LoadedTextures.end(), [&texId](auto& t) { return t.Handle == texId; });
 	auto texName = it != catalog.LoadedTextures.end() ? it->Name.data() : "NotSelected";
+	bool changed = false;
 	if (ImGui::BeginCombo(title, texName))
 	{
 		for (int i = 0; i < (int)catalog.LoadedTextures.size(); ++i)
@@ -220,6 +218,7 @@ static void ChooseTexture(Graphics* graphics, TextureCatalog& catalog, const cha
 			if (ImGui::Selectable(tex.Name.data(), tex.Handle == texId))
 			{
 				texId = tex.Handle;
+				changed = true;
 			}
 
 		}
@@ -230,10 +229,16 @@ static void ChooseTexture(Graphics* graphics, TextureCatalog& catalog, const cha
 		ImGui::SameLine();
 		ImGui::Image(graphics->Textures.at(texId).srv, { 64, 64 });
 	}
+	return changed;
+}
 
-	
-
-
+static bool CheckBoxBit(const char* lable, uint32& bits, uint32 mask)
+{
+	bool hasMask = (bits & mask ) > 0;
+	bool changed = ImGui::Checkbox(lable, &hasMask);
+	if (hasMask) bits |= mask;
+	else  bits &= ~mask;
+	return changed;
 }
 
 bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog& textures, Graphics* graphics)
@@ -247,30 +252,36 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 
 	ImGui::Text("Texture Masks");
 
-	ImGui::Checkbox("Ka", &hasKaMask);
-	ImGui::SameLine();
-	if (hasKaMask) mat.illum |= KA_TEX_MASK;
-	else  mat.illum &= ~KA_TEX_MASK;
-
-	ImGui::Checkbox("Kd", &hasKdMask);
-	ImGui::SameLine();
-	if (hasKdMask) mat.illum |= KD_TEX_MASK;
-	else  mat.illum &= ~KD_TEX_MASK;
-
-	ImGui::Checkbox("Ks", &hasKsMask);
-	ImGui::SameLine();
-	if (hasKsMask) mat.illum |= KS_TEX_MASK;
-	else  mat.illum &= ~KS_TEX_MASK;
+	changed |= CheckBoxBit("Ka[m]", mat.illum, KA_TEX_MASK);
 	
-	ImGui::Checkbox("Ns", &hasNsMask);
 	ImGui::SameLine();
-	if (hasNsMask) mat.illum |= NS_TEX_MASK;
-	else  mat.illum &= ~NS_TEX_MASK;
+	changed |= CheckBoxBit("Kd[m]", mat.illum, KD_TEX_MASK);
 
-	ImGui::Checkbox("D", &hasDMask);
-	if (hasDMask) mat.illum |= D_TEX_MASK;
-	else  mat.illum &= ~D_TEX_MASK;
+	ImGui::SameLine();
+	changed |= CheckBoxBit("Ks[m]", mat.illum, KS_TEX_MASK);
 		
+	ImGui::SameLine();
+	changed |= CheckBoxBit("Ns[m]", mat.illum, NS_TEX_MASK);
+
+	ImGui::SameLine();
+	changed |= CheckBoxBit("D[m]", mat.illum, D_TEX_MASK);
+
+	ImGui::Text("Factor Masks");
+
+	changed |= CheckBoxBit("Ka[f]", mat.illum, KA_FACT_MASK);
+	
+	ImGui::SameLine();
+	changed |= CheckBoxBit("Kd[f]", mat.illum, KD_FACT_MASK);
+
+	ImGui::SameLine();
+	changed |= CheckBoxBit("Ks[f]", mat.illum, KS_FACT_MASK);
+		
+	ImGui::SameLine();
+	changed |= CheckBoxBit("Ns[f]", mat.illum, NS_FACT_MASK);
+
+	ImGui::SameLine();
+	changed |= CheckBoxBit("D[f]", mat.illum, D_FACT_MASK);
+			
 	ImGui::Separator();
 		
 	ImGui::Text("Colors:");
@@ -287,11 +298,11 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 	ImGui::Separator();
 	ImGui::Text("Maps: ");
 
-	ChooseTexture(graphics, textures, "Ka Map", mat.KaMap);
-	ChooseTexture(graphics, textures, "Kd Map", mat.KdMap);
-	ChooseTexture(graphics, textures, "Ks Map", mat.KsMap);
-	ChooseTexture(graphics, textures, "Ns Map", mat.NsMap);
-	ChooseTexture(graphics, textures, "d Map", mat.dMap);
+	changed |= ChooseTexture(graphics, textures, "Ka Map", mat.KaMap);
+	changed |= ChooseTexture(graphics, textures, "Kd Map", mat.KdMap);
+	changed |= ChooseTexture(graphics, textures, "Ks Map", mat.KsMap);
+	changed |= ChooseTexture(graphics, textures, "Ns Map", mat.NsMap);
+	changed |= ChooseTexture(graphics, textures, "d Map", mat.dMap);
 	
 
 	return changed;
@@ -311,8 +322,8 @@ bool ControlTexturedMaterialImGui(TexturedMaterial& mat, const char* name, Textu
 
 	ImGui::Text("Maps:");
 
-	ChooseTexture(graphics, textures, "Base Map", mat.BaseMap);
-	ChooseTexture(graphics, textures, "Ao Map", mat.AoMap);
+	changed |= ChooseTexture(graphics, textures, "Base Map", mat.BaseMap);
+	changed |= ChooseTexture(graphics, textures, "Ao Map", mat.AoMap);
 
 	return changed;
 }

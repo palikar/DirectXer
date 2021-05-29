@@ -42,7 +42,7 @@ struct VSIn
 struct VSOut
 {
     float4 pos : SV_Position;
-    float3 color : COLOR0;
+    nointerpolation float3 color : COLOR0;
 };
 
 

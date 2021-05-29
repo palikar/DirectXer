@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Types.hpp>
+
 enum  SerializationEntry
 {
 	SE_Camera,
@@ -8,6 +10,8 @@ enum  SerializationEntry
 	SE_PhongMat,
 	SE_TexMat,
 	SE_MtlMat,
+
+	SE_Data,
 	
 	SE_Count,
 };
@@ -19,6 +23,12 @@ struct PhongMaterialData;
 struct TexturedMaterialData;
 struct MtlMaterialData;
 
+struct SerializationData
+{
+	size_t Size;
+	void* Data;
+};
+
 struct SerializationContext
 {
 	Camera* Camera;
@@ -27,7 +37,8 @@ struct SerializationContext
 	PhongMaterialData* PhongMaterials[8];
 	TexturedMaterialData* TexturedMaterials[8];
 	MtlMaterialData* MtlMaterials[8];
-	
+
+	SerializationData Datas[8];
 	
 };
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Serialization.hpp>
 #include <GraphicsCommon.hpp>
 #include <Types.hpp>
 #include <Utils.hpp>
@@ -13,6 +14,7 @@
 #include <FileUtils.hpp>
 #include <Platform.hpp>
 #include <TextureCatalog.hpp>
+#include <2DRendering.hpp>
 
 #include <imgui.h>
 
@@ -86,6 +88,12 @@ struct Context
 	LightHelpers LightHelpersState;
 
 	float T = 0.0f;
+};
+
+struct SessionSaveContext
+{
+	uint32 MaterialsCount;
+	char* Paths;
 };
 
 void Init(Context& context);

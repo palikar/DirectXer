@@ -31,10 +31,11 @@ bool ControlLightingImGui(Lighting& light)
 
 		for (size_t i = 0; i < PointLightsCount; ++i)
 		{
-			if (ImGui::TreeNode(formater.Format("Point light[{}]", i)))
-			{
-				ImGui::Checkbox("Active", (bool*)&light.pointLights[i].Active);
+			bool treeActive = ImGui::TreeNodeEx(formater.Format("Point light[{}]", i), ImGuiTreeNodeFlags_AllowItemOverlap);
+			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
+			ImGui::ToggleButton("Active", (bool*)&light.pointLights[i].Active);
 
+			if(treeActive){
 				ImGui::Text("Color");
 				ImGui::SameLine();
 				lightChanged |= ImGui::ColorEdit3("Color", (float*)&light.pointLights[i].Color);
@@ -47,11 +48,12 @@ bool ControlLightingImGui(Lighting& light)
 
 		for (size_t i = 0; i < SpotLightsCount; ++i)
 		{
-					
-			if (ImGui::TreeNode(formater.Format("Spot light[{}]", i)))
-			{
-				ImGui::Checkbox("Active", (bool*)&light.spotLights[i].Active);
 
+			bool treeActive = ImGui::TreeNode(formater.Format("Spot light[{}]", i));
+			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
+			ImGui::ToggleButton("Active", (bool*)&light.spotLights[i].Active);
+			if (treeActive)
+			{
 				ImGui::Text("Color");
 				ImGui::SameLine();
 				lightChanged |= ImGui::ColorEdit3("Color", (float*)&light.spotLights[i].color);

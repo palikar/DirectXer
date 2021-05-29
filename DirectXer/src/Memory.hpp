@@ -128,6 +128,7 @@ inline T& ReadBlob(char* &Current)
 	return *res;
 }
 
+
 template<typename T>
 inline T& ReadBlobAndMove(char* &Current, size_t size)
 {
