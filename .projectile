@@ -3,7 +3,7 @@
 -External/scripting
 
 -DirectXer/libs
-
+-DirectXer/CompiledShaders
 -Fmt
 
 -Build
@@ -20,7 +20,9 @@
 -*.nmeta*
 -*.log*
 -*.tlog*
+-*args.json*
 
+-*.sln*
 -*.lib*
 -*.obj*
 -*.pdb*

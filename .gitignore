@@ -7,6 +7,7 @@ imgui.ini
 
 build.bat
 DirectXer/Shaders/*.hpp
+DirectXer/CompiledShaders
 DirectXer/Shaders/*.cso
 resources/*.dxl
 resources/*.dxa
