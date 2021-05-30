@@ -269,6 +269,8 @@ static void ParseCommandLineArguments(int argc, char *argv[], MaterialEditor::Co
 			arguments.Root = argv[++i];
 		} else if (current == "-i") {
 			arguments.Input = argv[++i];
+		} else if (current == "-f") {
+			arguments.fullScreen = true;
 		}
 	}
 }
@@ -325,11 +327,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	Init(context);
 
-	ToggleFullscreen(context);
+	if (context.Args.fullScreen)
+	{
+		ToggleFullscreen(context);
+	}
 
 	clock_t dt = 0;
 	
-	while (true)
+	while (!context.Exit)
 	{
 		Input::gInput.Update();
 		

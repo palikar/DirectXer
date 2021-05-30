@@ -23,39 +23,6 @@ void Init(Context& context)
 {
 	auto Graphics = &context.Graphics;
 	context.Renderer3D.InitRenderer(Graphics);
-	context.Textures.LoadedTextures.reserve(64);
-	context.Textures.LoadedCubes.reserve(16);
-
-	const char* Envs[] = {
-		"resources/night_sky",
-		"resources/sky",
-	};
-
-	const char* Texs[] = {
-		"resources/floor_color.png",
-		"resources/rocks_color.png",
-		"resources/rocks_normal.png",
-		"resources/rocks_ao.png",
-		"resources/checker.png",
-		"resources/bricks_color.png",
-		"resources/bricks_ao.png",
-		"resources/bricks_normal.png",
-		"resources/dummyTexture.png",
-	};
-
-	const char* Meshes[] = {
-		"resources/models/first_tree.obj",
-		"resources/models/simple_monkey.obj",
-		"resources/models/simple_sphere.obj",
-	};
-
-	for (size_t i = 0; i < Size(Meshes); i++)
-	{
-		LoadObjMesh(context, Meshes[i]);
-	}
-
-	context.Textures.LoadTextures(Graphics, Texs, (uint32)Size(Texs));
-	context.Textures.LoadCubes(Graphics, Envs, (uint32)Size(Envs));
 
 	Memory::EstablishTempScope(Megabytes(4));
 	{
@@ -73,6 +40,43 @@ void Init(Context& context)
 		context.Renderer3D.InitDebugGeometry(builder);
 	}
 	Memory::EndTempScope();
+
+	
+	context.Textures.LoadedTextures.reserve(64);
+	context.Textures.LoadedCubes.reserve(16);
+	
+
+	const char* Envs[] = {
+		"resources/textures/cubes/night_sky",
+		"resources/textures/cubes/sky",
+	};
+
+	const char* Texs[] = {
+		"resources/textures/floor_color.png",
+		"resources/textures/rocks_color.png",
+		"resources/textures/rocks_normal.png",
+		"resources/textures/rocks_ao.png",
+		"resources/textures/checker.png",
+		"resources/textures/bricks_color.png",
+		"resources/textures/bricks_ao.png",
+		"resources/textures/bricks_normal.png",
+		"resources/textures/dummyTexture.png",
+	};
+
+	const char* Meshes[] = {
+		"resources/models/first_tree.obj",
+		"resources/models/simple_monkey.obj",
+		"resources/models/simple_sphere.obj",
+		"resources/models/teapot.obj",
+	};
+
+	for (size_t i = 0; i < Size(Meshes); i++)
+	{
+		LoadObjMesh(context, Meshes[i]);
+	}
+
+	context.Textures.LoadTextures(Graphics, Texs, (uint32)Size(Texs));
+	context.Textures.LoadCubes(Graphics, Envs, (uint32)Size(Envs));
 
 	context.Renderer3D.CurrentCamera.Pos = { 1.0f, 0.5f, 1.0f };
 	context.Renderer3D.CurrentCamera.lookAt({ 0.0f, 0.0f, 0.0f });
@@ -343,7 +347,7 @@ void Update(Context& context, float dt)
 			ImGui::Separator();
 			if(ImGui::MenuItem("Exit"))
 			{
-				
+				context.Exit = true;
 			}
 			
 			ImGui::EndMenu();

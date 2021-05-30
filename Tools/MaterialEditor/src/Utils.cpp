@@ -29,6 +29,11 @@ void LoadObjMesh(Context& context, const char* path)
 	while(std::getline(stream, line, '\n'))
 	{
 		if (line[0] == '#') continue;
+		std::string::iterator new_end =
+			std::unique(line.begin(), line.end(),
+				[=](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
+		);
+		line.erase(new_end, line.end());
 		
 		if (line[0] == 'v' && line[1] == ' ')
 		{

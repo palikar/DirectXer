@@ -28,6 +28,8 @@ struct MaterialEditor
 	{
 		std::string Root{"resources"};
 		std::string Input{"input.dxa"};
+
+		bool fullScreen{false};
 	};
 
 };
@@ -75,6 +77,7 @@ struct Context
 	Graphics Graphics;
 	float Width;
 	float Height;
+	bool Exit{false};
 
 	Renderer3D Renderer3D;
 	

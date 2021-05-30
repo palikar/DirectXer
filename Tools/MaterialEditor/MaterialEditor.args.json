@@ -3,8 +3,12 @@
   "Id": "536a196c-d3d2-4463-9699-50b09b2cea1a",
   "Items": [
     {
+      "Id": "26916c61-8327-4c0c-ad16-69fff3f43e31",
+      "Command": "-f"
+    },
+    {
       "Id": "f8704a5e-464b-48f2-bc54-f43e94875c87",
-      "Command": "-i SpaceGameAtlases.datlas"
+      "Command": ""
     }
   ]
 }
