@@ -49,6 +49,7 @@
   <ItemGroup>
     <ClCompile Include="src\MaterialEditor.cpp" />
     <ClCompile Include="src\MaterialEditorApplication.cpp" />
+    <ClCompile Include="src\MaterialEditorSerialization.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>

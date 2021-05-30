@@ -4,6 +4,7 @@
     <ClCompile Include="src\MaterialEditor.cpp" />
     <ClCompile Include="src\MaterialEditorApplication.cpp" />
     <ClCompile Include="src\Utils.cpp" />
+    <ClCompile Include="src\MaterialEditorSerialization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\MaterialEditor.hpp" />

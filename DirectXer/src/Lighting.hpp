@@ -18,7 +18,6 @@ struct PointLight
 
 struct SpotLight
 {
-	
 	glm::vec4 color{ 0.0f, 0.0f, 0.0f, 0.0f };
     glm::vec4 position{ 0.0f, 0.0f, 0.0f, 0.0f };
     glm::vec4 dir{ 0.0f, 0.0f, 0.0f, 0.0f};

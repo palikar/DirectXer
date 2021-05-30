@@ -17,6 +17,10 @@
 #include <2DRendering.hpp>
 
 #include <imgui.h>
+#include <ImGuiFileDialog.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 struct MaterialEditor
 {
@@ -99,7 +103,16 @@ struct SessionSaveContext
 void Init(Context& context);
 void Update(Context& context, float dt);
 
+inline static MaterialId NextMaterialId = 1;
 
-// control camera (?)
-// serialization
-// Split up the tex and phong materials in their own shaders
+void LoadSession(Context& context, const char* path);
+MtlMaterial LoadMtlMaterial(Context& context, fs::path path);
+PhongMaterial LoadPhongMaterial(Context& context, fs::path path);
+TexturedMaterial LoadTexturedMaterial(Context& context, fs::path path);
+void LoadMaterial(Context& context, fs::path path);
+void LoadSession(Context& context, const char* path);
+
+void SaveMaterial(Context& context, MtlMaterial mat, const char* path, const char* name);
+void SaveMaterial(Context& context, PhongMaterial mat, const char* path, const char* name);
+void SaveMaterial(Context& context, TexturedMaterial mat, const char* path, const char* name);
+void SaveSession(Context& context, const char* path);

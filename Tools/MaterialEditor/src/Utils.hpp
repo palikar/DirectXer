@@ -9,8 +9,8 @@
 #include <fstream>
 #include <stb_image.h>
 #include <fmt/format.h>
-#include <filesystem>
 #include <Glm.hpp>
+#include <filesystem>
 
 static std::vector<unsigned char> LoadFile(const std::string &t_filename)
 {
