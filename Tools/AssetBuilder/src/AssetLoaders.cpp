@@ -86,7 +86,6 @@ static bool EndsWith(const std::string &str, const std::string &suffix)
     return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
 }
 
-
 static std::string ReplaceAll(std::string str, const std::string &from, const std::string &to)
 {
     if (from.empty()) return str;
@@ -438,7 +437,86 @@ static void LoadPhongMaterial(AssetToLoad asset, AssetBundlerContext& context, A
 {
 	auto content = LoadFileIntoString(asset.Path);
 	std::stringstream stream(content);
-	std::string line;	
+	std::string line;
+	std::string newMatName;
+
+	PhongMaterial newMat;
+	memset(&newMat, 0, sizeof(PhongMaterial));
+	while (std::getline(stream, line, '\n'))
+	{
+		if (line[0] == '#') continue;
+
+		if (StartsWith(line, "newmtl"))
+		{
+			auto parts = SplitLine(line, ' ');
+			
+			newMatName = ReplaceAll(parts[1], ".", "_");
+
+			// @Note: We don't want to load the same material twice
+			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
+			if( id != context.Defines.end())
+			{
+				newMatName.clear();
+			}
+
+		}
+		else if (StartsWith(line, "Ambient "))
+		{
+			auto parts = SplitLine(line, ' ');
+			
+			newMat.Ambient = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "Diffuse "))
+		{
+			auto parts = SplitLine(line, ' ');
+
+			newMat.Diffuse = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "Specular "))
+		{
+			auto parts = SplitLine(line, ' ');
+
+			newMat.Specular = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "Emissive "))
+		{
+			auto parts = SplitLine(line, ' ');
+
+			newMat.Emissive = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str())
+			};
+		}
+		else if (StartsWith(line, "SpecularExponent "))
+		{
+			auto parts = SplitLine(line, ' ');
+
+			newMat.SpecularChininess = std::stof(parts[1].c_str());
+		}
+	}
+
+	if (!newMatName.empty())
+	{
+		MaterialLoadEntry newEntry{};
+		memset(&newEntry, 0, sizeof(MaterialLoadEntry));
+		newEntry.Desc.Type = MT_PHONG;
+		newEntry.Desc.Phong = newMat;
+		newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
+
+	}
 }
 
 static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
@@ -446,7 +524,88 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 	auto content = LoadFileIntoString(asset.Path);
 	std::stringstream stream(content);
 	std::string line;
-	
+
+	std::string newMatName;
+	std::string texName;
+
+	TexturedMaterial newMat;
+	memset(&newMat, 0, sizeof(TexturedMaterial));
+
+	while (std::getline(stream, line, '\n'))
+	{
+		if (line[0] == '#') continue;
+
+		if (StartsWith(line, "newmtl"))
+		{
+			auto parts = SplitLine(line, ' ');
+			
+			newMatName = ReplaceAll(parts[1], ".", "_");
+
+			// @Note: We don't want to load the same material twice
+			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
+			if( id != context.Defines.end())
+			{
+				newMatName.clear();
+			}
+		}
+		else if (StartsWith(line, "Color "))
+		{
+			auto parts = SplitLine(line, ' ');
+			
+			newMat.Color = {
+				std::stof(parts[1].c_str()),
+				std::stof(parts[2].c_str()),
+				std::stof(parts[3].c_str()),
+				1.0f
+			};
+		}
+		else if (StartsWith(line, "ColorIntensity "))
+		{
+			auto parts = SplitLine(line, ' ');
+
+			newMat.ColorIntensity = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "AoIntensity "))
+		{
+			auto parts = SplitLine(line, ' ');
+
+			newMat.AoIntensity = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "Reflectivity "))
+		{
+			auto parts = SplitLine(line, ' ');
+			
+			newMat.Reflectivity = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "Refraction_ration "))
+		{
+			auto parts = SplitLine(line, ' ');
+			
+			newMat.Refraction_ration = std::stof(parts[1].c_str());
+		}
+		else if (StartsWith(line, "AoMap "))
+		{
+			texName = fmt::format("{}_AoMap", newMatName);
+			
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line, "AoMap ", "");
+			texAsset.Id = texName.data();
+			LoadTexture(texAsset, context, blob);
+			
+			newMat.AoMap = context.TexturesToCreate.back().Id;
+		}
+		else if (StartsWith(line, "BaseMap "))
+		{
+			texName = fmt::format("{}_BaseMap", newMatName);
+
+			AssetToLoad texAsset;
+			texAsset.Path = ReplaceAll(line, "BaseMap ", "");
+			texAsset.Id = texName.data();
+			LoadTexture(texAsset, context, blob);
+			
+			newMat.BaseMap = context.TexturesToCreate.back().Id;
+		}
+	}
 }
 
 void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
