@@ -86,9 +86,19 @@ struct SkyboxLoadEntry
 	size_t DataOffset[6];
 };
 
+struct MaterialDesc
+{
+	MaterialType Type;
+	union {
+		MtlMaterial Mtl;
+		PhongMaterial Phong;
+		TexturedMaterial Tex;
+	};
+};
+
 struct MaterialLoadEntry
 {
-	MtlMaterial Desc;
+	MaterialDesc Desc;
 	MaterialId Id;
 	ConstantBufferId Buffer;
 };

@@ -50,7 +50,7 @@ static AssetToLoad AssetsToLoad[] = {
 };
 
 // @Note: The images here will be packed into atlases and those will be put in the asset bundle file.
-static inline ImageToPack IagesForPacking[] = {
+static inline ImageToPack ImagesForPacking[] = {
 		
 	{"assets/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
 	{"assets/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
 	fmt::print("----------Running the texture packer----------\n");
 	TexturePacker::CommandLineArguments texturePackingArguments;
 	texturePackingArguments.Root = arguments.Root;
-	TexturePackerOutput packedImages = PackTextures(texturePackingArguments, IagesForPacking, size(IagesForPacking));
+	TexturePackerOutput packedImages = PackTextures(texturePackingArguments, ImagesForPacking, size(ImagesForPacking));
 	fmt::print("----------Done with image packing----------\n");
 	
 	// @Note: Create atlas entry and texture load entry for each atlas

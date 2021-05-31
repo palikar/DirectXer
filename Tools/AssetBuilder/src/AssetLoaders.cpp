@@ -81,6 +81,12 @@ static bool StartsWith(const std::string &str, const std::string &prefix)
 	return str.size() >= prefix.size() && 0 == str.compare(0, prefix.size(), prefix);
 }
 
+static bool EndsWith(const std::string &str, const std::string &suffix)
+{
+    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
+
+
 static std::string ReplaceAll(std::string str, const std::string &from, const std::string &to)
 {
     if (from.empty()) return str;
@@ -228,7 +234,7 @@ void LoadSkybox(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& 
 
 }
 
-void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+static void LoadMtlMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
 {
 	auto content = LoadFileIntoString(asset.Path);
 	std::stringstream stream(content);
@@ -254,8 +260,10 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 
 			if (!newMatName.empty())
 			{
-				MaterialLoadEntry newEntry;
-				newEntry.Desc = newMat;
+				MaterialLoadEntry newEntry{};
+				memset(&newEntry, 0, sizeof(MaterialLoadEntry));
+				newEntry.Desc.Type = MT_MTL;
+				newEntry.Desc.Mtl = newMat;
 				newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
 				context.Materials.push_back(newEntry);
 			}
@@ -413,14 +421,48 @@ void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob
 
 	if (!newMatName.empty())
 	{
-		MaterialLoadEntry newEntry;
-		newEntry.Desc = newMat;
+		MaterialLoadEntry newEntry{};
+		memset(&newEntry, 0, sizeof(MaterialLoadEntry));
+		newEntry.Desc.Type = MT_MTL;
+		newEntry.Desc.Mtl = newMat;
 		newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
 		
 		std::string debugName = fmt::format("{}_CB", newMatName.c_str());
 		newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, debugName.c_str(), NextCBAssetId());
 		
 		context.Materials.push_back(newEntry);
+	}	
+}
+
+static void LoadPhongMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	auto content = LoadFileIntoString(asset.Path);
+	std::stringstream stream(content);
+	std::string line;	
+}
+
+static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	auto content = LoadFileIntoString(asset.Path);
+	std::stringstream stream(content);
+	std::string line;
+	
+}
+
+void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
+{
+	
+	if (EndsWith(asset.Path, ".mtl"))
+	{
+		LoadMtlMaterial(asset, context, blob);
+	}
+	else if (EndsWith(asset.Path, ".mtl_phong"))
+	{
+		LoadPhongMaterial(asset, context, blob);
+	}
+	else if (EndsWith(asset.Path, ".mtl_tex"))
+	{
+		LoadTexMaterial(asset, context, blob);
 	}	
 }
 
@@ -601,8 +643,10 @@ uint32 LoadDefaultMaterial(AssetBundlerContext& context)
 
 	newMat.Program = SC_MTL_1;
 	
-	MaterialLoadEntry newEntry;
-	newEntry.Desc = newMat;
+	MaterialLoadEntry newEntry{};
+	memset(&newEntry, 0, sizeof(MaterialLoadEntry));
+	newEntry.Desc.Type = MT_MTL;
+	newEntry.Desc.Mtl = newMat;
 	newEntry.Id = NewAssetName(context, Type_Material, "DefaultMaterial");
 	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, "DefaultMaterial_CB", NextCBAssetId());
 		
