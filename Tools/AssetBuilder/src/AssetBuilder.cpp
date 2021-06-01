@@ -33,36 +33,43 @@ static AssetToLoad AssetsToLoad[] = {
 	{Type_Mesh, Tag_Level,  "models/first_tree.obj", "M_TREE_1"},
 	{Type_Mesh, Tag_Level,  "models/simple_monkey.obj", "M_SUZANNE"},
 
-	{Type_Skybox, Tag_Level, "sky", "T_SKY"},
-	{Type_Skybox, Tag_Level, "night_sky", "T_NIGHT_SKY"},
+	{Type_Skybox, Tag_Level, "textures/cubes/sky", "T_SKY"},
+	{Type_Skybox, Tag_Level, "textures/cubes/night_sky", "T_NIGHT_SKY"},
 
-	{Type_Texture, Tag_Level, "checker.png", "T_CHECKER"},
-	{Type_Texture, Tag_Level, "rocks_color.png", "T_ROCKS_COLOR"},
-	{Type_Texture, Tag_Level, "floor_color.png", "T_FLOOR_COLOR"},
-	{Type_Texture, Tag_Level, "rocks_ao.png", "T_ROCKS_AO"},
-	{Type_Texture, Tag_Level, "rocks_normal.png", "T_ROCKS_NORMAL"},	
+	{Type_Texture, Tag_Level, "textures/checker.png", "T_CHECKER"},
+	{Type_Texture, Tag_Level, "textures/rocks_color.png", "T_ROCKS_COLOR"},
+	{Type_Texture, Tag_Level, "textures/floor_color.png", "T_FLOOR_COLOR"},
+	{Type_Texture, Tag_Level, "textures/rocks_ao.png", "T_ROCKS_AO"},
+	{Type_Texture, Tag_Level, "textures/rocks_normal.png", "T_ROCKS_NORMAL"},	
 
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans.ttf", "F_DroidSans", {24, 20}},
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans-Bold.ttf", "F_DroidSansBold", {24, 20}},
 	
-	{Type_Wav, Tag_Level,  "shoot.wav", "A_SHOOT"},
-	{Type_Wav, Tag_Level,  "explosion.wav", "A_EXPLODE"},
+	{Type_Wav, Tag_Level,  "sounds/shoot.wav", "A_SHOOT"},
+	{Type_Wav, Tag_Level,  "sounds/explosion.wav", "A_EXPLODE"},
+
+	{Type_Material, Tag_Level,  "materials/Phong_Material_0.mtl_phong", "MAT_PHONG0"},
+	{Type_Material, Tag_Level,  "materials/Phong_Material_1.mtl_phong", "MAT_PHONG1"},
+	{Type_Material, Tag_Level,  "materials/Textured_Material_0.mtl_tex", "MAT_TEX0"},
 };
 
 // @Note: The images here will be packed into atlases and those will be put in the asset bundle file.
 static inline ImageToPack ImagesForPacking[] = {
 		
-	{"assets/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
-	{"assets/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
-	{"assets/evil_ship_3.png", 64, 64, "I_EVIL_SHIP_3"},
-	{"assets/PNG/Ship_Parts/Ship_Main_Icon.png", 64, 64, "I_MAIN_SHIP"},
-	{"assets/ship_bullet.png", 32, 64, "I_BULLET"},
-	{"assets/explosion.png", 0, 0, "I_EXPLOSION"},
-	{"assets/heart.png", 32, 32, "I_HEART"},
-	{"assets/PNG/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
-	{"assets/PNG/Main_Menu/BG.png", 0, 0, "I_BG"},
-	{"assets/PNG/Main_UI/Stats_Bar.png", 0, 0, "I_STATS"},
-	{"assets/sprites.png", 0, 0, "I_SHOOT"},
+	{"images/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
+	{"images/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
+	{"images/evil_ship_3.png", 64, 64, "I_EVIL_SHIP_3"},
+
+	{"images/SpaceGameAssets/Ship_Parts/Ship_Main_Icon.png", 64, 64, "I_MAIN_SHIP"},
+	{"images/SpaceGameAssets/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
+	{"images/SpaceGameAssets/Main_Menu/BG.png", 0, 0, "I_BG"},
+	{"images/SpaceGameAssets/Main_UI/Stats_Bar.png", 0, 0, "I_STATS"},
+
+	{"images/heart.png", 32, 32, "I_HEART"},
+	{"images/ship_bullet.png", 32, 64, "I_BULLET"},
+	{"images/explosion.png", 0, 0, "I_EXPLOSION"},
+
+	{"images/sprites.png", 0, 0, "I_SHOOT"},
 	{"images/facebook.png", 0, 0, "I_FACEBOOK"},
 	{"images/instagram.png", 0, 0, "I_INSTAGRAM"},
 };
@@ -267,6 +274,12 @@ int main(int argc, char *argv[])
 		  {
 			  LoadSkybox(asset, context, dataBlob);
 			  std::cout << fmt::format("{} \t->\t Bundling Skybox [{:.3} MB] [{}]\n", asset.Id, (6*dataBlob.lastSize)/(1024.0f*1024.0f), asset.Path);
+			  break;
+		  }
+		  case Type_Material: 
+		  {
+			  LoadMaterial(asset, context, dataBlob);
+			  std::cout << fmt::format("{} \t->\t Bundling Material [{:.3} KB] [{}]\n", asset.Id, (dataBlob.lastSize)/(1024.0f), asset.Path);
 			  break;
 		  }
 		  case Type_Mesh: 

@@ -599,7 +599,7 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 			texName = fmt::format("{}_BaseMap", newMatName);
 
 			AssetToLoad texAsset;
-			texAsset.Path = ReplaceAll(line, "BaseMap ", "");
+			texAsset.Path = ReplaceAll(ReplaceAll(line, "BaseMap ", ""), "\r", "");
 			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
