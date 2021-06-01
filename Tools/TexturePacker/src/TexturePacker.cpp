@@ -20,14 +20,14 @@
 
 static inline ImageToPack images[] = {
 
-	{"assets/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
-	{"assets/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
-	{"assets/evil_ship_3.png", 64, 64, "I_EVIL_SHIP_3"},
-	{"assets/PNG/Ship_Parts/Ship_Main_Icon.png", 64, 64, "I_MAIN_SHIP"},
-	{"assets/ship_bullet.png", 32, 64, "I_BULLET"},
-	{"assets/explosion.png", 0, 0, "I_EXPLOSION"},
-	{"assets/heart.png", 32, 32, "I_HEART"},
-	{"assets/PNG/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
+	{"images/evil_ship_1.png", 64, 64, "I_EVIL_SHIP_1"},
+	{"images/evil_ship_2.png", 64, 64, "I_EVIL_SHIP_2"},
+	{"images/evil_ship_3.png", 64, 64, "I_EVIL_SHIP_3"},
+	{"images/ship_bullet.png", 32, 64, "I_BULLET"},
+	{"images/explosion.png", 0, 0, "I_EXPLOSION"},
+	{"images/heart.png", 32, 32, "I_HEART"},
+	{"images/SpaceGameAssets/Ship_Parts/Ship_Main_Icon.png", 64, 64, "I_MAIN_SHIP"},
+	{"images/SpaceGameAssets/Main_UI/Health_Bar_Table.png", 0, 0, "I_HEALTH"},
 };
 
 static void ParseCommandLineArguments(int argc, char *argv[], TexturePacker::CommandLineArguments& arguments)

@@ -7,10 +7,6 @@
       "Command": "-i SpaceGameAssetFile"
     },
     {
-      "Id": "4d75821d-758a-4465-be01-31cdbce4df55",
-      "Command": "-o resources/SpaceAssets "
-    },
-    {
       "Id": "e788e0be-f373-4065-83ab-487d65507c09",
       "Command": "-h DirectXer/ResorceHeaders/SpaceAssets.hpp"
     },

@@ -508,15 +508,16 @@ static void LoadPhongMaterial(AssetToLoad asset, AssetBundlerContext& context, A
 		}
 	}
 
-	if (!newMatName.empty())
-	{
-		MaterialLoadEntry newEntry{};
-		memset(&newEntry, 0, sizeof(MaterialLoadEntry));
-		newEntry.Desc.Type = MT_PHONG;
-		newEntry.Desc.Phong = newMat;
-		newEntry.Id = NewAssetName(context, Type_Material, newMatName.c_str());
+	MaterialLoadEntry newEntry{};
+	memset(&newEntry, 0, sizeof(MaterialLoadEntry));
+	newEntry.Desc.Type = MT_PHONG;
+	newEntry.Desc.Phong = newMat;
+	newEntry.Id = NewAssetName(context, Type_Material, asset.Id);
 
-	}
+	std::string debugName = fmt::format("{}_CB", asset.Id);
+	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, debugName.c_str(), NextCBAssetId());
+		
+	context.Materials.push_back(newEntry);
 }
 
 static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)
@@ -588,7 +589,7 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 			texName = fmt::format("{}_AoMap", newMatName);
 			
 			AssetToLoad texAsset;
-			texAsset.Path = ReplaceAll(line, "AoMap ", "");
+			texAsset.Path = ReplaceAll(ReplaceAll(line, "AoMap ", ""), "\r", "");
 			texAsset.Id = texName.data();
 			LoadTexture(texAsset, context, blob);
 			
@@ -606,6 +607,17 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 			newMat.BaseMap = context.TexturesToCreate.back().Id;
 		}
 	}
+
+	MaterialLoadEntry newEntry{};
+	memset(&newEntry, 0, sizeof(MaterialLoadEntry));
+	newEntry.Desc.Type = MT_TEXTURED;
+	newEntry.Desc.Tex = newMat;
+	newEntry.Id = NewAssetName(context, Type_Material, asset.Id);
+		
+	std::string debugName = fmt::format("{}_CB", newMatName.c_str());
+	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, debugName.c_str(), NextCBAssetId());
+	
+	context.Materials.push_back(newEntry);
 }
 
 void LoadMaterial(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& blob)

@@ -118,11 +118,25 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		MaterialLoadEntry& entry = ReadBlob<MaterialLoadEntry>(current);
 		if (!context.MeshesLib) continue;
 
-		entry.Desc.Cbo = entry.Buffer;
-		entry.Desc.Id = entry.Id;
+		switch (entry.Desc.Type)
+		{
+		case MT_MTL:
+			entry.Desc.Mtl.Id = entry.Id;
+			context.MeshesLib->Materials.MtlMaterials.push_back(entry.Desc.Mtl);
+			context.Graphics->CreateConstantBuffer(entry.Desc.Mtl.Cbo, sizeof(MtlMaterialData), &entry.Desc.Mtl);
+			break;
+		case MT_TEXTURED:
+			entry.Desc.Tex.Id = entry.Id;
+			context.MeshesLib->Materials.TexMaterials.push_back(entry.Desc.Tex);
+			context.Graphics->CreateConstantBuffer(entry.Desc.Tex.Cbo, sizeof(TexturedMaterialData), &entry.Desc.Tex);
+			break;
+		case MT_PHONG:
+			entry.Desc.Phong.Id = entry.Id;
+			context.MeshesLib->Materials.PhongMaterials.push_back(entry.Desc.Phong);
+			context.Graphics->CreateConstantBuffer(entry.Desc.Phong.Cbo, sizeof(PhongMaterialData), &entry.Desc.Phong);
+			break;
+		}
 		
-		context.MeshesLib->Materials.MtlMaterials.push_back(entry.Desc);
-		context.Graphics->CreateConstantBuffer(entry.Desc.Cbo, sizeof(MtlMaterialData), &entry.Desc);
 	}
 	
 }

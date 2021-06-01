@@ -1,19 +1,19 @@
 #pragma once
 
 #include <iostream>
-#include <algorithm>
 #include <unordered_map>
 #include <vector>
 #include <string>
-#include <cstdint>
 #include <fstream>
-#include <stb_image.h>
+#include <filesystem>
+
 #include <GraphicsCommon.hpp>
 #include <Types.hpp>
 #include <Utils.hpp>
 #include <Assets.hpp>
+
 #include <fmt/format.h>
-#include <filesystem>
+#include <stb_image.h>
 
 namespace fs = std::filesystem;
 

@@ -45,7 +45,6 @@ void Init(Context& context)
 	context.Textures.LoadedTextures.reserve(64);
 	context.Textures.LoadedCubes.reserve(16);
 	
-
 	const char* Envs[] = {
 		"resources/textures/cubes/night_sky",
 		"resources/textures/cubes/sky",

@@ -1,17 +1,3 @@
-#include <iostream>
-#include <unordered_map>
-#include <vector>
-#include <string>
-#include <cstdint>
-#include <fstream>
-#include <stb_image.h>
-#include <GraphicsCommon.hpp>
-#include <Types.hpp>
-#include <Utils.hpp>
-#include <Assets.hpp>
-#include <fmt/format.h>
-#include <filesystem>
-
 #include <TexturePacker.hpp>
 #include "AssetBuilder.hpp"
 
@@ -30,8 +16,8 @@
 
 static AssetToLoad AssetsToLoad[] = {
 
-	{Type_Mesh, Tag_Level,  "models/first_tree.obj", "M_TREE_1"},
-	{Type_Mesh, Tag_Level,  "models/simple_monkey.obj", "M_SUZANNE"},
+	{Type_Mesh, Tag_Level,	"models/first_tree.obj", "M_TREE_1"},
+	{Type_Mesh, Tag_Level,	"models/simple_monkey.obj", "M_SUZANNE"},
 
 	{Type_Skybox, Tag_Level, "textures/cubes/sky", "T_SKY"},
 	{Type_Skybox, Tag_Level, "textures/cubes/night_sky", "T_NIGHT_SKY"},
@@ -40,7 +26,13 @@ static AssetToLoad AssetsToLoad[] = {
 	{Type_Texture, Tag_Level, "textures/rocks_color.png", "T_ROCKS_COLOR"},
 	{Type_Texture, Tag_Level, "textures/floor_color.png", "T_FLOOR_COLOR"},
 	{Type_Texture, Tag_Level, "textures/rocks_ao.png", "T_ROCKS_AO"},
-	{Type_Texture, Tag_Level, "textures/rocks_normal.png", "T_ROCKS_NORMAL"},	
+	{Type_Texture, Tag_Level, "textures/rocks_normal.png", "T_ROCKS_NORMAL"},
+
+	{Type_Texture, Tag_Level, "textures/PavingStones/Color.png", "T_STONES_COLOR"},
+	{Type_Texture, Tag_Level, "textures/PavingStones/Roughness.png", "T_STONES_ROUGHNESS"},
+	{Type_Texture, Tag_Level, "textures/PavingStones/Normal.png", "T_STONES_NORMAL"},
+	{Type_Texture, Tag_Level, "textures/PavingStones/Displacement.png", "T_STONES_DISPLACEMENT"},
+	{Type_Texture, Tag_Level, "textures/PavingStones/AmbientOcclusion.png", "T_STONES_AO"},
 
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans.ttf", "F_DroidSans", {24, 20}},
 	{Type_Font, Tag_Level, "fonts/DroidSans/DroidSans-Bold.ttf", "F_DroidSansBold", {24, 20}},
@@ -48,9 +40,9 @@ static AssetToLoad AssetsToLoad[] = {
 	{Type_Wav, Tag_Level,  "sounds/shoot.wav", "A_SHOOT"},
 	{Type_Wav, Tag_Level,  "sounds/explosion.wav", "A_EXPLODE"},
 
-	{Type_Material, Tag_Level,  "materials/Phong_Material_0.mtl_phong", "MAT_PHONG0"},
-	{Type_Material, Tag_Level,  "materials/Phong_Material_1.mtl_phong", "MAT_PHONG1"},
-	{Type_Material, Tag_Level,  "materials/Textured_Material_0.mtl_tex", "MAT_TEX0"},
+	{Type_Material, Tag_Level,	"materials/Phong_Material_0.mtl_phong", "MAT_PHONG0"},
+	{Type_Material, Tag_Level,	"materials/Phong_Material_1.mtl_phong", "MAT_PHONG1"},
+	{Type_Material, Tag_Level,	"materials/Textured_Material_0.mtl_tex", "MAT_TEX0"},
 };
 
 // @Note: The images here will be packed into atlases and those will be put in the asset bundle file.
@@ -279,7 +271,7 @@ int main(int argc, char *argv[])
 		  case Type_Material: 
 		  {
 			  LoadMaterial(asset, context, dataBlob);
-			  std::cout << fmt::format("{} \t->\t Bundling Material [{:.3} KB] [{}]\n", asset.Id, (dataBlob.lastSize)/(1024.0f), asset.Path);
+			  std::cout << fmt::format("{} \t->\t Bundling Material [{:.3} B] [{}]\n", asset.Id, (float)sizeof(MaterialDesc), asset.Path);
 			  break;
 		  }
 		  case Type_Mesh: 

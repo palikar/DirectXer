@@ -3,6 +3,10 @@
   "Id": "32d63685-09ed-459e-a8ff-95501679056a",
   "Items": [
     {
+      "Id": "292b4448-f758-4be9-ba09-61fb88746dfa",
+      "Command": "-i SpaceAssets.dbundle"
+    },
+    {
       "Id": "f8704a5e-464b-48f2-bc54-f43e94875c87",
       "Command": "-i SpaceGameAtlases.datlas"
     }

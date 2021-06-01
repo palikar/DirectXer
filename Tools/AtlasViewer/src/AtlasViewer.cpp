@@ -22,9 +22,15 @@
 #include <Assets.hpp>
 #include <FileUtils.hpp>
 #include <Platform.hpp>
+#include <TexturePacker.hpp>
 
 #include "AtlasViewer.hpp"
 #include "DummyTexture.hpp"
+
+static bool EndsWith(const std::string &str, const std::string &suffix)
+{
+    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
 
 static void Update(Context& context)
 {
@@ -46,10 +52,15 @@ static void DumpImages(char* memory, uint16 count)
 	for (size_t i = 0; i < count; ++i)
 	{
 		auto image = (ImageEntry*)(memory + sizeof(ImageEntry) * i);
-		fmt::print("Image [{}]\tis in atlas [{}] and has size of [{}x{}]\n", image->Id, image->Atlas,
-				   (int)roundf(image->AtlasWidth * image->Width), (int)roundf(image->AtlasHeight * image->Height));
+		fmt::print("Image [{}]\tis in atlas [{}] and has size of [{}x{}]\n", image->Id, image->Id,
+				   (int)roundf(image->Image.AtlasSize.x * image->Image.AtlasSize.y), (int)roundf(image->Image.AtlasSize.y *  image->Image.ScreenSize.y));
 
 	}
+}
+template<typename T>
+static void* GetData(MemoryArena& fileArena, T& entry)
+{
+	return fileArena.Memory + entry.DataOffset;
 }
 
 static void LoadAtlas(Context& context, const char* path)
@@ -57,29 +68,50 @@ static void LoadAtlas(Context& context, const char* path)
 	if (!PlatformLayer::IsValidPath(path)) return;
 	
 	auto Graphics = &context.Graphics;
-	MemoryArena fileArena = Memory::GetTempArena(Megabytes(128));
+	MemoryArena fileArena = Memory::GetTempArena(Megabytes(220));
 	Defer {
 		Memory::DestoryTempArena(fileArena);
 	};
 	ReadWholeFile(path, fileArena);
-	auto header = (AtlasFileHeader*)(fileArena.Memory);
-	fmt::print("Opening an atlas file with [{}] images and [{}] atlases\n", header->NumImages, header->NumAtlases);
+	context.Texs.clear();
 
-	context.Texs.resize(header->NumAtlases);
-	for (size_t i = 0; i < header->NumAtlases; ++i)
+	// @Todo: Delete the textures from GPU memory here
+	
+	
+	if (EndsWith(path, ".datlas"))
 	{
-		auto atlas = (AtlasEntry*)(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * i);
-		fmt::print("Atlas [{}] has size [{}x{}]\n", i, atlas->Width, atlas->Height);
-		context.Texs[i] = NextIndexBufferId();
-		Graphics->CreateTexture(context.Texs[i], {(uint16)atlas->Width, (uint16)atlas->Height, atlas->Format}, fileArena.Memory + atlas->Offset);
+		auto current = fileArena.Memory;
+		auto header = ReadBlob<AtlasFileHeader>(current);
+		
+		fmt::print("Opening an atlas file with [{}] images and [{}] atlases\n", header.NumImages, header.NumAtlases);
+		context.Texs.resize(header.NumAtlases);
+		
+		for (size_t i = 0; i < header.NumAtlases; ++i)
+		{
+			auto atlas = ReadBlob<AtlasEntry>(current);
+			fmt::print("Atlas [{}] has size [{}x{}]\n", i, atlas.Width, atlas.Height);
+			context.Texs[i] = NextTextureId();
+			Graphics->CreateTexture(context.Texs[i], {(uint16)atlas.Width, (uint16)atlas.Height, atlas.Format}, fileArena.Memory + atlas.Offset);
+		}
 	}
+	else if (EndsWith(path, ".dbundle"))
+	{
+		auto current = fileArena.Memory;
+		auto header = ReadBlob<AssetColletionHeader>(current);
 
-	DumpImages(fileArena.Memory + sizeof(AtlasFileHeader) + sizeof(AtlasEntry) * header->NumAtlases, header->NumImages);
+		fmt::print("Opening an atlas file with [{}] images and [{}] atlases\n", header.ImagesCount, header.AtlasesCount);
+
+		for (uint32 i = 0; i < header.TexturesCount; ++i)
+		{
+			const TextureLoadEntry& entry = ReadBlob<TextureLoadEntry>(current);
+			Graphics->CreateTexture(entry.Id, entry.Desc, GetData(fileArena, entry));
+			context.Texs.push_back(entry.Id);
+		}		
+	}	
 }
 
 static void Init(Context& context)
 {
-	Memory::InitMemoryState();
 	auto Graphics = &context.Graphics;
 
 	Memory::EstablishTempScope(Megabytes(16));
@@ -127,7 +159,8 @@ void HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, Context& c
 		  auto bytesCopied = DragQueryFileA(dropHandle, 0, &droppedFilepath[0], droppedFilepathSize + 1);
 		  // @Note: this does not work for some reason with full path; the probelm seems to be the Win32 function
 		  // CreateFile but I don't really care right now
-		  // LoadAtlas(context, droppedFilepath.c_str());
+		  // -> the problem has probably been the fact that the file is still opened and can't be open for a second time
+		   LoadAtlas(context, droppedFilepath.c_str());
 		  DragFinish(dropHandle);
 		  break;
 
@@ -151,6 +184,7 @@ static void ParseCommandLineArguments(int argc, char *argv[], AtlasViewer::Comma
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdSHow)
 {
+	Memory::InitMemoryState();
 	SetupConsole();
 	gDxgiManager.Init();
 
