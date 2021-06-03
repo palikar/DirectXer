@@ -10,7 +10,7 @@ static void ParseCommandLineArguments(CommandLineSettings& t_Settings, char** ar
 {
 	for (size_t i = 1; i < argc; ++i)
 	{
-		if (strcmp(argv[i], "--resources") == 0)
+		if (strcmp(argv[i], "--resources") == 0 || strcmp(argv[i], "-r") == 0)
 		{
 			DXDEBUG("[Init] Argument: {} -> {}", argv[i], argv[i + 1]);
 			t_Settings.ResourcesPath = argv[i + 1];
@@ -50,7 +50,7 @@ App* InitMain(char** argv, int argc)
     // any command line arguments will load the settings from some file on the diska
     if (application->Arguments.ResourcesPath.empty())
     {
-        DXERROR("[INIT] The resource path fiven is empty. Please provide a sensible one.");
+        DXERROR("[INIT] The given resource path is empty. Please provide a sensible one.");
         assert(false);
     }
 

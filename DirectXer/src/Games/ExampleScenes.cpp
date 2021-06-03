@@ -93,10 +93,10 @@ void ExampleScenes::Init()
 	floorMat.Id = FloorTextured;
 
 	PhongMaterial phongMat;
-	phongMat.Ambient  = {0.5f, 0.5f, 0.5f, 0.3f };
-	phongMat.Diffuse  = {0.5f, 0.5f, 0.0f, 0.3f };
-	phongMat.Specular = {1.0f, 0.0f, 0.0f, 0.3f };
-	phongMat.Emissive = {0.0f, 0.0f, 0.0f, 0.0f };
+	phongMat.Ambient  = {0.5f, 0.5f, 0.5f };
+	phongMat.Diffuse  = {0.5f, 0.5f, 0.0f };
+	phongMat.Specular = {1.0f, 0.0f, 0.0f };
+	phongMat.Emissive = {0.0f, 0.0f, 0.0f };
 	InitMaterial(Graphics, phongMat, formater.Format("PhongMaterialCB"));
 	phongMat.Id = SimplePhong;
 	
@@ -221,19 +221,8 @@ void ExampleScenes::UpdateTime(float dt)
 void ExampleScenes::ProcessFirstScene(float dt)
 {
 	
-	if (ImGui::CollapsingHeader("Materials"))
-	{
-		bool changed = false;
-		ImGui::Text("Textured Materials:");
-		changed |= ControlTexturedMaterialImGui(*Renderer3D.MeshData.Materials.GetTexturedData(RocksTextured), "Rocks");
-		changed |= ControlTexturedMaterialImGui(*Renderer3D.MeshData.Materials.GetTexturedData(CheckerTextured), "Checker");
-		changed |= ControlTexturedMaterialImGui(*Renderer3D.MeshData.Materials.GetTexturedData(FloorTextured), "Floor");
-
-		Renderer3D.MeshData.Materials.UpdateAll(Graphics);		
-	}
-	
 	UpdateTime(dt);
-	ControlCameraFPS(Renderer3D.CurrentCamera, dt);
+	ControlCameraFPS(CameraState, Renderer3D.CurrentCamera, dt);
 
 	
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
@@ -327,7 +316,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 void ExampleScenes::ProcessPhongScene(float dt)
 {
 	UpdateTime(dt);
-	ControlCameraFPS(Renderer3D.CurrentCamera, dt);
+	ControlCameraFPS(CameraState, Renderer3D.CurrentCamera, dt);
 	Renderer3D.UpdateCamera();
 
 	static float lightRadius = 1.0;
@@ -456,7 +445,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 // 	Light.lighting.pointLights[0].Position = {lightX, 0.5f, lightY, 0.0f};
 
 // 	Graphics->UpdateCBs(Light.bufferId, sizeof(Lighting), &Light.lighting);
-// 	ControlCameraFPS(camera, dt);
+// 	ControlCameraFPS(CameraState, camera, dt);
 
 // 	// @Note: Rendering begins here
 
@@ -542,12 +531,12 @@ void ExampleScenes::ProcessPhongScene(float dt)
 // 	}
 
 	
-// 	ControlCameraFPS(camera, dt);
+// 	ControlCameraFPS(CameraState, camera, dt);
 	
 // 	Light.lighting.spotLights[0].position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(t), 1.0f, (0.5f * (ball_grid_y - 3) * offset), 0.0f};
 // 	Light.lighting.pointLights[0].Position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(t), 1.0f, (- 0.5f * (ball_grid_y - 3) * offset), 0.0f};
 
-// 	ControlCameraFPS(camera, dt);
+// 	ControlCameraFPS(CameraState, camera, dt);
 
 // 	// The rendering starts here
 	
