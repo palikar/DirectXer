@@ -1,57 +1,57 @@
 #pragma once
 
 
-#define T_ATLAS_0                   32769
-#define T_ATLAS_1                   32770
-#define T_ATLAS_2                   32771
-#define I_EVIL_SHIP_1                   1
-#define I_EVIL_SHIP_2                   2
-#define I_EVIL_SHIP_3                   3
-#define I_MAIN_SHIP                     4
-#define I_HEALTH                        5
-#define I_BG                            6
-#define I_STATS                         7
-#define I_HEART                         8
-#define I_BULLET                        9
-#define I_EXPLOSION                    10
-#define I_SHOOT                        11
-#define I_FACEBOOK                     12
-#define I_INSTAGRAM                    13
-#define Material_001_Kd_Map         32772
-#define Material_001                   14
-#define Material_001_CB             32769
-#define M_TREE_1_VB                 32769
-#define M_TREE_1_IB                 32769
-#define M_TREE_1                       15
-#define SimpleColor                    16
-#define SimpleColor_CB              32770
-#define M_SUZANNE_VB                32770
-#define M_SUZANNE_IB                32770
-#define M_SUZANNE                      17
-#define T_SKY                       32773
-#define T_NIGHT_SKY                 32774
-#define T_CHECKER                   32775
-#define T_ROCKS_COLOR               32776
-#define T_FLOOR_COLOR               32777
-#define T_ROCKS_AO                  32778
-#define T_ROCKS_NORMAL              32779
-#define T_STONES_COLOR              32780
-#define T_STONES_ROUGHNESS          32781
-#define T_STONES_NORMAL             32782
-#define T_STONES_DISPLACEMENT       32783
-#define T_STONES_AO                 32784
-#define F_DroidSans_24                 18
-#define F_DroidSansBold_24             19
-#define A_SHOOT                        20
-#define A_EXPLODE                      21
-#define MAT_PHONG0                     22
-#define MAT_PHONG0_CB               32771
-#define MAT_PHONG1                     23
-#define MAT_PHONG1_CB               32772
-#define Textured_Material_0_BaseMap 32785
-#define Textured_Material_0_AoMap  32786
-#define MAT_TEX0                       24
-#define Textured_Material_0_CB     32773
+#define T_ATLAS_0            32769
+#define T_ATLAS_1            32770
+#define T_ATLAS_2            32771
+#define I_EVIL_SHIP_1            1
+#define I_EVIL_SHIP_2            2
+#define I_EVIL_SHIP_3            3
+#define I_MAIN_SHIP              4
+#define I_HEALTH                 5
+#define I_BG                     6
+#define I_STATS                  7
+#define I_HEART                  8
+#define I_BULLET                 9
+#define I_EXPLOSION             10
+#define I_SHOOT                 11
+#define I_FACEBOOK              12
+#define I_INSTAGRAM             13
+#define Material_001_Kd_Map  32772
+#define Material_001            14
+#define Material_001_CB      32769
+#define M_TREE_1_VB          32769
+#define M_TREE_1_IB          32769
+#define M_TREE_1                15
+#define SimpleColor             16
+#define SimpleColor_CB       32770
+#define M_SUZANNE_VB         32770
+#define M_SUZANNE_IB         32770
+#define M_SUZANNE               17
+#define T_SKY                32773
+#define T_NIGHT_SKY          32774
+#define T_CHECKER            32775
+#define T_ROCKS_COLOR        32776
+#define T_FLOOR_COLOR        32777
+#define T_ROCKS_AO           32778
+#define T_ROCKS_NORMAL       32779
+#define T_STONES_COLOR       32780
+#define T_STONES_ROUGHNESS   32781
+#define T_STONES_NORMAL      32782
+#define T_STONES_DISPLACEMENT 32783
+#define T_STONES_AO          32784
+#define F_DroidSans_24          18
+#define F_DroidSansBold_24      19
+#define A_SHOOT                 20
+#define A_EXPLODE               21
+#define MAT_PHONG0              22
+#define MAT_PHONG0_CB        32771
+#define MAT_PHONG1              23
+#define MAT_PHONG1_CB        32772
+#define MAT_TEX0_BaseMap     32785
+#define MAT_TEX0_AoMap       32786
+#define MAT_TEX0                24
+#define MAT_TEX0_CB          32773
 
 
 static inline const char* ImagesNames[] = {
@@ -149,9 +149,9 @@ GPUResource GPUResources[] = {
 	{ GPUResourceType(0), 32784, "T_STONES_AO" },
 	{ GPUResourceType(3), 32771, "MAT_PHONG0_CB" },
 	{ GPUResourceType(3), 32772, "MAT_PHONG1_CB" },
-	{ GPUResourceType(0), 32785, "Textured_Material_0_BaseMap" },
-	{ GPUResourceType(0), 32786, "Textured_Material_0_AoMap" },
-	{ GPUResourceType(3), 32773, "Textured_Material_0_CB" },
+	{ GPUResourceType(0), 32785, "MAT_TEX0_BaseMap" },
+	{ GPUResourceType(0), 32786, "MAT_TEX0_AoMap" },
+	{ GPUResourceType(3), 32773, "MAT_TEX0_CB" },
 };
 
 static inline AssetFile AssetFiles[] = {

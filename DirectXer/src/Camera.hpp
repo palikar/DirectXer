@@ -45,6 +45,14 @@ struct Camera
 	}
 };
 
-void ControlCameraFPS(Camera& t_Camera, float dt = 1.0f);
-void ControlCameraOrbital(Camera& t_Camera, float dt = 1.0f);
+struct CameraControlState
+{
+	bool InitialClick{false};
+	glm::vec2 Look{0,0};
+	glm::vec2 Orbit{0.0f, 0.0f};
+	float Radius{1.0f};
+};
+
+void ControlCameraFPS(CameraControlState& state, Camera& t_Camera, float dt = 1.0f);
+void ControlCameraOrbital(CameraControlState& state, Camera& t_Camera, float dt = 1.0f);
 

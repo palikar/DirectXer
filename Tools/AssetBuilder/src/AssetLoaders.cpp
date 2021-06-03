@@ -268,6 +268,7 @@ static void LoadMtlMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 			}
 			
 			newMatName = ReplaceAll(parts[1], ".", "_");
+			newMatName = ReplaceAll(newMatName, "\r", "");
 
 			// @Note: We don't want to load the same material twice
 			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
@@ -451,6 +452,7 @@ static void LoadPhongMaterial(AssetToLoad asset, AssetBundlerContext& context, A
 			auto parts = SplitLine(line, ' ');
 			
 			newMatName = ReplaceAll(parts[1], ".", "_");
+			newMatName = ReplaceAll(newMatName, "\r", "");
 
 			// @Note: We don't want to load the same material twice
 			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
@@ -508,6 +510,8 @@ static void LoadPhongMaterial(AssetToLoad asset, AssetBundlerContext& context, A
 		}
 	}
 
+	newMatName = ReplaceAll(newMatName, "\r", "");
+
 	MaterialLoadEntry newEntry{};
 	memset(&newEntry, 0, sizeof(MaterialLoadEntry));
 	newEntry.Desc.Type = MT_PHONG;
@@ -541,7 +545,8 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 			auto parts = SplitLine(line, ' ');
 			
 			newMatName = ReplaceAll(parts[1], ".", "_");
-
+			newMatName = ReplaceAll(newMatName, "\r", "");
+				
 			// @Note: We don't want to load the same material twice
 			auto id = std::find_if(context.Defines.begin(), context.Defines.end(), [&newMatName](auto def) { return def.Name == newMatName; });
 			if( id != context.Defines.end())
@@ -586,7 +591,7 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 		}
 		else if (StartsWith(line, "AoMap "))
 		{
-			texName = fmt::format("{}_AoMap", newMatName);
+			texName = fmt::format("{}_AoMap", asset.Id);
 			
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(ReplaceAll(line, "AoMap ", ""), "\r", "");
@@ -597,7 +602,7 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 		}
 		else if (StartsWith(line, "BaseMap "))
 		{
-			texName = fmt::format("{}_BaseMap", newMatName);
+			texName = fmt::format("{}_BaseMap", asset.Id);
 
 			AssetToLoad texAsset;
 			texAsset.Path = ReplaceAll(ReplaceAll(line, "BaseMap ", ""), "\r", "");
@@ -614,7 +619,7 @@ static void LoadTexMaterial(AssetToLoad asset, AssetBundlerContext& context, Ass
 	newEntry.Desc.Tex = newMat;
 	newEntry.Id = NewAssetName(context, Type_Material, asset.Id);
 		
-	std::string debugName = fmt::format("{}_CB", newMatName.c_str());
+	std::string debugName = fmt::format("{}_CB", asset.Id);
 	newEntry.Buffer = NewAssetName(context, Type_ConstantBuffer, debugName.c_str(), NextCBAssetId());
 	
 	context.Materials.push_back(newEntry);

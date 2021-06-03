@@ -95,6 +95,7 @@ struct Context
 	LightHelpers LightHelpersState;
 
 	float T = 0.0f;
+	CameraControlState CameraState;
 };
 
 struct SessionSaveContext

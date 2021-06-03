@@ -316,6 +316,9 @@ void LoadSession(Context& context, const char* path)
 	serial.Datas[1].Size = sizeof(32);
 	serial.Datas[1].Data = &saveContext.MaterialsCount;
 
+	serial.Datas[2].Size = sizeof(CameraControlState);
+	serial.Datas[2].Data = &context.CameraState;
+
 	Serialization::LoadFromFile(path, serial);
 
 	for (uint32 i = 0; i < saveContext.MaterialsCount; ++i)
@@ -450,6 +453,9 @@ void SaveSession(Context& context, const char* path)
 
 	serial.Datas[1].Size = sizeof(32);
 	serial.Datas[1].Data = &saveContext.MaterialsCount;
+
+	serial.Datas[2].Size = sizeof(CameraControlState);
+	serial.Datas[2].Data = &context.CameraState;
 
 	Serialization::DumpToFile(path, serial);
 }

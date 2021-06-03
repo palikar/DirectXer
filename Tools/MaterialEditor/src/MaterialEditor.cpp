@@ -108,6 +108,7 @@ static void NewMtlMaterial(Context& context)
 	context.Renderer3D.MeshData.Materials.GenerateProxy(context.Renderer3D.MeshData.Materials.MtlMaterials.back());
 
 	MaterialEditEntry basicEntry;
+	basicEntry.Name.reserve(64);
 	basicEntry.Type = MT_MTL;
 	basicEntry.Id = basicMat.Id;
 	basicEntry.Mtl = &context.Renderer3D.MeshData.Materials.MtlMaterials.back();
@@ -139,6 +140,7 @@ static void NewPhongMaterial(Context& context)
 	context.Renderer3D.MeshData.Materials.GenerateProxy(context.Renderer3D.MeshData.Materials.PhongMaterials.back());
 
 	MaterialEditEntry basicEntry;
+	basicEntry.Name.reserve(64);
 	basicEntry.Type = MT_PHONG;
 	basicEntry.Id = basicMat.Id;
 	basicEntry.Phong = &context.Renderer3D.MeshData.Materials.PhongMaterials.back();
@@ -173,6 +175,7 @@ static void NewTexMaterial(Context& context)
 	context.Renderer3D.MeshData.Materials.GenerateProxy(context.Renderer3D.MeshData.Materials.TexMaterials.back());
 
 	MaterialEditEntry basicEntry;
+	basicEntry.Name.reserve(64);
 	basicEntry.Type = MT_TEXTURED;
 	basicEntry.Id = basicMat.Id;
 	basicEntry.Tex = &context.Renderer3D.MeshData.Materials.TexMaterials.back();
@@ -229,6 +232,7 @@ static void Reload(Context& context, const char* file)
 		InitMaterial(&context.Graphics, basicMat, "Default Material");
 	
 		MaterialEditEntry basicEntry;
+		basicEntry.Name.reserve(64);
 		basicEntry.Name = "Default_MTL";
 		basicEntry.Type = MT_MTL;
 		basicEntry.Id = basicMat.Id;
@@ -319,12 +323,16 @@ void Update(Context& context, float dt)
 				context.CurrentMaterialIndex = (int)i;
 			}
 		}
-
 		ImGui::EndCombo();
 	}
+	
 	ImGui::SameLine();
 	if (ImGui::Button("Remove")) RemoveCurrentMat(context);
-	
+
+	ImGui::Text("Name:");
+	ImGui::SameLine();
+	ImGui::InputText("", context.Materials[context.CurrentMaterialIndex].Name.data(), 64);
+	ImGui::Separator();
 	ControlCurrentMaterial(context);
 	ImGui::End();
 
@@ -390,7 +398,7 @@ void Update(Context& context, float dt)
 	Renderer3D.LightingSetup.LightingData.pointLights[0].Position = glm::vec4(light1Pos, 0.0f);
 	Renderer3D.LightingSetup.LightingData.pointLights[1].Position = glm::vec4(light2Pos, 0.0f);
 
-	ControlCameraOrbital(context.Renderer3D.CurrentCamera, dt);
+	ControlCameraOrbital(context.CameraState, context.Renderer3D.CurrentCamera, dt);
 	context.Renderer3D.UpdateCamera();
 	
 	Renderer3D.UpdateLighting();

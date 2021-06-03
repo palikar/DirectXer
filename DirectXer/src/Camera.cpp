@@ -3,7 +3,7 @@
 #include "Camera.hpp"
 
 
-void ControlCameraFPS(Camera& t_Camera, float dt)
+void ControlCameraFPS(CameraControlState& state, Camera& t_Camera, float dt)
 {
 	const float highSpeed = 15.0f;
 	
@@ -43,8 +43,8 @@ void ControlCameraFPS(Camera& t_Camera, float dt)
 		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * -1.0f * dt * speed;
 	}
 
-	static bool initialClick = false;
-	static glm::vec2 look{0,0};
+	auto& initialClick = state.InitialClick;
+	auto& look = state.Look;
 
 	if (Input::gInput.IsKeyPressed(MouseCode::BUTTON_2))
 	{
@@ -94,11 +94,11 @@ void ControlCameraFPS(Camera& t_Camera, float dt)
 	}
 }
 
-void ControlCameraOrbital(Camera& t_Camera, float dt)
+void ControlCameraOrbital(CameraControlState& state, Camera& t_Camera, float dt)
 {
-	static bool initialClick = false;
-	static glm::vec2 orbit{0.0f, 0.0f};
-	static float radius = 1.0f;
+	auto& initialClick = state.InitialClick;
+	auto& orbit = state.Orbit;
+	auto& radius = state.Radius;
 
 	const auto update = [&]()
 	{
