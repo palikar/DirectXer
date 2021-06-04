@@ -71,11 +71,12 @@ class Renderer3D
 	void InitDebugGeometry(DebugGeometryBuilder& builder);
 	void InitLighting();
 
+	void SetupProjection(glm::mat4 matrix);
+
 	void EnableLighting();
 	void DisableLighting();
-	void UpdateLighting();
 
-	void SetupProjection(glm::mat4 matrix);
+	void UpdateLighting();
 	void UpdateCamera();
 
 	void BeginScene(ShaderConfiguration config);

@@ -36,7 +36,6 @@ void Renderer3D::UpdateCamera()
 	Gfx->VertexShaderCB.view = glm::transpose(CurrentCamera.view());
 	Gfx->PixelShaderCB.cameraPos = CurrentCamera.Pos;
 	Gfx->VertexShaderCB.cameraPos = CurrentCamera.Pos;
-	// Gfx->UpdateCBs();
 }
 
 void Renderer3D::UpdateLighting()
@@ -74,7 +73,6 @@ void Renderer3D::DrawMeshWithMaterial(MeshId id, glm::vec3 pos, glm::vec3 scale)
 	const auto mesh = MeshData.Meshes.at(id);
 	MeshData.Materials.Bind(Gfx, mesh.Material);
 	Gfx->BindVSConstantBuffers(LightingSetup.Cbo, 2);
-
 		
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);

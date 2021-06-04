@@ -45,14 +45,42 @@ struct Camera
 	}
 };
 
+enum CameraControlMode
+{
+	CCM_FPS,
+	CCM_Orbital,
+	CCM_Count,
+};
+
 struct CameraControlState
 {
 	bool InitialClick{false};
 	glm::vec2 Look{0,0};
 	glm::vec2 Orbit{0.0f, 0.0f};
 	float Radius{1.0f};
+
+	float MaxRadius{10.0f};
+	float MinRadius{0.05f};
+
+	int FastSpeed{15};
+	int SlowSpeed{1};
+
+	CameraControlMode Mode{CCM_FPS};
 };
 
 void ControlCameraFPS(CameraControlState& state, Camera& t_Camera, float dt = 1.0f);
 void ControlCameraOrbital(CameraControlState& state, Camera& t_Camera, float dt = 1.0f);
+void ControlCameraStateImgui(CameraControlState& state);
+
+inline void ControlCamera(CameraControlState& state, Camera& t_Camera, float dt = 1.0f)
+{
+	switch (state.Mode) {
+	  case CCM_FPS: 
+		  ControlCameraFPS(state, t_Camera, dt);
+		  break;
+	 case CCM_Orbital:
+		 ControlCameraOrbital(state, t_Camera, dt);
+		 break;
+	}
+}
 

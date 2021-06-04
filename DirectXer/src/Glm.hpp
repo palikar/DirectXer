@@ -12,7 +12,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/vec_swizzle.hpp>
 
-
+using float3 = glm::vec3;
+using float4 = glm::vec4;
+using mat4   = glm::mat4;
 
 inline glm::mat4 init_rotation(glm::vec3 forward, glm::vec3 up, glm::vec3 right)
 {
@@ -57,6 +59,11 @@ inline glm::mat4 init_scale(float x, float y, float z)
     return glm::mat4(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
 }
 
+inline glm::mat4 init_scale(float x)
+{
+	return glm::mat4(x, 0, 0, 0, 0, x, 0, 0, 0, 0, x, 0, 0, 0, 0, 1);
+}
+
 inline glm::mat4 init_scale(glm::vec3 v)
 {
     return init_scale(v.x, v.y, v.z);
@@ -85,6 +92,11 @@ inline glm::vec3 rotate(glm::vec3 v, glm::quat q)
 
     auto res = (q * glm::quat(0, v.x, v.y, v.z)) * glm::conjugate(q);
     return glm::vec3(res.x, res.y, res.z);
+}
+
+inline glm::vec3 Scale(float x)
+{
+    return glm::vec3(x, x, x);
 }
 
 inline glm::vec3 up(glm::quat q)

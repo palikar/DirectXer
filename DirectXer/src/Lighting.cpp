@@ -2,7 +2,6 @@
 
 #include "Lighting.hpp"
 
-
 bool ControlLightingImGui(Lighting& light)
 {
 	TempFormater formater;

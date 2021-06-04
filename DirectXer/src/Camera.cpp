@@ -1,45 +1,45 @@
-
+#include <imgui.h>
 
 #include "Camera.hpp"
 
-
 void ControlCameraFPS(CameraControlState& state, Camera& t_Camera, float dt)
 {
-	const float highSpeed = 15.0f;
+	const float highSpeed = (float)state.FastSpeed;
+	const float lowSpeed = (float)state.SlowSpeed;
 	
 	if (Input::gInput.IsKeyPressed(KeyCode::W))
 	{
-		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : lowSpeed;
 		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * speed * dt;
 	}
 
 	if (Input::gInput.IsKeyPressed(KeyCode::S))
 	{
-		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : lowSpeed;
 		t_Camera.Pos = t_Camera.Pos + t_Camera.at() * -1.0f * dt * speed;
 	}
 
 	if (Input::gInput.IsKeyPressed(KeyCode::A))
 	{
-		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : lowSpeed;
 		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * 1.0f * dt * speed;
 	}
 	
 	if (Input::gInput.IsKeyPressed(KeyCode::D))
 	{
-		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : lowSpeed;
 		t_Camera.Pos = t_Camera.Pos + t_Camera.left() * -1.0f * dt * speed;
 	}
 		
 	if (Input::gInput.IsKeyPressed(KeyCode::E))
 	{
-		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : lowSpeed;
 		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * 1.0f * dt * speed;
 	}
 
 	if (Input::gInput.IsKeyPressed(KeyCode::Q))
 	{
-		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : 1.0f;
+		const float speed = Input::gInput.IsKeyPressed(KeyCode::LeftShift) ? highSpeed : lowSpeed;
 		t_Camera.Pos = t_Camera.Pos + t_Camera.up() * -1.0f * dt * speed;
 	}
 
@@ -94,7 +94,7 @@ void ControlCameraFPS(CameraControlState& state, Camera& t_Camera, float dt)
 	}
 }
 
-void ControlCameraOrbital(CameraControlState& state, Camera& t_Camera, float dt)
+void ControlCameraOrbital(CameraControlState& state, Camera& t_Camera, float)
 {
 	auto& initialClick = state.InitialClick;
 	auto& orbit = state.Orbit;
@@ -138,14 +138,39 @@ void ControlCameraOrbital(CameraControlState& state, Camera& t_Camera, float dt)
 	if (scrollDelta > 0.0f)
 	{
 		radius -= 0.15f;
-		radius = clamp(radius, 0.05f, 10.0f);
+		radius = clamp(radius, state.MinRadius, state.MaxRadius);
 		update();
 	}
 	else if(scrollDelta < 0.0f)
 	{
 		radius += 0.15f;
-		radius = clamp(radius, 0.05f, 10.0f);
+		radius = clamp(radius, state.MinRadius, state.MaxRadius);
 		update();
 	}
 	
+}
+
+void ControlCameraStateImgui(CameraControlState& state)
+{
+	if (ImGui::CollapsingHeader("Camera Control"))
+	{
+
+		const char* elems_names[CCM_Count] = { "FPS", "Orbital" };
+		const char* elem_name = (state.Mode >= 0 && state.Mode < CCM_Count) ? elems_names[state.Mode] : "Unknown";
+		ImGui::SliderInt("Control Mode", (int*)&state.Mode, 0, CCM_Count - 1, elem_name);
+		ImGui::Separator();
+
+		if (state.Mode == CCM_FPS)
+		{
+			ImGui::Text("FPS camera:");
+			ImGui::SliderInt("Slow fly speed", &state.SlowSpeed, 1, 15, "%d");
+			ImGui::SliderInt("Fast fly speed", &state.FastSpeed, 10, 55, "%d");			
+		}
+		else if (state.Mode == CCM_Orbital)
+		{
+			ImGui::Text("Orbital camera:");
+			ImGui::InputFloat("Max Radius", &state.MaxRadius, 1.0f, 5.0f);
+			ImGui::InputFloat("Min Radius", &state.MinRadius, 1.0f, 5.0f);
+		}		
+	}
 }
