@@ -131,12 +131,28 @@ static double clockToMilliseconds(clock_t ticks)
     return (ticks/(double)CLOCKS_PER_SEC)*1000.0;
 }
 
+static RENDERDOC_API_1_3_0* InitRenderDoc()
+{
+	RENDERDOC_API_1_3_0 *rdoc_api = NULL;
+	
+	HMODULE mod = GetModuleHandleA(TEXT("renderdoc.dll"));
+	if(!mod) return nullptr;
+	
+	pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress(mod, "RENDERDOC_GetAPI");
+    int ret = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_1_2, (void **)&rdoc_api);
+    assert(ret == 1);
+
+	return rdoc_api;
+}
+
 void WindowsWindow::Init(WindowsSettings t_Settings)
 {
 	Settings = t_Settings;
 	FullscreenMode = false;
 	Minimized = false;
 
+	Rdoc =	InitRenderDoc();
+	
 	WNDCLASSEX windowClass{ 0 };
 	windowClass.cbSize = sizeof(windowClass);
 	windowClass.style = CS_OWNDC;
@@ -177,6 +193,7 @@ void WindowsWindow::Init(WindowsSettings t_Settings)
 
 void WindowsWindow::InitAfterCreate(HWND t_hWnd)
 {
+	if (Rdoc) Rdoc->StartFrameCapture(NULL, NULL);
 	Application->Window = this;
 	Application->Init(t_hWnd);
 
@@ -188,8 +205,9 @@ void WindowsWindow::InitAfterCreate(HWND t_hWnd)
 	ImGui_ImplWin32_Init(t_hWnd);
 	ImGui_ImplDX11_Init(Application->Graphics.Device, Application->Graphics.Context);
 	
-
 	Application->Graphics.EndFrame();
+
+	if (Rdoc) Rdoc->EndFrameCapture(NULL, NULL);
 }
 
 void WindowsWindow::Resize(uint32 width, uint32 height)
@@ -295,6 +313,8 @@ int WindowsWindow::Run()
 		if (!Minimized)
 		{
 			clock_t beginFrame = clock();
+			
+			
 
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
@@ -340,7 +360,7 @@ int WindowsWindow::Run()
 			}
 			
 			Application->Graphics.EndFrame(Application->EnableVsync);
-			
+
 			clock_t endFrame = clock();
 
 			dt = endFrame - beginFrame;

@@ -9,6 +9,8 @@
 
 #pragma comment(lib, "dxguid.lib")
 
+#include <renderdoc_app.h>
+
 #include <Types.hpp>
 #include <Utils.hpp>
 #include <GraphicsCommon.hpp>
@@ -46,6 +48,8 @@ public:
 	GPUStatsResult LastGpuStats;
 	float LastFPS;
 	float LastFrameTime;
+
+	RENDERDOC_API_1_3_0* Rdoc;
 	
 	void Init(WindowsSettings t_Settings);
 	void ToggleFullscreen();
