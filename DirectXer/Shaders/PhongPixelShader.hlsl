@@ -117,6 +117,7 @@ float4 main(PSIn input) : SV_Target
     outgoingLight += apply_ambient_light(input);
     outgoingLight += apply_dir_light(input);
 
+    
     for (int i = 0; i < 5; ++i)
     {
 	if (PointLights[i].active)
@@ -129,7 +130,6 @@ float4 main(PSIn input) : SV_Target
 	    outgoingLight += apply_spot_light(SpotLights[i], input.normal, input.world_pos, to_camera);
 	}
     }
-
-
-    return float4(outgoingLight, 1.0f);    
+    
+    return float4(outgoingLight, 1.0f);
 }

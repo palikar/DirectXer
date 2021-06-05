@@ -64,7 +64,7 @@ App* InitMain(char** argv, int argc)
 // @Done: Pool temporary allocation strategy
 // @Done: Temporary Vector and Map
 // @Done: Platform independent logging
-// @Todo: Have a separate palce for "debug" memory
+// @Todo: Have a separate place for "debug" memory
 
 // @Done: Ability to transform vertices on the CPU
 // @Done: Proper Vertex struct format
@@ -129,7 +129,6 @@ App* InitMain(char** argv, int argc)
 // @Done: Loading obj files
 // @Todo: Mouse picking
 
-
 // === theses are probably part of some bigger setup to stream resources asynchronously ===
 // @Todo: Tags for the textures -- for certain level, for certain material instance
 // @Todo: Deffered loading of scenes resources
@@ -152,6 +151,7 @@ App* InitMain(char** argv, int argc)
 // @Done: Windows Abstraction Layer
 // @Done: Handle Minimization
 // @Done: Image merger -- take sevaral pngs, put them in a sprite sheet
+// @Done: 3D renderer API
 // @Todo: Some job\task system for basic multithreading support
 //    -- maybe this is only useful for loading resources
 //    -- Defer certain things "for later"
@@ -162,7 +162,6 @@ App* InitMain(char** argv, int argc)
 // @Todo: Input Abstraction -- left, right, actionXXX, axis x/y
 // @Todo: 2D Collision detection with something like GJK Algorithm
 // @Todo: Inter image based animator setup
-// @Todo: 3D renderer API
 
 // == Telemtry ==
 // @Done: Current Bulk
@@ -172,8 +171,8 @@ App* InitMain(char** argv, int argc)
 // @Done: Allocation tracking
 // @Done: Tagged bulk allocation
 // @Done: Tracking support for the map
+// @Done: Displaying the used GPU resources in ImGui
 // @Todo: Temorary memory tracking(?)
-// @Todo: Displaying the used GPU resources in ImGui
 
 // == Memory ==
 // @Todo Allocating general arenas in BulkStorage

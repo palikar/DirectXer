@@ -14,6 +14,7 @@
 #include <time.h>
 
 #include "PlatformWindows.hpp"
+#include "ShaderRecompilation.hpp"
 
 void WindowsPlatformLayer::Init()
 {
@@ -308,6 +309,11 @@ int WindowsWindow::Run()
 		if (Input::gInput.IsKeyReleased(KeyCode::F11))
 		{
 			ToggleFullscreen();
+		}
+
+		if (Input::gInput.IsKeyReleased(KeyCode::F5))
+		{
+			ShaderRecompilation::RecompileShaders(&Application->Graphics);
 		}
 
 		if (!Minimized)

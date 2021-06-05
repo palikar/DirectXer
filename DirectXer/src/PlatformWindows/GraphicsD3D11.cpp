@@ -836,8 +836,6 @@ void GraphicsD3D11::InitResources()
 		SetDebugName(shaderObject.vs, "MtlInstancedVertexShader");
 		SetDebugName(shaderObject.il, "MtlVertexInstanced");
 	}
-
-
 		
 	D3D11_BUFFER_DESC vertexShaderCBDesc{ 0 };
 	vertexShaderCBDesc.Usage = D3D11_USAGE_DYNAMIC;

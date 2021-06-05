@@ -17,7 +17,7 @@ void Renderer3D::InitDebugGeometry(DebugGeometryBuilder& builder)
 		   builder.GeometryBuffer.Geometries.size() * sizeof(GPUGeometryInfo));
 }
 
-xvoid Renderer3D::InitRenderer(Graphics* t_Graphics)
+void Renderer3D::InitRenderer(Graphics* t_Graphics)
 {
 	Gfx = t_Graphics;
 	MeshData.Meshes.reserve(32);

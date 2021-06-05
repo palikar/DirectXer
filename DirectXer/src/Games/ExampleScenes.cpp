@@ -13,7 +13,7 @@
 static uint32 CUBE;
 static uint32 PLANE;
 static uint32 LINES;
-static uint32 CYLINDER; 
+static uint32 CYLINDER;
 static uint32 SPHERE;
 static uint32 AXIS;
 static uint32 POINTLIGHT;
@@ -25,7 +25,7 @@ static uint32 SHIPIMAGE = 4;
 void ExampleScenes::Init()
 {
 	CurrentScene = SCENE_FIRST;
-	
+
 	CurrentRastState = RS_NORMAL;
 
 	Renderer2D.InitRenderer(Graphics, { Application->Width, Application->Height });
@@ -38,7 +38,7 @@ void ExampleScenes::Init()
 		masterBuilder.WavLib = &AudioEngine;
 		masterBuilder.MeshesLib = &Renderer3D.MeshData;
 		masterBuilder.Graphics = Graphics;
-	
+
 		AssetStore::LoadAssetFile(AssetFiles[SpaceGameAssetFile], masterBuilder);
 		AssetStore::SetDebugNames(Graphics, GPUResources, Size(GPUResources));
 	}
@@ -69,7 +69,7 @@ void ExampleScenes::Init()
 	CheckerTextured = 3;
 	FloorTextured = 4;
 	SimplePhong = 2;
-	
+
 	// Create materials
 	TexturedMaterial rocksMat;
 	InitMaterial(Graphics, rocksMat, "RocksdMaterialCB");
@@ -99,12 +99,12 @@ void ExampleScenes::Init()
 	phongMat.Emissive = {0.0f, 0.0f, 0.0f };
 	InitMaterial(Graphics, phongMat, formater.Format("PhongMaterialCB"));
 	phongMat.Id = SimplePhong;
-	
+
 	Renderer3D.MeshData.Materials.TexMaterials.push_back(rocksMat);
 	Renderer3D.MeshData.Materials.TexMaterials.push_back(checkerMat);
 	Renderer3D.MeshData.Materials.TexMaterials.push_back(floorMat);
 	Renderer3D.MeshData.Materials.PhongMaterials.push_back(phongMat);
-	
+
 	Renderer3D.MeshData.Materials.GenerateProxies();
 
 	// Setup the lighting
@@ -131,19 +131,19 @@ void ExampleScenes::Init()
 	SaveContext.Camera = &Renderer3D.CurrentCamera;
 	SaveContext.Lighting = &Renderer3D.LightingSetup.LightingData;
 	SaveContext.PhongMaterials[0] = &Renderer3D.MeshData.Materials.GetPhong(SimplePhong);
-	
+
 	auto saveFile = Resources::ResolveFilePath("setup.ddata");
 	if (PlatformLayer::IsValidPath(saveFile))
 	{
 		Serialization::LoadFromFile(saveFile, SaveContext);
-	}	
-	
+	}
+
 	SpriteSheets.Init(5, &Renderer2D);
 	SpriteSheets.PutSheet(I_SHOOT, { 640.0f, 470.0f }, { 8, 5 });
-	
+
 	uiRenderTarget.Color = NextTextureId();
 	uiRenderTarget.DepthStencil = NextTextureId();
-	
+
 	Graphics->SetShaderConfiguration(SC_TEX);
 	Graphics->SetViewport(0, 0, 800, 600);
 	Graphics->SetRasterizationState(CurrentRastState);
@@ -164,11 +164,11 @@ void ExampleScenes::Init()
 		instData[i + 32].model = init_scale(0.07) * init_translate(-4.5f + 1.5f * (8 - (i & 0x0F)), 3.0f, -5.0f + 1.5f * (8 - ((i & 0xF0) >> 4) - 1));
 		instData[i + 32].invModel = glm::inverse(instData[i].model);
 	}
-	
+
 	Renderer3D.UpdateInstancedData();
-	
-} 
- 
+
+}
+
 void ExampleScenes::Resize()
 {
 	Renderer2D.Params.Width = Application->Width;
@@ -188,7 +188,7 @@ void ExampleScenes::Update(float dt)
 		Application->RenderImGui = !Application->RenderImGui;
 	}
 
-	
+
 	if (Input::gInput.IsKeyReleased(KeyCode::F3))
 	{
 		Application->EnableVsync = (Application->EnableVsync + 1) % 2;
@@ -237,11 +237,11 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	ControlCamera(CameraState, Renderer3D.CurrentCamera, dt);
 
 	ControlCameraStateImgui(CameraState);
-	
+
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
 	Graphics->SetDepthStencilState(DSS_Normal);
-		
+
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
 	Renderer3D.UpdateCamera();
 
@@ -281,7 +281,7 @@ void ExampleScenes::ProcessUIScene(float dt)
 
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
 	Renderer3D.UpdateCamera();
-	
+
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
 	Graphics->SetDepthStencilState(DSS_Normal);
@@ -289,11 +289,11 @@ void ExampleScenes::ProcessUIScene(float dt)
 	Renderer3D.BeginScene(SC_DEBUG_COLOR);
 	Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, float3(1.0f));
 	Renderer3D.DrawSkyBox(T_SKY);
-	
+
 	Renderer2D.BeginScene();
-	
+
 	Renderer2D.DrawQuad({10.f, 10.f}, {200.f, 200.f}, {1.0f, 0.0f, 0.0f, 1.0f});
-	Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f}); 
+	Renderer2D.DrawQuad({210.f, 210.f}, {50.f, 50.f}, {0.0f, 1.0f, 0.0f, 1.0f});
 	Renderer2D.DrawQuad({310.f, 310.f}, {20.f, 50.f}, {0.0f, 1.0f, 1.0f, 1.0f});
 	Renderer2D.DrawCirlce({510.f, 210.f}, 20.0f, {1.0f, 0.0f, 0.0f, 1.0f});
 	Renderer2D.DrawCirlce({210.f, 510.f}, 50.0f, {1.0f, 0.0f, 0.0f, 1.0f});
@@ -318,7 +318,7 @@ void ExampleScenes::ProcessUIScene(float dt)
 		{555.0f, 590.0f},
 	};
 	Renderer2D.DrawFourPolygon(polygon, Color::AquaMarine);
-	
+
 	static uint32 spriteIndex = 0;
 	static float acc = 0;
 	acc += dt * 0.3f;
@@ -334,9 +334,9 @@ void ExampleScenes::ProcessUIScene(float dt)
 	Renderer2D.BeginScene(TT_LINES);
 
 	Renderer2D.DrawLine({600.0f, 300.0f}, {620.0f, 400.0f}, {0.5f, 0.5f, 1.0f, 1.0f});
-	
+
 	Renderer2D.EndScene();
-	
+
 }
 
 void ExampleScenes::ProcessPhongScene(float dt)
@@ -357,7 +357,7 @@ void ExampleScenes::ProcessPhongScene(float dt)
 	Renderer3D.UpdateLighting();
 	Renderer3D.UpdateCamera();
 	Renderer3D.BindLighting();
-	
+
 	Graphics->SetDepthStencilState(DSS_Normal);
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
@@ -377,9 +377,9 @@ void ExampleScenes::ProcessPhongScene(float dt)
 
 	Renderer3D.DrawSkyBox(T_NIGHT_SKY);
 }
-	
+
 void ExampleScenes::ProcessObjectsScene(float dt)
-{	
+{
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
 
 	UpdateTime(dt);
@@ -387,16 +387,16 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
 	Renderer3D.UpdateCamera();
-	
+
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
 	Graphics->SetDepthStencilState(DSS_Normal);
 
 	Renderer3D.BeginScene(SC_DEBUG_COLOR);
 	Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, float3(1.0f));
-	
+
 	Renderer3D.BindLighting();
-	
+
 	Renderer3D.BindMaterial(Material_001);
 	Renderer3D.DrawMesh(M_TREE_1, float3{3.0f, -2.0f, 0.0f}, Scale(0.05f));
 
@@ -408,7 +408,7 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 
 	Renderer3D.BindMaterialInstanced(Material_001);
 	Renderer3D.DrawInstancedMesh(M_TREE_1, 32, 32);
-		
+
 	Renderer3D.DrawSkyBox(T_SKY);
 
 }
@@ -416,16 +416,16 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 void ExampleScenes::ProcessBallsScene(float dt)
 {
 	UpdateTime(dt);
-	
+
 	static int ball_grid_x = 20;
-    static int ball_grid_y = 20;
+	static int ball_grid_y = 20;
 	static float offset = 2.5f;
 	static float ballScale = 1.0f;
 	static float lightRadius = 1.0;
 
 	ControlCameraStateImgui(CameraState);
 	ControlLightingImGui(Renderer3D.LightingSetup.LightingData);
-	
+
 	if (ImGui::CollapsingHeader("Ball Scene"))
 	{
 		//ImGui::Text("Balls material");
@@ -454,7 +454,7 @@ void ExampleScenes::ProcessBallsScene(float dt)
 			Serialization::LoadFromFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
 		}
 	}
-	
+
 	Renderer3D.LightingSetup.LightingData.spotLights[0].position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(T), 1.0f, (0.5f * (ball_grid_y - 3) * offset), 0.0f};
 	Renderer3D.LightingSetup.LightingData.pointLights[0].Position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(T), 1.0f, (- 0.5f * (ball_grid_y - 3) * offset), 0.0f};
 
@@ -465,7 +465,7 @@ void ExampleScenes::ProcessBallsScene(float dt)
 	Renderer3D.UpdateLighting();
 
 	// The rendering starts here
-	
+
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
 	Graphics->SetDepthStencilState(DSS_Normal);
