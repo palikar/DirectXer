@@ -133,6 +133,7 @@ void App::Update(float dt)
 
 			displayTimingBlocksOfType(Phase_Init);
 			displayTimingBlocksOfType(Phase_Rendering);
+			displayTimingBlocksOfType(Phase_Update);
 
 			ImGui::Separator();
 			
