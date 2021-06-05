@@ -61,6 +61,9 @@ class Renderer3D
 	LightSetup LightingSetup;
 	Camera CurrentCamera;
 
+	VertexBufferId InstancedBuffer;
+	BulkVector<MtlInstanceData> InstancedData;
+
 	DebugGeometryDescription DebugGeometries;
 
 	ShaderConfiguration CurrentConfig;
@@ -70,19 +73,29 @@ class Renderer3D
 	void InitRenderer(Graphics* t_Graphics);
 	void InitDebugGeometry(DebugGeometryBuilder& builder);
 	void InitLighting();
+	void InitInstancedDataBuffer(uint32 maxInstances);
 
 	void SetupProjection(glm::mat4 matrix);
 
-	void EnableLighting();
 	void DisableLighting();
 
 	void UpdateLighting();
 	void UpdateCamera();
+	void UpdateInstancedData();
 
 	void BeginScene(ShaderConfiguration config);
 	void EndScene();
-	
+
+	void BindLighting();
+	void BindMaterial(MaterialId id);
+	void BindMaterialInstanced(MaterialId id);
+
+
+	Lighting&						 AccessLightingData()  { return LightingSetup.LightingData; }
+	BulkVector<MtlInstanceData>&	 AccessInstancedData() { return InstancedData;              }
+
 	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
+	void DrawInstancedMesh(MeshId id, uint32 instancesCount, uint32 baseInstanced = 0);
 	void DrawMeshWithMaterial(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
 	void DrawDebugGeometry(uint32 id, glm::vec3 pos = {}, glm::vec3 scale = {}, glm::mat4 rotation = glm::mat4(1));
 	void DrawSkyBox(TextureId sky);

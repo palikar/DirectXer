@@ -122,16 +122,19 @@ void AssetStore::LoadAssetFile(AssetFile file, AssetBuildingContext& context)
 		{
 		case MT_MTL:
 			entry.Desc.Mtl.Id = entry.Id;
+			entry.Desc.Mtl.Cbo = entry.Buffer;
 			context.MeshesLib->Materials.MtlMaterials.push_back(entry.Desc.Mtl);
 			context.Graphics->CreateConstantBuffer(entry.Buffer, sizeof(MtlMaterialData), &entry.Desc.Mtl);
 			break;
 		case MT_TEXTURED:
 			entry.Desc.Tex.Id = entry.Id;
+			entry.Desc.Tex.Cbo = entry.Buffer;
 			context.MeshesLib->Materials.TexMaterials.push_back(entry.Desc.Tex);
 			context.Graphics->CreateConstantBuffer(entry.Buffer, sizeof(TexturedMaterialData), &entry.Desc.Tex);
 			break;
 		case MT_PHONG:
 			entry.Desc.Phong.Id = entry.Id;
+			entry.Desc.Phong.Cbo = entry.Buffer;
 			context.MeshesLib->Materials.PhongMaterials.push_back(entry.Desc.Phong);
 			context.Graphics->CreateConstantBuffer(entry.Buffer, sizeof(PhongMaterialData), &entry.Desc.Phong);
 			break;

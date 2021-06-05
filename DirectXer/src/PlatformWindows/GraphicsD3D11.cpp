@@ -1095,7 +1095,7 @@ void GraphicsD3D11::Draw(TopolgyType topology, uint32 count, uint32 base)
 	DrawCallsCount += 1;
 }
 
-void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset, uint32 base)
+void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset, uint32 base, uint32 baseInstanced)
 {
 	uint32 factor = 1;
 	switch (topology) {
@@ -1108,7 +1108,7 @@ void GraphicsD3D11::DrawInstancedIndex(TopolgyType topology, uint32 count, uint3
 		  break;
 	}
 
-	Context->DrawIndexedInstanced(count/factor, instances, offset, base, 0);
+	Context->DrawIndexedInstanced(count/factor, instances, offset, base, baseInstanced);
 	DrawCallsCount += 1;
 }
 

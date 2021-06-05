@@ -131,7 +131,7 @@ class GraphicsD3D11
 	void UpdateTexture(TextureId t_Id, Rectangle2D rect, const void* t_Data, int t_Pitch = 4);
 
 	void DrawIndexed(TopolgyType topology, uint32 count, uint32 offset = 0,  uint32 base = 0);
-	void DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset = 0,  uint32 base = 0);
+	void DrawInstancedIndex(TopolgyType topology, uint32 count, uint32 instances, uint32 offset = 0,  uint32 base = 0, uint32 baseInstanced = 0);
 	void Draw(TopolgyType topology, uint32 count, uint32 base);
 
 	void ClearBuffer(float red, float green, float blue);

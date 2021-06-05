@@ -141,6 +141,8 @@ struct MtlMaterial : public MtlMaterialData
 
 class MaterialLibrary
 {
+  public:
+
 	struct MaterialUpdateProxy
 	{
 		ConstantBufferId Cbo;
@@ -173,12 +175,13 @@ class MaterialLibrary
 	void GenerateProxy(PhongMaterial& mat);
 	void GenerateProxy(TexturedMaterial& mat);
 	void GenerateProxy(MtlMaterial& mat);
-	
+
 	void Update(Graphics* graphics, MaterialId id);
 
 	void UpdateAll(Graphics* graphics);
 
 	void Bind(Graphics* graphics, MaterialId id);
+	void BindInstanced(Graphics* graphics, MaterialId id);
 
 	PhongMaterialData* GetPhongData(MaterialId id);
 	TexturedMaterial* GetTexturedData(MaterialId id);
@@ -218,7 +221,7 @@ inline void InitMaterial(Graphics* graphics, MtlMaterial& mat, String debugName)
 	mat.illum |= KS_FACT_MASK;
 	mat.illum |= NS_FACT_MASK;
 	mat.illum |= D_FACT_MASK;
-		
+
 	graphics->CreateConstantBuffer(mat.Cbo, sizeof(MtlMaterialData), &mat);
 	graphics->SetConstantBufferName(mat.Cbo, debugName);
 }

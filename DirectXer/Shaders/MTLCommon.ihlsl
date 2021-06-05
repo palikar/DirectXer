@@ -134,11 +134,12 @@ float3 ApplySpotLight(SpotLight light, float3 normal, float3 surface_pos, float3
 SamplerState linearSamp : register(s0);
 SamplerState pointSamp : register(s1);
 
-Texture2D KaMap : register(t0);
-Texture2D KdMap : register(t1);
+Texture2D KaMap : register(t1);
+Texture2D KdMap : register(t2);
 Texture2D KsMap : register(t3);
 Texture2D NsMap : register(t4);
 Texture2D dMap  : register(t5);
+
 
 float3 Shade(float3 worldPos, float3 toCamera, float2 uv, float3 normal)
 {

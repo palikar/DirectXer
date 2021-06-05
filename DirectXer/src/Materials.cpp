@@ -27,7 +27,7 @@ void MaterialLibrary::GenerateProxy(PhongMaterial& mat)
 	upadte.Cbo = mat.Cbo;
 	upadte.Data = &mat;
 	upadte.DataSize = sizeof(PhongMaterialData);
-	UpdateViews.insert({mat.Id, upadte});	
+	UpdateViews.insert({mat.Id, upadte});
 }
 
 void MaterialLibrary::GenerateProxy(TexturedMaterial& mat)
@@ -46,7 +46,7 @@ void MaterialLibrary::GenerateProxy(TexturedMaterial& mat)
 	upadte.Cbo = mat.Cbo;
 	upadte.Data = &mat;
 	upadte.DataSize = sizeof(TexturedMaterialData);
-	UpdateViews.insert({mat.Id, upadte});	
+	UpdateViews.insert({mat.Id, upadte});
 }
 
 void MaterialLibrary::GenerateProxy(MtlMaterial& mat)
@@ -68,7 +68,7 @@ void MaterialLibrary::GenerateProxy(MtlMaterial& mat)
 	upadte.Data = &mat;
 	upadte.DataSize = sizeof(MtlMaterial);
 	UpdateViews.insert({mat.Id, upadte});
-	
+
 }
 
 void MaterialLibrary::GenerateProxies()
@@ -145,11 +145,8 @@ void MaterialLibrary::UpdateAll(Graphics* graphics)
 	}
 }
 
-void MaterialLibrary::Bind(Graphics* graphics, MaterialId id)
+static void BindTextures(Graphics* graphics, MaterialLibrary::MaterialBindProxy& mat)
 {
-	MaterialBindProxy mat = BindViews.at(id);
-	graphics->SetShaderConfiguration(mat.Program);
-
 	if (mat.BindToPS)
 	{
 		graphics->BindPSConstantBuffers(mat.Cbo, mat.Slot);
@@ -166,8 +163,22 @@ void MaterialLibrary::Bind(Graphics* graphics, MaterialId id)
 			if (mat.Textures[i] && *mat.Textures[i] != 0) graphics->BindVSTexture(i + 1, *mat.Textures[i]);
 		}
 	}
-		
 }
+
+void MaterialLibrary::Bind(Graphics* graphics, MaterialId id)
+{
+	MaterialBindProxy mat = BindViews.at(id);
+	graphics->SetShaderConfiguration(mat.Program);
+	BindTextures(graphics, mat);
+}
+
+void MaterialLibrary::BindInstanced(Graphics* graphics, MaterialId id)
+{
+	MaterialBindProxy mat = BindViews.at(id);
+	graphics->SetShaderConfiguration(ShaderConfiguration((mat.Program & ~0xFF) | ((mat.Program & 0xFF) + 1)));
+	BindTextures(graphics, mat);
+}
+
 
 PhongMaterialData* MaterialLibrary::GetPhongData(MaterialId id)
 {
@@ -253,13 +264,13 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 	ImGui::Text("Texture Masks");
 
 	changed |= CheckBoxBit("Ka[m]", mat.illum, KA_TEX_MASK);
-	
+
 	ImGui::SameLine();
 	changed |= CheckBoxBit("Kd[m]", mat.illum, KD_TEX_MASK);
 
 	ImGui::SameLine();
 	changed |= CheckBoxBit("Ks[m]", mat.illum, KS_TEX_MASK);
-		
+
 	ImGui::SameLine();
 	changed |= CheckBoxBit("Ns[m]", mat.illum, NS_TEX_MASK);
 
@@ -269,21 +280,21 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 	ImGui::Text("Factor Masks");
 
 	changed |= CheckBoxBit("Ka[f]", mat.illum, KA_FACT_MASK);
-	
+
 	ImGui::SameLine();
 	changed |= CheckBoxBit("Kd[f]", mat.illum, KD_FACT_MASK);
 
 	ImGui::SameLine();
 	changed |= CheckBoxBit("Ks[f]", mat.illum, KS_FACT_MASK);
-		
+
 	ImGui::SameLine();
 	changed |= CheckBoxBit("Ns[f]", mat.illum, NS_FACT_MASK);
 
 	ImGui::SameLine();
 	changed |= CheckBoxBit("D[f]", mat.illum, D_FACT_MASK);
-			
+
 	ImGui::Separator();
-		
+
 	ImGui::Text("Colors:");
 	changed |= ImGui::ColorEdit3("Ambient Factors", (float*)&mat.Ka);
 	changed |= ImGui::ColorEdit3("Diffuse Factors", (float*)&mat.Kd);
@@ -303,7 +314,7 @@ bool ControlMtlMaterialImGui(MtlMaterial& mat, const char* name, TextureCatalog&
 	changed |= ChooseTexture(graphics, textures, "Ks Map", mat.KsMap);
 	changed |= ChooseTexture(graphics, textures, "Ns Map", mat.NsMap);
 	changed |= ChooseTexture(graphics, textures, "d Map", mat.dMap);
-	
+
 
 	return changed;
 }
@@ -336,7 +347,7 @@ bool ControlPhongMaterialImGui(PhongMaterial& mat, const char* name)
 	changed |= ImGui::ColorEdit3("Specular Factors", (float*)&mat.Specular);
 	changed |= ImGui::ColorEdit3("Emissive Factors", (float*)&mat.Emissive);
 	ImGui::Separator();
-		
+
 	changed |= ImGui::SliderFloat("Specular Exponent", (float*)&mat.SpecularChininess, 0.0f, 25.0f, "%.3f");
 
 	return changed;

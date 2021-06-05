@@ -12,15 +12,15 @@ void Renderer3D::InitDebugGeometry(DebugGeometryBuilder& builder)
 	DebugGeometries.Vbo = buffers.vbo;
 
 	DebugGeometries.Geometries.resize(builder.GeometryBuffer.Geometries.size());
-	
+
 	memcpy(DebugGeometries.Geometries.data(), builder.GeometryBuffer.Geometries.data(),
 		   builder.GeometryBuffer.Geometries.size() * sizeof(GPUGeometryInfo));
 }
 
-void Renderer3D::InitRenderer(Graphics* t_Graphics)
+xvoid Renderer3D::InitRenderer(Graphics* t_Graphics)
 {
 	Gfx = t_Graphics;
-	MeshData.Meshes.reserve(32); 
+	MeshData.Meshes.reserve(32);
 	MeshData.Materials.Init();
 }
 
@@ -29,6 +29,19 @@ void Renderer3D::InitLighting()
 	LightingSetup.Cbo = NextConstantBufferId();
 	Gfx->CreateConstantBuffer(LightingSetup.Cbo, sizeof(Lighting), &LightingSetup.LightingData);
 	Gfx->SetConstantBufferName(LightingSetup.Cbo, "Lighting CB");
+}
+
+void Renderer3D::InitInstancedDataBuffer(uint32 maxInstances)
+{
+	InstancedData.resize(maxInstances);
+	InstancedBuffer = NextVertexBufferId();
+	Gfx->CreateVertexBuffer(InstancedBuffer, sizeof(MtlInstanceData), nullptr, maxInstances * sizeof(MtlInstanceData), true);
+	Gfx->SetVertexBufferName(InstancedBuffer, "MTLInstancedData");
+}
+
+void Renderer3D::UpdateInstancedData()
+{
+	Gfx->UpdateVertexBuffer(InstancedBuffer, InstancedData.data(), InstancedData.size() * sizeof(MtlInstanceData));
 }
 
 void Renderer3D::UpdateCamera()
@@ -43,7 +56,7 @@ void Renderer3D::UpdateLighting()
 	Gfx->UpdateCBs(LightingSetup.Cbo, sizeof(Lighting), &LightingSetup.LightingData);
 }
 
-void Renderer3D::EnableLighting()
+void Renderer3D::BindLighting()
 {
 	Gfx->BindPSConstantBuffers(LightingSetup.Cbo, 2);
 	Gfx->BindVSConstantBuffers(LightingSetup.Cbo, 2);
@@ -52,6 +65,16 @@ void Renderer3D::EnableLighting()
 void Renderer3D::SetupProjection(glm::mat4 matrix)
 {
 	Gfx->VertexShaderCB.projection = glm::transpose(matrix);
+}
+
+void Renderer3D::BindMaterial(MaterialId id)
+{
+	MeshData.Materials.Bind(Gfx, id);
+}
+
+void Renderer3D::BindMaterialInstanced(MaterialId id)
+{
+	MeshData.Materials.BindInstanced(Gfx, id);
 }
 
 void Renderer3D::DrawSkyBox(TextureId sky)
@@ -72,11 +95,10 @@ void Renderer3D::DrawMeshWithMaterial(MeshId id, glm::vec3 pos, glm::vec3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
 	MeshData.Materials.Bind(Gfx, mesh.Material);
-	Gfx->BindVSConstantBuffers(LightingSetup.Cbo, 2);
-		
+
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
-		
+
 	Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();
@@ -89,12 +111,25 @@ void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
 	const auto mesh = MeshData.Meshes.at(id);
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
-		
+
 	Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();
 
 	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
+}
+
+void Renderer3D::DrawInstancedMesh(MeshId id, uint32 instancesCount, uint32 baseInstanced)
+{
+	const auto mesh = MeshData.Meshes.at(id);
+	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
+	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
+
+	Gfx->BindVertexBuffer(InstancedBuffer, 0, 1);
+
+	Gfx->UpdateCBs();
+
+	Gfx->DrawInstancedIndex(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, instancesCount, 0, 0, baseInstanced);
 }
 
 void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, glm::mat4 rotation)
@@ -103,7 +138,7 @@ void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, gl
 
 	Gfx->BindVertexBuffer(DebugGeometries.Vbo, 0, 0);
 	Gfx->BindIndexBuffer(DebugGeometries.Ibo);
-	
+
 	Gfx->VertexShaderCB.model = init_identity() * rotation * init_translate(pos) * init_scale(scale);
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();

@@ -12,6 +12,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/vec_swizzle.hpp>
 
+using float2 = glm::vec2;
 using float3 = glm::vec3;
 using float4 = glm::vec4;
 using mat4   = glm::mat4;
