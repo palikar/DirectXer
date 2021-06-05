@@ -77,6 +77,7 @@ void ExampleScenes::Init()
 	rocksMat.AoMap = T_ROCKS_AO;
 	rocksMat.EnvMap = ST_SKY;
 	rocksMat.Id = RocksTextured;
+	rocksMat.Color = float4(0.0f);
 
 	TexturedMaterial checkerMat;
 	InitMaterial(Graphics, checkerMat, "CheckerMaterialCB");
@@ -84,13 +85,15 @@ void ExampleScenes::Init()
 	checkerMat.AoMap = T_CHECKER;
 	checkerMat.EnvMap = ST_SKY;
 	checkerMat.Id = CheckerTextured;
+	checkerMat.Color = float4(0.0f);
 
 	TexturedMaterial floorMat;
-	InitMaterial(Graphics, floorMat, "CheckerMaterialCB");
+	InitMaterial(Graphics, floorMat, "FlootMaterialCB");
 	floorMat.BaseMap = T_FLOOR_COLOR;
 	floorMat.AoMap = T_FLOOR_COLOR;;
 	floorMat.EnvMap = ST_SKY;
 	floorMat.Id = FloorTextured;
+	floorMat.Color = float4(0.0f);
 
 	PhongMaterial phongMat;
 	phongMat.Ambient  = {0.5f, 0.5f, 0.5f };

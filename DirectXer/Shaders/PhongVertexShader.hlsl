@@ -16,13 +16,14 @@ cbuffer VSPrim : register(b0)
     float3 CameraPos;
 };
 
-VSOut main(float3 pos : Position, float2 uv: Texcoord, float3 norm: Normal)
+
+VSOut main(float3 pos : Position, float2 uv: Texcoord, float3 normal: Normal)
 {
     VSOut output = (VSOut)0;
 	
     output.pos = mul(float4(pos.x, pos.y, pos.z, 1.0), mul(model, mul(view, projection)));
     output.world_pos = (float3)mul(float4(pos.x, pos.y, pos.z, 1.0), model);
-    output.normal = mul((float3x3)(transpose(invModel)), norm);
+    output.normal = mul((float3x3)(transpose(invModel)), normal);
     output.uv = uv;    
 	
     return output;

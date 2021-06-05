@@ -27,9 +27,9 @@ struct SimpleVertex
 struct ColorVertex
 {
 	glm::vec3 pos;
-	glm::vec3 color;
 	glm::vec2 uv;
 	glm::vec3 normal;
+	glm::vec3 color;
 };
 
 struct MtlVertex
