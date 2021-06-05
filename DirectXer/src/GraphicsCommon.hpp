@@ -90,6 +90,7 @@ enum RasterizationState : uint8
 {
 	RS_NORMAL = 0,
 	RS_DEBUG,
+	RS_BACK,
 
 	RS_COUNT
 };

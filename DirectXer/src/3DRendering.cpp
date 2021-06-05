@@ -79,6 +79,7 @@ void Renderer3D::BindMaterialInstanced(MaterialId id)
 
 void Renderer3D::DrawSkyBox(TextureId sky)
 {
+	Gfx->SetRasterizationState(RS_BACK);
 	Gfx->SetShaderConfiguration(SC_DEBUG_SKY);
 	Gfx->BindIndexBuffer(DebugGeometries.Ibo);
 	Gfx->BindVertexBuffer(DebugGeometries.Vbo);
@@ -89,6 +90,7 @@ void Renderer3D::DrawSkyBox(TextureId sky)
 
 	auto geom = DebugGeometries.Geometries[0];
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);
+	Gfx->SetRasterizationState(RS_NORMAL);
 }
 
 void Renderer3D::DrawMeshWithMaterial(MeshId id, glm::vec3 pos, glm::vec3 scale)

@@ -173,30 +173,25 @@ void GraphicsD3D11::InitZBuffer(float width, float height)
 
 void GraphicsD3D11::InitRasterizationsStates()
 {
-	ID3D11RasterizerState* rastStateNormal;
-	ID3D11RasterizerState* rastStateDebug;
-
 	D3D11_RASTERIZER_DESC rastDesc{0};
-	rastDesc.CullMode = D3D11_CULL_NONE;
+	rastDesc.CullMode = D3D11_CULL_BACK;
 	rastDesc.FillMode = D3D11_FILL_SOLID;
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;
 
 	[[maybe_unused]]HRESULT hr;
-	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateNormal));
+	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &RasterizationsStates[RS_NORMAL]));
+	rastDesc.CullMode = D3D11_CULL_NONE;
+	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &RasterizationsStates[RS_BACK]));
 
 	rastDesc.CullMode = D3D11_CULL_NONE;
 	rastDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;
-	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &rastStateDebug));
-
-	RasterizationsStates[RS_NORMAL] = rastStateNormal;
-	RasterizationsStates[RS_DEBUG] = rastStateDebug;
+	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &RasterizationsStates[RS_DEBUG]));
 
 	SetDebugName(RasterizationsStates[RS_NORMAL], "Normal RS");
 	SetDebugName(RasterizationsStates[RS_DEBUG], "Debug RS");
-
 }
 
 void GraphicsD3D11::InitSamplers()

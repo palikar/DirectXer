@@ -1,6 +1,8 @@
 #include <TexturePacker.hpp>
 #include "AssetBuilder.hpp"
 
+#include <chrono>
+
 /*
   @Note: Checklist for adding as new asset type
 
@@ -185,6 +187,8 @@ int main(int argc, char *argv[])
 
 	AssetDataBlob dataBlob;
 	dataBlob.Data.reserve(1024u*1024u*256u);
+
+	std::chrono::steady_clock::time_point beginBuilding = std::chrono::steady_clock::now();
 	
 	fmt::print("----------Running the texture packer----------\n");
 	TexturePacker::CommandLineArguments texturePackingArguments;
@@ -296,6 +300,12 @@ int main(int argc, char *argv[])
 	context.Header.SkyboxesCount  = (uint32)context.Skyboxes.size();
 	context.Header.LoadMeshesCount  = (uint32)context.LoadMeshes.size();
 	context.Header.MaterialsCount  = (uint32)context.Materials.size();
+
+	// @Note: The offsets in the context are relative to the beginning of the DataBlob;
+	// when we put them on disk, some of the data in the context will be in front of the
+	// pure data; hence we have to add this base offset to the offsets in the context
+	size_t baseOffset = CalculateBaseOffset(context);
+	ApplyBaseOffset(context, baseOffset);
 	
 	fmt::print("----------Done building assets----------\n");
 	fmt::print("Textures: \t[{}]\n", context.Header.TexturesCount);
@@ -308,12 +318,10 @@ int main(int argc, char *argv[])
 	fmt::print("Meshes: \t[{}]\n", context.Header.LoadMeshesCount);
 	fmt::print("Materials: \t[{}]\n", context.Header.MaterialsCount);
 	
-	// @Note: The offsets in the context are relative to the beginning of the DataBlob;
-	// when we put them on disk, some of the data in the context will be in front of the
-	// pure data; hence we have to add this base offset to the offsets in the context
-	size_t baseOffset = CalculateBaseOffset(context);
-	ApplyBaseOffset(context, baseOffset);
-
+	std::chrono::steady_clock::time_point endBuilding = std::chrono::steady_clock::now();
+	fmt::print("Total time for building: [{:.2} s]\n", std::chrono::duration_cast<std::chrono::milliseconds>(endBuilding - beginBuilding).count() / 1000.0f);
+	
+	
 	// @Note: From here forward, we are only writing the results of the packing to the files;
 	// one header file and one asset bundle file
 	

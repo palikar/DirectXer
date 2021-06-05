@@ -738,8 +738,8 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 			}
 
 			IndexData.push_back(indexMap[parts[1]]);
-			IndexData.push_back(indexMap[parts[2]]);
 			IndexData.push_back(indexMap[parts[3]]);
+			IndexData.push_back(indexMap[parts[2]]);
 
 			if (parts.size() > 4)
 			{
@@ -753,8 +753,8 @@ void LoadMesh(AssetToLoad asset, AssetBundlerContext& context, AssetDataBlob& bl
 				}
 
 				IndexData.push_back(indexMap[parts[4]]);
-				IndexData.push_back(indexMap[parts[1]]);
 				IndexData.push_back(indexMap[parts[3]]);
+				IndexData.push_back(indexMap[parts[1]]);
 
 			}
 			
