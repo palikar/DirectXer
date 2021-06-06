@@ -554,16 +554,19 @@ void ExampleScenes::ProcessEditorScene(float dt)
     Renderer3D.UpdateCamera();
     Renderer3D.UpdateLighting();
 
-
-    Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
     Graphics->ClearZBuffer();
     Graphics->SetDepthStencilState(DSS_Normal);
 
     Renderer3D.BeginScene(SC_DEBUG_COLOR);
     Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, float3(1.0f));
 
-
-    Renderer3D.DrawSkyBox(T_SKY);
+	{
+		
+		
+	}
+	
+	Renderer3D.DrawSkyBox(T_SKY);
 
 	Renderer2D.BeginScene();
     Renderer2D.DrawText("Editor Scene", {450.0f, 30.0f}, F_DroidSansBold_24, Color::Chartreuse);

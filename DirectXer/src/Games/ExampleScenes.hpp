@@ -38,8 +38,6 @@ public:
 	void Resize();
 	void PostInit() {};
 	
-	void RenderDebugGeometry(uint32 t_Id, glm::mat4 t_Translation = glm::mat4(1), glm::mat4 t_Scale = glm::mat4(1), glm::mat4 t_Rotation = glm::mat4(1)){}
-
 	void UpdateTime(float dt);
 	
 	void ProcessFirstScene(float dt);
@@ -48,6 +46,24 @@ public:
 	void ProcessUIScene(float dt);
 	void ProcessObjectsScene(float dt);
 	void ProcessEditorScene(float dt);
+
+	struct MeshPrototype
+	{
+		MeshId Mesh;
+		MaterialId Material;
+		String Name;
+	};
+	
+	struct MeshEntry
+	{
+		MeshId Mesh;
+		MaterialId Material;
+		mat4 Transform;
+		String Name;
+	};
+	
+	BulkVector<MeshEntry> Prototypes;
+	BulkVector<MeshEntry> Meshes;
 
 	ConstantBufferId DebugCBId;
 	
