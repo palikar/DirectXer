@@ -76,6 +76,7 @@ void Renderer3D::BindLighting()
 
 void Renderer3D::SetupProjection(glm::mat4 matrix)
 {
+	CurrentProjection = (matrix);
 	Gfx->VertexShaderCB.projection = glm::transpose(matrix);
 }
 
@@ -104,7 +105,7 @@ void Renderer3D::DrawSkyBox(TextureId sky)
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.BaseIndex, geom.IndexOffset);
 }
 
-void Renderer3D::DrawMeshWithMaterial(MeshId id, glm::vec3 pos, glm::vec3 scale)
+void Renderer3D::DrawMeshWithMaterial(MeshId id, float3 pos, float3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
 	MeshData.Materials.Bind(Gfx, mesh.Material);
@@ -119,13 +120,26 @@ void Renderer3D::DrawMeshWithMaterial(MeshId id, glm::vec3 pos, glm::vec3 scale)
 	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
 }
 
-void Renderer3D::DrawMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
+void Renderer3D::DrawMesh(MeshId id, float3 pos, float3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
 
 	Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
+	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
+	Gfx->UpdateCBs();
+
+	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
+}
+
+void Renderer3D::DrawMesh(MeshId id, mat4 transform)
+{
+	const auto mesh = MeshData.Meshes.at(id);
+	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
+	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
+
+	Gfx->VertexShaderCB.model = transform;
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();
 
@@ -145,7 +159,7 @@ void Renderer3D::DrawInstancedMesh(MeshId id, uint32 instancesCount, uint32 base
 	Gfx->DrawInstancedIndex(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, instancesCount, 0, 0, baseInstanced);
 }
 
-void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, glm::mat4 rotation)
+void Renderer3D::DrawDebugGeometry(uint32 id, float3 pos, float3 scale, glm::mat4 rotation)
 {
 	auto geom = DebugGeometries.Geometries[id];
 
@@ -159,7 +173,7 @@ void Renderer3D::DrawDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, gl
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.IndexOffset, geom.BaseIndex);
 }
 
-void Renderer3D::DrawSelectedDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 scale, glm::mat4 rotation)
+void Renderer3D::DrawSelectedDebugGeometry(uint32 id, float3 pos, float3 scale, glm::mat4 rotation)
 {
 	auto geom = DebugGeometries.Geometries[id];
 
@@ -179,13 +193,33 @@ void Renderer3D::DrawSelectedDebugGeometry(uint32 id, glm::vec3 pos, glm::vec3 s
 	Gfx->SetRasterizationState(RS_NORMAL);
 }
 
-void Renderer3D::DrawSelectedMesh(MeshId id, glm::vec3 pos, glm::vec3 scale)
+void Renderer3D::DrawSelectedMesh(MeshId id, float3 pos, float3 scale)
 {
 	const auto mesh = MeshData.Meshes.at(id);
 	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
 	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
 
 	Gfx->VertexShaderCB.model = init_translate(pos) * init_scale(scale);
+	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
+
+	Gfx->BindPSConstantBuffers(DebugCBId, 3);
+	Gfx->SetShaderConfiguration(SC_COLOR);
+	Gfx->SetRasterizationState(RS_DEBUG);
+	
+	Gfx->UpdateCBs();
+	
+	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
+
+	Gfx->SetRasterizationState(RS_NORMAL);
+}
+
+void Renderer3D::DrawSelectedMesh(MeshId id, mat4 transform)
+{
+	const auto mesh = MeshData.Meshes.at(id);
+	Gfx->BindVertexBuffer(mesh.Geometry.Vbo);
+	Gfx->BindIndexBuffer(mesh.Geometry.Ibo);
+
+	Gfx->VertexShaderCB.model = transform;
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 
 	Gfx->BindPSConstantBuffers(DebugCBId, 3);

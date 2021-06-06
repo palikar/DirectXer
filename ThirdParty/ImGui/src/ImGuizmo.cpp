@@ -984,9 +984,13 @@ namespace ImGuizmo
       }
       else
       {
+         // gContext.mModel.Transpose();
          gContext.mModel.Translation(((matrix_t*)matrix)->v.position);
       }
+	  
       gContext.mModelSource = *(matrix_t*)matrix;
+	  // gContext.mModelSource.Transpose();
+	  
       gContext.mModelScaleOrigin.Set(gContext.mModelSource.v.right.Length(), gContext.mModelSource.v.up.Length(), gContext.mModelSource.v.dir.Length());
 
       gContext.mModelInverse.Inverse(gContext.mModel);
@@ -1918,6 +1922,7 @@ namespace ImGuizmo
          }
 
          matrix_t res = gContext.mModelSource * deltaMatrixTranslation;
+          // res.Transpose();
          *(matrix_t*)matrix = res;
 
          if (!io.MouseDown[0])
@@ -2049,6 +2054,7 @@ namespace ImGuizmo
          deltaMatrixScale.Scale(gContext.mScale * gContext.mScaleValueOrigin);
 
          matrix_t res = deltaMatrixScale * gContext.mModel;
+		 // res.Transpose();
          *(matrix_t*)matrix = res;
 
          if (deltaMatrix)
@@ -2159,6 +2165,7 @@ namespace ImGuizmo
             matrix_t res = gContext.mModelSource;
             res.v.position.Set(0.f);
 
+			// res.Transpose();
             *(matrix_t*)matrix = res * deltaRotation;
             ((matrix_t*)matrix)->v.position = gContext.mModelSource.v.position;
          }

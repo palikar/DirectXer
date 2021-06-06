@@ -232,6 +232,7 @@
     <ClCompile Include="src\dear_widgets.cpp" />
     <ClCompile Include="src\imgui.cpp" />
     <ClCompile Include="src\ImGuiFileDialog.cpp" />
+    <ClCompile Include="src\ImGuizmo.cpp" />
     <ClCompile Include="src\imgui_demo.cpp" />
     <ClCompile Include="src\imgui_draw.cpp" />
     <ClCompile Include="src\imgui_impl_dx11.cpp" />

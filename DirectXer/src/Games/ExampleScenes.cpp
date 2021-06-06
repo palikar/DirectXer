@@ -9,6 +9,7 @@
 #include <SpaceAssets.hpp>
 
 #include <imgui.h>
+#include <ImGuizmo.h>
 
 static uint32 CUBE;
 static uint32 PLANE;
@@ -199,6 +200,29 @@ void ExampleScenes::Update(float dt)
 		CurrentScene = Scene((CurrentScene + 1) % SCENE_COUNT);
 	}
 
+	ControlCameraStateImgui(CameraState);
+	ControlLightingImGui(Renderer3D.LightingSetup.LightingData);
+	
+	if (ImGui::CollapsingHeader("Serialization"))
+	{
+		if (ImGui::Button("Save Setup"))
+		{
+			Serialization::DumpToFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("LoadSetup"))
+		{
+			Serialization::LoadFromFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
+		}
+	}
+
+	ImGuiIO &io = ImGui::GetIO();
+	ImGuizmo::SetRect(io.DisplayFramebufferScale.x,
+                      io.DisplayFramebufferScale.y,
+                      io.DisplaySize.x,
+                      io.DisplaySize.y);
+	
 	switch (CurrentScene)
 	{
 	case SCENE_FIRST:
@@ -217,6 +241,9 @@ void ExampleScenes::Update(float dt)
 		ProcessObjectsScene(dt);
 		break;
 	}
+
+	// ImGui::ShowDemoWindow();
+	
 }
 
 void ExampleScenes::UpdateTime(float dt)
@@ -230,8 +257,6 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	UpdateTime(dt);
 
 	ControlCamera(CameraState, Renderer3D.CurrentCamera, dt);
-
-	ControlCameraStateImgui(CameraState);
 
 	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
 	Graphics->ClearZBuffer();
@@ -342,7 +367,6 @@ void ExampleScenes::ProcessPhongScene(float dt)
 {
 	UpdateTime(dt);
 	ControlCamera(CameraState, Renderer3D.CurrentCamera, dt);
-	ControlCameraStateImgui(CameraState);
 
 	static float lightRadius = 1.0;
 	ImGui::SliderFloat("Light Radius: ", (float*)&lightRadius, 0.1f, 1.5f, "%.3f");
@@ -402,8 +426,27 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 	Renderer3D.DrawMesh(M_TREE_1, float3{3.0f, -2.0f, 0.0f}, Scale(0.05f));
 
 	Renderer3D.BindMaterial(SimpleColor);
-	Renderer3D.DrawMesh(M_SUZANNE, {-3.0f, 0.0f, 0.0f}, Scale(0.5f));
-	Renderer3D.DrawSelectedMesh(M_SUZANNE, {-3.0f, 0.0f, 0.0f}, Scale(0.5f));
+
+	static mat4 transf = init_translate({-3.0f, 0.0f, 0.0f}) * init_scale(Scale(0.5f));
+	ImGuizmo::Enable(true);
+
+	ImGuizmo::AllowAxisFlip(true);
+
+	ImGuizmo::MODE currentGizmoMode(ImGuizmo::WORLD);
+	ImGuizmo::OPERATION currentGizmoOperation{ ImGuizmo::SCALE };
+		
+	ImGuizmo::BeginFrame();
+
+	transf = glm::transpose(transf);
+	ImGuizmo::Manipulate(glm::value_ptr(Renderer3D.CurrentCamera.view()),
+						 glm::value_ptr(Renderer3D.CurrentProjection),
+						 currentGizmoOperation,
+						 currentGizmoMode,
+						 glm::value_ptr(transf));
+	transf = glm::transpose(transf);
+		
+	Renderer3D.DrawMesh(M_SUZANNE, transf);
+	Renderer3D.DrawSelectedMesh(M_SUZANNE, transf);
 
 	Renderer3D.BindMaterialInstanced(SimpleColor);
 	Renderer3D.DrawInstancedMesh(M_SUZANNE, 32);
@@ -425,9 +468,6 @@ void ExampleScenes::ProcessBallsScene(float dt)
 	static float ballScale = 1.0f;
 	static float lightRadius = 1.0;
 
-	ControlCameraStateImgui(CameraState);
-	ControlLightingImGui(Renderer3D.LightingSetup.LightingData);
-
 	if (ImGui::CollapsingHeader("Ball Scene"))
 	{
 		//ImGui::Text("Balls material");
@@ -441,20 +481,6 @@ void ExampleScenes::ProcessBallsScene(float dt)
 		ImGui::SliderInt("Ball Grid Y", &ball_grid_y, 10, 30);
 		ImGui::SliderFloat("Offset", &offset, 1.5f, 4.0f);
 		ImGui::SliderFloat("Ball Scale", &ballScale, 0.05f, 1.3f);
-	}
-
-	if (ImGui::CollapsingHeader("Serialization"))
-	{
-		if (ImGui::Button("Save Setup"))
-		{
-			Serialization::DumpToFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
-		}
-
-		ImGui::SameLine();
-		if (ImGui::Button("LoadSetup"))
-		{
-			Serialization::LoadFromFile(Resources::ResolveFilePath("setup.ddata"), SaveContext);
-		}
 	}
 
 	Renderer3D.LightingSetup.LightingData.spotLights[0].position = {((ball_grid_x - 3) * offset * 0.5f) * std::sin(T), 1.0f, (0.5f * (ball_grid_y - 3) * offset), 0.0f};
@@ -479,8 +505,8 @@ void ExampleScenes::ProcessBallsScene(float dt)
 		for (int j = 0; j < ball_grid_y; ++j)
 		{
 			float3 ballPosition(i * offset - (ball_grid_x * offset * 0.5f),
-								   0.0f,
-								   j * offset - (ball_grid_y * offset * 0.5f));
+								0.0f,
+								j * offset - (ball_grid_y * offset * 0.5f));
 
 			Renderer3D.DrawDebugGeometry(SPHERE, ballPosition, Scale(ballScale));
 		}
