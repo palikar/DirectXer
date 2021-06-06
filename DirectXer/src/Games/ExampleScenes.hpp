@@ -21,6 +21,7 @@ enum Scene
 	SCENE_BALLS,
 	SCENE_UI,
 	SCENE_OBJECTS,
+	SCENE_EDITOR,
 	SCENE_COUNT
 };
 
@@ -46,6 +47,7 @@ public:
 	void ProcessBallsScene(float dt);
 	void ProcessUIScene(float dt);
 	void ProcessObjectsScene(float dt);
+	void ProcessEditorScene(float dt);
 
 	ConstantBufferId DebugCBId;
 	

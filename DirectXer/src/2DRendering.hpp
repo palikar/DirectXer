@@ -8,6 +8,27 @@
 #include <FontLibrary.hpp>
 #include <Resources.hpp>
 
+
+struct Color
+{
+	static inline float4 Black{0.0f, 0.0f, 0.0f, 1.0f};
+    static inline float4 White{1.0f, 1.0f, 1.0f, 1.0f};
+    static inline float4 Red{1.0f, 0.0f, 0.0f, 1.0f};
+    static inline float4 Blue{0.0f, 1.0f, 0.0f, 1.0f};
+    static inline float4 Green{0.0f, 0.0f, 1.0f, 1.0f};
+    static inline float4 Cyan{0.0f, 1.0f, 1.0f, 1.0f};
+    static inline float4 Yellow{1.0f, 1.0f, 0.0f, 1.0f};
+    static inline float4 Magenta{1.0f, 0.0f, 1.0f, 1.0f};
+    static inline float4 Orange{1, 0.5, 0, 1.0f};
+    static inline float4 AquaMarine{127.0f/255.0f, 255.0f/255.0f, 212.0f/255.0f, 1.0f};
+	static inline float4 DarkViolet{148.0f/255.0f, 0.0f, 211.0f/255.0f, 1.0f};
+	static inline float4 Chartreuse{127.0f/255.0f, 255.0f/255.0f, 0.0f, 1.0f};
+	static inline float4 HotPink{255.0f/255.0f, 105.0f/255.0f, 180.0f/255.0f, 1.0f};
+	static inline float4 Gold{255.0f/255.0f, 215.0f/255.0f, 0.0f, 1.0f};
+	static inline float4 PaleGreen{152.0f/255.0f, 251.0f/255.0f, 152.0f/255.0f, 1.0f};
+	static inline float4 Teal{0.0f, 128.0f/255.0f, 128.0f/255.0f, 1.0f};
+};
+
 struct Init2DParams
 {
 	float32 Width;
@@ -80,16 +101,16 @@ class Renderer2D
     
     uint8 AttachTexture(TextureId t_Tex);
     
-    void DrawQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color);
-    void DrawTriangle(const glm::vec2 vertices[3], glm::vec4 color);
-	void DrawFourPolygon(const glm::vec2 vertices[4], glm::vec4 color);
-    void DrawCirlce(glm::vec2 pos, float radius, glm::vec4 color);
-    void DrawImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size);
-    void DrawRoundedQuad(glm::vec2 pos, glm::vec2 size, glm::vec4 color, float radius);
-    void DrawSubImage(uint32 t_Id, glm::vec2 pos, glm::vec2 size, glm::vec2 subPos, glm::vec2 subSize);
-    void DrawText(std::string_view text, glm::vec2 pos, FontId typeface);
+    void DrawQuad(float2 pos, float2 size, float4 color);
+    void DrawTriangle(const float2 vertices[3], float4 color);
+	void DrawFourPolygon(const float2 vertices[4], float4 color);
+    void DrawCirlce(float2 pos, float radius, float4 color);
+    void DrawImage(uint32 t_Id, float2 pos, float2 size);
+    void DrawRoundedQuad(float2 pos, float2 size, float4 color, float radius);
+    void DrawSubImage(uint32 t_Id, float2 pos, float2 size, float2 subPos, float2 subSize);
+    void DrawText(String text, float2 pos, FontId typeface, float4 color = Color::White);
 
-	void DrawLine(glm::vec2 from, glm::vec2 to, glm::vec4 color);
+	void DrawLine(float2 from, float2 to, float4 color);
 };
 
 // @Todo: Pusing transform matrices
@@ -99,7 +120,7 @@ struct SpriteSheetHolder
 {
 	struct SpriteSheet
 	{
-		glm::vec2 SubSize;
+		float2 SubSize;
 		glm::ivec2 GridSize;
 		uint32 ImageIndex;
 	};
@@ -109,30 +130,9 @@ struct SpriteSheetHolder
 
     void Init(size_t t_Size, Renderer2D* Gfx);
 
-	uint32 PutSheet(uint32 t_ImageIndex, glm::vec2 t_Size, glm::ivec2 t_GridSize);
+	uint32 PutSheet(uint32 t_ImageIndex, float2 t_Size, glm::ivec2 t_GridSize);
 
-	void DrawSprite(size_t spiretSheet, int index, glm::vec2 pos, glm::vec2 size);
+	void DrawSprite(size_t spiretSheet, int index, float2 pos, float2 size);
 
-	void DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, glm::vec2 pos, glm::vec2 size);
-};
-
-
-struct Color
-{
-	static inline glm::vec4 Black{0.0f, 0.0f, 0.0f, 1.0f};
-    static inline glm::vec4 White{1.0f, 1.0f, 1.0f, 1.0f};
-    static inline glm::vec4 Red{1.0f, 0.0f, 0.0f, 1.0f};
-    static inline glm::vec4 Blue{0.0f, 1.0f, 0.0f, 1.0f};
-    static inline glm::vec4 Green{0.0f, 0.0f, 1.0f, 1.0f};
-    static inline glm::vec4 Cyan{0.0f, 1.0f, 1.0f, 1.0f};
-    static inline glm::vec4 Yellow{1.0f, 1.0f, 0.0f, 1.0f};
-    static inline glm::vec4 Magenta{1.0f, 0.0f, 1.0f, 1.0f};
-    static inline glm::vec4 Orange{1, 0.5, 0, 1.0f};
-    static inline glm::vec4 AquaMarine{127.0f/255.0f, 255.0f/255.0f, 212.0f/255.0f, 1.0f};
-	static inline glm::vec4 DarkViolet{148.0f/255.0f, 0.0f, 211.0f/255.0f, 1.0f};
-	static inline glm::vec4 Chartreuse{127.0f/255.0f, 255.0f/255.0f, 0.0f, 1.0f};
-	static inline glm::vec4 HotPink{255.0f/255.0f, 105.0f/255.0f, 180.0f/255.0f, 1.0f};
-	static inline glm::vec4 Gold{255.0f/255.0f, 215.0f/255.0f, 0.0f, 1.0f};
-	static inline glm::vec4 PaleGreen{152.0f/255.0f, 251.0f/255.0f, 152.0f/255.0f, 1.0f};
-	static inline glm::vec4 Teal{0.0f, 128.0f/255.0f, 128.0f/255.0f, 1.0f};
+	void DrawSprite(uint32 spiretSheet, glm::ivec2 spirtePos, float2 pos, float2 size);
 };
