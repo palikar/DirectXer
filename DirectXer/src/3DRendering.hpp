@@ -68,6 +68,8 @@ class Renderer3D
 
 	ShaderConfiguration CurrentConfig;
 
+	ConstantBufferId DebugCBId;
+
   public:
 
 	void InitRenderer(Graphics* t_Graphics);
@@ -82,6 +84,7 @@ class Renderer3D
 	void UpdateLighting();
 	void UpdateCamera();
 	void UpdateInstancedData();
+	void UpdateDebugData(float T);
 
 	void BeginScene(ShaderConfiguration config);
 	void EndScene();
@@ -94,9 +97,12 @@ class Renderer3D
 	Lighting&						 AccessLightingData()  { return LightingSetup.LightingData; }
 	BulkVector<MtlInstanceData>&	 AccessInstancedData() { return InstancedData;              }
 
+	
 	void DrawMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
 	void DrawInstancedMesh(MeshId id, uint32 instancesCount, uint32 baseInstanced = 0);
 	void DrawMeshWithMaterial(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
 	void DrawDebugGeometry(uint32 id, glm::vec3 pos = {}, glm::vec3 scale = {}, glm::mat4 rotation = glm::mat4(1));
+	void DrawSelectedDebugGeometry(uint32 id, glm::vec3 pos = {}, glm::vec3 scale = {}, glm::mat4 rotation = glm::mat4(1));
+	void DrawSelectedMesh(MeshId id, glm::vec3 pos = {}, glm::vec3 scale = {});
 	void DrawSkyBox(TextureId sky);
 };

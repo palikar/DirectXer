@@ -169,7 +169,6 @@ void ExampleScenes::Init()
 	}
 
 	Renderer3D.UpdateInstancedData();
-
 }
 
 void ExampleScenes::Resize()
@@ -180,23 +179,15 @@ void ExampleScenes::Resize()
 
 void ExampleScenes::Update(float dt)
 {
-	if (Input::gInput.IsKeyReleased(KeyCode::F1))
-	{
-		CurrentRastState = RasterizationState((CurrentRastState + 1) % RS_COUNT);
-		Graphics->SetRasterizationState(CurrentRastState);
-	}
-
 	if (Input::gInput.IsKeyReleased(KeyCode::F2))
 	{
 		Application->RenderImGui = !Application->RenderImGui;
 	}
 
-
 	if (Input::gInput.IsKeyReleased(KeyCode::F3))
 	{
 		Application->EnableVsync = (Application->EnableVsync + 1) % 2;
 	}
-
 
 	if (Input::gInput.IsKeyReleased(KeyCode::Left))
 	{
@@ -237,6 +228,7 @@ void ExampleScenes::UpdateTime(float dt)
 void ExampleScenes::ProcessFirstScene(float dt)
 {
 	UpdateTime(dt);
+
 	ControlCamera(CameraState, Renderer3D.CurrentCamera, dt);
 
 	ControlCameraStateImgui(CameraState);
@@ -245,6 +237,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 	Graphics->ClearZBuffer();
 	Graphics->SetDepthStencilState(DSS_Normal);
 
+	Renderer3D.UpdateDebugData(T);
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
 	Renderer3D.UpdateCamera();
 
@@ -259,6 +252,7 @@ void ExampleScenes::ProcessFirstScene(float dt)
 
 			Renderer3D.DrawDebugGeometry(SPHERE, float3(4.0f, std::sin(T*3)*0.5f + 1.5f, 4.0f), Scale(0.25f));
 			Renderer3D.DrawDebugGeometry(CYLINDER, float3(-4.0f, 1.0f, 4.0f), Scale(0.25f));
+			Renderer3D.DrawSelectedDebugGeometry(CYLINDER, float3(-4.0f, 1.0f, 4.0f), Scale(0.25f));
 
 			Renderer3D.BindMaterial(CheckerTextured);
 			Renderer3D.DrawDebugGeometry(CUBE, float3(0.0f, 1.0, 4.0f), Scale(0.25f), init_rotation(T*0.25f, {0.0f, 1.0f, 0.0f}));
@@ -268,7 +262,9 @@ void ExampleScenes::ProcessFirstScene(float dt)
 		}
 
 		{
+			Renderer3D.BindMaterial(FloorTextured);
 			Renderer3D.DrawMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, Scale(0.05f));
+			Renderer3D.DrawSelectedMesh(M_TREE_1, {0.0f, 1.0f, -4.0f}, Scale(0.05f));
 		}
 
 		Renderer3D.DrawSkyBox(T_SKY);
@@ -386,6 +382,8 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
 
 	UpdateTime(dt);
+
+	Renderer3D.UpdateDebugData(T);
 	ControlCamera(CameraState, Renderer3D.CurrentCamera, dt);
 
 	Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
@@ -405,6 +403,7 @@ void ExampleScenes::ProcessObjectsScene(float dt)
 
 	Renderer3D.BindMaterial(SimpleColor);
 	Renderer3D.DrawMesh(M_SUZANNE, {-3.0f, 0.0f, 0.0f}, Scale(0.5f));
+	Renderer3D.DrawSelectedMesh(M_SUZANNE, {-3.0f, 0.0f, 0.0f}, Scale(0.5f));
 
 	Renderer3D.BindMaterialInstanced(SimpleColor);
 	Renderer3D.DrawInstancedMesh(M_SUZANNE, 32);

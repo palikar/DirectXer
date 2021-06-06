@@ -184,7 +184,7 @@ void GraphicsD3D11::InitRasterizationsStates()
 	rastDesc.CullMode = D3D11_CULL_NONE;
 	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &RasterizationsStates[RS_BACK]));
 
-	rastDesc.CullMode = D3D11_CULL_NONE;
+	rastDesc.CullMode = D3D11_CULL_BACK;
 	rastDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rastDesc.FrontCounterClockwise = false;
 	rastDesc.ScissorEnable  = false;

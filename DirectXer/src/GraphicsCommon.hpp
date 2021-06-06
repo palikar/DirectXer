@@ -19,6 +19,11 @@ struct VSConstantBuffer
 	glm::vec3 cameraPos;
 };
 
+struct DebugCB
+{
+	float4 DebugColor;
+};
+
 struct SimpleVertex
 {
 	glm::vec3 pos;
@@ -123,6 +128,8 @@ enum ShaderType : uint8
 
 	ST_1_MTL       = 8,
 	ST_2_MTL       = 9,
+
+	DEBUG_COLOR    = 10,
 	
 	ST_COUNT
 };
@@ -130,9 +137,9 @@ enum ShaderType : uint8
 enum ShaderConfiguration
 {
 	// Debug Rendering
-	SC_DEBUG_COLOR       = SF_DEBUG		| (ST_COLOR			<< 8),
-	SC_DEBUG_SKY         = SF_DEBUG		| (ST_SKY			<< 8),
-	SC_DEBUG_SIMPLE_TEX  = SF_DEBUG		| (ST_TEX_SIMPLE	<< 8),
+	SC_DEBUG_COLOR		 = SF_DEBUG		| (ST_COLOR			<< 8),
+	SC_DEBUG_SKY		 = SF_DEBUG		| (ST_SKY			<< 8),
+	SC_DEBUG_SIMPLE_TEX	 = SF_DEBUG		| (ST_TEX_SIMPLE	<< 8),
 
 	// 2D rendering
 	SC_2D_RECT           = SF_2D		| (ST_RECT			<< 8),
@@ -149,6 +156,8 @@ enum ShaderConfiguration
 
 	SC_PHONG			 = SF_PHONG		| (ST_PHONG			<< 8),
 	SC_TEX   			 = SF_TEX		| (ST_TEX			<< 8),
+
+	SC_COLOR        	 = SF_DEBUG		| (DEBUG_COLOR		<< 8),
 	
 	SC_COUNT
 };

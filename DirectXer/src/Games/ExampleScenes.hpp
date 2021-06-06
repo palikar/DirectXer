@@ -46,6 +46,8 @@ public:
 	void ProcessBallsScene(float dt);
 	void ProcessUIScene(float dt);
 	void ProcessObjectsScene(float dt);
+
+	ConstantBufferId DebugCBId;
 	
 	Graphics* Graphics;
 	App* Application;
