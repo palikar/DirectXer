@@ -900,7 +900,7 @@ void GraphicsD3D11::InitDepthStencilStates()
 		// 2D Rendering
 	
 		D3D11_DEPTH_STENCIL_DESC dsDesc{0};
-		dsDesc.DepthEnable = TRUE;
+		dsDesc.DepthEnable = FALSE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 

@@ -186,11 +186,13 @@ void Renderer3D::DrawSelectedDebugGeometry(uint32 id, float3 pos, float3 scale, 
 	Gfx->BindPSConstantBuffers(DebugCBId, 3);
 	Gfx->SetShaderConfiguration(SC_COLOR);
 	Gfx->SetRasterizationState(RS_DEBUG);
+	Gfx->SetDepthStencilState(DSS_2DRendering);
 
 	Gfx->UpdateCBs();
 	
 	Gfx->DrawIndexed(geom.Topology, geom.IndexCount, geom.IndexOffset, geom.BaseIndex);
 	Gfx->SetRasterizationState(RS_NORMAL);
+	Gfx->SetDepthStencilState(DSS_Normal);
 }
 
 void Renderer3D::DrawSelectedMesh(MeshId id, float3 pos, float3 scale)
@@ -205,12 +207,14 @@ void Renderer3D::DrawSelectedMesh(MeshId id, float3 pos, float3 scale)
 	Gfx->BindPSConstantBuffers(DebugCBId, 3);
 	Gfx->SetShaderConfiguration(SC_COLOR);
 	Gfx->SetRasterizationState(RS_DEBUG);
+	Gfx->SetDepthStencilState(DSS_2DRendering);
 	
 	Gfx->UpdateCBs();
 	
 	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
 
 	Gfx->SetRasterizationState(RS_NORMAL);
+	Gfx->SetDepthStencilState(DSS_Normal);
 }
 
 void Renderer3D::DrawSelectedMesh(MeshId id, mat4 transform)
@@ -225,12 +229,14 @@ void Renderer3D::DrawSelectedMesh(MeshId id, mat4 transform)
 	Gfx->BindPSConstantBuffers(DebugCBId, 3);
 	Gfx->SetShaderConfiguration(SC_COLOR);
 	Gfx->SetRasterizationState(RS_DEBUG);
+	Gfx->SetDepthStencilState(DSS_2DRendering);
 	
 	Gfx->UpdateCBs();
 	
 	Gfx->DrawIndexed(TT_TRIANGLES, mesh.Geometry.Description.IndexCount, 0, 0);
 
 	Gfx->SetRasterizationState(RS_NORMAL);
+	Gfx->SetDepthStencilState(DSS_Normal);
 }
 
 void Renderer3D::BeginScene(ShaderConfiguration config)

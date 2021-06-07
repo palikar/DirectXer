@@ -64,8 +64,6 @@ void ExampleScenes::Init()
     }
     Memory::EndTempScope();
 
-    TempFormater formater;
-
     RocksTextured = 1;
     CheckerTextured = 3;
     FloorTextured = 4;
@@ -101,7 +99,7 @@ void ExampleScenes::Init()
     phongMat.Diffuse  = {0.5f, 0.5f, 0.0f };
     phongMat.Specular = {1.0f, 0.0f, 0.0f };
     phongMat.Emissive = {0.0f, 0.0f, 0.0f };
-    InitMaterial(Graphics, phongMat, formater.Format("PhongMaterialCB"));
+    InitMaterial(Graphics, phongMat, Formater.Format("PhongMaterialCB"));
     phongMat.Id = SimplePhong;
 
     Renderer3D.MeshData.Materials.TexMaterials.push_back(rocksMat);
@@ -170,6 +168,12 @@ void ExampleScenes::Init()
     }
 
     Renderer3D.UpdateInstancedData();
+
+	MeshStore[0] = {M_TREE_1, Material_001, "Tree"};
+	MeshStore[1] = {M_SUZANNE, SimpleColor, "Monkey"};
+
+	Meshes.reserve(128);
+	MeshesNames.reserve(128);
 }
 
 void ExampleScenes::Resize()
@@ -243,9 +247,10 @@ void ExampleScenes::Update(float dt)
     case SCENE_EDITOR:
         ProcessEditorScene(dt);
         break;
+	case SCENE_IMGUI_DEMO:
+		ProcessIMGUIScene(dt);
+		break;
     }
-
-    // ImGui::ShowDemoWindow();
 }
 
 void ExampleScenes::UpdateTime(float dt)
@@ -561,7 +566,84 @@ void ExampleScenes::ProcessEditorScene(float dt)
     Renderer3D.BeginScene(SC_DEBUG_COLOR);
     Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, float3(1.0f));
 
+	Renderer3D.BindLighting();
+	
 	{
+		ImGui::Separator();
+		if (ImGui::Button("New Object..")) ImGui::OpenPopup("select_new_object");
+        if (ImGui::BeginPopup("select_new_object"))
+        {
+            ImGui::Text("New Object");
+            ImGui::Separator();
+            for (int i = 0; i < MeshPrototypesCount; i++)
+			{
+				auto mesh = MeshStore[i];
+                if (mesh.Mesh == 0) continue;
+                if (ImGui::Selectable(mesh.Name.data()))
+				{
+                    Meshes.push_back({ mesh.Mesh, mesh.Material, mat4{1}, mesh.Name });
+					MeshesNames.push_back(fmt::format("{}_{}", mesh.Name, Meshes.size()));
+				}
+			}
+            ImGui::EndPopup();
+        }
+		ImGui::Separator();
+		
+
+		ImGui::Text("Meshes:");
+        {
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+            ImGui::BeginChild("ChildL", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 260), false, window_flags);
+			
+			for (size_t i = 0; i < Meshes.size(); ++i)
+			{
+				auto mesh = Meshes[i];
+				if (ImGui::Selectable(MeshesNames[i].c_str(), i == SelectedMeshIndex))
+				{
+					SelectedMesh = mesh.Mesh;
+					SelectedMeshIndex = (uint32)i;
+				}
+			}
+
+			
+            ImGui::EndChild();
+        }
+
+		for (size_t i = 0; i < Meshes.size(); ++i)
+		{
+			auto mesh = Meshes[i];
+			Renderer3D.BindMaterial(mesh.Material);
+			Renderer3D.DrawMesh(mesh.Mesh, mesh.Transform);
+		}
+		
+		if (SelectedMeshIndex < Meshes.size())
+		{
+			auto& selectedMesh = Meshes[SelectedMeshIndex];
+
+			ImGuizmo::MODE currentGizmoMode(ImGuizmo::WORLD);
+			ImGuizmo::OPERATION currentGizmoOperation{ ImGuizmo::TRANSLATE };
+
+			static int op = 0;
+			ImGui::Text("Gizmo Operation:");
+			ImGui::RadioButton("Translate", &op, 0); ImGui::SameLine();
+			ImGui::RadioButton("Rotate", &op, 1); ImGui::SameLine();
+			ImGui::RadioButton("Scale", &op, 2);
+
+			if (op == 0) currentGizmoOperation = ImGuizmo::TRANSLATE;
+			if (op == 1) currentGizmoOperation = ImGuizmo::ROTATE;
+			if (op == 2) currentGizmoOperation = ImGuizmo::SCALE;
+
+			ImGuizmo::BeginFrame();
+			selectedMesh.Transform = glm::transpose(selectedMesh.Transform);
+			ImGuizmo::Manipulate(glm::value_ptr(Renderer3D.CurrentCamera.view()),
+								 glm::value_ptr(Renderer3D.CurrentProjection),
+								 currentGizmoOperation,
+								 currentGizmoMode,
+								 glm::value_ptr(selectedMesh.Transform));
+			selectedMesh.Transform = glm::transpose(selectedMesh.Transform);
+
+			Renderer3D.DrawSelectedMesh(selectedMesh.Mesh, selectedMesh.Transform);
+		}
 		
 		
 	}
@@ -570,5 +652,37 @@ void ExampleScenes::ProcessEditorScene(float dt)
 
 	Renderer2D.BeginScene();
     Renderer2D.DrawText("Editor Scene", {450.0f, 30.0f}, F_DroidSansBold_24, Color::Chartreuse);
+    Renderer2D.DrawText(Formater.Format("Mesh: {}", MeshesNames[SelectedMeshIndex].c_str()),
+						{450.0f, 57.0f}, F_DroidSansBold_24, Color::Chartreuse);
     Renderer2D.EndScene();
+}
+
+void ExampleScenes::ProcessIMGUIScene(float dt)
+{
+	
+    UpdateTime(dt);
+
+    Renderer3D.UpdateDebugData(T);
+    ControlCamera(CameraState, Renderer3D.CurrentCamera, dt);
+    Renderer3D.SetupProjection(glm::perspective(pov, Application->Width / Application->Height, nearPlane, farPlane));
+    Renderer3D.UpdateCamera();
+    Renderer3D.UpdateLighting();
+
+	Graphics->ClearBuffer(0.0f, 0.0f, 0.0f);
+    Graphics->ClearZBuffer();
+    Graphics->SetDepthStencilState(DSS_Normal);
+
+    Renderer3D.BeginScene(SC_DEBUG_COLOR);
+    Renderer3D.DrawDebugGeometry(AXIS, { 0.0f, 0.0f, 0.0f }, float3(1.0f));
+
+	{
+		ImGui::ShowDemoWindow();		
+	}
+	
+	Renderer3D.DrawSkyBox(T_SKY);
+
+	Renderer2D.BeginScene();
+    Renderer2D.DrawText("ImGui Scene", {450.0f, 30.0f}, F_DroidSansBold_24, Color::Chartreuse);
+    Renderer2D.EndScene();
+
 }

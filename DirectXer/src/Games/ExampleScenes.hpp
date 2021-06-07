@@ -22,6 +22,7 @@ enum Scene
 	SCENE_UI,
 	SCENE_OBJECTS,
 	SCENE_EDITOR,
+	SCENE_IMGUI_DEMO,
 	SCENE_COUNT
 };
 
@@ -46,6 +47,7 @@ public:
 	void ProcessUIScene(float dt);
 	void ProcessObjectsScene(float dt);
 	void ProcessEditorScene(float dt);
+	void ProcessIMGUIScene(float dt);
 
 	struct MeshPrototype
 	{
@@ -53,6 +55,9 @@ public:
 		MaterialId Material;
 		String Name;
 	};
+
+	static const inline int MeshPrototypesCount = 3;
+	MeshPrototype MeshStore[MeshPrototypesCount];
 	
 	struct MeshEntry
 	{
@@ -62,8 +67,13 @@ public:
 		String Name;
 	};
 	
-	BulkVector<MeshEntry> Prototypes;
+	TempFormater Formater;
+
+	// @Todo: Replace this with string interning context
+	BulkVector<std::string> MeshesNames;
 	BulkVector<MeshEntry> Meshes;
+	MeshId SelectedMesh{0};
+	uint32 SelectedMeshIndex{0};
 
 	ConstantBufferId DebugCBId;
 	
