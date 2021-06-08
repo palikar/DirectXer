@@ -177,5 +177,11 @@ App* InitMain(char** argv, int argc)
 // == Memory ==
 // @Todo Allocating general arenas in BulkStorage
 
+// == Tool Ideas ==
+// @Todo: Packing meshes into a single GPU buffer
+// @Todo: Packing sprites
+// @Todo: Packing bounding boxes (AABBs probably) for the meshes
+// @Todo: Mesh viewre
+
 // ***** Queue *****
 //  <--- this one
