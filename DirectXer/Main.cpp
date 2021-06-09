@@ -1,4 +1,5 @@
 #include <limits>
+#include <vector>
 
 #include <Types.hpp>
 #include <Glm.hpp>
@@ -6,6 +7,138 @@
 #include <immintrin.h>
 #include <xmmintrin.h>
 #include <mmintrin.h>
+
+
+struct AABB
+{
+	float3 Min;
+	float3 Max;
+};
+
+AABB Union(AABB a, AABB b)
+{
+	AABB result;
+	float var = 5;
+
+	_mm_storeu_ps(&result.Min.x, _mm_min_ps(_mm_loadu_ps(&a.Min.x), _mm_loadu_ps(&b.Min.x)));
+	_mm_storeu_ps(&result.Max.x, _mm_max_ps(_mm_loadu_ps(&a.Max.x), _mm_loadu_ps(&b.Max.x)));
+
+	return result;
+}
+
+float Area(AABB a)
+{
+	const auto d = _mm_sub_ps(_mm_loadu_ps(&a.Min.x), _mm_loadu_ps(&a.Max.x));
+	const auto dd = _mm_shuffle_ps(d, d, _MM_SHUFFLE(3, 0, 2, 1));
+	const auto dot = _mm_dp_ps(d, dd, 0X71);
+
+	return 2.0f * dot.m128_f32[0];
+}
+
+struct BVHNode
+{
+	AABB box;
+	int objectIndex;
+	int parentIndex;
+	int child1;
+	int child2;
+	bool isLeaf;
+};
+
+struct SlowBVH
+{
+	std::vector<BVHNode> Nodes;
+	int RootIndex;
+};
+
+void InsertAABB(SlowBVH& bvh, AABB aabb)
+{
+	const auto newNode = bvh.Nodes.size();
+	bvh.Nodes.push_back({ aabb });
+	bvh.Nodes.back().child1 = -1;
+	bvh.Nodes.back().child2 = -1;
+
+	auto& nodes = bvh.Nodes;
+
+	if (newNode == 0)
+	{
+		bvh.Nodes.back().parentIndex = -1;
+		bvh.RootIndex = 0;
+		return;
+	}
+
+	size_t best = bvh.RootIndex;
+	float bestCost = Area(Union(aabb, nodes[best].box));
+
+	struct Node
+	{
+		int index;
+		float inherited;
+	}; 
+	std::vector<Node> stack;
+	stack.reserve(256);
+
+	float delta = Area(aabb);
+	
+	stack.push_back({bvh.RootIndex, bestCost - Area(nodes[best].box)});
+	while (!stack.empty())
+	{
+		const float inheritedCost = stack.back().inherited;
+		const size_t i = stack.back().index;
+		
+		stack.pop_back();
+
+		auto& node = nodes[i];
+		const float totalCost = inheritedCost + Area(Union(node.box, aabb));
+		if (totalCost < bestCost )
+		{
+			bestCost = totalCost;
+			best = i;
+		}
+
+		const float low = totalCost - Area(node.box);
+		if (low + delta < bestCost)
+		{
+			if (node.child1 != -1) stack.push_back({node.child1, low});
+			if(node.child1 != -1) stack.push_back({node.child2, low});
+		}
+
+	}
+
+
+	auto oldParent = nodes[best].parentIndex;
+	auto newParent = nodes.size();
+	nodes.push_back({});
+	nodes[newParent].parentIndex = oldParent;
+	nodes[newParent].box = Union(aabb, nodes[best].box);
+
+	if (oldParent == -1)
+	{
+		nodes[newParent].child1 = best;
+		nodes[newParent].child2 = newNode;
+		nodes[best].parentIndex = newParent;
+		nodes[newNode].parentIndex = newParent;
+		bvh.RootIndex = newParent;
+
+	}
+	else
+	{
+		if (nodes[oldParent].child1 == best)
+		{
+			nodes[oldParent].child1 = newParent;
+		}
+		else
+		{
+			nodes[oldParent].child2 = newParent;
+		}
+
+		nodes[newParent].child1 = best;
+		nodes[newParent].child2 = newNode;
+		nodes[best].parentIndex = newParent;
+		nodes[newNode].parentIndex = newParent;
+	}	
+}
+
 
 struct alignas(16) AABBNode
 {
@@ -175,33 +308,36 @@ int main()
 	float3 min1{-10.0f, -10.0f, 10.0f};
 	float3 max1{10.0f, 10.0f, 15.0f};
 
-	float3 min2{-5.0f, 5.0f, 1.0f};
-	float3 max2{-1.0f, 1.0f, 5.0f};
+	float3 min2{-1.0f, -2.0f, -3.0f};
+	float3 max2{1.0f, 2.0f, 3.0f};
 
-	float3 min3{5.0f, -5.0f, 1.0f};
-	float3 max3{1.0f, -1.0f, 5.0f};
+	float3 min3{-.0f, -23.0f, -4.0f};
+	float3 max3{21.0f, 34.0f, 2.0f};
 	
 	float3 min4{-5.0f, -5.0f, 1.0f};
 	float3 max4{-1.0f, -1.0f, 5.0f};
 
-	float3 rayOrigin{0.0f, 0.0f, 0.0f};
-	float3 rayDir{0.0f, 0.0f, 1.0f};
+	float3 min5{23.0f, -5.0f, 23.0f};
+	float3 max5{1.0f, -1.0f, 5.0f};
 
-	FlatAABBs aabbList;
-	memset(&aabbList, 0, sizeof(aabbList));
-	aabbList.AddBox(min3, max3, 1);
-	aabbList.AddBox(min2, max2, 32);
-	aabbList.AddBox(min4, max4, 2);
-	aabbList.AddBox(min4, max4, 2);
-	aabbList.AddBox(min4, max4, 2);
-	aabbList.AddBox(min4, max4, 2);
-	aabbList.AddBox(min4, max4, 2);
-	aabbList.AddBox(min4, max4, 2);
-	aabbList.AddBox(min4, max4, 2);
-	//aabbList.AddBox(min1, max1, 42);
+	float3 min6{5.0f, -53.0f, 1.0f};
+	float3 max6{1.0f, -231.0f, 5.0f};
 
-	auto res = aabbList.Cast(rayOrigin, rayDir);
 
+	AABB aabb1{min2, max2};
+	AABB aabb2{min3, max3};
+	AABB aabb3{min4, max4};
+	AABB aabb4{min5, max5};
+	AABB aabb5{min6, max6};
+
+	SlowBVH bvh;
+	bvh.Nodes.reserve(256);
+
+	InsertAABB(bvh, aabb1);
+	InsertAABB(bvh, aabb2);
+	InsertAABB(bvh, aabb3);
+	InsertAABB(bvh, aabb4);
+	InsertAABB(bvh, aabb5);
 	
 	return 0;
 }
