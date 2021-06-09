@@ -1,5 +1,7 @@
+#include <iostream>
 #include <limits>
 #include <vector>
+#include <chrono>
 
 #include <Types.hpp>
 #include <Glm.hpp>
@@ -15,34 +17,33 @@ struct AABB
 	float3 Max;
 };
 
-AABB Union(AABB a, AABB b)
+AABB Union(const AABB a, const AABB b)
 {
 	AABB result;
-	float var = 5;
-
+	
 	_mm_storeu_ps(&result.Min.x, _mm_min_ps(_mm_loadu_ps(&a.Min.x), _mm_loadu_ps(&b.Min.x)));
 	_mm_storeu_ps(&result.Max.x, _mm_max_ps(_mm_loadu_ps(&a.Max.x), _mm_loadu_ps(&b.Max.x)));
 
 	return result;
 }
 
-float Area(AABB a)
+float Area(const AABB& a)
 {
 	const auto d = _mm_sub_ps(_mm_loadu_ps(&a.Min.x), _mm_loadu_ps(&a.Max.x));
 	const auto dd = _mm_shuffle_ps(d, d, _MM_SHUFFLE(3, 0, 2, 1));
 	const auto dot = _mm_dp_ps(d, dd, 0X71);
-
-	return 2.0f * dot.m128_f32[0];
+	return 2.0f * (dot.m128_f32[0]);
 }
 
 struct BVHNode
 {
 	AABB box;
-	int objectIndex;
+
 	int parentIndex;
 	int child1;
 	int child2;
-	bool isLeaf;
+	// int objectIndex;
+	
 };
 
 struct SlowBVH
@@ -51,9 +52,16 @@ struct SlowBVH
 	int RootIndex;
 };
 
-void InsertAABB(SlowBVH& bvh, AABB aabb)
+struct Node
 {
-	const auto newNode = bvh.Nodes.size();
+	int index;
+	float inherited;
+};
+
+void InsertAABB(SlowBVH& bvh, AABB aabb, std::vector<Node>& stack)
+{
+	stack.clear();
+	const auto newNode = (int)bvh.Nodes.size();
 	bvh.Nodes.push_back({ aabb });
 	bvh.Nodes.back().child1 = -1;
 	bvh.Nodes.back().child2 = -1;
@@ -67,16 +75,8 @@ void InsertAABB(SlowBVH& bvh, AABB aabb)
 		return;
 	}
 
-	size_t best = bvh.RootIndex;
+	int best = bvh.RootIndex;
 	float bestCost = Area(Union(aabb, nodes[best].box));
-
-	struct Node
-	{
-		int index;
-		float inherited;
-	}; 
-	std::vector<Node> stack;
-	stack.reserve(256);
 
 	float delta = Area(aabb);
 	
@@ -84,7 +84,7 @@ void InsertAABB(SlowBVH& bvh, AABB aabb)
 	while (!stack.empty())
 	{
 		const float inheritedCost = stack.back().inherited;
-		const size_t i = stack.back().index;
+		const auto i = (int)stack.back().index;
 		
 		stack.pop_back();
 
@@ -105,9 +105,8 @@ void InsertAABB(SlowBVH& bvh, AABB aabb)
 
 	}
 
-
 	auto oldParent = nodes[best].parentIndex;
-	auto newParent = nodes.size();
+	auto newParent = (int) nodes.size();
 	nodes.push_back({});
 	nodes[newParent].parentIndex = oldParent;
 	nodes[newParent].box = Union(aabb, nodes[best].box);
@@ -136,7 +135,17 @@ void InsertAABB(SlowBVH& bvh, AABB aabb)
 		nodes[newParent].child2 = newNode;
 		nodes[best].parentIndex = newParent;
 		nodes[newNode].parentIndex = newParent;
-	}	
+	}
+
+	int index = nodes[newNode].parentIndex;
+	while (index != -1)
+	{
+		int child1 = nodes[index].child1;
+		int child2 = nodes[index].child2;
+
+		nodes[index].box = Union(nodes[child1].box, nodes[child2].box);
+		index = nodes[index].parentIndex;
+	}
 }
 
 
@@ -303,6 +312,15 @@ struct FlatAABBs
 	
 };
 
+
+float RandomFloat(float a, float b) {
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return a + r;
+}
+
+
 int main()
 {
 	float3 min1{-10.0f, -10.0f, 10.0f};
@@ -331,13 +349,51 @@ int main()
 	AABB aabb5{min6, max6};
 
 	SlowBVH bvh;
-	bvh.Nodes.reserve(256);
 
-	InsertAABB(bvh, aabb1);
-	InsertAABB(bvh, aabb2);
-	InsertAABB(bvh, aabb3);
-	InsertAABB(bvh, aabb4);
-	InsertAABB(bvh, aabb5);
+	bvh.Nodes.reserve(4256);
+	std::vector<Node> stack;
+	stack.reserve(4256);
+
+
+	std::vector<AABB> aabbs;
+	
+	for (size_t i = 0; i < 256; ++i)
+	{
+		AABB aabb;
+
+		aabb.Min = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabb.Max = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabbs.push_back(aabb);		
+
+		aabb.Min = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabb.Max = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabbs.push_back(aabb);
+
+		aabb.Min = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabb.Max = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabbs.push_back(aabb);
+
+		aabb.Min = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabb.Max = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabbs.push_back(aabb);
+
+		aabb.Min = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabb.Max = float3(RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f), RandomFloat(-100.0f, 50.0f));
+		aabbs.push_back(aabb);
+		
+	}
+
+	std::chrono::steady_clock::time_point beginBuilding = std::chrono::steady_clock::now();
+
+	for (auto aabb : aabbs)
+	{
+		InsertAABB(bvh, aabb, stack);
+	}
+	
+	std::chrono::steady_clock::time_point endBuilding = std::chrono::steady_clock::now();
+
+
+	std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endBuilding - beginBuilding).count() / 1000.0f << "ms" << "\n";
 	
 	return 0;
 }

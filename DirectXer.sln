@@ -56,8 +56,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlatformWin32", "DirectXer\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Playground", "DirectXer\Playground.vcxproj", "{B5C7F2F9-C986-4998-BEAE-2DE61410DAD3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BVHVisualizer", "Tools\BVHVisualizer\BVHVisualizer.vcxproj", "{108FE76C-2C58-4367-A517-287ECDBD435E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		DirectXer\Core.vcxitems*{108fe76c-2c58-4367-a517-287ecdbd435e}*SharedItemsImports = 4
+		DirectXer\PlatformWin32.vcxitems*{108fe76c-2c58-4367-a517-287ecdbd435e}*SharedItemsImports = 4
+		DirectXer\ShadersD3D11.vcxitems*{108fe76c-2c58-4367-a517-287ecdbd435e}*SharedItemsImports = 4
 		DirectXer\Core.vcxitems*{32d63685-09ed-459e-a8ff-95501679056a}*SharedItemsImports = 4
 		DirectXer\PlatformWin32.vcxitems*{32d63685-09ed-459e-a8ff-95501679056a}*SharedItemsImports = 4
 		DirectXer\ShadersD3D11.vcxitems*{32d63685-09ed-459e-a8ff-95501679056a}*SharedItemsImports = 4
@@ -268,6 +273,18 @@ Global
 		{B5C7F2F9-C986-4998-BEAE-2DE61410DAD3}.Release|x64.Build.0 = Release|x64
 		{B5C7F2F9-C986-4998-BEAE-2DE61410DAD3}.Release|x86.ActiveCfg = Release|Win32
 		{B5C7F2F9-C986-4998-BEAE-2DE61410DAD3}.Release|x86.Build.0 = Release|Win32
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Debug|x64.ActiveCfg = Debug|x64
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Debug|x64.Build.0 = Debug|x64
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Debug|x86.ActiveCfg = Debug|Win32
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Debug|x86.Build.0 = Debug|Win32
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Profile|x64.ActiveCfg = Profile|x64
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Profile|x64.Build.0 = Profile|x64
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Profile|x86.ActiveCfg = Profile|Win32
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Profile|x86.Build.0 = Profile|Win32
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Release|x64.ActiveCfg = Release|x64
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Release|x64.Build.0 = Release|x64
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Release|x86.ActiveCfg = Release|Win32
+		{108FE76C-2C58-4367-A517-287ECDBD435E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -289,7 +306,8 @@ Global
 		{32D63685-09ED-459E-A8FF-95501679056A} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
 		{84ED5066-B3A1-46FA-8945-EFC477A708E4} = {2D254D02-9C89-4F3E-92AC-199D349BEBC9}
 		{536A196C-D3D2-4463-9699-50B09B2CEA1A} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
-		{B5C7F2F9-C986-4998-BEAE-2DE61410DAD3} = {C5EB2CD3-4D00-4E15-B575-38D18AF76860}
+		{B5C7F2F9-C986-4998-BEAE-2DE61410DAD3} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
+		{108FE76C-2C58-4367-A517-287ECDBD435E} = {01BEC4BF-0CFD-4BBA-90B9-02643AAD2EC3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6B8AD3D8-7C6D-400D-A86B-BEC34B5B7736}
