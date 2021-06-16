@@ -108,9 +108,6 @@ struct AssetBundlerContext
 	std::vector<FontLoadEntry> LoadFonts;
 
 	std::vector<MeshLoadEntry> LoadMeshes;
-
-	// @Note: The byte data of everything above
-	std::vector<unsigned char> Data;
 };
 
 struct AssetDataBlob

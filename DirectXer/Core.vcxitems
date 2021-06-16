@@ -20,6 +20,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Assets.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Audio.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\BVH.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\FontLibrary.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\GameDefinition.cpp" />

@@ -166,7 +166,7 @@ void Renderer3D::DrawDebugGeometry(uint32 id, float3 pos, float3 scale, glm::mat
 	Gfx->BindVertexBuffer(DebugGeometries.Vbo, 0, 0);
 	Gfx->BindIndexBuffer(DebugGeometries.Ibo);
 
-	Gfx->VertexShaderCB.model = init_identity() * rotation * init_translate(pos) * init_scale(scale);
+	Gfx->VertexShaderCB.model = init_identity() * rotation * init_scale(scale) * init_translate(pos);
 	Gfx->VertexShaderCB.invModel = glm::inverse(Gfx->VertexShaderCB.model);
 	Gfx->UpdateCBs();
 

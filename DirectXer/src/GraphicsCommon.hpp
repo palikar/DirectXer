@@ -96,6 +96,7 @@ enum RasterizationState : uint8
 	RS_NORMAL = 0,
 	RS_DEBUG,
 	RS_BACK,
+	RS_DEBUG_NOCULL,
 
 	RS_COUNT
 };

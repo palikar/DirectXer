@@ -15,6 +15,7 @@
 #include <Platform.hpp>
 #include <TextureCatalog.hpp>
 #include <2DRendering.hpp>
+#include <BVH.hpp>
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
@@ -51,6 +52,20 @@ struct Context
 
 	float T = 0.0f;
 	CameraControlState CameraState;
+
+	SlowBVH Bvh;
+
+	float3 MinBounds{-10.0f, -10.0f, -10.0f};
+	float3 MaxBounds{10.0f, 10.0f, 10.0f};
+	bool ShowBigBBox{true};
+
+	size_t SelectedLeaf{0};
+	int SelectedParent{0};
+
+	bool ShowAllBoxes{true};
+	
+	bool ShowSelectedLeaf{false};
+	bool ShowSelectedParent{false};
 };
 
 void Init(Context& context);

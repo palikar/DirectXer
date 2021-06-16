@@ -1,0 +1,10 @@
+{
+  "FileVersion": 2,
+  "Id": "d39df77f-24b0-44cc-ab02-d6a8e5d0ecf1",
+  "Items": [
+    {
+      "Id": "5c1b0e75-2755-48ed-ab02-ca460865ec6b",
+      "Command": "-r resources"
+    }
+  ]
+}

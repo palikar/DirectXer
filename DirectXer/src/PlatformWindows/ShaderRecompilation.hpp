@@ -22,8 +22,6 @@
 #include "PlatformWindows\IncludeWin.hpp"
 #include "PlatformWindows\GraphicsD3D11.hpp"
 
-
-
 struct ShaderReloadEntry
 {
 	ShaderFile ShaderProgram;
@@ -32,7 +30,6 @@ struct ShaderReloadEntry
 	ShaderFile PixelShadersDep[3]{SF_COUNT, SF_COUNT, SF_COUNT};
 	ShaderFile VertexShadersDep[3]{SF_COUNT, SF_COUNT, SF_COUNT};
 };
-
 
 inline const ShaderReloadEntry shaderEntries[]
 {
@@ -86,9 +83,7 @@ struct ShaderRecompilation
 				{
 					if (entry.VertexShadersDep[i] != SF_COUNT) Graphics->Shaders[entry.VertexShadersDep[i]].vs = shaderObject.vs;
 				}
-
-			}			
-
+			}
 			
 			if (entry.PSPath)
 			{
@@ -111,7 +106,6 @@ struct ShaderRecompilation
 				{
 					if (entry.PixelShadersDep[i] != SF_COUNT) Graphics->Shaders[entry.PixelShadersDep[i]].ps = shaderObject.ps;
 				}
-
 			}			
 
 			if (code) code->Release();

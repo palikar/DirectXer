@@ -190,8 +190,14 @@ void GraphicsD3D11::InitRasterizationsStates()
 	rastDesc.ScissorEnable  = false;
 	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &RasterizationsStates[RS_DEBUG]));
 
+	
+	rastDesc.CullMode = D3D11_CULL_NONE;
+	GFX_CALL(Device->CreateRasterizerState(&rastDesc, &RasterizationsStates[RS_DEBUG_NOCULL]));
+
+
 	SetDebugName(RasterizationsStates[RS_NORMAL], "Normal RS");
 	SetDebugName(RasterizationsStates[RS_DEBUG], "Debug RS");
+	SetDebugName(RasterizationsStates[RS_DEBUG_NOCULL], "Debug No Cull RS");
 }
 
 void GraphicsD3D11::InitSamplers()
@@ -900,7 +906,7 @@ void GraphicsD3D11::InitDepthStencilStates()
 		// 2D Rendering
 	
 		D3D11_DEPTH_STENCIL_DESC dsDesc{0};
-		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthEnable = TRUE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 
