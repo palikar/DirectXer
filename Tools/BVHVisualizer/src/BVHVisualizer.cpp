@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-static uint32 CUBE;
+static uint32 CUBE_RED;
 static uint32 CUBE_GREEN;
 static uint32 CUBE_BLUE;
 
@@ -31,7 +31,7 @@ void Init(Context& context)
 	{
 		DebugGeometryBuilder builder;
 		builder.Init(8);
-		CUBE = builder.InitCube(CubeGeometry{}, float3{ 1.0f, 0.0f, 0.0f });
+		CUBE_RED = builder.InitCube(CubeGeometry{}, float3{ 1.0f, 0.0f, 0.0f });
 		CUBE_GREEN = builder.InitCube(CubeGeometry{}, float3{ 0.0f, 1.0f, 0.0f });
 		CUBE_BLUE = builder.InitCube(CubeGeometry{}, float3{ 0.0f, 0.0f, 1.0f });
 
@@ -103,6 +103,7 @@ static void DisplayParentNode(Context& context, int parent)
 		| ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= (context.SelectedParent == parent ? ImGuiTreeNodeFlags_Selected : 0);
 
+	ImGui::SetNextItemOpen(context.OpenAllParents, ImGuiCond_None);
 	bool parentOpened = ImGui::TreeNodeEx((void*)(intptr_t)parent, flags, "Box %d", parent);
 	if (ImGui::IsItemClicked()) context.SelectedParent = parent;
 
@@ -138,9 +139,6 @@ void Update(Context& context, float dt)
 	Graphics->SetRasterizationState(RS_DEBUG_NOCULL);
 	Graphics->SetDepthStencilState(DSS_2DRendering);
 
-	// bounds min max -- fields that tell you how big\small the random boxes can be
-	// adding several boxes
-
 	// rebuilding the vbh
 
 	// rebuilding step by step -- separate list with aabbs that will be inserted into the tree
@@ -154,23 +152,32 @@ void Update(Context& context, float dt)
 
 	ImGui::Checkbox("Show MinMax Bound", &context.ShowBigBBox);
 
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
 	if (ImGui::Button("Add Random AABB"))
 	{
-		AABB aabb;
-		aabb.Min = float3(RandomFloat(context.MinBounds.x, context.MaxBounds.x),
-						  RandomFloat(context.MinBounds.y, context.MaxBounds.y),
-						  RandomFloat(context.MinBounds.z, context.MaxBounds.z));
+		for (size_t i = 0; i < context.BoxesToAdd; ++i)
+		{
+			AABB aabb;
+			aabb.Min = float3(RandomFloat(context.MinBounds.x, context.MaxBounds.x),
+							  RandomFloat(context.MinBounds.y, context.MaxBounds.y),
+							  RandomFloat(context.MinBounds.z, context.MaxBounds.z));
 
-		aabb.Max = float3(RandomFloat(context.MinBounds.x, context.MaxBounds.x),
-						  RandomFloat(context.MinBounds.y, context.MaxBounds.y),
-						  RandomFloat(context.MinBounds.z, context.MaxBounds.z));
+			aabb.Max = float3(RandomFloat(context.MinBounds.x, context.MaxBounds.x),
+							  RandomFloat(context.MinBounds.y, context.MaxBounds.y),
+							  RandomFloat(context.MinBounds.z, context.MaxBounds.z));
 
-		InsertAABB(context.Bvh, aabb);
+			InsertAABB(context.Bvh, aabb);
+		}
 	}
+	ImGui::SameLine();
+	ImGui::InputInt("Num Boxes:", &context.BoxesToAdd, 1, 5);
+	ImGui::PopItemWidth();
+
 
 	ImGui::Separator();
 
 	ImGui::Checkbox("Show All", &context.ShowAllBoxes);
+	ImGui::Checkbox("Open all parents", &context.OpenAllParents);
 	
 	if (context.ShowSelectedLeaf = ImGui::TreeNode("Leaf Nodes"); context.ShowSelectedLeaf)
 	{
@@ -202,7 +209,7 @@ void Update(Context& context, float dt)
 	{
 		for (auto& node : context.Bvh.Nodes)
 		{
-			DrawAABB(Renderer3D, node.box, CUBE);
+			DrawAABB(Renderer3D, node.box, CUBE_RED);
 		}
 	}
 
@@ -212,7 +219,7 @@ void Update(Context& context, float dt)
 	{
 		auto parent = context.Bvh.Nodes[context.SelectedParent];
 		
-		if (parent.child1 != -1) DrawAABB(Renderer3D, context.Bvh.Nodes[parent.child1].box, CUBE_GREEN);
+		if (parent.child1 != -1) DrawAABB(Renderer3D, context.Bvh.Nodes[parent.child1].box, CUBE_RED);
 		if (parent.child2 != -1) DrawAABB(Renderer3D, context.Bvh.Nodes[parent.child2].box, CUBE_GREEN);
 		
 		DrawAABB(Renderer3D, parent.box, CUBE_BLUE);

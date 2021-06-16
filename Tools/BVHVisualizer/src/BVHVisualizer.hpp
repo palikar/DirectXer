@@ -55,6 +55,7 @@ struct Context
 
 	SlowBVH Bvh;
 
+	int BoxesToAdd{1};
 	float3 MinBounds{-10.0f, -10.0f, -10.0f};
 	float3 MaxBounds{10.0f, 10.0f, 10.0f};
 	bool ShowBigBBox{true};
@@ -66,6 +67,8 @@ struct Context
 	
 	bool ShowSelectedLeaf{false};
 	bool ShowSelectedParent{false};
+
+	bool OpenAllParents{false};
 };
 
 void Init(Context& context);
