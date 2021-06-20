@@ -35,6 +35,7 @@ inline const ShaderReloadEntry shaderEntries[]
 {
 	{SF_DEBUG	, L"DirectXer//Shaders//VertexShader.hlsl",             L"DirectXer//Shaders//PixelShader.hlsl"},
 	{SF_2D		, L"DirectXer//Shaders//2DVertexShader.hlsl",           L"DirectXer//Shaders//2DPixelShader.hlsl"},
+	{SF_3D		, L"DirectXer//Shaders//3DVertexShader.hlsl",           L"DirectXer//Shaders//3DPixelShader.hlsl"},
 	{SF_QUAD	, L"DirectXer//Shaders//QuadVertexShader.hlsl",         L"DirectXer//Shaders//QuadPixelShader.hlsl"},
 	{SF_MTL		, L"DirectXer//Shaders//MTLVertexShader.hlsl",          L"DirectXer//Shaders//MTLPixelShader.hlsl",
 		{SF_MTLInst, SF_COUNT, SF_COUNT}},

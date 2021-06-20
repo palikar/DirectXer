@@ -55,6 +55,8 @@ struct Context
 
 	SlowBVH Bvh;
 
+	FlatAABBs AABBList;
+
 	int BoxesToAdd{1};
 	float3 MinBounds{-10.0f, -10.0f, -10.0f};
 	float3 MaxBounds{10.0f, 10.0f, 10.0f};

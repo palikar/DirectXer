@@ -323,7 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 							 nullptr, nullptr, GetModuleHandleA(NULL), &context);
 
 	DragAcceptFiles(context.hWnd, TRUE);
-	ShowWindow(context.hWnd, SW_SHOW);
+	ShowWindow(context.hWnd, SW_MAXIMIZE);
 	
 	Init(context);
 

@@ -5,6 +5,9 @@
 #include <2DVertexShader.hpp>
 #include <2DPixelShader.hpp>
 
+#include <3DVertexShader.hpp>
+#include <3DPixelShader.hpp>
+
 #include <PixelShader.hpp>
 #include <VertexShader.hpp>
 
@@ -749,6 +752,24 @@ void GraphicsD3D11::InitResources()
 		SetDebugName(shaderObject.vs, "2DVertexShader");
 		SetDebugName(shaderObject.il, "Vertex2D");
 		
+	}
+
+	{
+		// 3D shader
+		const D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
+			{"Position", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"Color", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT , D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+		
+		ShaderObject shaderObject;
+		GFX_CALL(Device->CreatePixelShader(g_3DPixelShader, Size(g_3DPixelShader), nullptr, &shaderObject.ps));
+		GFX_CALL(Device->CreateVertexShader(g_3DVertexShader, Size(g_3DVertexShader), nullptr, &shaderObject.vs));
+		GFX_CALL(Device->CreateInputLayout(layoutDesc, (uint32)std::size(layoutDesc), g_3DVertexShader, Size(g_3DVertexShader), &shaderObject.il));
+		Shaders[SF_3D] = shaderObject;
+
+		SetDebugName(shaderObject.ps, "3DPixelShader");
+		SetDebugName(shaderObject.vs, "3DVertexShader");
+		SetDebugName(shaderObject.il, "Vertex3D");		
 	}
 
 	{

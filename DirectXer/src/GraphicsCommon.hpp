@@ -59,6 +59,12 @@ struct Vertex2D
 	uint32 type;
 };
 
+struct Vertex3D
+{
+	glm::vec4 pos;
+	glm::vec4 color;
+};
+
 enum TopolgyType : uint8
 {
 	TT_TRIANGLES = 0,
@@ -105,6 +111,7 @@ enum ShaderFile : uint8
 {
 	SF_DEBUG   = 0,
 	SF_2D      = 1,
+	SF_3D      = 1,
 	SF_QUAD    = 2,
 	SF_MTL     = 3,
 	SF_MTLInst = 4,
@@ -131,6 +138,8 @@ enum ShaderType : uint8
 	ST_2_MTL       = 9,
 
 	DEBUG_COLOR    = 10,
+
+	ST_LINES       = 11,
 	
 	ST_COUNT
 };
@@ -159,6 +168,8 @@ enum ShaderConfiguration
 	SC_TEX   			 = SF_TEX		| (ST_TEX			<< 8),
 
 	SC_COLOR        	 = SF_DEBUG		| (DEBUG_COLOR		<< 8),
+
+	SC_3D_LINES        	 = SF_3D		| (ST_LINES 		<< 8),
 	
 	SC_COUNT
 };

@@ -71,6 +71,14 @@ class Renderer3D
 
 	ConstantBufferId DebugCBId;
 
+	BulkVector<Vertex3D, Memory_2DRendering> Vertices;
+    BulkVector<uint32, Memory_2DRendering> Indices;
+    VertexBufferId vbo;
+    IndexBufferId ibo;
+
+	Vertex3D* CurrentVertex;
+    uint32 CurrentVertexCount;
+
   public:
 
 	void InitRenderer(Graphics* t_Graphics);
@@ -112,4 +120,8 @@ class Renderer3D
 	void DrawDebugGeometry(uint32 id, float3 pos = {}, float3 scale = {}, glm::mat4 rotation = glm::mat4(1));
 	void DrawSelectedDebugGeometry(uint32 id, float3 pos = {}, float3 scale = {}, glm::mat4 rotation = glm::mat4(1));
 	void DrawSkyBox(TextureId sky);
+
+	void BeginLines();
+	void DrawLine(float3 from, float3 to, float4 color);
+	void EndLines();
 };

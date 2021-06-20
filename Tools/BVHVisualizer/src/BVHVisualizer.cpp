@@ -103,7 +103,7 @@ static void DisplayParentNode(Context& context, int parent)
 		| ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= (context.SelectedParent == parent ? ImGuiTreeNodeFlags_Selected : 0);
 
-	ImGui::SetNextItemOpen(context.OpenAllParents, ImGuiCond_None);
+	if (context.OpenAllParents) ImGui::SetNextItemOpen(context.OpenAllParents, ImGuiCond_Always);
 	bool parentOpened = ImGui::TreeNodeEx((void*)(intptr_t)parent, flags, "Box %d", parent);
 	if (ImGui::IsItemClicked()) context.SelectedParent = parent;
 
@@ -138,11 +138,7 @@ void Update(Context& context, float dt)
 
 	Graphics->SetRasterizationState(RS_DEBUG_NOCULL);
 	Graphics->SetDepthStencilState(DSS_2DRendering);
-
-	// rebuilding the vbh
-
-	// rebuilding step by step -- separate list with aabbs that will be inserted into the tree
-
+	
 	// shooting rays
 	ImGui::Begin("BVH Visualizer");
 
@@ -173,11 +169,12 @@ void Update(Context& context, float dt)
 	ImGui::InputInt("Num Boxes:", &context.BoxesToAdd, 1, 5);
 	ImGui::PopItemWidth();
 
-
 	ImGui::Separator();
 
 	ImGui::Checkbox("Show All", &context.ShowAllBoxes);
-	ImGui::Checkbox("Open all parents", &context.OpenAllParents);
+	if (ImGui::Button("Open all parents")) context.OpenAllParents = true;
+	ImGui::SameLine();
+	if (ImGui::Button("Close all parents")) context.OpenAllParents = false;
 	
 	if (context.ShowSelectedLeaf = ImGui::TreeNode("Leaf Nodes"); context.ShowSelectedLeaf)
 	{
@@ -199,8 +196,23 @@ void Update(Context& context, float dt)
 
 	if (context.ShowSelectedParent = ImGui::TreeNode("Parent Nodes"); context.ShowSelectedParent)
 	{
-		DisplayParentNode(context, context.Bvh.RootIndex);
+		if (context.Bvh.RootIndex != -1) DisplayParentNode(context, context.Bvh.RootIndex);
 		ImGui::TreePop();
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::Button("Generate Linear AABB list"))
+	{
+		uint32 index = 0;
+
+		for (auto& node : context.Bvh.Nodes)
+		{
+			++index;
+			if (node.child1 != -1 && node.child2 != -1) continue;
+			context.AABBList.AddBox(node.box.Min, node.box.Max, index);
+		}
+		
 	}
 
 	ImGui::End();
@@ -229,6 +241,11 @@ void Update(Context& context, float dt)
 	Graphics->SetDepthStencilState(DSS_Normal);
 	Graphics->SetRasterizationState(RS_NORMAL);	
 
+	context.Renderer3D.BeginLines();
+
+	context.Renderer3D.DrawLine({0.0f, 0.0f, 0.0f}, {5.0f, 5.0f, 5.0f}, Color::Magenta);
+	
+	context.Renderer3D.EndLines();
 	
 	context.Renderer3D.DrawSkyBox(context.Textures.LoadedCubes[0].Handle);
 }

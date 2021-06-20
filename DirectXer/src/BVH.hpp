@@ -26,7 +26,7 @@ struct BVHNode
 struct SlowBVH
 {
 	BulkVector<BVHNode> Nodes;
-	int RootIndex;
+	int RootIndex{-1};
 };
 
 struct Node
@@ -48,9 +48,9 @@ struct alignas(16) AABBNode
 struct FlatAABBs
 {
 	AABBNode BVH[64];
-	float3 Origin;
-	uint16 CurrentBox;
-	uint16 CurrentNode;
+	float3 Origin{0};
+	uint16 CurrentBox{0};
+	uint16 CurrentNode{0};
 
 	static inline const float MAX = 250.0f;
 	static inline const float MIN = -250.0f;

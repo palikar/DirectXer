@@ -27,6 +27,14 @@ void Renderer3D::InitRenderer(Graphics* t_Graphics)
 	DebugCBId = NextConstantBufferId();
 	Gfx->CreateConstantBuffer(DebugCBId, sizeof(DebugCB), nullptr);
 	Gfx->SetConstantBufferName(DebugCBId, "Debug Data CB");
+
+	vbo = NextVertexBufferId();
+	Gfx->CreateVertexBuffer(vbo, sizeof(Vertex3D), nullptr, (uint32)(sizeof(Vertex3D) * 1024), true);
+	Gfx->SetVertexBufferName(vbo, "Render3D Main VB");
+	
+	ibo = NextIndexBufferId();
+	Gfx->CreateIndexBuffer(ibo , nullptr, (uint32)(sizeof(uint32) * 1024 * 3), true);
+	Gfx->SetIndexBufferName(ibo, "Render3D Main IB");
 }
 
 void Renderer3D::InitLighting()
@@ -247,5 +255,43 @@ void Renderer3D::BeginScene(ShaderConfiguration config)
 
 void Renderer3D::EndScene()
 {
+}
 
+void Renderer3D::BeginLines()
+{
+	Indices.clear();
+	Vertices.clear();
+	Vertices.resize(1024);
+
+	CurrentVertexCount = 0;
+	CurrentVertex = &Vertices[0];
+}
+
+void Renderer3D::DrawLine(float3 from, float3 to, float4 color)
+{
+	CurrentVertex->pos = float4{ from , 1.0f};
+	CurrentVertex->color = color;
+	++CurrentVertex;
+
+	CurrentVertex->pos = float4{ to , 1.0f };
+	CurrentVertex->color = color;
+	++CurrentVertex;
+
+	Indices.insert(Indices.end(), { CurrentVertexCount , CurrentVertexCount + 1 });
+
+	CurrentVertexCount += 2;
+}
+
+void Renderer3D::EndLines()
+{
+	UpdateCamera();
+	Gfx->VertexShaderCB.model = glm::mat4(1.0f);
+	Gfx->SetShaderConfiguration(SC_3D_LINES);
+	Gfx->BindIndexBuffer(ibo);
+	Gfx->BindVertexBuffer(vbo, 0, 0);
+
+	Gfx->UpdateVertexBuffer(vbo, Vertices.data(), CurrentVertexCount * sizeof(Vertex3D));
+	Gfx->UpdateIndexBuffer(ibo, Indices.data(), 3u * CurrentVertexCount * sizeof(uint32));
+	Gfx->UpdateCBs();
+	Gfx->DrawIndexed(TT_LINES, (uint32)Indices.size(), 0u, 0u);
 }

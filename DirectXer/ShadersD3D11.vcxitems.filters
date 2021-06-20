@@ -13,6 +13,8 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\QuadVertexShader.hlsl" />
     <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\TexPixelShader.hlsl" />
     <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\VertexShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\3DPixelShader.hlsl" />
+    <FxCompile Include="$(MSBuildThisFileDirectory)Shaders\3DVertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Shaders\MTLCommon.ihlsl" />
